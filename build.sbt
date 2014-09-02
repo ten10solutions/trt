@@ -4,9 +4,11 @@ import PlayKeys._
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-name := "test-result-reports"
+name := "trt"
 
-version := "0.0.1-SNAPSHOT"
+organization := "com.thetestpeople"
+
+version := "0.1.0"
 
 scalacOptions ++= List("-deprecation", "-feature")
 
@@ -64,10 +66,10 @@ resourceDirectory in Test <<= baseDirectory(_ / "testResources")
 testOptions in Test := Seq(Tests.Argument(TestFrameworks.JUnit, "--ignore-runners=org.scalatest.junit.JUnitRunner")) 
 
 // Debian packaging support:
-packageArchetype.java_server
+// packageArchetype.java_server
 
-packageDescription := "Analysis and reporting of automated test results"
+// packageDescription := "Analysis and reporting of automated test results"
 
-packageSummary := "Analysis and reporting of automated test results"
+// packageSummary := "Analysis and reporting of automated test results"
 
-maintainer in Debian := "Matt Russell <MattRussellUK@gmail.com>"
+// maintainer in Debian := "Matt Russell <MattRussellUK@gmail.com>"
