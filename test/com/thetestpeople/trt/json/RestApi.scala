@@ -1,16 +1,13 @@
-package com.thetestpeople.trt.webdriver.screens
+package com.thetestpeople.trt.json
 
 import java.net.URI
-
 import scala.concurrent.Await
 import scala.concurrent.duration._
-
 import com.thetestpeople.trt.json.JsonSerializers.idFormat
 import com.thetestpeople.trt.json.JsonSerializers._
 import com.thetestpeople.trt.model._
 import com.thetestpeople.trt.service.Incoming
 import com.thetestpeople.trt.utils.UriUtils._
-
 import play.api.Play.current
 import play.api.libs.json.Json
 import play.api.libs.ws.WS
