@@ -1,0 +1,198 @@
+@(
+  testsSummary: TestsSummaryView, 
+  tests: List[TestView], 
+  configuration: Configuration, 
+  testStatusOpt: Option[TestStatus], 
+  groupOpt: Option[String], 
+  canRerun: Boolean, 
+  pagination: PaginationData,
+  historicalTestCountsTimelineOpt: Option[HistoricalTestCountsTimelineView])(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
+
+@scripts = {
+  <script src="@routes.Assets.at("javascripts/tests.js")"></script>
+  <script src="@routes.Assets.at("javascripts/pass-fail-pie-chart.js")"></script>
+  <script src="@routes.Assets.at("javascripts/history-chart.js")"></script>
+}
+
+@css = {
+  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/tests.css")">
+}
+
+@testsPaginationWidget = { 
+  @paginationWidget(pagination)((page, pageSize) => 
+    routes.Application.tests(
+      configuration = Some(configuration), 
+      status = testStatusOpt, 
+      group = groupOpt, 
+      page = Some(page), 
+      pageSize = Some(pageSize))) 
+}
+
+@main("Tests", "Tests", scripts = scripts, css = css) {
+
+  <h2><img src="@routes.Assets.at("images/" + testsSummary.ballIcon)"/> Tests</h2>
+  
+    <div class="row">
+    <div class="col-md-9">
+      <table style="margin-top: 15px" class="table table-striped table-bordered table-hover">
+        <tr>
+          <td>Configuration</td>
+          <td><a href="@routes.Application.tests(configuration = Some(configuration))">@configuration</a></td>
+        </tr>
+        <!-- http://jsfiddle.net/7zkCU/14/ -->
+        @for(group <- groupOpt) {
+          <tr>
+          <td>Group</td>
+          <td>
+            <span class="tag label label-info" style="margin-bottom: 0px">
+              <span>@group</span>
+              <a href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, group = None)" style="opacity: 0.6;" title="Remove filter by group">
+                <i class="remove glyphicon glyphicon-remove-sign glyphicon-white"></i>
+              </a> 
+            </span>
+          </td>
+          </tr>
+        }
+        @if(testsSummary.passCount > 0){
+          <tr>
+            <td>Passed</td>       
+            <td><a href="@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Pass), group = groupOpt)"><span class="badge badge-success">@testsSummary.passCount</span></a></td>
+          </tr>
+        }
+        @if(testsSummary.warnCount > 0){
+          <tr>          
+            <td>Warning</td>
+            <td><a href="@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Warn), group = groupOpt)"><span class="badge badge-warning">@testsSummary.warnCount</span></a></td>
+          </tr>
+        }
+        @if(testsSummary.failCount > 0){
+          <tr>
+            <td>Failed</td>
+            <td><a href="@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Fail), group = groupOpt)"><span class="badge badge-error">@testsSummary.failCount</span></a></td>
+          </tr>
+        }
+        <tr>
+          <td style="width: 100px;">Total</td>
+          <td><a href="@routes.Application.tests(configuration = Some(configuration), group = groupOpt)"><span class="badge badge-inverse">@testsSummary.totalCount</span></a></td>
+        </tr>
+      </table>
+    </div> <!-- col -->
+    <div class="col-md-3">
+      <div id="pie-chart" style="margin-top: 6px; width: 200px; height: 200px"></div>
+      <script>
+        $(document).ready(function(){
+          createPieChart("pie-chart",
+            {
+              pass: @testsSummary.passCount,
+              warn: @testsSummary.warnCount,
+              fail: @testsSummary.failCount,
+            },
+            {
+              pass: "@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Pass), group = groupOpt)",
+              warn: "@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Warn), group = groupOpt)",
+              fail: "@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Fail), group = groupOpt)",
+            }
+          );
+        });
+      </script>
+    </div> <!-- col -->
+  </div> <!-- row -->
+  @*  	     
+  @for(historicalTestCounts <- historicalTestCountsOpt) {
+     <div align="center"><div id="history-chart" style="width: 1024px; height: 180px"></div></div>
+      <script>
+         $(document).ready(function(){
+           var passes = [
+             @for((time, count) <- historicalTestCounts.passes if count > 0) {
+               [ new Date(@time), @count ],
+             }
+           ];
+           var warnings = [
+             @for((time, count) <- historicalTestCounts.warnings if count > 0) {
+               [ new Date(@time), @count ],
+             }
+           ];
+           var fails = [
+             @for((time, count) <- historicalTestCounts.failures if count > 0) {
+               [ new Date(@time), @count ],
+             }
+           ];
+           createHistoryChart("history-chart", passes, warnings, fails);
+         });
+      </script>
+  }*@
+  
+  @if(canRerun) {
+    <button style="margin-bottom: 12px" id="rerunSelected" type="button" class="btn btn-default" title="Rerun selected tests on Jenkins" onclick="rerunSelected('@routes.JenkinsController.rerunSelectedTests()')"><i class="glyphicon glyphicon-refresh"></i> Rerun Selected</button>
+  }
+  <div style="clear: both;"></div>
+
+  @testsPaginationWidget
+  
+  @*  
+  <form>
+    <select name="pageSize" id="page-size-select" class="form-control">
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="50">50</option>
+    </select>
+  </form>
+  *@
+  
+  <ul class="nav nav-tabs">
+    <li @if(testStatusOpt.isEmpty){ class="active" }>
+      <a href="@routes.Application.tests(configuration = Some(configuration), group = groupOpt)">All</a>
+    </li>
+    @if(testsSummary.passCount > 0) {
+      <li @if(testStatusOpt == Some(TestStatus.Pass)){ class="active" }>
+        <a href="@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Pass), group = groupOpt)">Pass<br/></a>
+      </li>
+    }
+    @if(testsSummary.warnCount > 0) {
+      <li @if(testStatusOpt == Some(TestStatus.Warn)){ class="active" }>
+        <a href="@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Warn), group = groupOpt)">Warn<br/></a>
+      </li>
+    }
+    @if(testsSummary.failCount > 0) {
+      <li @if(testStatusOpt == Some(TestStatus.Fail)){ class="active" }>
+        <a href="@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Fail), group = groupOpt)">Fail</a>
+      </li>
+    }
+  </ul>
+
+  <form style="margin-bottom: 0px; display: inline" id="testActionForm" action="nope" method="post">
+    <input type="hidden" name="previousURL" value="@request.uri"/>
+    <table class="table table-striped table-bordered table-hover table-condensed">
+      <thead>
+        <tr>
+          <th style="text-align: center"><input class="testCheckbox" id="selectAll" type="checkbox" title="Select all"/></th>
+          <th class="pass-fail-col">Status</th>
+          <th class="pass-fail-col">Weather</th>
+          <th class="group-col">Group</th>
+          <th class="name-col">Name</th>
+          <th class="consecutive-failures-col">Consecutive failures</th>
+          <th class="failing-since-col">Started failing</th>
+          <th class="last-passfail-col">Last passed</th>
+          <th class="last-passfail-col">Last failed</th>
+      </thead>
+      <tbody>
+        @for(test <- tests) {
+          <tr>
+            <td style="text-align: center; width: 50px"><input class="testCheckbox" type="checkbox" name="selectedTest" value="@test.id"/></td>
+            <td class="pass-fail-cell">@for(icon <- test.ballIconOpt){<a href="@routes.Application.test(test.id, configuration = Some(configuration))"><img src="@routes.Assets.at("images/" + icon)"/></a>}</td>
+            <td class="pass-fail-cell">@for(weatherIcon <- test.weatherIconOpt){<img src="@routes.Assets.at("images/" + weatherIcon)"/>}</td>
+            <td class="center-vert">@for(group <- test.groupOpt) {<a href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, group = Some(group.full))"><span title="@group.full">@group.abbreviate(maxLength = 35)</span></a>}</td>
+            <td class="center-vert"><a href="@routes.Application.test(test.id, configuration = Some(configuration))" title="@test.name.full">@test.name.abbreviate(maxLength = 40)</a></td>
+            <td class="consecutive-failures-cell">@for(consecutiveFailures <- test.consecutiveFailuresOpt){@consecutiveFailures}</td>
+            <td class="failing-since-cell">@for(failingSince <- test.failingSinceOpt){<span title="@failingSince.absolute">@failingSince.relative</span>}</td>
+            <td class="last-passfail-cell">@for((executionId, time) <- test.lastPassedExecutionOpt){<a href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a>}</td>
+            <td class="last-passfail-cell">@for((executionId, time) <- test.lastFailedExecutionOpt){<a href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a>}</td>
+          </tr>
+        }
+      <tbody>
+    </table>
+  </form>
+
+  @testsPaginationWidget
+
+}

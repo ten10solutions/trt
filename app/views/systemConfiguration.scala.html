@@ -1,0 +1,43 @@
+@(confForm: Form[SystemConfiguration])(implicit flash: Flash, globalViewContext: GlobalViewContext)
+
+@import BootstrapHelpers._
+
+@main("System Configuration", "System Configuration") {
+  
+  <h2>System Configuration</h2>
+
+  @helper.form(routes.Application.updateSystemConfiguration(), 'role -> "form") {
+    
+    @helper.inputText(confForm("failureDurationThreshold"), 
+      'class -> "form-control",
+      'placeholder -> "Failure duration threshold",
+	    '_label -> "Failure duration threshold",
+	    '_help -> "How long a test must have been failing before it is classified as failing, rather than a warning (e.g. 6 hours, 1 day, etc.)")
+    
+    @helper.inputText(confForm("failureCountThreshold"), 
+      'class -> "form-control",
+      'placeholder -> "Failure count threshold",
+	    '_label -> "Failure count threshold",
+      '_help -> "Number of consecutive failures required before a test is classed as failing, rather than a warning")
+        
+    @helper.inputText(confForm("passDurationThreshold"), 
+      'class -> "form-control",
+      'placeholder -> "Pass duration threshold",
+	    '_label -> "Pass duration threshold", 
+      '_help -> "How long a test must have been passing before it is classified as passing, rather than a warning (e.g. 6 hours, 1 day, etc.)")
+    
+    @helper.inputText(confForm("passCountThreshold"), 
+      'class -> "form-control",
+      'placeholder -> "Pass count threshold",
+	    '_label -> "Pass count threshold", 
+      '_help -> "Number of consecutive passes required before a test is classed as passing, rather than a warning")
+        
+    <div class="form-actions">
+      <button id="update" type="submit" class="btn btn-primary">Update</button>
+      <a id="cancel" href="@routes.Application.index" class="btn btn-default" role="button">Cancel</a>
+    </div>
+	
+  }
+
+  
+}

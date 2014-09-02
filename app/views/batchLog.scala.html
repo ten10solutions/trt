@@ -1,0 +1,14 @@
+@(batch: BatchView, log: String)(implicit flash: Flash, globalViewContext: GlobalViewContext)
+
+@main("Batch Log", "BatchLog") {
+
+  <ol class="breadcrumb">
+    <li><a href="@routes.Application.batch(batch.id)">@batch.nameOpt.getOrElse("Batch")</a></li>
+    <li class="active">Log</li>
+  </ol>
+
+  <h2><img src="@routes.Assets.at("images/" + batch.passFailBallIcon)" alt="@batch.passFailText" title="@batch.passFailText"/> Batch Log</h2>
+  
+  <pre id="log">@log</pre>
+
+}

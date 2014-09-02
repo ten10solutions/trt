@@ -1,0 +1,125 @@
+@(batch: BatchView, passedFilterOpt: Option[Boolean], canRerun: Boolean, pagination: PaginationData)(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
+
+@scripts = {
+  <script src="@routes.Assets.at("javascripts/batch.js")"></script>
+  <script src="@routes.Assets.at("javascripts/batch-chart.js")"></script>
+}
+
+
+@css = {
+  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/batch.css")">
+}
+
+
+@executionsPaginationWidget = { 
+  @paginationWidget(pagination)((page, pageSize) => 
+    routes.Application.batch(batch.id, passed = passedFilterOpt, page = Some(page), pageSize = Some(pageSize))) 
+}
+
+@main("Batch", "Batch", scripts = scripts, css = css) {
+
+  <h2><img src="@routes.Assets.at("images/" + batch.passFailBallIcon)" alt="@batch.passFailText" title="@batch.passFailText"/> Batch</h2>
+  
+  <div class="row">
+    <div class="col-md-9">
+      <table class="table table-striped table-bordered table-hover">
+        @for(name <- batch.nameOpt) {
+          <tr><td>Name</td><td id="batch-name">@name</td></tr>
+        }  
+        @for(url <- batch.urlOpt) {
+          <tr><td>URL</td><td><a href="@url" id="batch-url">@url</a></td></tr>
+        }  
+        <tr><td>Date</td><td>@batch.executionTime.absolute (@batch.executionTime.relative)</span></td></tr>
+        @for(duration <- batch.durationOpt) {
+          <tr><td>Duration</td><td>@duration</td></tr>
+        }
+        <tr>
+          <td>Counts</td>
+          <td>@if(batch.passCount > 0){<a href="@routes.Application.batch(batch.id, passed = Some(true))"><span class="badge badge-success">@batch.passCount</span> passed</a>  }@if(batch.failCount > 0){<a href="@routes.Application.batch(batch.id, passed = Some(false))"><span class="badge badge-error">@batch.failCount</span> failed</a> }<a href="@routes.Application.batch(batch.id)"><span class="badge badge-inverse">@batch.totalCount</span> total</a></td>
+        </tr>     
+        @if(batch.hasLog) {
+          <tr>
+          <td>Log</td>
+          <td><a href="@routes.Application.batchLog(batch.id)" id="batch-log-link">View</a></td>
+          </tr>
+        }
+
+      </table>
+      @if(canRerun) {
+        <button style="margin-bottom: 12px" id="rerunSelected" type="button" class="btn btn-default" title="Rerun selected tests on Jenkins" onclick="rerunSelected('@routes.JenkinsController.rerunSelectedTests()')"><i class="glyphicon glyphicon-refresh"></i> Rerun Selected</button>
+      }
+    </div>
+    <div class="col-md-3">
+    
+      <div id="pie-chart" style="width: 200px; height: 200px"></div>
+      <script>
+        $(document).ready(function() {
+          createPieChart(
+            {
+              pass: @batch.passCount,
+              fail: @batch.failCount,
+            },
+            {
+              pass: "@routes.Application.batch(batch.id, passed = Some(true))",
+              fail: "@routes.Application.batch(batch.id, passed = Some(false))",
+            }
+          );
+        });
+      </script>
+
+    </div>
+  </div>
+  
+  <h3>Test Executions</h3>
+  
+  @executionsPaginationWidget
+   
+  <ul class="nav nav-tabs">
+    <li @if(passedFilterOpt.isEmpty){ class="active" }>
+      <a href="@routes.Application.batch(batch.id)">All</a>
+    </li>
+    @if(batch.passCount > 0) {
+      <li @if(passedFilterOpt == Some(true)){ class="active" }>
+        <a href="@routes.Application.batch(batch.id, passed = Some(true))">Pass</a>
+      </li>
+    }
+    @if(batch.failCount > 0) {
+      <li @if(passedFilterOpt == Some(false)){ class="active" }>
+        <a href="@routes.Application.batch(batch.id, passed = Some(false))">Fail</a>
+      </li>
+    }
+  </ul>
+
+  <form style="margin-bottom: 0px; display: inline" id="executionActionForm" action="nope" method="post">
+    <input type="hidden" name="previousURL" value="@request.uri"/>
+    <table class="table table-striped table-bordered table-hover table-condensed">
+      <thead>
+        <tr>
+          <th style="text-align: center"><input class="executionCheckbox" id="selectAll" type="checkbox"/></th>     
+          <th class="pass-fail-col"></th>
+          <th>Group</th>
+          <th>Name</th>
+          <th>Summary</th>
+          <th class="duration-col">Duration</th>
+          <th class="execution-links-col">Execution</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for(execution <- batch.executions.drop(pagination.startFrom).take(pagination.pageSize)) {
+          <tr class="execution-row">
+            <td style="text-align: center; width: 50px"><input class="executionCheckbox" type="checkbox" name="selectedTest" value="@execution.testId"/></td>
+            <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.Application.execution(execution.id)"><img src="@routes.Assets.at("images/" + execution.passFailBallIcon)" alt="@execution.passFailText" title="@execution.passFailText"/></a></td>
+            <td class="center-vert">@for(group <- execution.groupOpt) { <a href="@routes.Application.tests(group = Some(group.full), configuration = Some(execution.configuration))"><span class="execution-group" title="@group.full">@group.abbreviate(maxLength = 35)</span></a> }</td>
+            <td class="center-vert"><a href="@routes.Application.test(execution.testId, configuration = Some(execution.configuration))" class="execution-name" title="@execution.name.full">@execution.name.abbreviate(maxLength = 40)</a></td>
+            <td class="center-vert">@for(summary <- execution.summaryOpt){ <span class="execution-summary" title="@summary.full">@summary.abbreviated</span> }</td>
+            <td class="duration-cell">@for(duration <- execution.durationOpt) { @duration }</td>
+            <td class="execution-links-cell"><a class="execution-link" href="@routes.Application.execution(execution.id)">Execution</a></td>
+          </tr>
+        }
+      <tbody>
+    </table>
+  </form>
+  
+  @executionsPaginationWidget
+  
+}

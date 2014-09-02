@@ -1,0 +1,74 @@
+@(
+  executions: List[ExecutionView], 
+  totalExecutionsCount: Int, 
+  configurationOpt: Option[Configuration], 
+  pagination: PaginationData)(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
+
+@executionsPaginationWidget = { 
+  @paginationWidget(pagination)((page, pageSize) => 
+    routes.Application.executions(configuration = configurationOpt, page = Some(page), pageSize = Some(pageSize))) 
+}
+
+@scripts = {
+  <script src="@routes.Assets.at("javascripts/executions.js")"></script>
+}
+
+@main("Executions", "Executions", scripts = scripts) {
+
+  <h2>Executions</h2>
+
+   <table style="margin-top: 7px;" class="table table-striped table-bordered table-hover">
+     <tr>
+       <td style="width: 220px">Number of executions recorded</td>
+       <td>@totalExecutionsCount</td>
+     </tr>
+   </table>
+   <form id="filter-form" role="form" method="get" action="@routes.Application.executions()">
+     <div class="form-group">
+       <label for="configuration-select">Configuration</label>
+       <select name="configuration" id="configuration-select" class="form-control">
+         <option value="">All</option>
+         @for(configuration <- globalViewContext.configurations) {
+           <option value="@configuration" @if(Some(configuration) == configurationOpt){selected}>@configuration</option>
+         }
+       </select>
+     </div>
+     <button id="filter-executions" type="submit" class="btn btn-default">Filter Executions</button>
+   </form>
+
+  @executionsPaginationWidget
+    
+  <table id="executionsTable" class="table table-striped table-bordered table-hover">
+    <thead>
+      <tr>
+        <th class="pass-fail-col"></th>
+        <th class="exec-time-col">Date</th>
+        <th class="duration-col">Duration</th>
+        <th>Group</th>
+        <th>Name</th>
+        <th>Configuration</th>
+        <th>Summary</th>
+        <th class="execution-links-col">Execution</th>
+        <th class="execution-links-col">Batch</th>
+      </tr>
+    </thead>
+    <tbody>
+    @for(execution <- executions) {
+      <tr class="execution-row">
+        <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.Application.execution(execution.id)"><img src="@routes.Assets.at("images/" + execution.passFailBallIcon)" alt="@execution.passFailText" title="@execution.passFailText"/></a></td>
+        <td class="exec-time-cell"><span title="@execution.executionTime.absolute">@execution.executionTime.relative</span></td>
+        <td class="duration-cell">@for(duration <- execution.durationOpt) { @duration }</td>
+        <td class="center-vert">@for(group <- execution.groupOpt) { <a href="@routes.Application.tests(configuration = Some(execution.configuration), group = Some(group.full))"><span class="execution-group" title="@group.full">@group.abbreviate(maxLength = 35)</span></a> }</td>
+        <td class="center-vert"><a class="execution-name" href="@routes.Application.test(execution.testId, configuration = Some(execution.configuration))" title="@execution.name.full">@execution.name.abbreviate(maxLength = 40)</a></td>
+        <td class="center-horiz center-vert"><a href="@routes.Application.tests(configuration = Some(execution.configuration))">@execution.configuration</a></td>
+        <td class="center-vert">@for(summary <- execution.summaryOpt) { <a href="@routes.Application.execution(execution.id)"><span title="@summary.full">@summary.abbreviated</span></a> }</td>
+        <td class="execution-links-cell"><a class="execution-link" href="@routes.Application.execution(execution.id)">Execution</a></td>
+        <td class="execution-links-cell"><a href="@routes.Application.batch(execution.batchId)">@execution.batchName</a></td>
+      </tr>
+    }
+    </tbody>
+  </table>
+  
+  @executionsPaginationWidget
+
+}

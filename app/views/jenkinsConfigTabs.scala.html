@@ -1,0 +1,13 @@
+@(tab: String)
+
+<ul class="nav nav-tabs">
+  <li @if(tab == "jobs"){class="active"}>
+    <a id="jobs-tab-link" href="@routes.JenkinsController.jenkinsImportSpecs()">Jobs</a>
+  </li>
+  <li @if(tab == "auth"){class="active"}>
+    <a id="auth-tab-link"  href="@routes.JenkinsController.auth()">Auth</a>
+  </li>
+  <li @if(tab == "reruns"){class="active"}>
+    <a id="reruns-tab-link" href="@routes.JenkinsController.reruns()">Reruns</a>
+  </li>
+</ul>

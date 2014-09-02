@@ -1,0 +1,46 @@
+@(confForm: Form[EditableJenkinsConfiguration])(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
+
+@css = {
+  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jenkinsImportSpecs.css")">
+}
+
+@import BootstrapHelpers._
+
+@main("Jenkins Configuration", "Jenkins Configuration", css = css) {
+
+  <h2>Jenkins Configuration</h2>  
+
+  @jenkinsConfigTabs("auth")
+   
+  <p style="margin-top: 20px"/>
+
+  @helper.form(routes.JenkinsController.updateAuth(), 'role -> "form") {
+    
+    <input type="hidden" name="@confForm("rerunJobUrl").name" value="@confForm("rerunJobUrl").value"/>
+    <input type="hidden" name="@confForm("authenticationToken").name" value="@confForm("authenticationToken").value"/>
+    @helper.repeat(confForm("params"), min = 0) { paramField =>
+      <input type="hidden" name="@paramField("name").name" value="@paramField("name").value"/>
+      <input type="hidden" name="@paramField("value").name" value="@paramField("value").value"/>
+    }
+    
+    @helper.inputText(confForm("credentials.username"), 
+      'class -> "form-control",
+      'placeholder -> "Username",
+	    '_label -> "Username", 
+	    '_help -> "Jenkins username to use to access the API (or blank if not required)")
+
+    @helper.inputText(confForm("credentials.apiToken"), 
+      'class -> "form-control",
+      'placeholder -> "API token",
+	    '_label -> "API token", 
+	    '_help -> "API token (or blank if not required). Find on Jenkins via User -> Configure -> API Token -> Show API Token...")
+        
+    <div class="form-actions" style="margin-bottom: 32px">
+      <button id="submit" type="submit" class="btn btn-primary">Update</button>
+      <a href="@routes.Application.index" class="btn btn-default" role="button">Cancel</a>
+    </div>
+	
+  }
+
+  
+}

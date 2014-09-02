@@ -1,0 +1,90 @@
+@(confForm: Form[EditableJenkinsConfiguration])(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
+
+@css = {
+  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jenkinsImportSpecs.css")">
+  <style>.paramSection-template { display: none;}</style>
+}
+
+@scripts = {
+  <script src="@routes.Assets.at("javascripts/jenkins-reruns.js")"></script>
+}
+
+@paramSection(paramField: Field, className: String = "paramSection") = {
+  <div class="panel panel-default @className">
+    <div class="panel-body">
+      @helper.inputText(paramField("name"), 
+        'class -> "form-control",
+        'placeholder -> "Parameter",
+        '_label -> "Parameter", 
+        '_help -> "Parameter name in the Jenkins rerun job")
+
+      @helper.inputText(paramField("value"), 
+        'class -> "form-control",
+        'placeholder -> "Value",
+        '_label -> "Value", 
+        '_help -> "Parameter value. Supported substitution variables: $MAVEN_TEST = test names formatted for use by Maven Surefire plugin (requires version >= 2.13) via the -Dtest option. $SST_REGEXES = test names formatted as regexes to pass to Selenium-Simple-Test's sst-run.")
+      <button type="button" class="btn btn-default delete-param"><i class="glyphicon glyphicon-trash"></i> Delete</button>
+    </div>
+  </div>
+}
+
+@import BootstrapHelpers._
+
+@main("Jenkins Configuration", "Jenkins Configuration", css = css, scripts = scripts) {
+
+  <h2>Jenkins Configuration</h2>  
+
+  @jenkinsConfigTabs("reruns")
+
+  <p style="margin-top: 20px"/>
+  
+  @if(confForm.hasGlobalErrors) {
+    <div class="panel panel-danger">
+      <div class="panel-heading">
+        <h3 class="panel-title">Problem with configuration</h3>
+      </div>
+      <div class="panel-body">
+        <ul>
+          @for(error <- confForm.globalErrors) {
+            <li>@error.message</li>
+          }
+        </ul>
+      </div>
+    </div>
+  }
+  
+  @helper.form(routes.JenkinsController.updateReruns(), 'role -> "form") {
+  
+    <input type="hidden" name="@confForm("credentials.username").name" value="@confForm("credentials.username").value"/>
+    <input type="hidden" name="@confForm("credentials.apiToken").name" value="@confForm("credentials.apiToken").value"/>
+ 
+    @helper.inputText(confForm("rerunJobUrl"), 
+      'class -> "form-control", 
+      'placeholder -> "Rerun job URL",
+	    '_label -> "Rerun job URL", 
+	    '_help -> "URL of a parameterised Jenkins job which can be used to rerun specific tests, e.g. http://some-jenkins/job/my-job-name/")
+ 
+    @helper.inputText(confForm("authenticationToken"), 
+      'class -> "form-control",
+      'placeholder -> "Job authentication token",
+	    '_label -> "Job authentication token", 
+	    '_help -> "Authentication token specified in the rerun job's configuration (or blank if not required). Find on Jenkins via Job -> Configure -> Build Triggers -> Trigger Builds Remotely -> Authentication Token")
+    
+    <h3>Job Parameters</h4>
+    
+    @helper.repeat(confForm("params"), min = 0) { paramField =>
+      @paramSection(paramField)
+    }
+    @paramSection(confForm("params[x]"), className="paramSection-template")
+    
+    <p/>
+    <button id="addParam" type="button" class="btn btn-default"><i class="glyphicon glyphicon-plus"></i> Add parameter</button>
+ 
+    <div class="form-actions" style="margin-bottom: 32px; margin-top: 32px">
+      <button type="submit" class="btn btn-primary">Update</button>
+      <a href="@routes.Application.index" class="btn btn-default" role="button">Cancel</a>
+    </div>
+	
+  }
+
+}

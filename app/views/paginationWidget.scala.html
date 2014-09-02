@@ -1,0 +1,27 @@
+@(pagination: PaginationData)(paginateUrl: (Int, Int) => Call)
+
+@if(pagination.isRequired) {
+  <ul class="pagination">
+    @if(pagination.currentPage == 1){
+      <li class="disabled"><a>&laquo; Previous</a>
+    } else {
+      <li><a href="@paginateUrl(pagination.previousPage, pagination.pageSize)">&laquo; Previous</a></li>  
+    }
+    @if(pagination.displayFirstPageSeparately) {
+      <li><a href="@paginateUrl(1, pagination.pageSize)">1</a></li> 
+      <li class="disabled"><a>..</a></li> 
+    }
+    @for(pageNumber <- pagination.displayedPages) {
+      <li @if(pageNumber == pagination.currentPage){class="active"}><a href="@paginateUrl(pageNumber, pagination.pageSize)">@pageNumber</a></li> 
+    }
+    @if(pagination.displayLastPageSeparately) {
+      <li class="disabled"><a href>..</a></li> 
+      <li><a href="@paginateUrl(pagination.maxPage, pagination.pageSize)">@pagination.maxPage</a></li> 
+    }
+    @if(pagination.isLastPage){
+      <li class="disabled"><a>Next &raquo;</a>
+    } else {
+      <li><a href="@paginateUrl(pagination.nextPage, pagination.pageSize)">Next &raquo;</a></li>  
+    }
+  </ul>
+}

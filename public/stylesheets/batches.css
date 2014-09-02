@@ -1,0 +1,36 @@
+.zoom-out-button {
+  position: absolute;
+  cursor: pointer;
+  font-size: smaller;
+  padding: 2px;
+  background-color: #eeeeee;
+  opacity: 0.6;
+  left:25px;
+  top:16px;
+}
+
+.zoom-out-button:hover {
+  opacity: 1;
+}
+
+.chart-tooltip {
+  position: absolute;
+  border: 1px solid #fdd;
+  padding: 2px;
+  background-color: #fee;
+  opacity: 0.80;
+}
+
+#batch-chart {
+	width: 760px;
+	height: 300px;
+	margin-bottom: 14px;
+}
+
+#batch-chart.not-shown {
+  border:1px solid #ddd;
+}
+
+#chart-hidden-message {
+	margin-top: 100px;
+}

@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd" objectQuotingStrategy="QUOTE_ALL_OBJECTS">
+
+  <changeSet author="matt" id="create-tests">
+    <createTable tableName="tests">
+      <column autoIncrement="true" name="id" type="SERIAL">
+        <constraints primaryKey="true" primaryKeyName="tests_pkey" />
+      </column>
+      <column name="name" type="VARCHAR(10485760)">
+        <constraints nullable="false" />
+      </column>
+      <column name="group" type="VARCHAR(10485760)" />
+    </createTable>
+    <createIndex indexName="idx_test_name_group" tableName="tests" unique="true">
+      <column name="name" />
+      <column name="group" />
+    </createIndex>
+  </changeSet>
+
+  <changeSet author="matt" id="create-batches">
+    <createTable tableName="batches">
+      <column autoIncrement="true" name="id" type="SERIAL">
+        <constraints primaryKey="true" primaryKeyName="batches_pkey" />
+      </column>
+      <column name="url" type="VARCHAR(10485760)" />
+      <column name="execution_time" type="TIMESTAMP WITH TIME ZONE">
+        <constraints nullable="false" />
+      </column>
+      <column name="duration" type="BIGINT" />
+      <column name="name" type="VARCHAR(10485760)" />
+      <column name="passed" type="BOOL">
+        <constraints nullable="false" />
+      </column>
+      <column name="total_count" type="INT">
+        <constraints nullable="false" />
+      </column>
+      <column name="pass_count" type="INT">
+        <constraints nullable="false" />
+      </column>
+      <column name="fail_count" type="INT">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet author="matt" id="create-executions">
+    <createTable tableName="executions">
+      <column autoIncrement="true" name="id" type="SERIAL">
+        <constraints primaryKey="true" primaryKeyName="executions_pkey" />
+      </column>
+      <column name="batch_id" type="INT">
+        <constraints nullable="false" />
+      </column>
+      <column name="test_id" type="INT">
+        <constraints nullable="false" />
+      </column>
+      <column name="execution_time" type="TIMESTAMP WITH TIME ZONE">
+        <constraints nullable="false" />
+      </column>
+      <column name="duration" type="BIGINT" />
+      <column name="summary" type="VARCHAR(10485760)" />
+      <column name="passed" type="BOOL">
+        <constraints nullable="false" />
+      </column>
+      <column name="configuration" type="VARCHAR(10485760)">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <addForeignKeyConstraint baseColumnNames="batch_id" baseTableName="executions" constraintName="batch_execution_id_fk" deferrable="false"
+      initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="batches" />
+    <addForeignKeyConstraint baseColumnNames="test_id" baseTableName="executions" constraintName="test_id_fk" deferrable="false"
+      initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="tests" />
+    <createIndex indexName="idx_executions_execution_time" tableName="executions">
+      <column name="execution_time" />
+    </createIndex>
+    <createIndex indexName="idx_executions_configuration" tableName="executions">
+      <column name="configuration" />
+    </createIndex>
+    <createIndex indexName="idx_execution_batch_id" tableName="executions">
+      <column name="batch_id" />
+    </createIndex>
+    <createIndex indexName="idx_execution_test_id" tableName="executions">
+      <column name="test_id" />
+    </createIndex>
+  </changeSet>
+
+  <changeSet author="matt" id="create-analysis">
+    <createTable tableName="analysis">
+      <column name="test_id" type="INT">
+        <constraints primaryKey="true" primaryKeyName="analysis_pkey" />
+      </column>
+      <column name="configuration" type="VARCHAR(10485760)">
+        <constraints primaryKey="true" primaryKeyName="analysis_pkey" />
+      </column>
+      <column name="status" type="VARCHAR(10485760)">
+        <constraints nullable="false" />
+      </column>
+      <column name="weather" type="DOUBLE">
+        <constraints nullable="false" />
+      </column>
+      <column name="consecutive_failures" type="INT">
+        <constraints nullable="false" />
+      </column>
+      <column name="failing_since" type="TIMESTAMP WITH TIME ZONE" />
+      <column name="last_passed_execution_id" type="INT" />
+      <column name="last_passed_time" type="TIMESTAMP WITH TIME ZONE" />
+      <column name="last_failed_execution_id" type="INT" />
+      <column name="last_failed_time" type="TIMESTAMP WITH TIME ZONE" />
+      <column name="when_analysed" type="TIMESTAMP WITH TIME ZONE">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <addForeignKeyConstraint baseColumnNames="last_failed_execution_id" baseTableName="analysis" constraintName="fk_last_failed_execution_id"
+      deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="executions" />
+    <addForeignKeyConstraint baseColumnNames="last_passed_execution_id" baseTableName="analysis" constraintName="fk_last_passed_execution_id"
+      deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="executions" />
+    <addForeignKeyConstraint baseColumnNames="test_id" baseTableName="analysis" constraintName="fk_analysis_test_id" deferrable="false"
+      initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="tests" />
+    <createIndex indexName="idx_analysis_last_failed_execution_id" tableName="analysis">
+      <column name="last_failed_execution_id" />
+    </createIndex>
+    <createIndex indexName="idx_analysis_last_passed_execution_id" tableName="analysis">
+      <column name="last_passed_execution_id" />
+    </createIndex>
+    <createIndex indexName="idx_analysis_test_id" tableName="analysis">
+      <column name="test_id" />
+    </createIndex>
+    <createIndex indexName="idx_analysis_configuration" tableName="analysis">
+      <column name="configuration" />
+    </createIndex>
+  </changeSet>
+
+  <changeSet author="matt" id="create-batch_logs">
+    <createTable tableName="batch_logs">
+      <column name="batch_id" type="INT">
+        <constraints primaryKey="true" primaryKeyName="batch_logs_pkey" />
+      </column>
+      <column name="log" type="CLOB">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <addForeignKeyConstraint baseColumnNames="batch_id" baseTableName="batch_logs" constraintName="fk_batch_log_id" deferrable="false"
+      initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="batches" />
+    <createIndex indexName="idx_batch_logs_batch_id" tableName="batch_logs">
+      <column name="batch_id" />
+    </createIndex>
+  </changeSet>
+
+  <changeSet author="matt" id="create-execution_logs">
+    <createTable tableName="execution_logs">
+      <column name="execution_id" type="INT">
+        <constraints primaryKey="true" primaryKeyName="execution_logs_pkey" />
+      </column>
+      <column name="log" type="CLOB">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <addForeignKeyConstraint baseColumnNames="execution_id" baseTableName="execution_logs" constraintName="fk_execution_log_id"
+      deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="executions" />
+    <createIndex indexName="idx_execution_logs_execution_id" tableName="execution_logs">
+      <column name="execution_id" />
+    </createIndex>
+  </changeSet>
+
+  <changeSet author="matt" id="create-jenkins_jobs">
+    <createTable tableName="jenkins_jobs">
+      <column autoIncrement="true" name="ID" type="SERIAL">
+        <constraints primaryKey="true" primaryKeyName="jenkins_jobs_pkey" />
+      </column>
+      <column name="url" type="VARCHAR(10485760)">
+        <constraints nullable="false" />
+      </column>
+      <column name="name" type="VARCHAR(10485760)">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <createIndex indexName="idx_jenkins_job_url" tableName="jenkins_jobs" unique="false">
+      <column name="url" />
+    </createIndex>
+  </changeSet>
+
+  <changeSet author="matt" id="create-jenkins_builds">
+    <createTable tableName="jenkins_builds">
+      <column name="batch_id" type="INT">
+        <constraints primaryKey="true" primaryKeyName="jenkins_builds_pkey" />
+      </column>
+      <column name="import_time" type="TIMESTAMP WITH TIME ZONE">
+        <constraints nullable="false" />
+      </column>
+      <column name="build_url" type="VARCHAR(10485760)">
+        <constraints nullable="false" />
+      </column>
+      <column name="job_id" type="INT">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <createIndex indexName="idx_jenkins_build_url" tableName="jenkins_builds" unique="true">
+      <column name="build_url" />
+    </createIndex>
+    <createIndex indexName="idx_jenkins_job_id" tableName="jenkins_builds" unique="false">
+      <column name="job_id" />
+    </createIndex>
+    <createIndex indexName="idx_jenkins_builds_job_id" tableName="jenkins_builds">
+      <column name="job_id" />
+    </createIndex>
+    <createIndex indexName="idx_jenkins_builds_batch_id" tableName="jenkins_builds">
+      <column name="batch_id" />
+    </createIndex>
+    <addForeignKeyConstraint baseColumnNames="job_id" baseTableName="jenkins_builds" constraintName="fk_job_id" deferrable="false"
+      initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="ID" referencedTableName="jenkins_jobs" />
+    <addForeignKeyConstraint baseColumnNames="batch_id" baseTableName="jenkins_builds" constraintName="fk_batch_id" deferrable="false"
+      initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="batches" />
+  </changeSet>
+
+  <changeSet author="matt" id="create-jenkins_configuration">
+    <createTable tableName="jenkins_configuration">
+      <column name="username" type="VARCHAR(10485760)" />
+      <column name="api_token" type="VARCHAR(10485760)" />
+      <column name="rerun_job_url" type="VARCHAR(10485760)" />
+      <column name="authentication_token" type="VARCHAR(10485760)" />
+    </createTable>
+    <insert tableName="jenkins_configuration">
+      <column name="username" type="VARCHAR(10485760)" />
+      <column name="api_token" type="VARCHAR(10485760)" />
+      <column name="rerun_job_url" type="VARCHAR(10485760)" />
+      <column name="authentication_token" type="VARCHAR(10485760)" />
+    </insert>
+  </changeSet>
+
+  <changeSet author="matt" id="create-jenkins_import_specs">
+    <createTable tableName="jenkins_import_specs">
+      <column autoIncrement="true" name="id" type="SERIAL">
+        <constraints primaryKey="true" primaryKeyName="jenkins_import_specs_pkey" />
+      </column>
+      <column name="job_url" type="VARCHAR(10485760)">
+        <constraints nullable="false" />
+      </column>
+      <column name="polling_interval" type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+      <column name="import_console_log" type="BOOL">
+        <constraints nullable="false" />
+      </column>
+      <column name="last_checked" type="TIMESTAMP WITH TIME ZONE" />
+      <column name="configuration" type="VARCHAR(10485760)" />
+    </createTable>
+  </changeSet>
+
+  <changeSet author="matt" id="create-jenkins_job_params">
+    <createTable tableName="jenkins_job_params">
+      <column name="param_name" type="VARCHAR(10485760)">
+        <constraints nullable="false" />
+      </column>
+      <column name="value" type="VARCHAR(10485760)">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet author="matt" id="create-system_configuration">
+    <createTable tableName="system_configuration">
+      <column name="failure_duration_threshold" type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+      <column name="failure_count_threshold" type="INT">
+        <constraints nullable="false" />
+      </column>
+      <column name="pass_duration_threshold" type="BIGINT">
+        <constraints nullable="false" />
+      </column>
+      <column name="pass_count_threshold" type="INT">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <insert tableName="system_configuration">
+      <column name="failure_duration_threshold" type="BIGINT" value="21600000" />
+      <column name="failure_count_threshold" type="INT" value="3" />
+      <column name="pass_duration_threshold" type="BIGINT" value="0" />
+      <column name="pass_count_threshold" type="INT" value="0" />
+    </insert>
+  </changeSet>
+
+  <changeSet author="matt" id="extra-index-1">
+    <createIndex indexName="idx_execution_config_test_id_exec_time" tableName="executions">
+      <column name="configuration" />
+      <column name="test_id" />
+      <column name="execution_time" />
+    </createIndex>
+  </changeSet>
+  
+  <changeSet author="matt" id="extra-index-2">
+    <createIndex indexName="idx_execution_config_test_id" tableName="executions">
+      <column name="configuration" />
+      <column name="test_id" />
+    </createIndex>
+  </changeSet> <!--  not needed --> 
+  
+</databaseChangeLog>

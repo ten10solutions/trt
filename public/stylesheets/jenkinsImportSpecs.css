@@ -1,0 +1,58 @@
+
+th.last-checked-col {
+  text-align: center;
+  width: 150px;
+}
+
+td.last-checked-cell {
+  text-align: center;
+}
+
+th.polling-interval-col {
+  text-align: center;
+  width: 120px;
+}
+
+td.polling-interval-cell {
+  text-align: center;
+}
+
+th.import-console-col {
+  text-align: center;
+  width: 120px;
+}
+
+td.import-console-cell {
+  text-align: center;
+}
+
+th.configure-col {
+  text-align: center;
+  width: 100px;
+}
+
+td.configure-cell {
+  text-align: center;
+  width: 100px;
+}
+
+th.sync-col {
+  text-align: center;
+  width: 100px;
+}
+
+td.sync-cell {
+  text-align: center;
+  width: 100px;
+}
+
+th.delete-col {
+  text-align: center;
+  width: 100px;
+}
+
+td.delete-cell {
+  text-align: center;
+  width: 100px;
+}
+

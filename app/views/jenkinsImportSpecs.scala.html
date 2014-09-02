@@ -1,0 +1,54 @@
+@(specs: List[JenkinsImportSpecView])(implicit flash: Flash, globalViewContext: GlobalViewContext)
+
+@css = {
+  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jenkinsImportSpecs.css")">
+}
+
+@main("Jenkins Imports", "Jenkins Imports", css = css) {
+
+  <h2>Jenkins Configuration</h2>  
+
+  @jenkinsConfigTabs("jobs")
+
+  <table style="margin-top: 20px" class="table table-striped table-bordered table-hover table-condensed">
+    <thead>
+      <tr>
+        <th>Jenkins job URL</th>
+        <th class="last-checked-col">Last checked</th>
+        <th class="polling-interval-col">Polling interval</th>
+        <th class="import-console-col">Import console log?</th>
+        <th class="configuration-col">Configuration</th>
+        <th colspan=3></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for(spec <- specs) {
+        <tr>
+          <td><a href="@spec.jobUrl">@spec.jobUrl</a></td>
+          <td class="last-checked-cell">@spec.lastCheckedOpt.getOrElse("-")</td>
+          <td class="polling-interval-cell">@spec.pollingInterval</td>
+          <td class="import-console-cell">@if(spec.importConsoleLog) { <i class="glyphicon glyphicon-ok"></i> }</td>
+          <td class="configuration-cell">@spec.configuration</td>
+          <td class="configure-cell"><a href="@routes.JenkinsController.editJenkinsImportSpec(spec.id)">Configure</a></td>
+          <td class="sync-cell">
+            <form action="@routes.JenkinsController.syncJenkins(spec.id)" method="post">
+              <button class="btn btn-default" title="Check for new builds now"><i class="glyphicon glyphicon-refresh"></i> Sync</button>
+            </form>
+          </td>
+          <td class="delete-cell">
+            <form action="@routes.JenkinsController.deleteJenkinsImportSpec(spec.id)" method="post">
+              <button class="btn btn-default" title="Permanently delete this Jenkins import"><i class="glyphicon glyphicon-trash"></i> Delete</button>
+            </form>
+          </td>
+        </tr>
+      }
+      <tr>
+        <td colspan="8" style="text-align: center">
+           <a href="@routes.JenkinsController.newJenkinsImportSpec"><i class="glyphicon glyphicon-plus"></i> Add new</a>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+ 
+}

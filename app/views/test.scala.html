@@ -1,0 +1,149 @@
+@(test: TestView, executions: List[ExecutionView], configurationOpt: Option[Configuration], canRerun: Boolean, pagination: PaginationData)(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
+
+@scripts = {
+  <script src="@routes.Assets.at("javascripts/test.js")"></script>
+}
+
+@css = {
+  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/test.css")">
+}
+
+@executionsPaginationWidget = { 
+  @paginationWidget(pagination)((page, pageSize) => 
+    routes.Application.test(test.id, configuration = configurationOpt, page = Some(page), pageSize = Some(pageSize))) 
+}
+
+@main("Test", "Test", scripts = scripts, css = css) {
+
+  <h2>@for(ballIcon <- test.ballIconOpt){<img src="@routes.Assets.at("images/" + ballIcon)"/> }Test Case</h2>
+
+  <div class="row">
+  <div class="col-md-5">
+
+  <table style="margin-top: 7px;" class="table table-striped table-bordered table-hover">
+    <tr>
+      <td>Name</td>
+      <td><span id="name" title="@test.name.full">@test.name.abbreviate(50)</span></a></td>
+    </tr>
+    @for(group <- test.groupOpt) {
+      <tr>
+        <td>Group</td>
+        <td><a href="@routes.Application.tests(configuration = configurationOpt, group = Some(group.full))"><span id="group" title="@group.full">@group.abbreviate(50)</span></a></td>
+      </tr>
+    }
+    @for(configuration <- configurationOpt) {
+      <tr>
+        <td>Configuration</td>
+        <td><a id="configuration" href="@routes.Application.tests(configuration = Some(configuration))">@configuration</a></td>
+      </tr>
+    }
+    @for(weatherIcon <- test.weatherIconOpt) {
+      <tr>
+        <td class="center-vert">Weather</td>
+        <td><img src="@routes.Assets.at("images/" + weatherIcon)"/></td>
+      </tr>
+    }
+    @for(consecutiveFailures <- test.consecutiveFailuresOpt) {
+      <tr>
+        <td>Consecutive failures</td>
+        <td id="consecutive-failures">@consecutiveFailures</td>
+      </tr>
+    }
+    @for(failingSince <- test.failingSinceOpt) {
+      <tr>
+        <td>Started failing</td>
+        <td><span title="@failingSince.absolute">@failingSince.relative</span></td>
+      </tr>
+    }
+    @for((executionId, time) <- test.lastExecutionOpt) {
+      <tr>
+        <td>Last executed</td>
+        <td><a href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a></td>
+      </tr>
+    }
+    @for((executionId, time) <- test.lastPassedExecutionOpt) {
+      <tr>
+        <td>Last passed</td>
+        <td><a href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a></td>
+      </tr>
+    }
+    @for((executionId, time) <- test.lastFailedExecutionOpt) {
+      <tr>
+        <td>Last failed</td>
+        <td><a href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a></td>
+      </tr>
+    }
+    <tr>
+      <td>Number of executions recorded</td>
+      <td>@pagination.totalItems</td>
+    </tr>
+  </table>
+  @if(canRerun) {
+    <form action="@routes.JenkinsController.rerunTest(test.id)" role="form" method="post">
+      <input type="hidden" name="previousURL" value="@request.uri"/>
+      <button style="margin-bottom: 12px" id="rerunTest" type="submit" class="btn btn-default" title="Rerun test on Jenkins"><i class="glyphicon glyphicon-refresh"></i> Rerun test</button>
+    </form>
+  }
+  </div>
+  <div class="col-md-7">
+  <div id="duration-chart" style="width:600px;height:300px"></div>
+  </div>
+  </div>
+  
+  <script>
+    $(document).ready(function(){
+      var executionUrls = [
+        [@for(execution <- executions; if execution.failed && execution.durationSecondsOpt.isDefined) {
+          "@routes.Application.execution(execution.id)",
+        }],
+        [@for(execution <- executions; if execution.passed && execution.durationSecondsOpt.isDefined) {
+          "@routes.Application.execution(execution.id)",
+        }]
+      ];
+      var fails = [
+        @for(execution <- executions; if execution.failed; duration <- execution.durationSecondsOpt) {
+          [ new Date(@execution.epochMillis), @duration ],
+        }
+      ];
+      var passes = [
+        @for(execution <- executions; if execution.passed; duration <- execution.durationSecondsOpt) {
+          [ new Date(@execution.epochMillis), @duration ],
+        }
+      ];
+      createDurationChart(executionUrls, fails, passes);
+    });
+  </script>
+  
+  <h3>Executions</h3>
+
+  @executionsPaginationWidget
+    
+  <table id="executionsTable" class="table table-striped table-bordered table-hover">
+    <thead>
+      <tr>
+        <th class="pass-fail-col"></th>
+        <th class="exec-time-col">Date</th>
+        <th class="duration-col">Duration</th>
+        <th>Summary</th>
+        <th>Configuration</th>
+        <th class="execution-links-col">Execution</th>
+        <th class="execution-links-col">Batch</th>
+      </tr>
+    </thead>
+    @for(execution <- executions.drop(pagination.startFrom).take(pagination.pageSize)) {
+      <tr class="execution-row">
+        <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.Application.execution(execution.id)"><img src="@routes.Assets.at("images/" + execution.passFailBallIcon)" alt="@execution.passFailText" title="@execution.passFailText"/></a></td>
+        <td class="exec-time-cell"><span title="@execution.executionTime.absolute">@execution.executionTime.relative</span></td>
+        <td class="duration-cell">@for(duration <- execution.durationOpt) { @duration }</td>
+        <td class="center-vert">@for(summary <- execution.summaryOpt) { <a href="@routes.Application.execution(execution.id)"><span title="@summary.full">@summary.abbreviated</span></a> }</td>
+        <td class="center-horiz center-vert"><a href="@routes.Application.tests(configuration = Some(execution.configuration))">@execution.configuration</a></td>
+        <td class="execution-links-cell"><a class="execution-link" href="@routes.Application.execution(execution.id)">Execution</a></td>
+        <td class="execution-links-cell"><a class="batch-link" href="@routes.Application.batch(execution.batchId)">@execution.batchName</a></td>
+      </tr>
+    }
+    <tbody>
+    </tbody>
+  </table>
+  
+  @executionsPaginationWidget
+}

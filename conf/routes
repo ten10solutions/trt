@@ -1,0 +1,41 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+GET     /                           @controllers.Application.index()
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.at(path="/public", file)
+
+GET     /configurations             @controllers.Application.configurations()
+GET     /tests                      @controllers.Application.tests(configuration: Option[Configuration] ?= None, status: Option[TestStatus] ?= None, group: Option[String] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
+GET     /test/:id                   @controllers.Application.test(id: Id[Test], configuration: Option[Configuration] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
+GET     /execution/:id              @controllers.Application.execution(id: Id[Execution])
+GET     /executions                 @controllers.Application.executions(configuration: Option[Configuration] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
+GET     /batch/:id                  @controllers.Application.batch(id: Id[Batch], passed: Option[Boolean] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
+GET     /batch/:id/log              @controllers.Application.batchLog(id: Id[Batch])
+GET     /batches                    @controllers.Application.batches(job: Option[JenkinsJobId] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
+POST    /batches/delete             @controllers.Application.deleteBatches()
+ 
+GET     /systemConfiguration        @controllers.Application.editSystemConfiguration
+POST    /systemConfiguration        @controllers.Application.updateSystemConfiguration
+GET     /admin                      @controllers.Application.admin()
+POST    /deleteAll                  @controllers.Application.deleteAll()
+
+GET     /api/batches                @controllers.JsonController.getBatches()
+POST    /api/batches                @controllers.JsonController.addBatch()
+POST    /api/deleteAll              @controllers.JsonController.deleteAll()
+
+GET     /jenkins/auth                   @controllers.JenkinsController.auth()
+POST    /jenkins/auth                   @controllers.JenkinsController.updateAuth()
+GET     /jenkins/reruns                 @controllers.JenkinsController.reruns()
+POST    /jenkins/reruns                 @controllers.JenkinsController.updateReruns()
+GET     /jenkins/importSpecs            @controllers.JenkinsController.jenkinsImportSpecs()
+GET     /jenkins/importSpecs/new        @controllers.JenkinsController.newJenkinsImportSpec()
+POST    /jenkins/importSpecs/new        @controllers.JenkinsController.createJenkinsImportSpec()
+GET     /jenkins/importSpec/:id/edit    @controllers.JenkinsController.editJenkinsImportSpec(id: Id[JenkinsImportSpec])
+POST    /jenkins/importSpec/:id/edit    @controllers.JenkinsController.updateJenkinsImportSpec(id: Id[JenkinsImportSpec])
+POST    /jenkins/importSpec/:id/delete  @controllers.JenkinsController.deleteJenkinsImportSpec(id: Id[JenkinsImportSpec])
+POST    /jenkins/importSpec/:id/sync    @controllers.JenkinsController.syncJenkins(id: Id[JenkinsImportSpec])
+POST    /jenkins/rerun                  @controllers.JenkinsController.rerunSelectedTests()
+POST    /jenkins/rerun/:id              @controllers.JenkinsController.rerunTest(id: Id[Test])

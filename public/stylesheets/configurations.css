@@ -1,0 +1,40 @@
+th.configuration-count-col {
+  vertical-align: middle !important;
+  text-align: center;
+  width: 64px;
+}
+
+td.configuration-count-cell {
+  vertical-align: middle !important;
+  text-align: center;
+}
+
+th.configuration-col {
+  vertical-align: middle !important;
+  text-align: center;
+  width: 120px;
+}
+
+td.configuration-cell {
+  vertical-align: middle !important;
+  text-align: center;
+}
+
+th.pie-col {
+  vertical-align: middle !important;
+  text-align: center;
+  width: 124px;
+}
+
+td.pie-cell {
+  vertical-align: middle !important;
+  text-align: center;
+}
+
+.chart-tooltip {
+  position: absolute;
+  border: 1px solid #fdd;
+  padding: 2px;
+  background-color: #fee;
+  opacity: 0.80;
+}
