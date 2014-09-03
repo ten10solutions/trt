@@ -67,11 +67,18 @@ resourceDirectory in Test <<= baseDirectory(_ / "testResources")
 
 testOptions in Test := Seq(Tests.Argument(TestFrameworks.JUnit, "--ignore-runners=org.scalatest.junit.JUnitRunner")) 
 
-// Debian packaging support:
-// packageArchetype.java_server
+// Deb packaging:
 
-// packageDescription := "Analysis and reporting of automated test results"
+packageDescription := "Reporting and analysis of automated test results"
 
-// packageSummary := "Analysis and reporting of automated test results"
+packageSummary := "Test Reporty Thing (trt)"
 
-// maintainer in Debian := "Matt Russell <MattRussellUK@gmail.com>"
+maintainer := "Matt Russell <MattRussellUK@gmail.com>"
+
+debianPackageDependencies in Debian ++= Seq("default-jre-headless (>= 1.7)")
+
+linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
+packageMapping(
+   (bd / "emptyDir") -> "/var/lib/trt"
+ ) withUser "trt" withGroup "trt" withPerms "0755"
+}
