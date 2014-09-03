@@ -13,7 +13,13 @@ Requirements:
 
 Setup after clone:
 
-    $ bower install
-    $ activator run
+    bower install
+    activator run
     
-Navigate to http://localhost:9000
+Navigate to: http://localhost:9000
+
+Run tests:
+    sbt test
+
+Exclude all the slow integration tests:
+    sbt "test-only * -- -l com.thetestpeople.trt.tags.SlowTest"
