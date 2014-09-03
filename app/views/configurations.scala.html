@@ -44,17 +44,17 @@
           <script>
              $(document).ready(function(){
                var passes = [
-                 @for((time, count) <- historicalTestCounts.passes if count > 0) {
+                 @for((time, count) <- historicalTestCounts.passes) {
                    [ new Date(@time), @count ],
                  }
                ];
                var warnings = [
-                 @for((time, count) <- historicalTestCounts.warnings if count > 0) {
+                 @for((time, count) <- historicalTestCounts.warnings) {
                    [ new Date(@time), @count ],
                  }
                ];
                var fails = [
-                 @for((time, count) <- historicalTestCounts.failures if count > 0) {
+                 @for((time, count) <- historicalTestCounts.failures) {
                    [ new Date(@time), @count ],
                  }
                ];

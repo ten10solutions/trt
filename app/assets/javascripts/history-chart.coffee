@@ -25,23 +25,27 @@ chartOptions =
 
 window.createHistoryChart = (chartId, passes, warnings, fails) ->  
   series = [] # We omit empty series, otherwise JFlot displays no data
+  seriesData = []
   if passes.length > 0
     series.push
       label: "Passes"
       data: passes
       color: "#609000"
+    seriesData.push(passes)
   if warnings.length > 0
     series.push
       label: "Warnings"
       data: warnings
       color: "#FFBF00"
+    seriesData.push(warnings)
   if fails.length > 0
     series.push
       label: "Failures"
       data: fails
       color: "#b94a48"
+    seriesData.push(fails)
   $.plot $("#" + chartId), series, chartOptions
-  $("#" + chartId).bind "plothover", onChartHover(passes, warnings, fails)
+  $("#" + chartId).bind "plothover", onChartHover(seriesData)
   initialiseTooltip()
 
 prettyDate = (epochMillis) ->
@@ -49,15 +53,9 @@ prettyDate = (epochMillis) ->
   date = new Date(epochMillis).toLocaleDateString()
   "#{time} #{date}" 
   
-onChartHover = (passes, warnings, fails) -> (event, pos, item) ->
+onChartHover = (seriesData) -> (event, pos, item) ->
   if item
-    dataItem = undefined
-    if item.seriesIndex == 0
-      dataItem = passes[item.dataIndex]
-    else if item.seriesIndex == 1
-      dataItem = warnings[item.dataIndex]
-    else if item.seriesIndex == 2
-      dataItem = fails[item.dataIndex]
+    dataItem = seriesData[item.seriesIndex][item.dataIndex]
     epochMillis = dataItem[0]
     count = dataItem[1]
 
