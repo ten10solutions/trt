@@ -114,15 +114,13 @@ class TestAnalyserTest extends FlatSpec with Matchers {
 
   }
 
-  "Analyser" should "count the correct number of consecutive failures" in {
+  "If the fail threshold is one, and failure duration is zero, then a test which has failed most recently" should "be classed as a failure" in {
 
-    val analysis = getTestAnalyser().analyse(
+    val analysis = getTestAnalyser(failureDurationThreshold = 0.minutes, failureCountThreshold = 1).analyse(
       fail(1.hour.ago),
-      fail(12.hours.ago),
-      pass(24.hours.ago),
-      fail(1.week.ago))
+      pass(12.hours.ago))
 
-    analysis.consecutiveFailures should be(2)
+    analysis.status should be(TestStatus.Fail)
   }
 
   "Analyser" should "count zero consecutive failures" in {
@@ -143,6 +141,17 @@ class TestAnalyserTest extends FlatSpec with Matchers {
       pass(24.hours.ago))
 
     analysis.weather should be(1.0)
+  }
+
+  "Analyser" should "count the correct number of consecutive failures" in {
+
+    val analysis = getTestAnalyser().analyse(
+      fail(1.hour.ago),
+      fail(12.hours.ago),
+      pass(24.hours.ago),
+      fail(1.week.ago))
+
+    analysis.consecutiveFailures should be(2)
   }
 
   "A test's weather" should "be stormy if it has always failed" in {
