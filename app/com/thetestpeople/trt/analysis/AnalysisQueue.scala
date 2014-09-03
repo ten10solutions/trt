@@ -32,4 +32,6 @@ class AnalysisQueue {
 
   def size = testQueue.size
 
+  override def toString = synchronized { "AnalysisQueue(" + testSet.map(_.value).toList.sorted + ")" }
+  
 }
