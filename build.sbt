@@ -57,6 +57,8 @@ EclipseKeys.withSource := true
 
 EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Resource
 
+EclipseKeys.eclipseOutput := Some("bin")
+
 // Change resources dir from default for easy integration with Eclipse
 resourceDirectory in Test <<= baseDirectory(_ / "testResources")
 
