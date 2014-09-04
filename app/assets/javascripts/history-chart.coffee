@@ -13,7 +13,7 @@ chartOptions =
       fill: true
       fillColor:
         colors: [
-          { opacity: 0.2 }
+          { opacity: 0.1 }
           { opacity: 0.8 }
         ]
     points:
@@ -24,9 +24,9 @@ chartOptions =
     show: false
 
 window.createHistoryChart = (chartId, passes, warnings, fails) ->  
-  series = [] # We omit empty series, otherwise JFlot displays no data
+  series = []
   seriesData = []
-  if passes.length > 0
+  if passes.length > 0  # omit empty series otherwise JFlot displays no data
     series.push
       label: "Passes"
       data: passes
