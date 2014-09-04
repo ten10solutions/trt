@@ -45,10 +45,10 @@ onChartHover = (passes, fails) -> (event, pos, item) ->
       dataItem = fails[item.dataIndex]
     else
       dataItem = passes[item.dataIndex]
-    epochMillis = dataItem[0]
+    date = dataItem[0]
     count = dataItem[1]
 
-    tooltipText = count + " " + item.series.label + " on " + new Date(epochMillis).toLocaleTimeString() + " " + new Date(epochMillis).toLocaleDateString()
+    tooltipText = "#{count} #{item.series.label} on #{formatDate(date)}"
     $("#chart-tooltip").html(tooltipText).css(
       top: item.pageY + 5
       left: item.pageX + 5
@@ -56,13 +56,17 @@ onChartHover = (passes, fails) -> (event, pos, item) ->
   else
     $("#chart-tooltip").hide()
 
-
-onChartClick = (batchUrls) -> (event, pos, item) ->
-  if item
-    window.location = batchUrls[item.dataIndex]  if item
+formatDate = (date) ->
+  time = new Date(date).toLocaleTimeString()
+  date = new Date(date).toLocaleDateString()
+  "#{time} #{date}" 
 
 initialiseTooltip = ->
   $("<div class='chart-tooltip' id='chart-tooltip'/>").appendTo "body"
+
+onChartClick = (batchUrls) -> (event, pos, item) ->
+  if item
+    window.location = batchUrls[item.dataIndex]
 
 getPlotBounds = (plot) ->
   xFrom: plot.getAxes().xaxis.from
