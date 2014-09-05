@@ -73,7 +73,14 @@ window.createPassFailChart = ->
 
   plot = $.plot($("#batch-chart"), series, chartOptions)
 
-  addZoomSupport(plot, "batch-chart", series, chartOptions)
+  addZoomSupport
+    plot: plot
+    chartId: "batch-chart"
+    series: series
+    chartOptions: chartOptions
+    minX: 10 * 60 * 1000
+    minY: 10
+
   $("#batch-chart").bind "plotclick", onChartClick(chartData.batchUrls)
   $("#batch-chart").bind "plothover", onChartHover(chartData.passes, chartData.fails)
 

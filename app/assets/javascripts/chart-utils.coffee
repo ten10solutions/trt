@@ -3,17 +3,17 @@ merge = (obj1, obj2) -> $.extend true, {}, obj1, obj2
 
 zoomOutButtonTemplate = "<div class='zoom-out-button'>Zoom out</div>"
 
-addZoomOutButton = (chartId, series, originalBounds, chartOptions) ->
-  $(zoomOutButtonTemplate).appendTo($("#" + chartId)).click (event) ->
+addZoomOutButton = (config, originalBounds) ->
+  $(zoomOutButtonTemplate).appendTo($("#" + config.chartId)).click (event) ->
     event.preventDefault()
-    zoomedOptions = merge chartOptions,
+    zoomedOptions = merge config.chartOptions,
       xaxis:
         min: originalBounds.xFrom
         max: originalBounds.xTo
       yaxis:
         min: originalBounds.yFrom
         max: originalBounds.yTo
-    $.plot "#" + chartId, series, zoomedOptions
+    $.plot "#" + config.chartId, config.series, zoomedOptions
 
 getPlotBounds = (plot) ->
   xFrom: plot.getAxes().xaxis.from
@@ -21,28 +21,27 @@ getPlotBounds = (plot) ->
   yFrom: plot.getAxes().yaxis.from
   yTo: plot.getAxes().yaxis.to
 
-clampRanges = (ranges) -> 
-  minutes = 60 * 1000
-  if ranges.xaxis.to - ranges.xaxis.from < 10 * minutes
-    ranges.xaxis.to = ranges.xaxis.from + 10 * minutes
-  if ranges.yaxis.to - ranges.yaxis.from < 10
-    ranges.yaxis.to = ranges.yaxis.from + 10
+clampRanges = (ranges, minX, minY) -> 
+  if ranges.xaxis.to - ranges.xaxis.from < minX
+    ranges.xaxis.to = ranges.xaxis.from + minX
+  if ranges.yaxis.to - ranges.yaxis.from < minY
+    ranges.yaxis.to = ranges.yaxis.from + minY
 
-onChartSelected = (chartId, series, originalBounds, chartOptions) -> (event, ranges) ->
-  clampRanges ranges
-  zoomedOptions = merge chartOptions,
+onChartSelected = (config, originalBounds) -> (event, ranges) ->
+  clampRanges ranges, config.minX, config.minY
+  zoomedOptions = merge config.chartOptions,
     xaxis:
       min: ranges.xaxis.from
       max: ranges.xaxis.to
     yaxis:
       min: ranges.yaxis.from
       max: ranges.yaxis.to
-  $.plot "#" + chartId, series, zoomedOptions
-  addZoomOutButton chartId, series, originalBounds, chartOptions
+  $.plot "#" + config.chartId, config.series, zoomedOptions
+  addZoomOutButton config, originalBounds
 
-window.addZoomSupport = (plot, chartId, series, chartOptions) ->
-  originalBounds = getPlotBounds plot 
-  $("#" + chartId).bind "plotselected", onChartSelected(chartId, series, originalBounds, chartOptions)
+window.addZoomSupport = (config) ->
+  originalBounds = getPlotBounds config.plot 
+  $("#" + config.chartId).bind "plotselected", onChartSelected(config, originalBounds)
 
 window.formatDate = (date) ->
   time = new Date(date).toLocaleTimeString()

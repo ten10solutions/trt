@@ -63,7 +63,13 @@ window.createHistoryChart = (chartId, passes, warnings, fails) ->
     seriesData.push(fails)
   plot = $.plot $("#" + chartId), series, chartOptions
 
-  addZoomSupport(plot, chartId, series, chartOptions)
+  addZoomSupport
+    plot: plot
+    chartId: chartId
+    series: series
+    chartOptions: chartOptions
+    minX: 10 * 60 * 1000
+    minY: 10
   $("#" + chartId).bind "plothover", onChartHover(seriesData)
 
   initialiseTooltip()
