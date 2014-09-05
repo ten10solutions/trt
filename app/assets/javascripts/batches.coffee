@@ -21,23 +21,6 @@ chartOptions =
   selection:
     mode: "xy"
 
-# (Recursively) merge two objects, returning a new object
-merge = (obj1, obj2) -> $.extend true, {}, obj1, obj2
-
-zoomOutButtonTemplate = "<div class='zoom-out-button'>Zoom out</div>"
-
-addZoomOutButton = (series, originalBounds) ->
-  $(zoomOutButtonTemplate).appendTo($("#batch-chart")).click (event) ->
-    event.preventDefault()
-    zoomedOptions = merge chartOptions,
-      xaxis:
-        min: originalBounds.xFrom
-        max: originalBounds.xTo
-      yaxis:
-        min: originalBounds.yFrom
-        max: originalBounds.yTo
-    $.plot "#batch-chart", series, zoomedOptions
-
 onChartHover = (passes, fails) -> (event, pos, item) ->
   if item
     dataItem = undefined
@@ -56,42 +39,12 @@ onChartHover = (passes, fails) -> (event, pos, item) ->
   else
     $("#chart-tooltip").hide()
 
-formatDate = (date) ->
-  time = new Date(date).toLocaleTimeString()
-  date = new Date(date).toLocaleDateString()
-  "#{time} #{date}" 
-
 initialiseTooltip = ->
   $("<div class='chart-tooltip' id='chart-tooltip'/>").appendTo "body"
 
 onChartClick = (batchUrls) -> (event, pos, item) ->
   if item
     window.location = batchUrls[item.dataIndex]
-
-getPlotBounds = (plot) ->
-  xFrom: plot.getAxes().xaxis.from
-  xTo: plot.getAxes().xaxis.to
-  yFrom: plot.getAxes().yaxis.from
-  yTo: plot.getAxes().yaxis.to
-
-clampRanges = (ranges) -> 
-  minutes = 60 * 1000
-  if ranges.xaxis.to - ranges.xaxis.from < 10 * minutes
-    ranges.xaxis.to = ranges.xaxis.from + 10 * minutes
-  if ranges.yaxis.to - ranges.yaxis.from < 10
-    ranges.yaxis.to = ranges.yaxis.from + 10
-
-onChartSelected = (series, originalBounds) -> (event, ranges) ->
-  clampRanges ranges
-  zoomedOptions = merge chartOptions,
-    xaxis:
-      min: ranges.xaxis.from
-      max: ranges.xaxis.to
-    yaxis:
-      min: ranges.yaxis.from
-      max: ranges.yaxis.to
-  $.plot "#batch-chart", series, zoomedOptions
-  addZoomOutButton series, originalBounds
 
 createSeries = (fails, passes) -> 
   [
@@ -119,9 +72,8 @@ window.createPassFailChart = ->
   series = createSeries chartData.fails, chartData.passes
 
   plot = $.plot($("#batch-chart"), series, chartOptions)
-  originalBounds = getPlotBounds plot
 
-  $("#batch-chart").bind "plotselected", onChartSelected(series, originalBounds)
+  addZoomSupport(plot, "batch-chart", series, chartOptions)
   $("#batch-chart").bind "plotclick", onChartClick(chartData.batchUrls)
   $("#batch-chart").bind "plothover", onChartHover(chartData.passes, chartData.fails)
 

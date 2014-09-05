@@ -31,27 +31,6 @@ addZoomOutButton = (series, originalBounds) ->
         max: originalBounds.yTo
     $.plot "#duration-chart", series, zoomedOptions
 
-onChartHover = (event, pos, item) ->
-  if item
-    eventDate = new Date(item.datapoint[0])
-    seconds = item.datapoint[1]
-    time = eventDate.toLocaleTimeString()
-    date = eventDate.toLocaleDateString()
-    tooltipText = "#{seconds} seconds #{time} #{date}"
-    $("#chart-tooltip").html(tooltipText).css(
-      top: item.pageY + 5
-      left: item.pageX + 5
-    ).fadeIn(200)
-  else
-    $("#chart-tooltip").hide()
-
-onChartClick = (executionUrls) -> (event, pos, item) ->
-  if item
-    window.location = executionUrls[item.seriesIndex][item.dataIndex]
-
-initialiseTooltip = ->
-  $("<div class='chart-tooltip' id='chart-tooltip'/>").appendTo "body"
-
 getPlotBounds = (plot) ->
   xFrom: plot.getAxes().xaxis.from
   xTo: plot.getAxes().xaxis.to
@@ -77,6 +56,25 @@ onChartSelected = (series, originalBounds) -> (event, ranges) ->
   $.plot "#duration-chart", series, zoomedOptions
   addZoomOutButton series, originalBounds
 
+onChartHover = (event, pos, item) ->
+  if item
+    eventDate = item.datapoint[0]
+    seconds = item.datapoint[1]
+    tooltipText = "#{seconds} seconds #{formatDate(eventDate)}"
+    $("#chart-tooltip").html(tooltipText).css(
+      top: item.pageY + 5
+      left: item.pageX + 5
+    ).fadeIn(200)
+  else
+    $("#chart-tooltip").hide()
+
+initialiseTooltip = ->
+  $("<div class='chart-tooltip' id='chart-tooltip'/>").appendTo "body"
+
+onChartClick = (executionUrls) -> (event, pos, item) ->
+  if item
+    window.location = executionUrls[item.seriesIndex][item.dataIndex]
+
 createSeries = (fails, passes) -> 
   [
     {
@@ -97,6 +95,7 @@ window.createDurationChart = (executionUrls, fails, passes) ->
   plot = $.plot $("#duration-chart"), series, chartOptions
   originalBounds = getPlotBounds plot
 
+  #addZoomSupport(plot, "duration-chart", series, chartOptions)
   $("#duration-chart").bind "plotselected", onChartSelected(series, originalBounds)
   $("#duration-chart").bind "plotclick", onChartClick(executionUrls)
   $("#duration-chart").bind "plothover", onChartHover

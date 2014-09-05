@@ -1,6 +1,7 @@
 @(batches: List[BatchView], jobIdOpt: Option[Id[JenkinsJob]], jobs: List[JenkinsJob], pagination: PaginationData, hideChartInitially: Boolean)(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
 
 @scripts = {
+  <script src="@routes.Assets.at("javascripts/chart-utils.js")"></script>
   <script src="@routes.Assets.at("javascripts/batches.js")"></script>
 }
 
