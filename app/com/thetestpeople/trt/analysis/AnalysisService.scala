@@ -5,6 +5,7 @@ import com.thetestpeople.trt.service.Clock
 import com.thetestpeople.trt.utils.HasLogger
 import com.thetestpeople.trt.utils.Utils
 import com.thetestpeople.trt.utils.LockUtils._
+import com.thetestpeople.trt.utils.CoalescingBlockingQueue
 import java.util.concurrent._
 import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.atomic.AtomicBoolean
@@ -23,7 +24,7 @@ class AnalysisService(dao: Dao, clock: Clock, async: Boolean = true) extends Has
   /**
    * Queue of tests which need their analysis updating
    */
-  private val testQueue: AnalysisQueue = new AnalysisQueue()
+  private val testQueue: CoalescingBlockingQueue[Id[Test]] = new CoalescingBlockingQueue()
 
   private def launchAnalyserThread() {
     new Thread(new Runnable() {
