@@ -1,19 +1,21 @@
 import scala.concurrent.duration._
-import scala.slick.driver.H2Driver
+
+import com.thetestpeople.trt.analysis.AnalysisService
+import com.thetestpeople.trt.jenkins.importer.JenkinsImportStatusManager
 import com.thetestpeople.trt.model.impl.SlickDao
+import com.thetestpeople.trt.model.impl.migration.DbMigrator
 import com.thetestpeople.trt.service._
 import com.thetestpeople.trt.utils._
 import com.thetestpeople.trt.utils.RichConfiguration._
+import com.thetestpeople.trt.utils.http.Http
+import com.thetestpeople.trt.utils.http.PathCachingHttp
+import com.thetestpeople.trt.utils.http.WsHttp
+
 import controllers._
-import play.api.mvc.Controller
+import play.api.Configuration
 import play.api.Play
 import play.api.db._
-import play.api.Configuration
-import com.thetestpeople.trt.model.impl.migration.DbMigrator
-import com.thetestpeople.trt.analysis.AnalysisService
-import com.thetestpeople.trt.utils.http.Http
-import com.thetestpeople.trt.utils.http.WsHttp
-import com.thetestpeople.trt.utils.http.PathCachingHttp
+import play.api.mvc.Controller
 
 object Factory {
 
@@ -65,7 +67,7 @@ class Factory(configuration: Configuration) {
 
   lazy val analysisService = new AnalysisService(dao, clock, async = true)
 
-  lazy val service: Service = new ServiceImpl(dao, clock, http, analysisService)
+  lazy val service: Service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager)
 
   lazy val adminService = new AdminServiceImpl(dao)
 
@@ -73,6 +75,8 @@ class Factory(configuration: Configuration) {
 
   lazy val jenkinsController = new JenkinsController(service)
 
+  lazy val jenkinsImportStatusManager: JenkinsImportStatusManager = new JenkinsImportStatusManager(clock)
+  
   lazy val jsonController = new JsonController(service, adminService)
 
   def getControllerInstance[A](clazz: Class[A]): A = controllerMap(clazz).asInstanceOf[A]
@@ -81,5 +85,4 @@ class Factory(configuration: Configuration) {
     classOf[Application] -> controller,
     classOf[JenkinsController] -> jenkinsController,
     classOf[JsonController] -> jsonController)
-
 }

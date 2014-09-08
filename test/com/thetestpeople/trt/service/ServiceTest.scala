@@ -3,14 +3,15 @@ package com.thetestpeople.trt.service
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
 import org.scalatest._
-import com.thetestpeople.trt.model.impl.MockDao
+import com.github.nscala_time.time.Imports._
 import com.thetestpeople.trt.utils._
 import com.thetestpeople.trt.utils.http._
 import com.thetestpeople.trt.mother.{ IncomingFactory ⇒ F }
+import com.thetestpeople.trt.model.impl.MockDao
 import com.thetestpeople.trt.model.impl.DummyData
 import com.thetestpeople.trt.model._
-import com.github.nscala_time.time.Imports._
 import com.thetestpeople.trt.analysis.AnalysisService
+import com.thetestpeople.trt.jenkins.importer.JenkinsImportStatusManager
 
 @RunWith(classOf[JUnitRunner])
 class ServiceTest extends FlatSpec with ShouldMatchers {
@@ -92,10 +93,10 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
     service.addBatch(F.batch(executions = List(F.execution(F.test("test3"), passed = false))))
     service.addBatch(F.batch(executions = List(F.execution(F.test("test4"), passed = true))))
     val (counts, testsAndAnalysis) = service.getTests(startingFrom = 0, limit = 2)
-    counts.total should be (4)
-    testsAndAnalysis.size should be (2)
+    counts.total should be(4)
+    testsAndAnalysis.size should be(2)
   }
-  
+
   "Deleting batches" should "delete the data and trigger analysis" in {
     val service = setup().service
     service.updateSystemConfiguration(SystemConfiguration(
@@ -139,7 +140,8 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
     val clock = FakeClock()
     val http = AlwaysFailingHttp
     val analysisService = new AnalysisService(dao, clock, async = false)
-    val service = new ServiceImpl(dao, clock, http, analysisService)
+    val jenkinsImportStatusManager = new JenkinsImportStatusManager(clock)
+    val service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager)
     Setup(service)
   }
 

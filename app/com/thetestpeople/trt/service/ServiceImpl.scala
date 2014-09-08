@@ -7,12 +7,14 @@ import com.thetestpeople.trt.service.jenkins.JenkinsServiceImpl
 import com.thetestpeople.trt.analysis._
 import java.net.URI
 import com.thetestpeople.trt.utils.http.Http
+import com.thetestpeople.trt.jenkins.importer.JenkinsImportStatusManager
 
 class ServiceImpl(
   protected val dao: Dao,
   protected val clock: Clock,
   protected val http: Http,
-  protected val analysisService: AnalysisService)
+  protected val analysisService: AnalysisService, 
+  protected val jenkinsImportStatusManager: JenkinsImportStatusManager)
     extends Service with HasLogger with JenkinsServiceImpl {
 
   protected lazy val batchRecorder = new BatchRecorder(dao, clock, analysisService)

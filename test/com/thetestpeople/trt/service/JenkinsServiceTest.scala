@@ -12,6 +12,7 @@ import com.thetestpeople.trt.model.impl.MockDao
 import java.net.URI
 import com.thetestpeople.trt.utils.http.AlwaysFailingHttp
 import com.thetestpeople.trt.utils.http.Http
+import com.thetestpeople.trt.jenkins.importer.JenkinsImportStatusManager
 
 @RunWith(classOf[JUnitRunner])
 class JenkinsServiceTest extends FlatSpec with ShouldMatchers {
@@ -31,7 +32,8 @@ class JenkinsServiceTest extends FlatSpec with ShouldMatchers {
     val dao = new MockDao
     val analysisService = new AnalysisService(dao, clock, async = false)
     val batchRecorder = new BatchRecorder(dao, clock, analysisService)
-    val service = new ServiceImpl(dao, clock, http, analysisService)
+    val jenkinsImportStatusManager = new JenkinsImportStatusManager(clock)
+    val service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager)
     Setup(service, batchRecorder)
   }
 
