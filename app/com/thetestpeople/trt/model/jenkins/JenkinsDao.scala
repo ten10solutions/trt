@@ -9,6 +9,11 @@ import java.net.URI
  */
 trait JenkinsDao {
 
+  /**
+   * Run the given block within a transaction
+   */
+  def transaction[T](block: ⇒ T): T
+
   def ensureJenkinsJob(job: JenkinsJob): Id[JenkinsJob]
 
   def newJenkinsBuild(jenkinsBuild: JenkinsBuild)

@@ -17,6 +17,18 @@ class JenkinsScraper(
 
   type Callback = (JenkinsJob, JenkinsBuild) ⇒ Unit
 
+  def getJenkinsJob(jobUrl: URI): Option[JenkinsJob] =
+    for {
+      jobXml ← getJobXml(jobUrl)
+      jenkinsJob ← parseJobXml(jobUrl, jobXml)
+    } yield jenkinsJob
+
+  def getBuildLinks(jobUrl: URI): Seq[JenkinsBuildLink] =
+    for {
+      jenkinsJob ← getJenkinsJob(jobUrl).toSeq
+      buildLink ← jenkinsJob.buildLinks
+    } yield buildLink
+
   def scrapeBuildsFromJob(jobUrl: URI)(buildCallback: Callback): Unit =
     for (jobXml ← getJobXml(jobUrl))
       scrapeBuildsFromJob(jobUrl, jobXml, buildCallback)
@@ -24,7 +36,8 @@ class JenkinsScraper(
   private def scrapeBuildsFromJob(jobUrl: URI, jobXml: Elem, buildCallback: Callback): Unit = {
     for {
       jenkinsJob ← parseJobXml(jobUrl, jobXml).toList
-      buildUrl ← jenkinsJob.buildUrls
+      buildLink ← jenkinsJob.buildLinks
+      buildUrl = buildLink.buildUrl
       if !alreadyImportedBuildUrls.contains(buildUrl)
       build ← scrapeBuild(buildUrl, jobUrl)
     } buildCallback(jenkinsJob, build)
@@ -74,7 +87,7 @@ class JenkinsScraper(
         None
     }
 
-  private def scrapeBuild(buildUrl: URI, jobUrl: URI): Option[JenkinsBuild] = {
+  def scrapeBuild(buildUrl: URI, jobUrl: URI): Option[JenkinsBuild] = {
     logger.debug(s"scrapeBuild($buildUrl)")
     for {
       buildXml ← getBuildXml(buildUrl)

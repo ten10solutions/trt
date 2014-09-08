@@ -14,6 +14,7 @@ import com.thetestpeople.trt.utils.http.Http
 import com.thetestpeople.trt.utils.http.AlwaysFailingHttp
 import com.thetestpeople.trt.utils.http.ClasspathCachingHttp
 import com.thetestpeople.trt.jenkins.importer.JenkinsImportStatusManager
+import com.thetestpeople.trt.jenkins.importer.FakeJenkinsImportQueue
 
 @RunWith(classOf[JUnitRunner])
 class JenkinsImportTest extends FlatSpec with ShouldMatchers {
@@ -58,7 +59,7 @@ class JenkinsImportTest extends FlatSpec with ShouldMatchers {
     val analysisService = new AnalysisService(dao, clock, async = false)
     val batchRecorder = new BatchRecorder(dao, clock, analysisService)
     val jenkinsImportStatusManager = new JenkinsImportStatusManager(clock)
-    val service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager)
+    val service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, FakeJenkinsImportQueue)
     Setup(service, batchRecorder)
   }
 

@@ -5,3 +5,4 @@ import org.joda.time.DateTime
 import java.net.URI
 
 case class JenkinsBuild(jobUrl: URI, buildSummary: BuildSummary, testResult: OrdinaryTestResult, consoleTextOpt: Option[String])
+

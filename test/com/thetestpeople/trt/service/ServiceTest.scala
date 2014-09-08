@@ -12,6 +12,7 @@ import com.thetestpeople.trt.model.impl.DummyData
 import com.thetestpeople.trt.model._
 import com.thetestpeople.trt.analysis.AnalysisService
 import com.thetestpeople.trt.jenkins.importer.JenkinsImportStatusManager
+import com.thetestpeople.trt.jenkins.importer.FakeJenkinsImportQueue
 
 @RunWith(classOf[JUnitRunner])
 class ServiceTest extends FlatSpec with ShouldMatchers {
@@ -141,7 +142,8 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
     val http = AlwaysFailingHttp
     val analysisService = new AnalysisService(dao, clock, async = false)
     val jenkinsImportStatusManager = new JenkinsImportStatusManager(clock)
-    val service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager)
+    val batchRecorder = new BatchRecorder(dao, clock, analysisService)
+    val service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, FakeJenkinsImportQueue)
     Setup(service)
   }
 

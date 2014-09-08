@@ -5,6 +5,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import com.thetestpeople.trt.utils.RichConfiguration._
 import com.thetestpeople.trt.Config._
 import com.thetestpeople.trt.utils.HasLogger
+import scala.concurrent.Future
 
 object Global extends GlobalSettings with HasLogger {
 
@@ -13,8 +14,15 @@ object Global extends GlobalSettings with HasLogger {
   override def onStart(app: Application) {
     factory.dbMigrator.migrate()
 
+    initialiseJenkinsImportWorker(app)
     initialiseJenkinsPoller(app)
     initialiseCountsCalculatorPoller(app)
+  }
+
+  private def initialiseJenkinsImportWorker(app: Application) {
+    Future {
+      factory.jenkinsImportWorker.run()
+    }
   }
 
   private def getDuration(configuration: Configuration, key: String, default: FiniteDuration): FiniteDuration =

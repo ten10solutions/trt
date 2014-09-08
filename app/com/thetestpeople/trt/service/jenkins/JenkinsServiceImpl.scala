@@ -80,14 +80,10 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
       success
     }
 
-  def syncJenkins(specId: Id[JenkinsImportSpec]) =
-    transaction(dao.getJenkinsImportSpec(specId)) match {
-      case Some(spec) ⇒
-        importNewJenkinsBuilds(specId, spec.jobUrl, spec.importConsoleLog, spec.configurationOpt)
-        true
-      case None ⇒
-        false
-    }
+  def syncJenkins(specId: Id[JenkinsImportSpec]) = {
+    jenkinsImportQueue.add(specId)
+    true
+  }
 
   def syncAllJenkins() {
     logger.debug("syncAllJenkins()")
@@ -96,6 +92,7 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
     def isOverdue(spec: JenkinsImportSpec) = spec.nextCheckDueOpt.forall(_ <= now)
     for (spec ← specs if isOverdue(spec))
       syncJenkins(spec.id)
+
   }
 
   def getJenkinsConfiguration(): FullJenkinsConfiguration = transaction { dao.getJenkinsConfiguration() }

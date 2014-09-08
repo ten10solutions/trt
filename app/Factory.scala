@@ -1,5 +1,4 @@
 import scala.concurrent.duration._
-
 import com.thetestpeople.trt.analysis.AnalysisService
 import com.thetestpeople.trt.jenkins.importer.JenkinsImportStatusManager
 import com.thetestpeople.trt.model.impl.SlickDao
@@ -10,12 +9,13 @@ import com.thetestpeople.trt.utils.RichConfiguration._
 import com.thetestpeople.trt.utils.http.Http
 import com.thetestpeople.trt.utils.http.PathCachingHttp
 import com.thetestpeople.trt.utils.http.WsHttp
-
 import controllers._
 import play.api.Configuration
 import play.api.Play
 import play.api.db._
 import play.api.mvc.Controller
+import com.thetestpeople.trt.jenkins.importer.JenkinsImportWorker
+import com.thetestpeople.trt.jenkins.importer.JenkinsImportWorker
 
 object Factory {
 
@@ -67,7 +67,7 @@ class Factory(configuration: Configuration) {
 
   lazy val analysisService = new AnalysisService(dao, clock, async = true)
 
-  lazy val service: Service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager)
+  lazy val service: Service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, jenkinsImportWorker)
 
   lazy val adminService = new AdminServiceImpl(dao)
 
@@ -76,8 +76,12 @@ class Factory(configuration: Configuration) {
   lazy val jenkinsController = new JenkinsController(service)
 
   lazy val jenkinsImportStatusManager: JenkinsImportStatusManager = new JenkinsImportStatusManager(clock)
-  
+
   lazy val jsonController = new JsonController(service, adminService)
+
+  lazy val batchRecorder = new BatchRecorder(dao, clock, analysisService)
+
+  lazy val jenkinsImportWorker = new JenkinsImportWorker(clock, http, dao, jenkinsImportStatusManager, batchRecorder)
 
   def getControllerInstance[A](clazz: Class[A]): A = controllerMap(clazz).asInstanceOf[A]
 
