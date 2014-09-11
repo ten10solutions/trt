@@ -16,7 +16,7 @@ Setup after clone:
     bower install
     activator run
     
-View website (http://localhost:9000/)
+View website ([http://localhost:9000](http://localhost:9000/))
 
 Run tests:
 
