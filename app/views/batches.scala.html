@@ -16,6 +16,12 @@
 
 @main("Batches", "Batches", scripts = scripts, css = css) {
 
+@if(batches.isEmpty) {
+
+  @noResultsYet()
+
+} else {
+
   <h2>Batches</h2>
   
   <div style="margin-bottom: 12px;" class="row">
@@ -127,5 +133,7 @@
   </form>
 
   @batchesPaginationWidget
+
+}
   
 }
