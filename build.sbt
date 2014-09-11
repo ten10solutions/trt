@@ -24,6 +24,7 @@ libraryDependencies ++= List(
   "postgresql" % "postgresql" % "9.1-901.jdbc4",
   "com.ocpsoft" % "ocpsoft-pretty-time" % "1.0.7",
   "joda-time" % "joda-time" % "2.3",
+  "org.pegdown" % "pegdown" % "1.0.2", // Needed for error when generating report: https://groups.google.com/forum/#!topic/scalatest-users/6TGms7jYn6E
   "org.joda" % "joda-convert" % "1.5",
   "com.github.tototoshi" %% "slick-joda-mapper" % "1.2.0",
   "com.github.nscala-time" %% "nscala-time" % "1.4.0",
@@ -65,7 +66,9 @@ resourceDirectory in Test <<= baseDirectory(_ / "testResources")
 // Override specs2 options
 // & Stop problem with tests executing twice because of "JUnitRunner" annotation:
 
-testOptions in Test := Seq(Tests.Argument(TestFrameworks.JUnit, "--ignore-runners=org.scalatest.junit.JUnitRunner")) 
+(testOptions in Test) := Seq(Tests.Argument(TestFrameworks.JUnit, "--ignore-runners=org.scalatest.junit.JUnitRunner")) 
+
+(testOptions in Test) += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/report")
 
 // Deb packaging:
 

@@ -48,6 +48,7 @@ object DummyData {
   val JenkinsCrumb = Crumb("ab133bb9a146966dd7f34d7cacb2ae38")
   val JenkinsUrl = uri("http://www.example.com/")
   val JenkinsToken = "Token"
+  val BuildNumber = 1
   
   val Configuration1 = Configuration("Configuration1")
   val Configuration2 = Configuration("Configuration2")

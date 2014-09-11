@@ -1,0 +1,30 @@
+th.build-number-col {
+  width: 120px;
+}
+
+td.build-number-cell {
+}
+
+
+th.status-col {
+  width: 320px;
+}
+
+td.status-cell {
+}
+
+th.updated-col {
+  width: 140px;
+}
+
+td.udpated-cell {
+}
+
+th.batch-col {
+  text-align: center;
+  width: 64px;
+}
+
+td.batch-cell {
+  text-align: center;
+}

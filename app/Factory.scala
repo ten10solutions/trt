@@ -16,6 +16,7 @@ import play.api.db._
 import play.api.mvc.Controller
 import com.thetestpeople.trt.jenkins.importer.JenkinsImportWorker
 import com.thetestpeople.trt.jenkins.importer.JenkinsImportWorker
+import com.thetestpeople.trt.jenkins.importer.JenkinsImporter
 
 object Factory {
 
@@ -81,7 +82,9 @@ class Factory(configuration: Configuration) {
 
   lazy val batchRecorder = new BatchRecorder(dao, clock, analysisService)
 
-  lazy val jenkinsImportWorker = new JenkinsImportWorker(clock, http, dao, jenkinsImportStatusManager, batchRecorder)
+  lazy val jenkinsImporter = new JenkinsImporter(clock, http, dao, jenkinsImportStatusManager, batchRecorder)
+  
+  lazy val jenkinsImportWorker = new JenkinsImportWorker(dao, jenkinsImporter)
 
   def getControllerInstance[A](clazz: Class[A]): A = controllerMap(clazz).asInstanceOf[A]
 

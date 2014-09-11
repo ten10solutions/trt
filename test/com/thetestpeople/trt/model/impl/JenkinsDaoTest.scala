@@ -76,12 +76,27 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
     val build = JenkinsBuild(
       jobId = jobId,
       batchId = batchId,
+      buildNumber = DummyData.BuildNumber,
       importTime = DummyData.ImportTime,
       buildUrl = DummyData.BuildUrl)
     dao.newJenkinsBuild(build)
 
     val Some(buildAgain) = dao.getJenkinsBuild(DummyData.BuildUrl)
     buildAgain should equal(build)
+  }
+
+  "Fetching jenkins builds associated with a job URL" should "return the builds" in transaction { dao ⇒
+    val batchId1 = dao.newBatch(F.batch())
+    val batchId2 = dao.newBatch(F.batch())
+    val jobId = dao.ensureJenkinsJob(F.jenkinsJob(url = DummyData.JobUrl))
+    val build1 = F.jenkinsBuild(jobId = jobId, batchId = batchId1, buildUrl = DummyData.BuildUrl)
+    val build2 = F.jenkinsBuild(jobId = jobId, batchId = batchId2, buildUrl = DummyData.BuildUrl2)
+    dao.newJenkinsBuild(build1)
+    dao.newJenkinsBuild(build2)
+
+    val builds = dao.getJenkinsBuilds(DummyData.JobUrl)
+
+    builds should contain theSameElementsAs (Seq(build1, build2))
   }
 
   "The DAO" should "return all the Jenkins build URLs" in transaction { dao ⇒
@@ -134,4 +149,5 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
     val fullConfigAgain = dao.getJenkinsConfiguration
     fullConfigAgain should equal(fullConfig)
   }
+  
 }

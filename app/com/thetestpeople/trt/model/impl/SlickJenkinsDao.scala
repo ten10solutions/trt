@@ -32,6 +32,17 @@ trait SlickJenkinsDao { this: SlickDao ⇒
 
   def getJenkinsBuildUrls(): List[URI] = jenkinsBuilds.map(_.buildUrl).run.toList
 
+  def getJenkinsBuilds(jobUrl: URI): Seq[JenkinsBuild] = {
+    val query =
+      for {
+        job ← jenkinsJobs
+        build ← jenkinsBuilds
+        if build.jobId === job.id
+        if job.url === jobUrl
+      } yield build
+    query.run
+  }
+
   def getJenkinsJobs(): List[JenkinsJob] = jenkinsJobs.run.toList
 
   def newJenkinsImportSpec(spec: JenkinsImportSpec): Id[JenkinsImportSpec] =

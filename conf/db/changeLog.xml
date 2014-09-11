@@ -295,5 +295,12 @@
       <column name="test_id" />
     </createIndex>
   </changeSet> <!--  not needed --> 
+
+  <changeSet author="matt" id="add_build_number">
+    <addColumn tableName="jenkins_builds">
+      <column name="build_number" type="INT" defaultValue="1"/>
+    </addColumn>
+  </changeSet> 
+
   
 </databaseChangeLog>

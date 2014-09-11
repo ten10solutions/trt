@@ -18,4 +18,5 @@ case class HttpResponse(status: Int, statusText: String, body: String = "") {
         val bodyStart = body.take(200)
         throw new HttpException(s"Problem parsing XML from response body: $bodyStart", e)
     }
+  
 }

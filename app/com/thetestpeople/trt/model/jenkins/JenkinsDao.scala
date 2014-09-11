@@ -26,6 +26,8 @@ trait JenkinsDao {
   def getJenkinsBuildUrls(): List[URI]
 
   def getJenkinsJobs(): List[JenkinsJob]
+  
+  def getJenkinsBuilds(jobUrl: URI): Seq[JenkinsBuild]
 
   def newJenkinsImportSpec(spec: JenkinsImportSpec): Id[JenkinsImportSpec]
 

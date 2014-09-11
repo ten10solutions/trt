@@ -17,10 +17,11 @@ class JenkinsImportStatusManager(clock: Clock) {
 
   private val lock: Lock = new ReentrantLock
 
-  private var specStatuses: Map[Id[JenkinsImportSpec], JenkinsSpecImportStatus] = Map()
+  private var specStatuses: Map[Id[JenkinsImportSpec], MutableJenkinsSpecImportStatus] = Map()
 
   def importStarted(id: Id[JenkinsImportSpec], jobUrl: URI) = lock.withLock {
-    specStatuses += id -> new JenkinsSpecImportStatus(jobUrl)
+    specStatuses += id -> new MutableJenkinsSpecImportStatus(id, jobUrl)
+    specStatuses(id).started()
   }
 
   def importComplete(id: Id[JenkinsImportSpec]) = lock.withLock {
@@ -31,25 +32,42 @@ class JenkinsImportStatusManager(clock: Clock) {
     specStatuses(id).errored(t)
   }
 
-  def buildStarted(id: Id[JenkinsImportSpec], buildUrl: URI, buildNumber: Int) = lock.withLock {
-    specStatuses(id).buildStarted(buildUrl, buildNumber)
+  def getBuildImportStatuses(id: Id[JenkinsImportSpec]): Seq[JenkinsBuildImportStatus] = lock.withLock {
+    specStatuses.get(id).toSeq.flatMap(importStatus ⇒ importStatus.getBuildStatuses.map(_.snapshot))
   }
 
-  def buildComplete(id: Id[JenkinsImportSpec], buildUrl: URI, batchId: Id[Batch], numberOfExecutions: Int) = lock.withLock {
-    specStatuses(id).buildComplete(buildUrl, batchId, numberOfExecutions)
+  def getJobImportStatus(id: Id[JenkinsImportSpec]): Option[JenkinsJobImportStatus] = lock.withLock {
+    specStatuses.get(id).map(_.snapshot)
+  }
+
+  def buildExists(id: Id[JenkinsImportSpec], buildUrl: URI, buildNumber: Int) = lock.withLock {
+    specStatuses(id).buildExists(buildUrl, buildNumber)
+  }
+
+  def buildStarted(id: Id[JenkinsImportSpec], buildUrl: URI) = lock.withLock {
+    specStatuses(id).buildStarted(buildUrl)
+  }
+
+  def buildComplete(id: Id[JenkinsImportSpec], buildUrl: URI, batchId: Id[Batch]) = lock.withLock {
+    specStatuses(id).buildComplete(buildUrl, batchId)
   }
 
   def buildErrored(id: Id[JenkinsImportSpec], buildUrl: URI, t: Throwable) = lock.withLock {
     specStatuses(id).buildErrored(buildUrl, t)
   }
 
-  private class JenkinsSpecImportStatus(jobUrl: URI) {
+  private class MutableJenkinsSpecImportStatus(specId: Id[JenkinsImportSpec], jobUrl: URI) {
 
     private var updatedAt: DateTime = clock.now
 
-    private var state: JobImportState = JobImportState.InProgress
+    private var state: JobImportState = JobImportState.NotStarted
 
-    private var buildStatuses: Map[URI, JenkinsBuildImportStatus] = Map()
+    private var buildStatuses: Map[URI, MutableJenkinsBuildImportStatus] = Map()
+
+    def started() = {
+      updatedAt = clock.now
+      state = JobImportState.InProgress
+    }
 
     def complete() = {
       updatedAt = clock.now
@@ -61,29 +79,42 @@ class JenkinsImportStatusManager(clock: Clock) {
       state = JobImportState.Errored(t)
     }
 
-    def buildStarted(buildUrl: URI, buildNumber: Int) = {
-      buildStatuses += buildUrl -> new JenkinsBuildImportStatus(buildNumber)
+    def getBuildStatuses = buildStatuses.values.toSeq
+
+    def buildExists(buildUrl: URI, buildNumber: Int) = {
+      buildStatuses += buildUrl -> new MutableJenkinsBuildImportStatus(buildUrl, buildNumber)
     }
 
-    def buildComplete(buildUrl: URI, batchId: Id[Batch], numberOfExecutions: Int) = {
-      buildStatuses(buildUrl).buildComplete(batchId, numberOfExecutions)
+    def buildStarted(buildUrl: URI) = {
+      buildStatuses(buildUrl).buildStarted()
+    }
+
+    def buildComplete(buildUrl: URI, batchId: Id[Batch]) = {
+      buildStatuses(buildUrl).buildComplete(batchId)
     }
 
     def buildErrored(buildUrl: URI, t: Throwable) = {
       buildStatuses(buildUrl).buildErrored(t)
     }
 
+    def snapshot = JenkinsJobImportStatus(specId, updatedAt, state)
+
   }
 
-  private class JenkinsBuildImportStatus(buildNumber: Int) {
+  private class MutableJenkinsBuildImportStatus(val buildUrl: URI, val buildNumber: Int) {
 
     private var updatedAt: DateTime = clock.now
 
-    private var state: BuildImportState = BuildImportState.InProgress
+    private var state: BuildImportState = BuildImportState.NotStarted
 
-    def buildComplete(batchId: Id[Batch], numberOfExecutions: Int) {
+    def buildStarted() {
       updatedAt = clock.now
-      state = BuildImportState.Complete(batchId, numberOfExecutions)
+      state = BuildImportState.InProgress
+    }
+
+    def buildComplete(batchId: Id[Batch]) {
+      updatedAt = clock.now
+      state = BuildImportState.Complete(batchId)
     }
 
     def buildErrored(t: Throwable) {
@@ -91,16 +122,23 @@ class JenkinsImportStatusManager(clock: Clock) {
       state = BuildImportState.Errored(t)
     }
 
+    def snapshot = JenkinsBuildImportStatus(buildUrl, buildNumber, updatedAt, state)
+
   }
 
 }
 
+case class JenkinsBuildImportStatus(buildUrl: URI, buildNumber: Int, updatedAt: DateTime, state: BuildImportState)
+
+case class JenkinsJobImportStatus(specId: Id[JenkinsImportSpec], updatedAt: DateTime, state: JobImportState)
+
 sealed trait BuildImportState
 
 object BuildImportState {
-  case class Complete(batchId: Id[Batch], numberOfExecutions: Int) extends BuildImportState
+  case class Complete(batchId: Id[Batch]) extends BuildImportState
   case object InProgress extends BuildImportState
   case class Errored(t: Throwable) extends BuildImportState
+  case object NotStarted extends BuildImportState
 }
 
 sealed trait JobImportState
@@ -109,4 +147,5 @@ object JobImportState {
   case object Complete extends JobImportState
   case object InProgress extends JobImportState
   case class Errored(t: Throwable) extends JobImportState
+  case object NotStarted extends JobImportState
 }

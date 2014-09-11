@@ -56,6 +56,7 @@ object Global extends GlobalSettings with HasLogger {
   }
 
   override def onStop(app: Application) {
+    factory.jenkinsImportWorker.stop()
   }
 
   override def getControllerInstance[A](clazz: Class[A]): A = factory.getControllerInstance(clazz)

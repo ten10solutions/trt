@@ -9,144 +9,117 @@ import com.thetestpeople.trt.utils.UriUtils._
 import com.thetestpeople.trt.utils.http.Credentials
 import com.thetestpeople.trt.utils.http._
 
+class JenkinsScraperException(message: String, cause: Throwable = null) extends RuntimeException(message, cause)
+
 class JenkinsScraper(
     http: Http,
     credentialsOpt: Option[Credentials],
-    fetchConsole: Boolean,
-    alreadyImportedBuildUrls: Set[URI]) extends HasLogger {
+    fetchConsole: Boolean) extends HasLogger {
 
-  type Callback = (JenkinsJob, JenkinsBuild) ⇒ Unit
-
-  def getJenkinsJob(jobUrl: URI): Option[JenkinsJob] =
-    for {
-      jobXml ← getJobXml(jobUrl)
-      jenkinsJob ← parseJobXml(jobUrl, jobXml)
-    } yield jenkinsJob
-
-  def getBuildLinks(jobUrl: URI): Seq[JenkinsBuildLink] =
-    for {
-      jenkinsJob ← getJenkinsJob(jobUrl).toSeq
-      buildLink ← jenkinsJob.buildLinks
-    } yield buildLink
-
-  def scrapeBuildsFromJob(jobUrl: URI)(buildCallback: Callback): Unit =
-    for (jobXml ← getJobXml(jobUrl))
-      scrapeBuildsFromJob(jobUrl, jobXml, buildCallback)
-
-  private def scrapeBuildsFromJob(jobUrl: URI, jobXml: Elem, buildCallback: Callback): Unit = {
-    for {
-      jenkinsJob ← parseJobXml(jobUrl, jobXml).toList
-      buildLink ← jenkinsJob.buildLinks
-      buildUrl = buildLink.buildUrl
-      if !alreadyImportedBuildUrls.contains(buildUrl)
-      build ← scrapeBuild(buildUrl, jobUrl)
-    } buildCallback(jenkinsJob, build)
+  @throws[JenkinsScraperException]
+  def getJenkinsJob(jobUrl: URI): JenkinsJob = {
+    val jobXml = getJobXml(jobUrl)
+    parseJobXml(jobUrl, jobXml)
   }
 
-  private def parseJobXml(jobUrl: URI, jobXml: Elem): Option[JenkinsJob] =
+  private def parseJobXml(jobUrl: URI, jobXml: Elem): JenkinsJob =
     try
-      Some(new JenkinsJobXmlParser().parse(jobXml))
+      new JenkinsJobXmlParser().parse(jobXml)
     catch {
       case e: ParseException ⇒
-        logger.error(s"Problem parsing Jenkins job XML from $jobUrl", e)
-        None
+        throw new JenkinsScraperException(s"Problem parsing Jenkins job XML from $jobUrl", e)
     }
 
-  private def scrapeTestResult(buildUrl: URI): Option[OrdinaryTestResult] =
-    for {
-      testXml ← getTestResultsXml(buildUrl)
-      testResult ← parseTestResultsXml(testResultsUrl(buildUrl), testXml)
-      ordinaryResult ← testResult match {
-        case result: MatrixTestResult   ⇒ processMatrixTestResult(result)
-        case result: OrdinaryTestResult ⇒ Some(result)
-      }
-    } yield ordinaryResult
+  private def scrapeTestResult(buildUrl: URI): Option[OrdinaryTestResult] = {
+    val testXml = getTestResultsXml(buildUrl)
+    val testResult = parseTestResultsXml(testResultsUrl(buildUrl), testXml)
+    testResult match {
+      case result: MatrixTestResult   ⇒ processMatrixTestResult(result)
+      case result: OrdinaryTestResult ⇒ Some(result)
+    }
+  }
 
-  private def parseTestResultsXml(testUrl: URI, testXml: Elem): Option[TestResult] =
+  private def parseTestResultsXml(testUrl: URI, testXml: Elem): TestResult =
     try
-      Some(new JenkinsTestResultXmlParser().parseTestResult(testXml))
+      new JenkinsTestResultXmlParser().parseTestResult(testXml)
     catch {
       case e: ParseException ⇒
-        logger.error(s"Problem parsing test result XML from $testUrl", e)
-        None
+        throw new JenkinsScraperException(s"Problem parsing test result XML from $testUrl: ${e.getMessage}", e)
     }
 
   private def processMatrixTestResult(testResult: MatrixTestResult): Option[OrdinaryTestResult] =
     for {
       childUrl ← testResult.urls.headOption // TODO: handle more than one matrix result
-      childTestXml ← getTestResultsXml(childUrl)
-      testResult ← parseOrdinaryTestResult(childTestXml)
-    } yield testResult
+      childTestXml = getTestResultsXml(childUrl)
+    } yield parseOrdinaryTestResult(childTestXml)
 
-  private def parseOrdinaryTestResult(testResultXml: Elem): Option[OrdinaryTestResult] =
+  private def parseOrdinaryTestResult(testResultXml: Elem): OrdinaryTestResult =
     try
-      Some(new JenkinsTestResultXmlParser().parseOrdinaryTestResult(testResultXml))
+      new JenkinsTestResultXmlParser().parseOrdinaryTestResult(testResultXml)
     catch {
       case e: ParseException ⇒
-        logger.error("Problem parsing test result", e)
-        None
+        throw new JenkinsScraperException(s"Problem parsing test result: ${e.getMessage}", e)
     }
 
+  @throws[JenkinsScraperException]
   def scrapeBuild(buildUrl: URI, jobUrl: URI): Option[JenkinsBuild] = {
     logger.debug(s"scrapeBuild($buildUrl)")
-    for {
-      buildXml ← getBuildXml(buildUrl)
-      buildSummary ← parseBuild(buildUrl, buildXml)
-      if buildSummary.hasTestReport
-      testResult ← scrapeTestResult(buildUrl)
-      consoleTextOpt = if (fetchConsole) getConsole(buildUrl) else None
-    } yield JenkinsBuild(jobUrl, buildSummary, testResult, consoleTextOpt)
+    val buildXml = getBuildXml(buildUrl)
+    val buildSummary = parseBuild(buildUrl, buildXml)
+    if (buildSummary.hasTestReport) {
+      scrapeTestResult(buildUrl)
+      for {
+        testResult ← scrapeTestResult(buildUrl)
+        consoleTextOpt = if (fetchConsole) Some(getConsole(buildUrl)) else None
+      } yield JenkinsBuild(jobUrl, buildSummary, testResult, consoleTextOpt)
+    } else
+      None
   }
 
-  private def parseBuild(buildUrl: URI, buildXml: Elem): Option[BuildSummary] =
+  private def parseBuild(buildUrl: URI, buildXml: Elem): BuildSummary =
     try
-      Some(new JenkinsBuildXmlParser().parseBuild(buildXml))
+      new JenkinsBuildXmlParser().parseBuild(buildXml)
     catch {
       case e: ParseException ⇒
-        logger.error(s"Problem parsing Jenkins build XML from $buildUrl", e)
-        None
+        throw new JenkinsScraperException(s"Problem parsing Jenkins build XML from $buildUrl", e)
     }
 
-  private def getJobXml(jobUrl: URI): Option[Elem] = {
+  private def getJobXml(jobUrl: URI): Elem = {
     val url = jobUrl / "api/xml"
     try
-      Some(http.get(url, basicAuthOpt = credentialsOpt).bodyAsXml)
+      http.get(url, basicAuthOpt = credentialsOpt).bodyAsXml
     catch {
       case e: HttpException ⇒
-        logger.error(s"Problem getting Jenkins job information from $url", e)
-        None
+        throw new JenkinsScraperException(s"Problem getting Jenkins job information from $url", e)
     }
   }
 
-  private def getBuildXml(buildUrl: URI): Option[Elem] = {
+  private def getBuildXml(buildUrl: URI): Elem = {
     val url = buildUrl / "api/xml"
     try
-      Some(http.get(url, basicAuthOpt = credentialsOpt).bodyAsXml)
+      http.get(url, basicAuthOpt = credentialsOpt).bodyAsXml
     catch {
       case e: HttpException ⇒
-        logger.error(s"Problem getting Jenkins buid information for $url", e)
-        None
+        throw new JenkinsScraperException(s"Problem getting Jenkins build information from $url", e)
     }
   }
 
   private def testResultsUrl(buildUrl: URI): URI = buildUrl / "testReport/api/xml"
 
-  private def getTestResultsXml(buildUrl: URI): Option[Elem] =
+  private def getTestResultsXml(buildUrl: URI): Elem =
     try
-      Some(http.get(testResultsUrl(buildUrl), basicAuthOpt = credentialsOpt).bodyAsXml)
+      http.get(testResultsUrl(buildUrl), basicAuthOpt = credentialsOpt).bodyAsXml
     catch {
       case e: HttpException ⇒
-        logger.error(s"Problem getting Jenkins test results for build $buildUrl", e)
-        None
+        throw new JenkinsScraperException(s"Problem getting Jenkins test results for build $buildUrl", e)
     }
 
-  private def getConsole(buildUrl: URI): Option[String] =
+  private def getConsole(buildUrl: URI): String =
     try
-      Some(http.get(buildUrl / "consoleText", basicAuthOpt = credentialsOpt).body)
+      http.get(buildUrl / "consoleText", basicAuthOpt = credentialsOpt).body
     catch {
       case e: HttpException ⇒
-        logger.error(s"Problem getting console log for $buildUrl", e)
-        None
+        throw new JenkinsScraperException(s"Problem getting console log for $buildUrl", e)
     }
 
 }

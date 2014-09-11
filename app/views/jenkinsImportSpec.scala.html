@@ -1,46 +1,158 @@
-@(jenkinsImportForm: Form[EditableJenkinsImportData], specOpt: Option[Id[JenkinsImportSpec]])(implicit flash: Flash, globalViewContext: GlobalViewContext)
+@(spec: JenkinsImportSpec, jobImportInfo: JenkinsJobImportInfo, builds: Seq[JenkinsBuildImportInfo], name: String, progress: Int)(implicit flash: Flash, globalViewContext: GlobalViewContext)
 
-@import BootstrapHelpers._
- 
-@main("Jenkins Job", "Jenkins Job") {
+@css = {
+  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jenkinsImportSpec.css")">
+}
 
-  <h2>Jenkins Job</h2>  
+@scripts = {
+  <script src="@routes.Assets.at("javascripts/jenkinsImportSpec.js")"></script>
+}
 
-  @helper.form(action = specOpt match { 
-    case None       => routes.JenkinsController.createJenkinsImportSpec
-    case Some(id) => routes.JenkinsController.updateJenkinsImportSpec(id)
-   }, 'role -> "form") {
-    
-    @helper.inputText(jenkinsImportForm("jobUrl"), 
-      'class -> "form-control",
-      'placeholder -> "Job URL",
-	    '_label -> "Job URL", 
-	    '_help -> "URL of a Jenkins job, e.g. http://some-jenkins/job/my-job-name/")
-  
-    @helper.inputText(jenkinsImportForm("pollingInterval"), 
-      'class -> "form-control",
-      'placeholder -> "Polling interval",
-	    '_label -> "Polling interval", 
-	    '_help -> "How long to wait between checking for new results")
-  
-    @helper.checkbox(jenkinsImportForm("importConsoleLog"),
-      'class -> "checkbox",
-      '_label -> "Import console log",  
-      '_help -> "If true, import the console log of each build")
-    
-    @helper.inputText(jenkinsImportForm("configuration"), 
-      'class -> "form-control",
-      'placeholder -> "Configuration",
-      '_label -> "Configuration", 
-      '_help -> "Configuration label to associate with runs imported from this job. (Or none, if left blank).")
- 
-    <div class="form-actions">
-      <button type="submit" class="btn btn-primary">
-         @if(specOpt.isDefined){ Update } else { Create }
-       </button>
-      <a href="@routes.JenkinsController.jenkinsImportSpecs()" class="btn btn-default" role="button">Cancel</a>
-    </div>
-	
+@main("Jenkins Import Status", "Jenkins Import Status", css = css, scripts = scripts) {
+
+<ol class="breadcrumb">
+  <li><a href="@routes.JenkinsController.jenkinsImportSpecs()">Jenkins Jobs</a></li>
+  <li class="active">@name</li>
+</ol>
+
+<h2>Jenkins Import Status</h2>  
+
+<table style="margin-top: 15px" class="table table-striped table-bordered table-hover">
+  <tr>
+    <td>Job name</td>
+    <td>@name</td>
+  </tr>
+  <tr>
+    <td>URL</td>
+    <td><a href="@spec.jobUrl">@spec.jobUrl</a></td>
+  </tr>
+  <tr>
+    <td>Status</td>
+    <td>
+      @jobImportInfo.importState.description
+      @if(jobImportInfo.importState == ImportState.NotStarted) {
+       @* 
+        <div class="progress">
+          <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+          </div>
+        </div>
+       *@
+      }
+      @if(jobImportInfo.importState == ImportState.InProgress) {
+        <div class="progress">
+          <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: @{progress}%">
+          </div>
+        </div>
+      }
+      @if(jobImportInfo.importState == ImportState.Complete) {
+        <div class="progress">
+          <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+          </div>
+        </div>
+      }
+      @if(jobImportInfo.importState == ImportState.Errored) {
+        <div class="progress">
+          <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+          </div>
+        </div>
+      }
+    </td>
+  </tr>
+  @for(summary <- jobImportInfo.summaryOpt) {
+    <tr>
+      <td>Summary</td>
+      <td>@summary</td>
+    </tr>
   }
- 
+  @for(details <- jobImportInfo.detailsOpt) {
+    <tr>
+      <td>Details</td>
+      <td>
+        <button id="show-job-details-button" class="btn btn-default" title="Show details"><i class="glyphicon glyphicon-plus"></i> Show details</button>
+        <button id="hide-job-details-button" class="btn btn-default" title="Hide details" style="display: none"><i class="glyphicon glyphicon-minus"> </i> Hide details</button>
+        <pre id="job-details" style="width: 800px; display: none">@details</pre>
+      </td>
+    </tr>
+  }
+
+  <tr>
+    <td>Sync</td>
+    <td>
+      <form action="@routes.JenkinsController.syncJenkins(spec.id)" method="post">
+        <button class="btn btn-default" title="Check for new builds now"><i class="glyphicon glyphicon-refresh"></i> Sync</button>
+      </form>
+     </td>
+  </tr>
+  <tr>
+    <td>Configure</td>
+    <td><a href="@routes.JenkinsController.editJenkinsImportSpec(spec.id)">Configure how this job is imported</a></td>
+  </tr>
+</table>
+
+<h3>Builds</h3>
+
+<table style="margin-top: 15px" class="table table-striped table-bordered table-hover">
+<tr>
+  <th class="build-number-col">Build number</th>
+  <th class="status-col">Status</th>
+  <th class="summary-col">Summary</th>
+  <th class="updated-col">Updated</th>
+  <th class="batch-col">Batch</th>
+</tr>
+
+@for(build <- builds) {
+  <tr>
+    <td class="build-number-cell"><a href="@build.buildUrl">#@build.buildNumber</a></td>
+    <td class="status-cell">@build.importState.description 
+      @if(build.importState == ImportState.NotStarted) {
+        @*
+        <div class="progress">
+          <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+          </div>
+        </div>
+        *@
+      }
+      @if(build.importState == ImportState.InProgress) {
+        <div class="progress">
+          <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 50%">
+          </div>
+        </div>
+      }
+      @if(build.importState == ImportState.Complete) {
+        <div class="progress">
+          <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+          </div>
+        </div>
+      }
+      @if(build.importState == ImportState.Errored) {
+        <div class="progress">
+          <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+          </div>
+        </div>
+      }
+    </td>
+    <td class="summary-cell">@for(summary <- build.summaryOpt) { @summary }
+      @for(details <- build.detailsOpt) {
+        <br/>
+        <button id="show-build-details-button-@{build.buildNumber}" class="btn btn-default" title="Show details"><i class="glyphicon glyphicon-plus"></i> Show details</button>
+        <button id="hide-build-details-button-@{build.buildNumber}" class="btn btn-default" title="Hide details" style="display: none"><i class="glyphicon glyphicon-minus"> </i> Hide details</button>
+        <pre id="build-details-@{build.buildNumber}" style="width: 800px; display: none">@details</pre>
+        <script>
+          $(document).ready(function() {
+            setUpDetailsToggleButton('build-details-@{build.buildNumber}', 'show-build-details-button-@{build.buildNumber}', 'hide-build-details-button-@{build.buildNumber}')
+          });
+        </script>
+      }
+    </td>
+    <td class="updated-cell"><span title="@build.updatedAt.absolute">@build.updatedAt.relative</span></td>
+    <td class="batch-cell">
+      @for(batchId <- build.batchIdOpt) {
+        <a href="@routes.Application.batch(batchId)">Batch</a>
+      }
+    </td>
+  </tr>
+}
+</table>
+
+
 }

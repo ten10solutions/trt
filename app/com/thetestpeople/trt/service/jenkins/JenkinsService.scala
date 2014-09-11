@@ -3,6 +3,9 @@ package com.thetestpeople.trt.service.jenkins
 import com.thetestpeople.trt.model._
 import com.thetestpeople.trt.model.jenkins._
 import com.thetestpeople.trt.jenkins.trigger.TriggerResult
+import java.net.URI
+import com.thetestpeople.trt.jenkins.importer.JenkinsBuildImportStatus
+import com.thetestpeople.trt.jenkins.importer.JenkinsJobImportStatus
 
 trait JenkinsService {
 
@@ -25,10 +28,13 @@ trait JenkinsService {
   def deleteJenkinsImportSpec(id: Id[JenkinsImportSpec]): Boolean
 
   /**
-   * @return true if the import spec was synced, false if there was no import spec with the given ID
+   * Schedule the given Jenkins job to be scanned for builds to import
    */
-  def syncJenkins(id: Id[JenkinsImportSpec]): Boolean
+  def syncJenkins(id: Id[JenkinsImportSpec])
 
+  /**
+   * Schedule all the Jenkins jobs to be scanned for builds to import
+   */
   def syncAllJenkins()
 
   def getJenkinsConfiguration(): FullJenkinsConfiguration
@@ -44,4 +50,9 @@ trait JenkinsService {
 
   def getJenkinsJobs(): List[JenkinsJob]
 
+  def getJenkinsBuilds(jobUrl: URI): Seq[JenkinsBuild]
+
+  def getBuildImportStatuses(specId: Id[JenkinsImportSpec]): Seq[JenkinsBuildImportStatus]
+
+  def getJobImportStatus(specId: Id[JenkinsImportSpec]): Option[JenkinsJobImportStatus]
 }

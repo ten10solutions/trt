@@ -18,7 +18,7 @@
         <th class="polling-interval-col">Polling interval</th>
         <th class="import-console-col">Import console log?</th>
         <th class="configuration-col">Configuration</th>
-        <th colspan=3></th>
+        <th colspan=4></th>
       </tr>
     </thead>
     <tbody>
@@ -30,6 +30,7 @@
           <td class="import-console-cell">@if(spec.importConsoleLog) { <i class="glyphicon glyphicon-ok"></i> }</td>
           <td class="configuration-cell">@spec.configuration</td>
           <td class="configure-cell"><a href="@routes.JenkinsController.editJenkinsImportSpec(spec.id)">Configure</a></td>
+          <td class="import-status-cell"><a href="@routes.JenkinsController.getJenkinsImportSpec(spec.id)">View import status</a></td>
           <td class="sync-cell">
             <form action="@routes.JenkinsController.syncJenkins(spec.id)" method="post">
               <button class="btn btn-default" title="Check for new builds now"><i class="glyphicon glyphicon-refresh"></i> Sync</button>
@@ -43,7 +44,7 @@
         </tr>
       }
       <tr>
-        <td colspan="8" style="text-align: center">
+        <td colspan="9" style="text-align: center">
            <a href="@routes.JenkinsController.newJenkinsImportSpec"><i class="glyphicon glyphicon-plus"></i> Add new</a>
         </td>
       </tr>

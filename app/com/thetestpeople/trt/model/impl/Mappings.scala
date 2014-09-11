@@ -136,9 +136,10 @@ trait Mappings { self: SlickDao ⇒
     def batchId = column[Id[Batch]]("batch_id", O.PrimaryKey, O.NotNull)
     def importTime = column[DateTime]("import_time", O.NotNull)
     def buildUrl = column[URI]("build_url", O.NotNull)
+    def buildNumber = column[Int]("build_number", O.NotNull)
     def jobId = column[Id[JenkinsJob]]("job_id", O.NotNull)
 
-    def * = (batchId, importTime, buildUrl, jobId) <> (JenkinsBuild.tupled, JenkinsBuild.unapply)
+    def * = (batchId, importTime, buildUrl, buildNumber, jobId) <> (JenkinsBuild.tupled, JenkinsBuild.unapply)
 
     def buildUrlIndex = index("idx_jenkins_build_url", buildUrl, unique = true)
 

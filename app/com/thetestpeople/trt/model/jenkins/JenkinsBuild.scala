@@ -8,4 +8,5 @@ case class JenkinsBuild(
   batchId: Id[Batch],
   importTime: DateTime,
   buildUrl: URI,
+  buildNumber: Int,
   jobId: Id[JenkinsJob])

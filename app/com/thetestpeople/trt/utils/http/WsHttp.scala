@@ -23,7 +23,8 @@ class WsHttp(timeout: Duration = 60.seconds) extends Http with HasLogger {
       logger.debug("GET response: " + response.statusText)
       response
     } catch {
-      case e: Exception ⇒ throw new HttpException(s"Error with HTTP GET from $url", e)
+      case e: Exception ⇒
+        throw new HttpException(s"Error with HTTP GET from $url", e)
     }
 
   def post(url: URI, basicAuthOpt: Option[Credentials] = None, bodyParams: Map[String, Seq[String]]): HttpResponse =
@@ -35,7 +36,8 @@ class WsHttp(timeout: Duration = 60.seconds) extends Http with HasLogger {
       logger.debug("POST response: " + response.statusText)
       response
     } catch {
-      case e: Exception ⇒ throw new HttpException(s"Problem with HTTP POST to $url", e)
+      case e: Exception ⇒
+        throw new HttpException(s"Problem with HTTP POST to $url", e)
     }
 
   private def await(future: Future[WSResponse]): HttpResponse = {

@@ -15,6 +15,7 @@ import com.thetestpeople.trt.utils.http.AlwaysFailingHttp
 import com.thetestpeople.trt.utils.http.ClasspathCachingHttp
 import com.thetestpeople.trt.jenkins.importer.JenkinsImportStatusManager
 import com.thetestpeople.trt.jenkins.importer.FakeJenkinsImportQueue
+import com.thetestpeople.trt.jenkins.importer.JenkinsImporter
 
 @RunWith(classOf[JUnitRunner])
 class JenkinsImportTest extends FlatSpec with ShouldMatchers {
@@ -23,7 +24,7 @@ class JenkinsImportTest extends FlatSpec with ShouldMatchers {
 
     val clock = FakeClock()
     val http = new ClasspathCachingHttp("")
-    val Setup(service, _) = setup(http, clock)
+    val Setup(service, jenkinsImporter, _) = setup(http, clock)
 
     val specId = service.newJenkinsImportSpec(F.jenkinsImportSpec(
       jobUrl = new URI("http://ci.pentaho.com/job/pentaho-big-data-plugin/"),
@@ -33,6 +34,7 @@ class JenkinsImportTest extends FlatSpec with ShouldMatchers {
     http.prefix = "webcache-pentaho-846-848"
 
     service.syncAllJenkins()
+    jenkinsImporter.importBuilds(specId)
 
     service.getBatches().flatMap(_.nameOpt) should equal(List(
       "pentaho-big-data-plugin #848",
@@ -44,6 +46,7 @@ class JenkinsImportTest extends FlatSpec with ShouldMatchers {
     clock += 10.minutes
 
     service.syncAllJenkins()
+    jenkinsImporter.importBuilds(specId)
 
     service.getBatches().flatMap(_.nameOpt) should equal(List(
       "pentaho-big-data-plugin #849",
@@ -59,10 +62,12 @@ class JenkinsImportTest extends FlatSpec with ShouldMatchers {
     val analysisService = new AnalysisService(dao, clock, async = false)
     val batchRecorder = new BatchRecorder(dao, clock, analysisService)
     val jenkinsImportStatusManager = new JenkinsImportStatusManager(clock)
-    val service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, FakeJenkinsImportQueue)
-    Setup(service, batchRecorder)
+    val importQueue = FakeJenkinsImportQueue
+    val jenkinsImporter = new JenkinsImporter(clock, http, dao, jenkinsImportStatusManager, batchRecorder)
+    val service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, importQueue)
+    Setup(service, jenkinsImporter, batchRecorder)
   }
 
-  case class Setup(service: Service, batchRecorder: BatchRecorder)
+  case class Setup(service: Service, jenkinsImporter: JenkinsImporter, batchRecorder: BatchRecorder)
 
 }

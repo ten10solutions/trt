@@ -15,7 +15,8 @@ class JenkinsJobXmlParserTest extends FlatSpec with Matchers {
 
   "Parsing Jenkins project XML" should "correctly capture the build URLs" in {
 
-    val JenkinsJob(jobName, url, buildUrls) = parse(TestUtils.loadXmlFromClasspath("/freeStyleProject.xml"))
+    val JenkinsJob(jobName, url, buildLinks) = parse(TestUtils.loadXmlFromClasspath("/freeStyleProject.xml"))
+    val buildUrls = buildLinks.map(_.buildUrl)
 
     val expectedUrls = List(
       "http://ci.pentaho.com/job/pentaho-big-data-plugin/758/",

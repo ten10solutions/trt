@@ -90,4 +90,4 @@ class JenkinsTestResultXmlParser {
 
 }
 
-case class ParseException(message: String, cause: Throwable = null) extends RuntimeException(message)
+case class ParseException(message: String, cause: Throwable = null) extends RuntimeException(message, cause)

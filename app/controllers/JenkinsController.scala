@@ -12,6 +12,11 @@ import play.Logger
 import play.api.mvc._
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.data.Form
+import com.thetestpeople.trt.jenkins.importer.JenkinsImportStatusManager
+import com.thetestpeople.trt.jenkins.importer.JobImportState
+import com.thetestpeople.trt.jenkins.importer.JenkinsBuildImportStatus
+import com.thetestpeople.trt.jenkins.importer.BuildImportState
+import com.thetestpeople.trt.jenkins.importer.JobImportState
 
 /**
  * Handle HTTP requests specific to Jenkins functionality
@@ -31,7 +36,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
 
   def newJenkinsImportSpec() = Action { implicit request ⇒
     logger.debug(s"newJenkinsImportSpec()")
-    Ok(html.jenkinsImportSpec(JenkinsImportSpecForm.initial, specOpt = None))
+    Ok(html.editJenkinsImportSpec(JenkinsImportSpecForm.initial, specOpt = None))
   }
 
   def deleteJenkinsImportSpec(id: Id[JenkinsImportSpec]) = Action { implicit request ⇒
@@ -51,15 +56,124 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
       case Some(spec) ⇒
         val jenkinsImportData = EditableJenkinsImportData.fromSpec(spec)
         val populatedForm = JenkinsImportSpecForm.form.fill(jenkinsImportData)
-        Ok(html.jenkinsImportSpec(populatedForm, Some(id)))
+        Ok(html.editJenkinsImportSpec(populatedForm, Some(id)))
     }
   }
+
+  def getJenkinsImportSpec(id: Id[JenkinsImportSpec]) = Action { implicit request ⇒
+    logger.debug(s"getJenkinsImportSpec($id)")
+    service.getJenkinsImportSpec(id) match {
+      case None ⇒
+        NotFound(s"Could not find Jenkins import spec with id '$id'")
+      case Some(spec) ⇒
+        val allInfos = getBuildImportInfos(spec)
+        val jobName = service.getJenkinsJobs().find(_.url == spec.jobUrl).map(_.name)
+          .getOrElse(spec.jobUrl.toString) // Job name not known until first import completes
+        val jobImportInfo = getJobImportInfo(spec)
+        val progress = getJenkinsImportProgressPercent(allInfos)
+        Ok(html.jenkinsImportSpec(spec, jobImportInfo, allInfos, jobName, progress))
+    }
+  }
+
+  private def getJenkinsImportProgressPercent(allInfos: Seq[JenkinsBuildImportInfo]): Int =
+    if (allInfos.isEmpty)
+      0
+    else {
+      val done = allInfos.count(_.importState.done)
+      val total = allInfos.size
+      val percent = 100.0 * done / total
+      percent.toInt
+    }
+
+  private def getJobImportInfo(spec: JenkinsImportSpec): JenkinsJobImportInfo = {
+    service.getJobImportStatus(spec.id).map { status ⇒
+      val importState = status.state match {
+        case JobImportState.Complete   ⇒ viewModel.ImportState.Complete
+        case JobImportState.InProgress ⇒ viewModel.ImportState.InProgress
+        case JobImportState.Errored(_) ⇒ viewModel.ImportState.Errored
+        case JobImportState.NotStarted ⇒ viewModel.ImportState.NotStarted
+      }
+      val summaryOpt = PartialFunction.condOpt(status.state) {
+        case JobImportState.Errored(t) ⇒ t.getMessage
+      }
+      val detailsOpt = PartialFunction.condOpt(status.state) {
+        case JobImportState.Errored(t) ⇒ printStackTrace(t)
+      }
+      JenkinsJobImportInfo(
+        importState = importState,
+        updatedAtTimeOpt = Some(status.updatedAt),
+        summaryOpt = summaryOpt,
+        detailsOpt = detailsOpt)
+    }.getOrElse {
+      val importState =
+        if (spec.lastCheckedOpt.isDefined)
+          viewModel.ImportState.Complete
+        else
+          viewModel.ImportState.NotStarted
+      JenkinsJobImportInfo(
+        importState = importState,
+        updatedAtTimeOpt = spec.lastCheckedOpt,
+        summaryOpt = None)
+    }
+  }
+
+  private def printStackTrace(t: Throwable): String = {
+    val stringWriter = new java.io.StringWriter
+    t.printStackTrace(new java.io.PrintWriter(stringWriter))
+    stringWriter.toString
+  }
+
+  private def getBuildImportInfos(spec: JenkinsImportSpec): Seq[JenkinsBuildImportInfo] = {
+    val inMemoryStatuses = service.getBuildImportStatuses(spec.id)
+    val inMemoryInfos = inMemoryStatuses.map(makeBuildImportInfoFromImportStatus)
+    val inMemoryUrls = inMemoryStatuses.map(_.buildUrl).toSet
+
+    def inMemory(build: JenkinsBuild) = inMemoryUrls contains build.buildUrl
+    val dbBuilds = service.getJenkinsBuilds(spec.jobUrl).filterNot(inMemory)
+    val dbInfos = dbBuilds.map(makeBuildImportInfo)
+
+    (dbInfos ++ inMemoryInfos).sortBy(_.buildNumber).reverse
+  }
+
+  private def makeBuildImportInfoFromImportStatus(status: JenkinsBuildImportStatus) = {
+    val batchIdOpt = PartialFunction.condOpt(status.state) {
+      case BuildImportState.Complete(batchId) ⇒ batchId
+    }
+    val importState = status.state match {
+      case BuildImportState.Complete(_) ⇒ viewModel.ImportState.Complete
+      case BuildImportState.InProgress     ⇒ viewModel.ImportState.InProgress
+      case BuildImportState.Errored(_)     ⇒ viewModel.ImportState.Errored
+      case BuildImportState.NotStarted     ⇒ viewModel.ImportState.NotStarted
+    }
+    val summaryOpt = PartialFunction.condOpt(status.state) {
+      case BuildImportState.Errored(t) ⇒ t.getMessage
+    }
+    val detailsOpt = PartialFunction.condOpt(status.state) {
+      case BuildImportState.Errored(t) ⇒ printStackTrace(t)
+    }
+    JenkinsBuildImportInfo(
+      buildUrl = status.buildUrl,
+      buildNumber = status.buildNumber,
+      importState = importState,
+      updatedAtTime = status.updatedAt,
+      batchIdOpt = batchIdOpt,
+      summaryOpt = summaryOpt,
+      detailsOpt = detailsOpt)
+  }
+
+  private def makeBuildImportInfo(build: JenkinsBuild) =
+    JenkinsBuildImportInfo(
+      buildUrl = build.buildUrl,
+      buildNumber = build.buildNumber,
+      importState = viewModel.ImportState.Complete,
+      updatedAtTime = build.importTime,
+      batchIdOpt = Some(build.batchId))
 
   def syncJenkins(id: Id[JenkinsImportSpec]) = Action { implicit request ⇒
     logger.debug(s"syncJenkins($id)")
     if (service.getJenkinsImportSpec(id).isDefined) {
-      Future { service.syncJenkins(id) }
-      Redirect(JenkinsController.jenkinsImportSpecs).flashing("success" -> "Sync has been triggered")
+      service.syncJenkins(id)
+      Redirect(JenkinsController.getJenkinsImportSpec(id)).flashing("success" -> "Sync has been triggered")
     } else
       NotFound(s"Could not find Jenkins import spec with id '$id'")
   }
@@ -68,7 +182,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
     logger.debug(s"createJenkinsImportSpec()")
     JenkinsImportSpecForm.form.bindFromRequest().fold(
       formWithErrors ⇒
-        BadRequest(html.jenkinsImportSpec(formWithErrors, None)),
+        BadRequest(html.editJenkinsImportSpec(formWithErrors, None)),
       jenkinsImport ⇒ {
         service.newJenkinsImportSpec(jenkinsImport.newSpec)
         Redirect(JenkinsController.jenkinsImportSpecs).flashing("success" -> "Created new import specification")
@@ -83,7 +197,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
       case Some(spec) ⇒
         JenkinsImportSpecForm.form.bindFromRequest.fold(
           formWithErrors ⇒
-            BadRequest(html.jenkinsImportSpec(formWithErrors, Some(id))),
+            BadRequest(html.editJenkinsImportSpec(formWithErrors, Some(id))),
           jenkinsImport ⇒ {
             service.updateJenkinsImportSpec(jenkinsImport.updatedSpec(spec))
             Redirect(JenkinsController.jenkinsImportSpecs).flashing("success" -> "Updated import specification")

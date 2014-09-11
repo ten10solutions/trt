@@ -7,6 +7,8 @@ import com.thetestpeople.trt.model.jenkins._
 import com.thetestpeople.trt.utils.KeyedLocks
 import com.thetestpeople.trt.jenkins.importer
 import com.thetestpeople.trt.jenkins.importer.JenkinsScraper
+import com.thetestpeople.trt.jenkins.importer.JenkinsBuildImportStatus
+import com.thetestpeople.trt.jenkins.importer.JenkinsJobImportStatus
 import com.thetestpeople.trt.jenkins.importer.JenkinsBatchCreator
 import com.thetestpeople.trt.service.jenkins._
 import com.thetestpeople.trt.service._
@@ -16,41 +18,6 @@ import com.thetestpeople.trt.utils.KeyedLocks
 trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
 
   import dao.transaction
-
-  private def importNewJenkinsBuilds(specId: Id[JenkinsImportSpec], jobUrl: URI, importConsoleLog: Boolean, configurationOpt: Option[Configuration]) {
-    val alreadyImportedBuildUrls = transaction { dao.getJenkinsBuildUrls().toSet }
-    val jenkinsConfiguration = transaction { dao.getJenkinsConfiguration() }
-    val credentialsOpt = jenkinsConfiguration.config.credentialsOpt
-    val jenkinsScraper = new JenkinsScraper(http, credentialsOpt, importConsoleLog, alreadyImportedBuildUrls)
-    val builds = jenkinsScraper.scrapeBuildsFromJob(jobUrl)(tryImportJenkinsBuild(configurationOpt) _)
-    transaction { dao.updateJenkinsImportSpec(specId, Some(clock.now)) }
-  }
-
-  private val importLocks = new KeyedLocks[URI]
-
-  private def tryImportJenkinsBuild(configurationOpt: Option[Configuration])(job: importer.JenkinsJob, build: importer.JenkinsBuild) = {
-    val buildUrl = build.buildSummary.url
-    val successOpt = importLocks.tryLock(buildUrl) {
-      transaction {
-        dao.getJenkinsBuild(buildUrl) match {
-          case Some(importedBuild) ⇒
-            logger.debug(s"Already imported $buildUrl, skipping")
-          case None ⇒
-            importJenkinsBuild(job, build, configurationOpt)
-        }
-      }
-    }
-    if (successOpt.isEmpty)
-      logger.debug(s"Build $buildUrl is in the process of being imported, skipping")
-  }
-
-  private def importJenkinsBuild(job: importer.JenkinsJob, build: importer.JenkinsBuild, configurationOpt: Option[Configuration]) {
-    val buildUrl = build.buildSummary.url
-    val batch = new JenkinsBatchCreator(configurationOpt).createBatch(build)
-    val batchId = batchRecorder.recordBatch(batch).id
-    val jobId = dao.ensureJenkinsJob(JenkinsJob(url = job.url, name = job.name))
-    dao.newJenkinsBuild(JenkinsBuild(batchId, clock.now, buildUrl, jobId))
-  }
 
   def getJenkinsImportSpecs: List[JenkinsImportSpec] = transaction { dao.getJenkinsImportSpecs }
 
@@ -82,7 +49,6 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
 
   def syncJenkins(specId: Id[JenkinsImportSpec]) = {
     jenkinsImportQueue.add(specId)
-    true
   }
 
   def syncAllJenkins() {
@@ -111,5 +77,15 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
   }
 
   def getJenkinsJobs(): List[JenkinsJob] = transaction { dao.getJenkinsJobs() }
+
+  def getJenkinsBuilds(jobUrl: URI): Seq[JenkinsBuild] = transaction { dao.getJenkinsBuilds(jobUrl) }
+
+  def getBuildImportStatuses(specId: Id[JenkinsImportSpec]): Seq[JenkinsBuildImportStatus] = {
+    jenkinsImportStatusManager.getBuildImportStatuses(specId)
+  }
+  
+  def getJobImportStatus(specId: Id[JenkinsImportSpec]): Option[JenkinsJobImportStatus] = {
+    jenkinsImportStatusManager.getJobImportStatus(specId)
+  }
 
 }
