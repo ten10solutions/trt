@@ -81,7 +81,7 @@ maintainer := "Matt Russell <MattRussellUK@gmail.com>"
 debianPackageDependencies in Debian ++= Seq("default-jre-headless (>= 1.7)")
 
 linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
-packageMapping(
+  packageMapping(
    (bd / "emptyDir") -> "/var/lib/trt"
- ) withUser "trt" withGroup "trt" withPerms "0755"
+  ) withUser "trt" withGroup "trt" withPerms "0755"
 }
