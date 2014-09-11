@@ -15,8 +15,9 @@ object TestDataFactory {
 
   def test(
     name: String = "test" + testNameCounter.getAndIncrement(),
-    groupOpt: Option[String] = Some(DummyData.Group)): Test =
-    Test(name = name, groupOpt = groupOpt)
+    groupOpt: Option[String] = Some(DummyData.Group),
+    deleted: Boolean = false): Test =
+    Test(name = name, groupOpt = groupOpt, deleted = deleted)
 
   def batch(
     urlOpt: Option[URI] = Some(DummyData.BuildUrl),

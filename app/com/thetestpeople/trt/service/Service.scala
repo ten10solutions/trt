@@ -38,6 +38,8 @@ trait Service extends JenkinsService {
 
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts]
 
+  def markTestsAsDeleted(ids: Seq[Id[Test]], deleted: Boolean = true)
+  
   def getHistoricalTestCounts(): Map[Configuration, HistoricalTestCountsTimeline]
 
   def getHistoricalTestCounts(configuration: Configuration): Option[HistoricalTestCountsTimeline]

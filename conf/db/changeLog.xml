@@ -302,5 +302,11 @@
     </addColumn>
   </changeSet> 
 
+  <changeSet author="matt" id="add-test-deleted-flag">
+    <addColumn tableName="tests">
+      <column name="deleted" type="BOOL" defaultValue="false"/>
+    </addColumn>
+  </changeSet> 
+
   
 </databaseChangeLog>

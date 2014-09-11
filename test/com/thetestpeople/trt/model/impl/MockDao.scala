@@ -202,6 +202,12 @@ class MockDao extends Dao {
     }
   }
 
+  def markTestsAsDeleted(ids: Seq[Id[Test]], deleted: Boolean = true) {
+    tests =
+      tests.filterNot(ids contains _.id) ++
+        tests.filter(ids contains _.id).map(_.copy(deleted = deleted))
+  }
+
   def newExecution(execution: Execution, logOpt: Option[String]): Id[Execution] = {
     val newId = nextId(executions.map(_.id))
     executions ::= execution.copy(id = newId)

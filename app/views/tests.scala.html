@@ -123,8 +123,9 @@
   }*@
   
   @if(canRerun) {
-    <button style="margin-bottom: 12px" id="rerunSelected" type="button" class="btn btn-default" title="Rerun selected tests on Jenkins" onclick="rerunSelected('@routes.JenkinsController.rerunSelectedTests()')"><i class="glyphicon glyphicon-refresh"></i> Rerun Selected</button>
+    <button style="margin-bottom: 12px" id="rerunSelected" type="button" class="btn btn-default" title="Rerun selected tests on Jenkins" onclick="performTestAction('@routes.JenkinsController.rerunSelectedTests()')"><i class="glyphicon glyphicon-refresh"></i> Rerun Selected</button>
   }
+  <button style="margin-bottom: 12px" id="deleteSelected" type="button" class="btn btn-default" title="Rerun selected tests on Jenkins" onclick="performTestAction('@routes.Application.deleteTests()')"><i class="glyphicon glyphicon-trash"></i> Delete Selected</button>
   <div style="clear: both;"></div>
 
   @testsPaginationWidget

@@ -3,13 +3,14 @@ toggleCloseColor = ->
   opacity = (if opacity < 0.8 then 1 else 0.6)
   $(this).css opacity: opacity
 
-window.rerunSelected = (action) ->
+window.performTestAction = (action) ->
   $("#testActionForm").attr("action", action).submit()
 
 $(document).ready ->
   setButtonEnableState = ->
     disabled = $("input:checkbox:checked").length is 0
     $("button#rerunSelected").prop "disabled", disabled
+    $("button#deleteSelected").prop "disabled", disabled
 
   $("#selectAll").change ->
     c = @checked

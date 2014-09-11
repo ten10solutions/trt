@@ -272,7 +272,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
 
     val List(testAgain) = dao.getTestsById(List(testId2))
     testAgain.qualifiedName should equal(test.qualifiedName)
-    dao.getTestIds should contain theSameElementsAs (List(testId1, testId2))
+    dao.getTestIds() should contain theSameElementsAs (List(testId1, testId2))
   }
 
   it should "not record a new test if it has already been recorded" in transaction { dao ⇒
@@ -282,7 +282,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     val testIdAgain = dao.ensureTestIsRecorded(test)
 
     testIdAgain should equal(testId)
-    dao.getTestIds should contain theSameElementsAs (List(testId))
+    dao.getTestIds() should contain theSameElementsAs (List(testId))
   }
 
   "Getting a test by id" should "not bring anything back if no test with that id" in transaction { dao ⇒
@@ -448,4 +448,26 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     dao.getSystemConfiguration() should equal(systemConfiguration)
   }
 
+  "Deleting a test" should "mark it as deleted" in transaction { dao ⇒
+    val testId = dao.ensureTestIsRecorded(F.test(deleted = false))
+    dao.markTestsAsDeleted(Seq(testId))
+    val List(test) = dao.getTestsById(List(testId))
+    test.deleted should be(true)
+  }
+
+  "Deleting a test" should "only mark that test as deleted" in transaction { dao ⇒
+    val testId1 = dao.ensureTestIsRecorded(F.test(deleted = false))
+    val testId2 = dao.ensureTestIsRecorded(F.test(deleted = false))
+    dao.markTestsAsDeleted(Seq(testId1))
+    val List(test) = dao.getTestsById(List(testId2))
+    test.deleted should be(false)
+  }
+
+  "Undeleting a test" should "work" in transaction { dao ⇒
+    val testId = dao.ensureTestIsRecorded(F.test(deleted = true))
+    dao.markTestsAsDeleted(Seq(testId), deleted = false)
+    val List(test) = dao.getTestsById(List(testId))
+    test.deleted should be(false)
+  }
+  
 }

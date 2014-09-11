@@ -60,6 +60,8 @@ class ServiceImpl(
 
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts] = transaction { dao.getTestCountsByConfiguration() }
 
+  def markTestsAsDeleted(ids: Seq[Id[Test]], deleted: Boolean) = transaction { dao.markTestsAsDeleted(ids, deleted) }
+
   def addBatch(incomingBatch: Incoming.Batch): Id[Batch] = transaction {
     batchRecorder.recordBatch(incomingBatch).id
   }

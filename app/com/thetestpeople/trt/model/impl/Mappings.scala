@@ -199,8 +199,8 @@ trait Mappings { self: SlickDao ⇒
     def id = column[Id[Test]]("id", O.PrimaryKey, O.NotNull, O.AutoInc)
     def name = column[String]("name", O.NotNull)
     def group = column[Option[String]]("group")
-
-    def * = (id, name, group) <> (Test.tupled, Test.unapply)
+    def deleted = column[Boolean]("deleted")
+    def * = (id, name, group, deleted) <> (Test.tupled, Test.unapply)
 
     def nameGroupIndex = index("idx_test_name_group", (name, group), unique = true)
 

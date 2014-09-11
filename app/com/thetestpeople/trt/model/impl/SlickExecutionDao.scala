@@ -1,8 +1,10 @@
 package com.thetestpeople.trt.model.impl
 
 import org.joda.time.Interval
-
 import com.thetestpeople.trt.model._
+import scala.slick.ast.Node
+import scala.slick.driver.JdbcProfile
+import scala.slick.lifted.RunnableCompiled
 
 trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
 
@@ -47,15 +49,37 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
     }
   }
 
-  def iterateAllExecutions[T](f: Iterator[ExecutionLite] ⇒ T): T =
-    executions
-      .sortBy(e ⇒ (e.configuration, e.testId, e.executionTime))
-      .map(e ⇒ (e.configuration, e.testId, e.executionTime, e.passed))
-      .iterator
+  // Workaround for setting setFetchSize (from https://github.com/slick/slick/issues/809)
+  import scala.language.higherKinds
+  private def createBatchInvoker[U](n: Node, param: Any, fetchSize: Int)(implicit driver: JdbcProfile): driver.QueryInvoker[U] =
+    new driver.QueryInvoker[U](n, param) {
+      override def setParam(st: java.sql.PreparedStatement) {
+        super.setParam(st)
+        st.setFetchSize(fetchSize)
+      }
+    }
+  private def batch[U, C[_]](query: Query[_, U, C], fetchSize: Int)(implicit driver: JdbcProfile) =
+    createBatchInvoker[U](driver.queryCompiler.run(query.toNode).tree, (), fetchSize)
+
+  private def executionsOfNonDeletedTests =
+    for {
+      execution ← executions
+      test ← tests
+      if execution.testId === test.id
+      if test.deleted === false
+    } yield execution
+
+  def iterateAllExecutions[T](f: Iterator[ExecutionLite] ⇒ T): T = {
+    val ExecutionBatchSize = 1000
+    val query = batch(
+      fetchSize = ExecutionBatchSize,
+      query = executionsOfNonDeletedTests
+        .sortBy(e ⇒ (e.configuration, e.testId, e.executionTime))
+        .map(e ⇒ (e.configuration, e.testId, e.executionTime, e.passed)))
+    query.iterator
       .map(ExecutionLite.tupled)
       .use(f)
-  // We would like to setFetchSize hint to avoid loading all executions into memory, however this is an outstanding 
-  // feature request on Slick: https://github.com/slick/slick/issues/41
+  }
 
   def getExecutionIntervalsByConfig(): Map[Configuration, Interval] =
     executions.groupBy(_.configuration).map {

@@ -106,7 +106,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     query.firstOption.map(TestAndAnalysis.tupled)
   }
 
-  def getTestIds(): List[Id[Test]] =
+  def getTestIds(): List[Id[Test]] = 
     tests.map(_.id).run.toList
 
   def getAnalysedTests(
@@ -116,7 +116,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     startingFrom: Int = 0,
     limitOpt: Option[Int] = None): List[TestAndAnalysis] = {
 
-    var query = testsAndAnalyses.filter(_._2.configuration === configuration)
+    var query = testsAndAnalyses.filter(_._2.configuration === configuration).filterNot(_._1.deleted)
     for (group ← groupOpt)
       query = query.filter(_._1.group === group)
     for (status ← testStatusOpt)
@@ -131,7 +131,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   def getTestsById(testIds: List[Id[Test]]): List[Test] = tests.filter(_.id inSet testIds).run.toList
 
   def getTestCounts(configuration: Configuration, groupOpt: Option[String] = None): TestCounts = {
-    var query = testsAndAnalyses.filter(_._2.configuration === configuration)
+    var query = testsAndAnalyses.filter(_._2.configuration === configuration).filterNot(_._1.deleted)
     for (group ← groupOpt)
       query = query.filter(_._1.group === group)
     // Workaround for Slick exception if no analysis: "scala.slick.SlickException: Read NULL value for ResultSet column":
@@ -148,6 +148,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
         test ← tests
         analysis ← analyses
         if analysis.testId === test.id
+        if !test.deleted
       } yield (test, analysis)
     case class CountRecord(configuration: Configuration, status: TestStatus, count: Int)
     val countRecords: List[CountRecord] =
@@ -260,9 +261,6 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
 
   private val testInserter = (tests returning tests.map(_.id)).insertInvoker
 
-  def newTest(test: Test): Id[Test] =
-    testInserter.insert(test)
-
   def ensureTestIsRecorded(test: Test): Id[Test] = synchronized {
     getTestAndAnalysis(test.qualifiedName) match {
       case Some(testAndAnalysis) ⇒
@@ -271,6 +269,9 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
         testInserter.insert(test)
     }
   }
+
+  def markTestsAsDeleted(ids: Seq[Id[Test]], deleted: Boolean = true) =
+    tests.filter(_.id.inSet(ids)).map(_.deleted).update(deleted)
 
   private val executionInserter = (executions returning executions.map(_.id)).insertInvoker
   private val executionLogInserter = executionLogs.insertInvoker

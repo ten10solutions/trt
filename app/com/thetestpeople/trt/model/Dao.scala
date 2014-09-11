@@ -18,6 +18,10 @@ trait Dao extends ExecutionDao with JenkinsDao {
   def getTestIds(): List[Id[Test]]
 
   /**
+   * Get tests and any analysis for the given configuration and filters.
+   * 
+   * Excludes deleted tests
+   * 
    * @param groupOpt -- if Some(group), filter returned tests to those matching the given group.
    * @param testStatusOpt -- if Some(testStatus), filter returned tests to those matching the given status.
    */
@@ -29,10 +33,20 @@ trait Dao extends ExecutionDao with JenkinsDao {
     limitOpt: Option[Int] = None): List[TestAndAnalysis]
 
   /**
+   * Gets test counts for all configurations.
+   * 
+   * Excludes deleted tests
+   * 
    * @return a map of configuration to test counts for that configuration
    */
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts]
 
+
+  /**
+   * Gets test counts for a given configuration (and filters).
+   * 
+   * Excludes deleted tests
+   */
   def getTestCounts(
     configuration: Configuration = Configuration.Default,
     groupOpt: Option[String] = None): TestCounts
@@ -47,6 +61,8 @@ trait Dao extends ExecutionDao with JenkinsDao {
    */
   def ensureTestIsRecorded(test: Test): Id[Test]
 
+  def markTestsAsDeleted(ids: Seq[Id[Test]], deleted: Boolean = true) 
+  
   def upsertAnalysis(analysis: Analysis)
 
   def getBatch(id: Id[Batch]): Option[BatchAndLog]

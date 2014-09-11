@@ -252,7 +252,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
     } yield new Call("GET", previousUrl)
 
   def rerunSelectedTests() = Action { implicit request ⇒
-    val selectedTestIds: List[Id[Test]] = getSelectedTestIds(request)
+    val selectedTestIds: List[Id[Test]] = ControllerHelper.getSelectedTestIds(request)
     logger.debug(s"rerunSelectedTests(${selectedTestIds.mkString(",")})")
     rerunTests(selectedTestIds)
   }
@@ -280,14 +280,6 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
           "error" -> s"There was a problem triggering Jenkins build: $message")
     }
   }
-
-  private def getSelectedTestIds(request: Request[AnyContent]): List[Id[Test]] =
-    for {
-      requestMap ← request.body.asFormUrlEncoded.toList
-      selectedIds ← requestMap.get("selectedTest").toList
-      idString ← selectedIds
-      id ← Id.parse[Test](idString)
-    } yield id
 
   def rerunTest(testId: Id[Test]) = Action { implicit request ⇒
     logger.debug(s"rerunTest($testId)")

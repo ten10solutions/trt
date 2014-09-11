@@ -19,7 +19,8 @@ case class Test(
      * For example, in JUnit or TestNG, this would be the (fully-qualified)
      * name of the class containing the test method.
      */
-    groupOpt: Option[String]) extends EntityType {
+    groupOpt: Option[String] = None,
+    deleted: Boolean = false) extends EntityType {
 
   def qualifiedName = QualifiedName(name, groupOpt)
 

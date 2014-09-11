@@ -16,7 +16,9 @@
 
 @main("Test", "Test", scripts = scripts, css = css) {
 
-  <h2>@for(ballIcon <- test.ballIconOpt){<img src="@routes.Assets.at("images/" + ballIcon)"/> }Test Case</h2>
+  <div class="overlay"></div>
+
+  <h2>@for(ballIcon <- test.ballIconOpt){<img src="@routes.Assets.at("images/" + ballIcon)"/> }Test Case@if(test.deleted){ (deleted)}</h2>
 
   <div class="row">
   <div class="col-md-5">
@@ -83,6 +85,17 @@
     <form action="@routes.JenkinsController.rerunTest(test.id)" role="form" method="post">
       <input type="hidden" name="previousURL" value="@request.uri"/>
       <button style="margin-bottom: 12px" id="rerunTest" type="submit" class="btn btn-default" title="Rerun test on Jenkins"><i class="glyphicon glyphicon-refresh"></i> Rerun test</button>
+    </form>
+  }
+  @if(test.deleted) {
+    <form action="@routes.Application.undeleteTest(test.id)" role="form" method="post">
+      <input type="hidden" name="previousURL" value="@request.uri"/>
+      <button style="margin-bottom: 12px" id="deleteTest" type="submit" class="btn btn-default" title="Mark test as not deleted"><i class="fa fa-undo"></i> Undelete test</button>
+    </form>
+  } else {
+    <form action="@routes.Application.deleteTest(test.id)" role="form" method="post">
+      <input type="hidden" name="previousURL" value="@request.uri"/>
+      <button style="margin-bottom: 12px" id="deleteTest" type="submit" class="btn btn-default" title="Mark test as deleted"><i class="glyphicon glyphicon-trash"></i> Delete test</button>
     </form>
   }
   </div>

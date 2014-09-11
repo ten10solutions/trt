@@ -153,6 +153,34 @@ class Application(service: Service, adminService: AdminService) extends Controll
       id ← Id.parse[Batch](idString)
     } yield id
 
+  def deleteTests() = Action { implicit request ⇒
+    val selectedTestIds = ControllerHelper.getSelectedTestIds(request)
+    logger.debug(s"deleteTests(${selectedTestIds.mkString(",")})")
+    
+    service.markTestsAsDeleted(selectedTestIds)
+    
+    val redirectTarget = previousUrlOpt.getOrElse(routes.Application.configurations())
+    Redirect(redirectTarget).flashing("success" -> "Marked tests as deleted.")
+  }
+
+  def deleteTest(id: Id[Test]) = Action { implicit request ⇒
+    logger.debug(s"deleteTest($id)")
+
+    service.markTestsAsDeleted(Seq(id))
+
+    val redirectTarget = previousUrlOpt.getOrElse(routes.Application.configurations())
+    Redirect(redirectTarget).flashing("success" -> "Marked test as deleted.")
+  }
+
+  def undeleteTest(id: Id[Test]) = Action { implicit request ⇒
+    logger.debug(s"undeleteTest($id)")
+
+    service.markTestsAsDeleted(Seq(id), deleted = false)
+
+    val redirectTarget = previousUrlOpt.getOrElse(routes.Application.configurations())
+    Redirect(redirectTarget).flashing("success" -> "Marked test as no longer deleted.")
+  }
+
   def deleteBatches() = Action { implicit request ⇒
     val batchIds = getSelectedBatchIds(request)
     logger.debug(s"deleteBatches($batchIds)")
