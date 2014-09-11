@@ -75,6 +75,33 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
     }
   }
 
+  def createJenkinsImportSpec() = Action { implicit request ⇒
+    logger.debug(s"createJenkinsImportSpec()")
+    JenkinsImportSpecForm.form.bindFromRequest().fold(
+      formWithErrors ⇒
+        BadRequest(html.editJenkinsImportSpec(formWithErrors, None)),
+      jenkinsImport ⇒ {
+        service.newJenkinsImportSpec(jenkinsImport.newSpec)
+        Redirect(JenkinsController.jenkinsImportSpecs).flashing("success" -> "Created new import specification")
+      })
+  }
+
+  def updateJenkinsImportSpec(id: Id[JenkinsImportSpec]) = Action { implicit request ⇒
+    logger.debug(s"updateJenkinsImportSpec($id)")
+    service.getJenkinsImportSpec(id) match {
+      case None ⇒
+        NotFound(s"Could not find Jenkins import spec with id '$id'")
+      case Some(spec) ⇒
+        JenkinsImportSpecForm.form.bindFromRequest.fold(
+          formWithErrors ⇒
+            BadRequest(html.editJenkinsImportSpec(formWithErrors, Some(id))),
+          jenkinsImport ⇒ {
+            service.updateJenkinsImportSpec(jenkinsImport.updatedSpec(spec))
+            Redirect(JenkinsController.jenkinsImportSpecs).flashing("success" -> "Updated import specification")
+          })
+    }
+  }
+
   private def getJenkinsImportProgressPercent(allInfos: Seq[JenkinsBuildImportInfo]): Int =
     if (allInfos.isEmpty)
       0
@@ -141,9 +168,9 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
     }
     val importState = status.state match {
       case BuildImportState.Complete(_) ⇒ viewModel.ImportState.Complete
-      case BuildImportState.InProgress     ⇒ viewModel.ImportState.InProgress
-      case BuildImportState.Errored(_)     ⇒ viewModel.ImportState.Errored
-      case BuildImportState.NotStarted     ⇒ viewModel.ImportState.NotStarted
+      case BuildImportState.InProgress  ⇒ viewModel.ImportState.InProgress
+      case BuildImportState.Errored(_)  ⇒ viewModel.ImportState.Errored
+      case BuildImportState.NotStarted  ⇒ viewModel.ImportState.NotStarted
     }
     val summaryOpt = PartialFunction.condOpt(status.state) {
       case BuildImportState.Errored(t) ⇒ t.getMessage
@@ -176,33 +203,6 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
       Redirect(JenkinsController.getJenkinsImportSpec(id)).flashing("success" -> "Sync has been triggered")
     } else
       NotFound(s"Could not find Jenkins import spec with id '$id'")
-  }
-
-  def createJenkinsImportSpec() = Action { implicit request ⇒
-    logger.debug(s"createJenkinsImportSpec()")
-    JenkinsImportSpecForm.form.bindFromRequest().fold(
-      formWithErrors ⇒
-        BadRequest(html.editJenkinsImportSpec(formWithErrors, None)),
-      jenkinsImport ⇒ {
-        service.newJenkinsImportSpec(jenkinsImport.newSpec)
-        Redirect(JenkinsController.jenkinsImportSpecs).flashing("success" -> "Created new import specification")
-      })
-  }
-
-  def updateJenkinsImportSpec(id: Id[JenkinsImportSpec]) = Action { implicit request ⇒
-    logger.debug(s"updateJenkinsImportSpec($id)")
-    service.getJenkinsImportSpec(id) match {
-      case None ⇒
-        NotFound(s"Could not find Jenkins import spec with id '$id'")
-      case Some(spec) ⇒
-        JenkinsImportSpecForm.form.bindFromRequest.fold(
-          formWithErrors ⇒
-            BadRequest(html.editJenkinsImportSpec(formWithErrors, Some(id))),
-          jenkinsImport ⇒ {
-            service.updateJenkinsImportSpec(jenkinsImport.updatedSpec(spec))
-            Redirect(JenkinsController.jenkinsImportSpecs).flashing("success" -> "Updated import specification")
-          })
-    }
   }
 
   private def getJenkinsConfigurationForm: Form[EditableJenkinsConfiguration] = {
