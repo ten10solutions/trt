@@ -223,8 +223,14 @@ class MockDao extends Dao {
 
   def getJenkinsJobs(): List[JenkinsJob] = jenkinsJobs
 
-  def getJenkinsBuilds(jobUrl: URI): Seq[JenkinsBuild] = ???
-  
+  def getJenkinsBuilds(jobUrl: URI): Seq[JenkinsBuild] =
+    for {
+      job ← jenkinsJobs
+      build ← jenkinsBuilds
+      if job.id == build.jobId
+      if job.url == jobUrl
+    } yield build
+
   def newJenkinsImportSpec(spec: JenkinsImportSpec): Id[JenkinsImportSpec] = {
     val newId = nextId(jenkinsImportSpecs.map(_.id))
     jenkinsImportSpecs ::= spec.copy(id = newId)
