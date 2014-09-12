@@ -34,8 +34,9 @@ class JenkinsScraper(
     val testXml = getTestResultsXml(buildUrl)
     val testResult = parseTestResultsXml(testResultsUrl(buildUrl), testXml)
     testResult match {
-      case result: MatrixTestResult   ⇒ processMatrixTestResult(result)
-      case result: OrdinaryTestResult ⇒ Some(result)
+      case result: OrdinaryTestResult   ⇒ Some(result)
+      case result: MatrixTestResult     ⇒ processMatrixTestResult(result)
+      case result: AggregatedTestResult ⇒ processAggregatedTestResult(result)
     }
   }
 
@@ -47,9 +48,19 @@ class JenkinsScraper(
         throw new JenkinsScraperException(s"Problem parsing test result XML from $testUrl: ${e.getMessage}", e)
     }
 
+  private def processAggregatedTestResult(testResult: AggregatedTestResult): Option[OrdinaryTestResult] = {
+    val childResults =
+      for {
+        childUrl ← testResult.urls
+        childTestXml = getTestResultsXml(childUrl)
+      } yield parseOrdinaryTestResult(childTestXml)
+    val aggregatedResults = childResults.reduce(_ combine _)
+    Some(aggregatedResults)
+  }
+
   private def processMatrixTestResult(testResult: MatrixTestResult): Option[OrdinaryTestResult] =
     for {
-      childUrl ← testResult.urls.headOption // TODO: handle more than one matrix result
+      childUrl ← testResult.urls.headOption // TODO: handle more than one matrix result, maybe auto-assign to a configuration?
       childTestXml = getTestResultsXml(childUrl)
     } yield parseOrdinaryTestResult(childTestXml)
 

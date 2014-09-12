@@ -21,18 +21,18 @@ class JenkinsTestResultXmlParser {
 
   @throws[ParseException]
   def parseTestResult(root: Elem): TestResult = {
-    if (root.label == "matrixTestResult" || root.label == "surefireAggregatedReport")
-      parseMatrixTestResult(root)
+    if (root.label == "matrixTestResult" )
+      MatrixTestResult(getChildReportUrls(root))
+    else if (root.label == "surefireAggregatedReport")
+      AggregatedTestResult(getChildReportUrls(root))
     else if (root.label == "testResult")
       parseOrdinaryTestResult(root)
     else
       throw new ParseException(s"Unknown root element <${root.label}>")
   }
 
-  private def parseMatrixTestResult(root: Elem): MatrixTestResult = {
-    val urls = (root \ "childReport" \ "child" \ "url").map(_.text).map(new URI(_)).toList
-    MatrixTestResult(urls)
-  }
+  private def getChildReportUrls(root: Elem): List[URI] =
+    (root \ "childReport" \ "child" \ "url").map(_.text).map(new URI(_)).toList
 
   def parseOrdinaryTestResult(root: Elem): OrdinaryTestResult = {
     val durationString = getFieldOpt(root, "duration").getOrElse(

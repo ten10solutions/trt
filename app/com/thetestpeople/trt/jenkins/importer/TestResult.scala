@@ -2,10 +2,17 @@ package com.thetestpeople.trt.jenkins.importer
 
 import org.joda.time.Duration
 import java.net.URI
-
+import com.github.nscala_time.time.Imports._
 sealed trait TestResult
+
+case class AggregatedTestResult(urls: List[URI]) extends TestResult
 case class MatrixTestResult(urls: List[URI]) extends TestResult
-case class OrdinaryTestResult(duration: Duration, suites: List[Suite]) extends TestResult
+case class OrdinaryTestResult(duration: Duration, suites: List[Suite]) extends TestResult {
+
+  def combine(that: OrdinaryTestResult): OrdinaryTestResult =
+    OrdinaryTestResult(this.duration + that.duration, this.suites ++ that.suites)
+
+}
 
 case class Suite(name: String, duration: Duration, cases: List[Case])
 
