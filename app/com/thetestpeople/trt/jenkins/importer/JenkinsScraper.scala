@@ -72,6 +72,9 @@ class JenkinsScraper(
         throw new JenkinsScraperException(s"Problem parsing test result: ${e.getMessage}", e)
     }
 
+  /**
+   * @return None if build has no tests associated with it.
+   */
   @throws[JenkinsScraperException]
   def scrapeBuild(buildUrl: URI, jobUrl: URI): Option[JenkinsBuild] = {
     logger.debug(s"scrapeBuild($buildUrl)")

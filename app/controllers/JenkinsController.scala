@@ -30,7 +30,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
 
   def jenkinsImportSpecs() = Action { implicit request ⇒
     logger.debug(s"jenkinsImportSpecs()")
-    val specs = service.getJenkinsImportSpecs.map(JenkinsImportSpecView)
+    val specs = service.getJenkinsImportSpecs.map(JenkinsImportSpecView).sortBy(_.jobUrl)
     Ok(html.jenkinsImportSpecs(specs))
   }
 
@@ -132,13 +132,8 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
         summaryOpt = summaryOpt,
         detailsOpt = detailsOpt)
     }.getOrElse {
-      val importState =
-        if (spec.lastCheckedOpt.isDefined)
-          viewModel.ImportState.Complete
-        else
-          viewModel.ImportState.NotStarted
       JenkinsJobImportInfo(
-        importState = importState,
+        importState = viewModel.ImportState.NotStarted,
         updatedAtTimeOpt = spec.lastCheckedOpt,
         summaryOpt = None)
     }
@@ -164,7 +159,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
 
   private def makeBuildImportInfoFromImportStatus(status: JenkinsBuildImportStatus) = {
     val batchIdOpt = PartialFunction.condOpt(status.state) {
-      case BuildImportState.Complete(batchId) ⇒ batchId
+      case BuildImportState.Complete(Some(batchId)) ⇒ batchId
     }
     val importState = status.state match {
       case BuildImportState.Complete(_) ⇒ viewModel.ImportState.Complete

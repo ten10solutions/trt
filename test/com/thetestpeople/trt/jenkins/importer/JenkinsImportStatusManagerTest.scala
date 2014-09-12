@@ -71,10 +71,10 @@ class JenkinsImportStatusManagerTest extends FlatSpec with Matchers {
     buildStatus2.state should equal(BuildImportState.InProgress)
 
     val batchId = Id[Batch](1)
-    statusManager.buildComplete(specId, DummyData.BuildUrl, batchId)
+    statusManager.buildComplete(specId, DummyData.BuildUrl, Some(batchId))
     val Seq(buildStatus3) = statusManager.getBuildImportStatuses(specId)
     buildStatus3.updatedAt should equal(clock.now)
-    val BuildImportState.Complete(batchIdAgain) = buildStatus3.state
+    val BuildImportState.Complete(Some(batchIdAgain)) = buildStatus3.state
     batchIdAgain should equal(batchId) 
   }
 

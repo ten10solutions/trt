@@ -48,8 +48,8 @@ class JenkinsImportStatusManager(clock: Clock) {
     specStatuses(id).buildStarted(buildUrl)
   }
 
-  def buildComplete(id: Id[JenkinsImportSpec], buildUrl: URI, batchId: Id[Batch]) = lock.withLock {
-    specStatuses(id).buildComplete(buildUrl, batchId)
+  def buildComplete(id: Id[JenkinsImportSpec], buildUrl: URI, batchIdOpt: Option[Id[Batch]]) = lock.withLock {
+    specStatuses(id).buildComplete(buildUrl, batchIdOpt)
   }
 
   def buildErrored(id: Id[JenkinsImportSpec], buildUrl: URI, t: Throwable) = lock.withLock {
@@ -89,8 +89,8 @@ class JenkinsImportStatusManager(clock: Clock) {
       buildStatuses(buildUrl).buildStarted()
     }
 
-    def buildComplete(buildUrl: URI, batchId: Id[Batch]) = {
-      buildStatuses(buildUrl).buildComplete(batchId)
+    def buildComplete(buildUrl: URI, batchIdOpt: Option[Id[Batch]]) = {
+      buildStatuses(buildUrl).buildComplete(batchIdOpt)
     }
 
     def buildErrored(buildUrl: URI, t: Throwable) = {
@@ -112,9 +112,9 @@ class JenkinsImportStatusManager(clock: Clock) {
       state = BuildImportState.InProgress
     }
 
-    def buildComplete(batchId: Id[Batch]) {
+    def buildComplete(batchIdOpt: Option[Id[Batch]]) {
       updatedAt = clock.now
-      state = BuildImportState.Complete(batchId)
+      state = BuildImportState.Complete(batchIdOpt)
     }
 
     def buildErrored(t: Throwable) {
@@ -135,7 +135,7 @@ case class JenkinsJobImportStatus(specId: Id[JenkinsImportSpec], updatedAt: Date
 sealed trait BuildImportState
 
 object BuildImportState {
-  case class Complete(batchId: Id[Batch]) extends BuildImportState
+  case class Complete(batchIdOpt: Option[Id[Batch]]) extends BuildImportState
   case object InProgress extends BuildImportState
   case class Errored(t: Throwable) extends BuildImportState
   case object NotStarted extends BuildImportState

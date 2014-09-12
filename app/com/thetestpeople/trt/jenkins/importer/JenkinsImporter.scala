@@ -70,8 +70,8 @@ class JenkinsImporter(
     logger.debug(s"Importing build $buildUrl")
     importStatusManager.buildStarted(importSpec.id, buildUrl)
     try {
-      val batchId = doImportBuild(buildLink, job, importSpec, jenkinsScraper)
-      importStatusManager.buildComplete(importSpec.id, buildUrl, batchId)
+      val batchIdOpt = doImportBuild(buildLink, job, importSpec, jenkinsScraper)
+      importStatusManager.buildComplete(importSpec.id, buildUrl, batchIdOpt)
     } catch {
       case e: Exception ⇒
         logger.error(s"Problem importing from $buildUrl", e)
@@ -79,10 +79,13 @@ class JenkinsImporter(
     }
   }
 
-  private def doImportBuild(buildLink: JenkinsBuildLink, job: JenkinsJob, importSpec: JenkinsImportSpec, jenkinsScraper: JenkinsScraper): Id[Batch] = {
+  /**
+   * @return None if build had no associated test executions. 
+   */
+  private def doImportBuild(buildLink: JenkinsBuildLink, job: JenkinsJob, importSpec: JenkinsImportSpec, jenkinsScraper: JenkinsScraper): Option[Id[Batch]] = {
     val buildUrl = buildLink.buildUrl
     val build = jenkinsScraper.scrapeBuild(buildUrl, importSpec.jobUrl)
-      .getOrElse(throw new RuntimeException("No test results found"))
+      .getOrElse(return None)
 
     val batch = new JenkinsBatchCreator(importSpec.configurationOpt).createBatch(build)
     val batchId = batchRecorder.recordBatch(batch).id
@@ -91,7 +94,7 @@ class JenkinsImporter(
     val jobId = transaction { dao.ensureJenkinsJob(modelJob) }
     val modelBuild = model.jenkins.JenkinsBuild(batchId, clock.now, buildUrl, buildLink.buildNumber, jobId)
     transaction { dao.newJenkinsBuild(modelBuild) }
-    batchId
+    Some(batchId)
   }
 
 }
