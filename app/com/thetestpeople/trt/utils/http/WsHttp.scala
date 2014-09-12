@@ -17,9 +17,9 @@ class WsHttp(timeout: Duration = 60.seconds) extends Http with HasLogger {
   def get(url: URI, basicAuthOpt: Option[Credentials] = None): HttpResponse =
     try {
       val future = WS.url(url.toString).withBasicAuth(basicAuthOpt).get()
-      val response = await(future)
       logger.debug("GET: " + url.toString)
       logger.debug(curlGet(url, basicAuthOpt))
+      val response = await(future)
       logger.debug("GET response: " + response.statusText)
       response
     } catch {
@@ -30,9 +30,9 @@ class WsHttp(timeout: Duration = 60.seconds) extends Http with HasLogger {
   def post(url: URI, basicAuthOpt: Option[Credentials] = None, bodyParams: Map[String, Seq[String]]): HttpResponse =
     try {
       val future = WS.url(url.toString).withBasicAuth(basicAuthOpt).post(bodyParams)
-      val response = await(future)
       logger.debug("POST to: " + url.toString)
       logger.debug(curlPost(url, basicAuthOpt, bodyParams))
+      val response = await(future)
       logger.debug("POST response: " + response.statusText)
       response
     } catch {
@@ -66,7 +66,7 @@ class WsHttp(timeout: Duration = 60.seconds) extends Http with HasLogger {
         (paramName, paramValues) ← bodyParams.toList
         paramValue ← paramValues
       } yield s"--data-urlencode '${paramName}=${paramValue}'"
-    s"curl -v -X POST $url --user trt:8c31d02432cdea46547723875b0d7cf9 ${paramClauses.mkString(" ")}"
+    s"curl -v -X POST $url $userClause ${paramClauses.mkString(" ")}"
   }
 
 }
