@@ -4,7 +4,7 @@ import com.thetestpeople.trt.model.jenkins.JenkinsImportSpec
 import com.thetestpeople.trt.model.jenkins._
 import com.thetestpeople.trt.utils.DateUtils
 
-case class JenkinsImportSpecView(spec: JenkinsImportSpec) {
+case class JenkinsImportSpecView(spec: JenkinsImportSpec, inProgress: Boolean) {
 
   def id = spec.id
 
@@ -17,4 +17,5 @@ case class JenkinsImportSpecView(spec: JenkinsImportSpec) {
   def lastCheckedOpt: Option[String] = spec.lastCheckedOpt.map(DateUtils.describeRelative)
 
   def configuration = spec.configurationOpt.getOrElse("")
+
 }

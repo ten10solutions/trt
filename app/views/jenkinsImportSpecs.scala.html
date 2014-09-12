@@ -36,12 +36,20 @@
       @for(spec <- specs) {
         <tr>
           <td><a href="@spec.jobUrl">@spec.jobUrl</a></td>
-          <td class="last-checked-cell">@spec.lastCheckedOpt.getOrElse("-")</td>
+          <td class="last-checked-cell">
+          @if(spec.inProgress) {
+            <div class="progress">
+              <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 10%"></div>
+            </div>
+          } else { 
+	    @spec.lastCheckedOpt.getOrElse("-")
+          }
+          </td>
           <td class="polling-interval-cell">@spec.pollingInterval</td>
           <td class="import-console-cell">@if(spec.importConsoleLog) { <i class="glyphicon glyphicon-ok"></i> }</td>
           <td class="configuration-cell">@spec.configuration</td>
           <td class="configure-cell"><a href="@routes.JenkinsController.editJenkinsImportSpec(spec.id)">Configure</a></td>
-          <td class="import-status-cell"><a href="@routes.JenkinsController.getJenkinsImportSpec(spec.id)">View import status</a></td>
+          <td class="import-status-cell"><a href="@routes.JenkinsController.getJenkinsImportSpec(spec.id)">Imported builds</a></td>
           <td class="sync-cell">
             <form action="@routes.JenkinsController.syncJenkins(spec.id)" method="post">
               <button class="btn btn-default" title="Check for new builds now"><i class="glyphicon glyphicon-refresh"></i> Sync</button>

@@ -17,6 +17,7 @@ import com.thetestpeople.trt.jenkins.importer.JobImportState
 import com.thetestpeople.trt.jenkins.importer.JenkinsBuildImportStatus
 import com.thetestpeople.trt.jenkins.importer.BuildImportState
 import com.thetestpeople.trt.jenkins.importer.JobImportState
+import com.thetestpeople.trt.jenkins.importer.JenkinsJobImportStatus
 
 /**
  * Handle HTTP requests specific to Jenkins functionality
@@ -30,8 +31,15 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
 
   def jenkinsImportSpecs() = Action { implicit request ⇒
     logger.debug(s"jenkinsImportSpecs()")
-    val specs = service.getJenkinsImportSpecs.map(JenkinsImportSpecView).sortBy(_.jobUrl)
+    val specs = service.getJenkinsImportSpecs.map(makeView).sortBy(_.jobUrl)
     Ok(html.jenkinsImportSpecs(specs))
+  }
+
+  private def makeView(spec: JenkinsImportSpec): JenkinsImportSpecView = {
+    val inProgress = PartialFunction.cond(service.getJobImportStatus(spec.id)) {
+      case Some(JenkinsJobImportStatus(_, _, JobImportState.InProgress)) ⇒ true
+    }
+    JenkinsImportSpecView(spec, inProgress)
   }
 
   def newJenkinsImportSpec() = Action { implicit request ⇒
