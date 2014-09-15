@@ -68,11 +68,11 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   private def handleTest(testId: Id[Test], configuration: Configuration, pagination: Pagination)(implicit request: Request[_]) =
     service.getTestAndExecutions(testId, configuration) map {
-      case TestAndExecutions(test, executions) ⇒
+      case TestAndExecutions(test, executions, otherConfigurations) ⇒
         val executionViews = executions.map(ExecutionView)
         val testView = new TestView(test)
         val paginationData = pagination.paginationData(executions.size)
-        views.html.test(testView, executionViews, Some(configuration), service.canRerun, paginationData)
+        views.html.test(testView, executionViews, Some(configuration), otherConfigurations, service.canRerun, paginationData)
     }
 
   def batch(batchId: Id[Batch], passedFilterOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒

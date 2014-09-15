@@ -481,4 +481,22 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     test.deleted should be(false)
   }
 
+  "Getting all configurations" should "work" in transaction { dao ⇒
+    val testId = dao.ensureTestIsRecorded(F.test())
+    val batchId = dao.newBatch(F.batch())
+    dao.newExecution(F.execution(batchId, testId, configuration = DummyData.Configuration1))
+    dao.newExecution(F.execution(batchId, testId, configuration = DummyData.Configuration2))
+
+    dao.getConfigurations() should contain theSameElementsAs (List(DummyData.Configuration1, DummyData.Configuration2))
+  }
+
+  "Getting all configurations for a test" should "work" in transaction { dao ⇒
+    val testId = dao.ensureTestIsRecorded(F.test())
+    val batchId = dao.newBatch(F.batch())
+    dao.newExecution(F.execution(batchId, testId, configuration = DummyData.Configuration1))
+    dao.newExecution(F.execution(batchId, testId, configuration = DummyData.Configuration2))
+
+    dao.getConfigurations(testId) should contain theSameElementsAs (List(DummyData.Configuration1, DummyData.Configuration2))
+  }
+
 }

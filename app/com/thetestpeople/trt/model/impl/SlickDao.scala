@@ -321,5 +321,8 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   def getConfigurations(): List[Configuration] =
     executions.groupBy(_.configuration).map(_._1).sorted.run.toList
 
+  def getConfigurations(testId: Id[Test]): Seq[Configuration] = 
+    executions.filter(_.testId === testId).groupBy(_.configuration).map(_._1).sorted.run
+
 }
 

@@ -149,15 +149,6 @@ trait ExecutionDaoTest { self: AbstractDaoTest ⇒
     dao.countExecutions(configurationOpt = Some(DummyData.Configuration2)) should equal(1)
   }
 
-  "Getting all executions" should "work" in transaction { dao ⇒
-    val testId = dao.ensureTestIsRecorded(F.test())
-    val batchId = dao.newBatch(F.batch())
-    dao.newExecution(F.execution(batchId, testId, configuration = DummyData.Configuration1))
-    dao.newExecution(F.execution(batchId, testId, configuration = DummyData.Configuration2))
-
-    dao.getConfigurations() should contain theSameElementsAs (List(DummyData.Configuration1, DummyData.Configuration2))
-  }
-
   "Getting execution intervals by configuration" should "work" in transaction { dao ⇒
     def addExecution(configuration: Configuration, executionTime: DateTime) {
       val testId = dao.ensureTestIsRecorded(F.test())

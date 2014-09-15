@@ -8,7 +8,7 @@ import org.joda.time.Duration
 import java.net.URI
 import com.thetestpeople.trt.analysis.HistoricalTestCountsTimeline
 
-case class TestAndExecutions(test: TestAndAnalysis, executions: List[EnrichedExecution])
+case class TestAndExecutions(test: TestAndAnalysis, executions: List[EnrichedExecution], otherConfigurations: Seq[Configuration])
 
 case class BatchAndExecutions(batch: Batch, executions: List[EnrichedExecution], logOpt: Option[String])
 

@@ -97,4 +97,9 @@ trait Dao extends ExecutionDao with JenkinsDao {
 
   def getConfigurations(): List[Configuration]
 
+  /**
+   * Return the configurations of executions that have been recorded of the given test.
+   */
+  def getConfigurations(testId: Id[Test]): Seq[Configuration]
+
 }

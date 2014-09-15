@@ -1,4 +1,4 @@
-@(test: TestView, executions: List[ExecutionView], configurationOpt: Option[Configuration], canRerun: Boolean, pagination: PaginationData)(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
+@(test: TestView, executions: List[ExecutionView], configurationOpt: Option[Configuration], otherConfigurations: Seq[Configuration], canRerun: Boolean, pagination: PaginationData)(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
 
 @scripts = {
   <script src="@routes.Assets.at("javascripts/chart-utils.js")"></script>
@@ -38,6 +38,16 @@
       <tr>
         <td>Configuration</td>
         <td><a id="configuration" href="@routes.Application.tests(configuration = Some(configuration))">@configuration</a></td>
+      </tr>
+    }
+    @if(otherConfigurations.nonEmpty) {
+      <tr>
+        <td>In other configurations</td>
+        <td>
+          @for(otherConfiguration <- otherConfigurations) {
+            <a href="@routes.Application.test(id = test.id, configuration = Some(otherConfiguration))">@otherConfiguration</a>
+          }
+        </td>
       </tr>
     }
     @for(weatherIcon <- test.weatherIconOpt) {
@@ -139,7 +149,7 @@
         <th class="exec-time-col">Date</th>
         <th class="duration-col">Duration</th>
         <th>Summary</th>
-        <th>Configuration</th>
+        <th class="configuration-col">Configuration</th>
         <th class="execution-links-col">Execution</th>
         <th class="execution-links-col">Batch</th>
       </tr>
@@ -150,7 +160,7 @@
         <td class="exec-time-cell"><span title="@execution.executionTime.absolute">@execution.executionTime.relative</span></td>
         <td class="duration-cell">@for(duration <- execution.durationOpt) { @duration }</td>
         <td class="center-vert">@for(summary <- execution.summaryOpt) { <a href="@routes.Application.execution(execution.id)"><span title="@summary.full">@summary.abbreviated</span></a> }</td>
-        <td class="center-horiz center-vert"><a href="@routes.Application.tests(configuration = Some(execution.configuration))">@execution.configuration</a></td>
+        <td class="configuration-cellcenter-horiz center-vert"><a href="@routes.Application.tests(configuration = Some(execution.configuration))">@execution.configuration</a></td>
         <td class="execution-links-cell"><a class="execution-link" href="@routes.Application.execution(execution.id)">Execution</a></td>
         <td class="execution-links-cell"><a class="batch-link" href="@routes.Application.batch(execution.batchId)">@execution.batchName</a></td>
       </tr>
