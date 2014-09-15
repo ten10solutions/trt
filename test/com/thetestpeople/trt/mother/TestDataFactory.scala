@@ -27,7 +27,8 @@ object TestDataFactory {
     passed: Boolean = true,
     totalCount: Int = 10,
     passCount: Int = 5,
-    failCount: Int = 5): Batch =
+    failCount: Int = 5,
+    configurationOpt: Option[Configuration] = None): Batch =
     Batch(
       urlOpt = urlOpt,
       executionTime = executionTime,
@@ -36,7 +37,8 @@ object TestDataFactory {
       passed = passed,
       totalCount = totalCount,
       passCount = passCount,
-      failCount = failCount)
+      failCount = failCount,
+      configurationOpt = configurationOpt)
 
   def execution(
     batchId: Id[Batch],

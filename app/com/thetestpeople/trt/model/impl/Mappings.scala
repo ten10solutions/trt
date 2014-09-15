@@ -76,8 +76,9 @@ trait Mappings { self: SlickDao ⇒
     def totalCount = column[Int]("total_count", O.NotNull)
     def passCount = column[Int]("pass_count", O.NotNull)
     def failCount = column[Int]("fail_count", O.NotNull)
-
-    def * = (id, url, executionTime, duration, name, passed, totalCount, passCount, failCount) <>
+    def configuration = column[Option[Configuration]]("configuration")
+    
+    def * = (id, url, executionTime, duration, name, passed, totalCount, passCount, failCount, configuration) <>
       (Batch.tupled, Batch.unapply)
 
   }

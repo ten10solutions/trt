@@ -52,7 +52,8 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
       passed = true,
       totalCount = DummyData.TotalCount,
       passCount = DummyData.PassCount,
-      failCount = DummyData.FailCount),
+      failCount = DummyData.FailCount,
+      configurationOpt = Some(DummyData.Configuration1)),
       logOpt = Some(DummyData.Log))
 
     val Some(BatchAndLog(batch, Some(log))) = dao.getBatch(batchId)
@@ -64,6 +65,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     batch.totalCount should be(DummyData.TotalCount)
     batch.passCount should be(DummyData.PassCount)
     batch.failCount should be(DummyData.FailCount)
+    batch.configurationOpt should equal(Some(DummyData.Configuration1))
     log should equal(DummyData.Log)
   }
 
@@ -317,6 +319,15 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     dao.getBatches(jobOpt = None).map(_.id) should contain theSameElementsAs (List(batchId1, batchId2))
   }
 
+  "Getting batches" should "let you filter by configuration" in transaction { dao ⇒
+    val batchId1 = dao.newBatch(F.batch(configurationOpt = Some(DummyData.Configuration1)))
+    val batchId2 = dao.newBatch(F.batch(configurationOpt = Some(DummyData.Configuration2)))
+
+    val List(batch) = dao.getBatches(configurationOpt = Some(DummyData.Configuration1))
+
+    batch.id should equal(batchId1)
+  }
+
   "Inserting and updating a new analysis" should "persist all the analysis data" in transaction { dao ⇒
     val testId = dao.ensureTestIsRecorded(F.test())
     val batchId1 = dao.newBatch(F.batch())
@@ -469,5 +480,5 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     val List(test) = dao.getTestsById(List(testId))
     test.deleted should be(false)
   }
-  
+
 }

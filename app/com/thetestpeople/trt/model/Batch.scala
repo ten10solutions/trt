@@ -16,4 +16,5 @@ case class Batch(
   passed: Boolean,
   totalCount: Int,
   passCount: Int,
-  failCount: Int) extends AbstractExecution with EntityType
+  failCount: Int,
+  configurationOpt: Option[Configuration]) extends AbstractExecution with EntityType

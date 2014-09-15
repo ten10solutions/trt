@@ -24,7 +24,8 @@ class JenkinsBatchCreator(configurationOpt: Option[Configuration]) {
       nameOpt = build.buildSummary.nameOpt,
       logOpt = build.consoleTextOpt,
       executionTimeOpt = buildSummary.timestampOpt,
-      durationOpt = Some(testResult.duration))
+      durationOpt = Some(testResult.duration),
+      configurationOpt = configurationOpt)
   }
 
   private def createLog(testCase: Case): Option[String] = {

@@ -113,20 +113,20 @@ class Application(service: Service, adminService: AdminService) extends Controll
     }
   }
 
-  def batches(jobIdOpt: Option[Id[JenkinsJob]], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
-    logger.debug(s"batches(jobId = $jobIdOpt, page = $pageOpt, pageSize = $pageSizeOpt)")
+  def batches(jobIdOpt: Option[Id[JenkinsJob]], configurationOpt: Option[Configuration], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
+    logger.debug(s"batches(jobId = $jobIdOpt, configuration = $configurationOpt, page = $pageOpt, pageSize = $pageSizeOpt)")
     Pagination.validate(pageOpt, pageSizeOpt) match {
       case Left(errorMessage) ⇒ BadRequest(errorMessage)
-      case Right(pagination)  ⇒ Ok(handleBatches(jobIdOpt, pagination))
+      case Right(pagination)  ⇒ Ok(handleBatches(jobIdOpt, configurationOpt, pagination))
     }
   }
 
-  private def handleBatches(jobIdOpt: Option[Id[JenkinsJob]], pagination: Pagination)(implicit request: Request[_]) = {
-    val batches = service.getBatches(jobIdOpt).map(new BatchView(_))
+  private def handleBatches(jobIdOpt: Option[Id[JenkinsJob]], configurationOpt: Option[Configuration], pagination: Pagination)(implicit request: Request[_]) = {
+    val batches = service.getBatches(jobIdOpt, configurationOpt).map(new BatchView(_))
     val jobs = service.getJenkinsJobs()
     val paginationData = pagination.paginationData(batches.size)
     val hideChartInitially = batches.size >= HideBatchChartThreshold
-    views.html.batches(batches, jobIdOpt, jobs, paginationData, hideChartInitially)
+    views.html.batches(batches, jobIdOpt, configurationOpt, jobs, paginationData, hideChartInitially)
   }
 
   def executions(configurationOpt: Option[Configuration], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
@@ -156,9 +156,9 @@ class Application(service: Service, adminService: AdminService) extends Controll
   def deleteTests() = Action { implicit request ⇒
     val selectedTestIds = ControllerHelper.getSelectedTestIds(request)
     logger.debug(s"deleteTests(${selectedTestIds.mkString(",")})")
-    
+
     service.markTestsAsDeleted(selectedTestIds)
-    
+
     val redirectTarget = previousUrlOpt.getOrElse(routes.Application.configurations())
     Redirect(redirectTarget).flashing("success" -> "Marked tests as deleted.")
   }

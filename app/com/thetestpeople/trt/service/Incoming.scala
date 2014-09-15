@@ -25,7 +25,8 @@ object Incoming {
     nameOpt: Option[String],
     logOpt: Option[String],
     executionTimeOpt: Option[DateTime],
-    durationOpt: Option[Duration]) extends AbtractExecution
+    durationOpt: Option[Duration],
+    configurationOpt: Option[Configuration]) extends AbtractExecution
 
   case class Execution(
       test: Test,

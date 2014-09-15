@@ -23,7 +23,7 @@ trait Service extends JenkinsService {
   /**
    * Return batches, ordered most recent first
    */
-  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None): List[Batch]
+  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): List[Batch]
 
   def deleteBatches(batchIds: List[Id[Batch]])
 

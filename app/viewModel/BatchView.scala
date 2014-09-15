@@ -25,4 +25,6 @@ class BatchView(batch: Batch, _executions: List[EnrichedExecution] = Nil, logOpt
 
   def failPercent = if (totalCount == 0) 0 else 100.0 * failCount / totalCount
 
+  def configurationOpt: Option[Configuration] = batch.configurationOpt
+  
 }

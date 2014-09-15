@@ -308,5 +308,12 @@
     </addColumn>
   </changeSet> 
 
+  <changeSet author="matt" id="add-batches-configuration">
+    <addColumn tableName="batches">
+      <column name="configuration" type="VARCHAR(10485760)">
+        <constraints nullable="true" />
+      </column>
+    </addColumn>
+  </changeSet>
   
 </databaseChangeLog>

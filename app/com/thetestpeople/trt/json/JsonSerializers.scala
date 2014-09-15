@@ -56,7 +56,8 @@ object JsonSerializers {
     (__ \ "name").formatNullable[String] and
     (__ \ "log").formatNullable[String] and
     (__ \ "executionTime").formatNullable[DateTime] and
-    (__ \ "duration").formatNullable[Duration])(Incoming.Batch, unlift(Incoming.Batch.unapply))
+    (__ \ "duration").formatNullable[Duration] and 
+    (__ \ "configuration").formatNullable[Configuration])(Incoming.Batch, unlift(Incoming.Batch.unapply))
 
   implicit val batchFormat: Format[Batch] = (
     (__ \ "id").format[Id[Batch]] and
@@ -67,6 +68,7 @@ object JsonSerializers {
     (__ \ "passed").format[Boolean] and
     (__ \ "totalCount").format[Int] and
     (__ \ "passCount").format[Int] and
-    (__ \ "failCount").format[Int])(Batch, unlift(Batch.unapply))
+    (__ \ "failCount").format[Int] and
+    (__ \ "configuration").formatNullable[Configuration])(Batch, unlift(Batch.unapply))
 
 }

@@ -106,7 +106,8 @@ $(document).ready ->
     checkboxes.prop "checked", c
 
   $("form#filter-form").submit (e) ->
-    $("#job-select").removeAttr "name"  if $("#job-select").val() is ""
+    $("#job-select").removeAttr "name" if $("#job-select").val() is ""
+    $("#configuration-select").removeAttr "name" if $("#configuration-select").val() is ""
 
   setButtonEnableState()
   $(".batchCheckbox").click ->

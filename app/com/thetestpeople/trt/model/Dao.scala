@@ -19,9 +19,9 @@ trait Dao extends ExecutionDao with JenkinsDao {
 
   /**
    * Get tests and any analysis for the given configuration and filters.
-   * 
+   *
    * Excludes deleted tests
-   * 
+   *
    * @param groupOpt -- if Some(group), filter returned tests to those matching the given group.
    * @param testStatusOpt -- if Some(testStatus), filter returned tests to those matching the given status.
    */
@@ -34,17 +34,16 @@ trait Dao extends ExecutionDao with JenkinsDao {
 
   /**
    * Gets test counts for all configurations.
-   * 
+   *
    * Excludes deleted tests
-   * 
+   *
    * @return a map of configuration to test counts for that configuration
    */
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts]
 
-
   /**
    * Gets test counts for a given configuration (and filters).
-   * 
+   *
    * Excludes deleted tests
    */
   def getTestCounts(
@@ -61,8 +60,8 @@ trait Dao extends ExecutionDao with JenkinsDao {
    */
   def ensureTestIsRecorded(test: Test): Id[Test]
 
-  def markTestsAsDeleted(ids: Seq[Id[Test]], deleted: Boolean = true) 
-  
+  def markTestsAsDeleted(ids: Seq[Id[Test]], deleted: Boolean = true)
+
   def upsertAnalysis(analysis: Analysis)
 
   def getBatch(id: Id[Batch]): Option[BatchAndLog]
@@ -71,9 +70,10 @@ trait Dao extends ExecutionDao with JenkinsDao {
    * Return batches, ordered most recent first
    *
    * @param jobOpt -- if Some(job), then only return batches that were imported from the given job.
+   * @param configurationOpt -- if Some(configuration), then only return batches that are associated with the given configuration
    * Otherwise, return all batches.
    */
-  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None): List[Batch]
+  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): List[Batch]
 
   /**
    * Add a record for a new batch (the existing ID is ignored)

@@ -29,6 +29,12 @@
         @for(url <- batch.urlOpt) {
           <tr><td>URL</td><td><a href="@url" id="batch-url">@url</a></td></tr>
         }  
+        @for(configuration <- batch.configurationOpt) {
+          <tr>
+            <td>Configuration</td>
+            <td><a id="configuration-link" href="@routes.Application.tests(configuration = Some(configuration))">@configuration</a></td>
+          </tr>
+        }
         <tr><td>Date</td><td>@batch.executionTime.absolute (@batch.executionTime.relative)</span></td></tr>
         @for(duration <- batch.durationOpt) {
           <tr><td>Duration</td><td>@duration</td></tr>
@@ -39,8 +45,8 @@
         </tr>     
         @if(batch.hasLog) {
           <tr>
-          <td>Log</td>
-          <td><a href="@routes.Application.batchLog(batch.id)" id="batch-log-link">View</a></td>
+            <td>Log</td>
+            <td><a href="@routes.Application.batchLog(batch.id)" id="batch-log-link">View</a></td>
           </tr>
         }
 

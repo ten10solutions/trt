@@ -40,14 +40,16 @@ object IncomingFactory {
     nameOpt: Option[String] = Some(DummyData.BatchName),
     logOpt: Option[String] = Some(DummyData.Log),
     durationOpt: Option[Duration] = Some(DummyData.Duration),
-    executions: List[Incoming.Execution] = List(IncomingFactory.execution())): Incoming.Batch =
+    executions: List[Incoming.Execution] = List(IncomingFactory.execution()),
+    configurationOpt: Option[Configuration] = None): Incoming.Batch =
     Incoming.Batch(
       urlOpt = urlOpt,
       nameOpt = nameOpt,
       logOpt = logOpt,
       executionTimeOpt = executionTimeOpt,
       durationOpt = durationOpt,
-      executions = executions)
+      executions = executions,
+      configurationOpt = configurationOpt)
 
   private def opt[T](t: T): Option[T] = if (t == null) None else Some(t)
 

@@ -92,8 +92,12 @@ class MockDao extends Dao {
     BatchAndLog(batch, logOpt)
   }
 
-  def getBatches(jobIdOpt: Option[Id[JenkinsJob]] = None): List[Batch] = {
-    batches.filter(batch ⇒ jobIdOpt.forall(jobId ⇒ areAssociated(batch, jobId))).sortBy(_.executionTime).reverse
+  def getBatches(jobIdOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): List[Batch] = {
+    batches
+      .filter(batch ⇒ jobIdOpt.forall(jobId ⇒ areAssociated(batch, jobId)))
+      .filter(batch ⇒ configurationOpt.forall(configuration ⇒ batch.configurationOpt == Some(configuration)))
+      .sortBy(_.executionTime)
+      .reverse
   }
 
   private def areAssociated(batch: Batch, jobId: Id[JenkinsJob]): Boolean = {

@@ -106,7 +106,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     query.firstOption.map(TestAndAnalysis.tupled)
   }
 
-  def getTestIds(): List[Id[Test]] = 
+  def getTestIds(): List[Id[Test]] =
     tests.map(_.id).run.toList
 
   def getAnalysedTests(
@@ -205,8 +205,8 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     query.firstOption.map { case (batch, logRowOpt) ⇒ BatchAndLog(batch, logRowOpt.map(_.log)) }
   }
 
-  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None): List[Batch] = {
-    val baseQuery =
+  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): List[Batch] = {
+    var baseQuery =
       jobOpt match {
         case Some(jobId) ⇒
           for {
@@ -218,6 +218,8 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
         case None ⇒
           batches
       }
+    for (configuration ← configurationOpt)
+      baseQuery = baseQuery.filter(_.configuration === configuration)
     baseQuery.sortBy(_.executionTime.desc).run.toList
   }
 

@@ -22,7 +22,7 @@ GET     /executions                 @controllers.Application.executions(configur
 GET     /batch/:id                  @controllers.Application.batch(id: Id[Batch], passed: Option[Boolean] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 GET     /batch/:id/log              @controllers.Application.batchLog(id: Id[Batch])
 
-GET     /batches                    @controllers.Application.batches(job: Option[JenkinsJobId] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
+GET     /batches                    @controllers.Application.batches(job: Option[JenkinsJobId] ?= None, configuration: Option[Configuration] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 POST    /batches/delete             @controllers.Application.deleteBatches()
  
 GET     /systemConfiguration        @controllers.Application.editSystemConfiguration

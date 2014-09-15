@@ -1,4 +1,4 @@
-@(batches: List[BatchView], jobIdOpt: Option[Id[JenkinsJob]], jobs: List[JenkinsJob], pagination: PaginationData, hideChartInitially: Boolean)(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
+@(batches: List[BatchView], jobIdOpt: Option[Id[JenkinsJob]], configurationOpt: Option[Configuration], jobs: List[JenkinsJob], pagination: PaginationData, hideChartInitially: Boolean)(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
 
 @scripts = {
   <script src="@routes.Assets.at("javascripts/chart-utils.js")"></script>
@@ -43,6 +43,15 @@
             }
           </select>
         </div>
+        <div class="form-group">
+          <label for="configuration-select">Configuration</label>
+          <select name="configuration" id="configuration-select" class="form-control">
+            <option value="">All</option>
+            @for(configuration <- globalViewContext.configurations) {
+              <option value="@configuration" @if(Some(configuration) == configurationOpt){selected}>@configuration</option>
+            }
+          </select>
+        </div>
         <button id="filterBatches" type="submit" class="btn btn-default">Filter Batches</button>
       </form>
       
@@ -73,9 +82,9 @@
 			        }  
 			      ];
 			      saveChartData(batchUrls, passes, fails);
-           @if(!hideChartInitially) {
-              createPassFailChart();
-           }
+                              @if(!hideChartInitially) {
+                                createPassFailChart();
+                              }
 			    });
 			  </script>
     </div>
@@ -93,6 +102,7 @@
 	        <th style="text-align: center"><input class="batchCheckbox" id="selectAll" type="checkbox" title="Select all"/></th>
 	        <th class="pass-fail-col"></th>
 	        <th class="batch-name-col">Name</th>
+                <th class="configuration-col">Configuration</th>
 	        <th class="time-col">Date</th>
 	        <th class="url-col">External Link</th>
 	        <th class="duration-col">Duration</th>
@@ -108,6 +118,7 @@
 	          <td style="text-align: center; width: 50px"><input class="batchCheckbox" type="checkbox" name="selectedBatch" value="@batch.id"/></td>
 	          <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.Application.batch(batch.id)"><img src="@routes.Assets.at("images/" + batch.passFailBallIcon)" alt="@batch.passFailText" title="@batch.passFailText"/></a></td>
 	          <td class="batch-name-cell">@for(name <- batch.nameOpt){ <a href="@routes.Application.batch(batch.id)">@name</a> }</td>
+                  <td class="configuration-cell">@for(configuration <- batch.configurationOpt){<a href="@routes.Application.tests(configuration = Some(configuration))">@configuration</a>}</td>
 	          <td class="time-cell"><span title="@batch.executionTime.absolute">@batch.executionTime.relative</span></td>
 	          <td class="url-cell">@for(url <- batch.urlOpt){<a href="@url">External Link</a>}</td>
 	          <td class="duration-cell">@for(duration <- batch.durationOpt) { @duration }</td>

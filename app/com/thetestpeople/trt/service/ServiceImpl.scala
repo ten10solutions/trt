@@ -75,7 +75,8 @@ class ServiceImpl(
       }
     }
 
-  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None): List[Batch] = transaction { dao.getBatches(jobOpt) }
+  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): List[Batch] =
+    transaction { dao.getBatches(jobOpt, configurationOpt) }
 
   def deleteBatches(batchIds: List[Id[Batch]]) = {
     val testIds = transaction {
