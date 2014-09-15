@@ -20,7 +20,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   import Application._
 
-  private implicit def globalViewContext: GlobalViewContext = GlobalViewContext(service.getConfigurations())
+  private implicit def globalViewContext: GlobalViewContext = ControllerHelper.globalViewContext(service)
 
   def index = Action {
     Redirect(routes.Application.configurations())

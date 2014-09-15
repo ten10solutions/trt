@@ -24,7 +24,7 @@ import com.thetestpeople.trt.jenkins.importer.JenkinsJobImportStatus
  */
 class JenkinsController(service: Service) extends Controller with HasLogger {
 
-  private implicit def globalViewContext: GlobalViewContext = GlobalViewContext(service.getConfigurations())
+  private implicit def globalViewContext: GlobalViewContext = ControllerHelper.globalViewContext(service)
 
   import routes.JenkinsController
   import views.html

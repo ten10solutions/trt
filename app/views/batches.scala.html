@@ -16,7 +16,7 @@
 
 @main("Batches", "Batches", scripts = scripts, css = css) {
 
-@if(batches.isEmpty) {
+@if(globalViewContext.noData) {
 
   @noResultsYet()
 
@@ -90,6 +90,7 @@
     </div>
   </div>
 
+@if(batches.nonEmpty) {
     
   @batchesPaginationWidget
   
@@ -144,6 +145,8 @@
   </form>
 
   @batchesPaginationWidget
+
+}
 
 }
   

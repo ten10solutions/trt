@@ -56,4 +56,8 @@ trait Service extends JenkinsService {
 
   def getConfigurations(): List[Configuration]
 
+  /**
+   * Return true iff there is at least one execution recorded
+   */
+  def hasExecutions(): Boolean
 }

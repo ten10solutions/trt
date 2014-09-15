@@ -111,4 +111,6 @@ class ServiceImpl(
     analysisService.recomputeHistoricalTestCounts()
   }
 
+  def hasExecutions(): Boolean = transaction { dao.countExecutions() > 0 }
+
 }

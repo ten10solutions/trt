@@ -15,12 +15,11 @@
 
 @main("Executions", "Executions", scripts = scripts) {
 
-@if(executions.isEmpty) {
+@if(globalViewContext.noData) {
 
   @noResultsYet()
 
 } else {
-
 
   <h2>Executions</h2>
 

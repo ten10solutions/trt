@@ -13,8 +13,7 @@
 
 @main("Configurations", "Configurations", css = css, scripts = scripts) {
 
-
-@if(testsSummaries.isEmpty) {
+@if(globalViewContext.noData) {
 
   @noResultsYet()
 
