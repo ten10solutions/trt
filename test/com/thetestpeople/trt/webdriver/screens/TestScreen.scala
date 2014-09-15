@@ -6,6 +6,7 @@ import org.openqa.selenium.By._
 import org.openqa.selenium.WebElement
 import com.thetestpeople.trt.webdriver.screens.RichSelenium._
 import com.thetestpeople.trt.utils.Utils
+import com.thetestpeople.trt.model.Configuration
 
 class TestScreen(implicit automationContext: AutomationContext) extends AbstractScreen with HasMainMenu {
 
@@ -15,9 +16,20 @@ class TestScreen(implicit automationContext: AutomationContext) extends Abstract
 
   def groupOpt: Option[String] = webDriver.findImmediateDisplayedAndEnabled(id("group")).map(_.getText)
 
+  def configurationOpt: Option[Configuration] = {
+    val configurationLinkOpt = webDriver.findImmediateDisplayedAndEnabled(id("configuration"))
+    configurationLinkOpt.map(elem ⇒ Configuration(elem.getText))
+  }
+
   def executionRows: List[ExecutionRow] =
     for ((rowElement, index) ← webDriver.findElements_(cssSelector("tr.execution-row")).zipWithIndex)
       yield ExecutionRow(rowElement, index)
+
+  def delete() {
+    log("Click 'Delete'")
+    webDriver.waitForDisplayedAndEnabled(id("deleteTest")).click()
+    webDriver.waitForDisplayedAndEnabled(id("alert-success"))
+  }
 
   case class ExecutionRow(rowElement: WebElement, index: Int) {
 

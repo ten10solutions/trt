@@ -5,6 +5,32 @@ import com.thetestpeople.trt.webdriver.screens.RichSelenium._
 import org.openqa.selenium.By.id
 import org.openqa.selenium.WebDriver
 import com.thetestpeople.trt.webdriver.screens.jenkins.JenkinsJobsScreen
+import com.thetestpeople.trt.model.Configuration
+import org.openqa.selenium.By
+import scala.collection.JavaConverters._
+
+class ConfigurationsMenu(implicit automationContext: AutomationContext) extends AbstractComponent {
+
+  def chooseConfiguration(configuration: Configuration): TestsScreen = {
+    chooseConfiguration(configuration.configuration)
+  }
+
+  def chooseConfiguration(configuration: String): TestsScreen = {
+    log(s"Click configuration '$configuration'")
+    val configurationItems = webDriver.findElements(By.className("configuration-menu-item")).asScala
+    val menuItem = configurationItems.find(_.getText == configuration)
+      .getOrElse(throw new RuntimeException(s"Could not find menu item for configuration '$configuration'"))
+    menuItem.click()
+    new TestsScreen
+  }
+
+  def chooseAllConfigurations(): ConfigurationsScreen = {
+    log("Click 'All'")
+    webDriver.waitForDisplayedAndEnabled(id(s"configuration-menu-all"))
+    new ConfigurationsScreen
+  }
+
+}
 
 class MainMenu(implicit automationContext: AutomationContext) extends AbstractComponent {
 
@@ -25,9 +51,9 @@ class MainMenu(implicit automationContext: AutomationContext) extends AbstractCo
     new BatchesScreen
   }
 
-  def clickConfigurations(): ConfigurationsScreen = {
-    clickMenuItem("menu-configurations", itemName = "Configurations")
-    new ConfigurationsScreen
+  def clickConfigurations() = {
+    clickMenuItem("menu-choose-configuration", itemName = "Configurations")
+    new ConfigurationsMenu
   }
 
   def clickExecutions(): ExecutionsScreen = {

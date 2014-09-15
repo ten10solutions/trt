@@ -73,7 +73,7 @@
         }
         <tr>
           <td style="width: 100px;">Total</td>
-          <td><a href="@routes.Application.tests(configuration = Some(configuration), group = groupOpt)"><span class="badge badge-inverse">@testsSummary.totalCount</span></a></td>
+          <td><a id="total-test-count" href="@routes.Application.tests(configuration = Some(configuration), group = groupOpt)"><span class="badge badge-inverse">@testsSummary.totalCount</span></a></td>
         </tr>
       </table>
     </div> <!-- col -->
@@ -178,15 +178,15 @@
       </thead>
       <tbody>
         @for(test <- tests) {
-          <tr>
+          <tr class="test-row">
             <td style="text-align: center; width: 50px"><input class="testCheckbox" type="checkbox" name="selectedTest" value="@test.id"/></td>
             <td class="pass-fail-cell">@for(icon <- test.ballIconOpt){<a href="@routes.Application.test(test.id, configuration = Some(configuration))"><img src="@routes.Assets.at("images/" + icon)"/></a>}</td>
             <td class="pass-fail-cell">@for(weatherIcon <- test.weatherIconOpt){<img src="@routes.Assets.at("images/" + weatherIcon)"/>}</td>
             <td class="center-vert">@for(group <- test.groupOpt) {<a href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, group = Some(group.full))"><span title="@group.full">@group.abbreviate(maxLength = 35)</span></a>}</td>
-            <td class="center-vert"><a href="@routes.Application.test(test.id, configuration = Some(configuration))" title="@test.name.full">@test.name.abbreviate(maxLength = 40)</a></td>
+            <td class="center-vert"><a class="test-link" href="@routes.Application.test(test.id, configuration = Some(configuration))" title="@test.name.full">@test.name.abbreviate(maxLength = 40)</a></td>
             <td class="consecutive-failures-cell">@for(consecutiveFailures <- test.consecutiveFailuresOpt){@consecutiveFailures}</td>
             <td class="failing-since-cell">@for(failingSince <- test.failingSinceOpt){<span title="@failingSince.absolute">@failingSince.relative</span>}</td>
-            <td class="last-passfail-cell">@for((executionId, time) <- test.lastPassedExecutionOpt){<a href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a>}</td>
+            <td class="last-passfail-cell">@for((executionId, time) <- test.lastPassedExecutionOpt){<a class="last-passed-link" href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a>}</td>
             <td class="last-passfail-cell">@for((executionId, time) <- test.lastFailedExecutionOpt){<a href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a>}</td>
           </tr>
         }
