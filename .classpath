@@ -128,5 +128,6 @@
 	<classpathentry kind="lib" path="/home/matt/.ivy2/cache/net.jcip/jcip-annotations/jars/jcip-annotations-1.0.jar" sourcepath="/home/matt/.ivy2/cache/net.jcip/jcip-annotations/srcs/jcip-annotations-1.0-sources.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="src" path="target/scala-2.11/src_managed/main"/>
+	<classpathentry kind="lib" path="target/scala-2.11/classes"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
