@@ -10,7 +10,10 @@
         <td><a id="test-name" href="@routes.Application.test(execution.testId, configuration = Some(execution.configuration))">@execution.name.full</a></td>
       </tr>
       @for(group <- execution.groupOpt) {
-        <tr><td>Group</td><td id="test-group">@{group.full}</td></tr>
+        <tr>
+          <td>Group</td>
+          <td id="test-group"><a href="@routes.Application.tests(configuration = Some(execution.configuration), group = Some(group.full))"><span title="@group.full">@group.full</span></a></td>
+        </tr>
       }
       <tr>
         <td>Batch</td>
