@@ -143,11 +143,8 @@ trait Mappings { self: SlickDao ⇒
     def * = (batchId, importTime, buildUrl, buildNumber, jobId) <> (JenkinsBuild.tupled, JenkinsBuild.unapply)
 
     def buildUrlIndex = index("idx_jenkins_build_url", buildUrl, unique = true)
-
     def jobIdIndex = index("idx_jenkins_job_id", jobId)
-
     def batchIdFk = foreignKey("fk_batch_id", batchId, Tables.batches)(_.id)
-
     def jobIdFk = foreignKey("fk_job_id", jobId, Tables.jenkinsJobs)(_.id)
 
   }

@@ -6,7 +6,7 @@ import org.joda.time._
 trait ExecutionDao {
 
   /**
-   * Allow iteration over all executions of non-deleted tests. Results are sorted by configuration, testId and executionTime.
+   * Iterate over all executions (of non-deleted tests). Results are sorted by configuration, testId and executionTime.
    *
    * Once this method is complete, it will close any resources used.
    *

@@ -65,11 +65,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   import Tables._
   import Mappers._
 
-  def transaction[T](p: ⇒ T): T = {
-    database.withDynTransaction {
-      p
-    }
-  }
+  def transaction[T](p: ⇒ T): T = database.withDynTransaction { p }
 
   def deleteAll() = transaction {
     jenkinsImportSpecs.delete
@@ -183,7 +179,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
 
   private val getTestWithoutGroupCompiled = {
     def getTestWithNameAndNoGroup(name: Column[String]) =
-      getTestWithName(name).filter(_._1.group.isNull)
+      getTestWithName(name).filter(_._1.group.isEmpty)
     Compiled(getTestWithNameAndNoGroup _)
   }
 
@@ -321,7 +317,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   def getConfigurations(): Seq[Configuration] =
     executions.groupBy(_.configuration).map(_._1).sorted.run
 
-  def getConfigurations(testId: Id[Test]): Seq[Configuration] = 
+  def getConfigurations(testId: Id[Test]): Seq[Configuration] =
     executions.filter(_.testId === testId).groupBy(_.configuration).map(_._1).sorted.run
 
 }
