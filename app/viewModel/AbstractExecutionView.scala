@@ -18,7 +18,7 @@ abstract class AbstractExecutionView(execution: AbstractExecution) {
 
   def passFailText: String = if (passed) "Passed" else "Failed"
 
-  def passFailBallIcon = BallIcons.icon(execution.passed)
+  def passFailIcon = TickIcons.icon(execution.passed)
 
   def passed = execution.passed
 

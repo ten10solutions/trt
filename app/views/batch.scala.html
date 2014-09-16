@@ -18,7 +18,7 @@
 
 @main("Batch", "Batch", scripts = scripts, css = css) {
 
-  <h2><img src="@routes.Assets.at("images/" + batch.passFailBallIcon)" alt="@batch.passFailText" title="@batch.passFailText"/> Batch</h2>
+  <h2><img src="@routes.Assets.at("images/" + batch.passFailIcon)" alt="@batch.passFailText" title="@batch.passFailText"/> Batch</h2>
   
   <div class="row">
     <div class="col-md-9">
@@ -114,7 +114,7 @@
         @for(execution <- batch.executions.drop(pagination.startFrom).take(pagination.pageSize)) {
           <tr class="execution-row">
             <td style="text-align: center; width: 50px"><input class="executionCheckbox" type="checkbox" name="selectedTest" value="@execution.testId"/></td>
-            <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.Application.execution(execution.id)"><img src="@routes.Assets.at("images/" + execution.passFailBallIcon)" alt="@execution.passFailText" title="@execution.passFailText"/></a></td>
+            <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.Application.execution(execution.id)"><img src="@routes.Assets.at("images/" + execution.passFailIcon)" alt="@execution.passFailText" title="@execution.passFailText"/></a></td>
             <td class="center-vert">@for(group <- execution.groupOpt) { <a href="@routes.Application.tests(group = Some(group.full), configuration = Some(execution.configuration))"><span class="execution-group" title="@group.full">@group.abbreviate(maxLength = 35)</span></a> }</td>
             <td class="center-vert"><a href="@routes.Application.test(execution.testId, configuration = Some(execution.configuration))" class="execution-name" title="@execution.name.full">@execution.name.abbreviate(maxLength = 40)</a></td>
             <td class="center-vert">@for(summary <- execution.summaryOpt){ <span class="execution-summary" title="@summary.full">@summary.abbreviated</span> }</td>

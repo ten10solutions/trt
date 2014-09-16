@@ -156,7 +156,7 @@
     </thead>
     @for(execution <- executions.drop(pagination.startFrom).take(pagination.pageSize)) {
       <tr class="execution-row">
-        <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.Application.execution(execution.id)"><img src="@routes.Assets.at("images/" + execution.passFailBallIcon)" alt="@execution.passFailText" title="@execution.passFailText"/></a></td>
+        <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.Application.execution(execution.id)"><img src="@routes.Assets.at("images/" + execution.passFailIcon)" alt="@execution.passFailText" title="@execution.passFailText"/></a></td>
         <td class="exec-time-cell"><span title="@execution.executionTime.absolute">@execution.executionTime.relative</span></td>
         <td class="duration-cell">@for(duration <- execution.durationOpt) { @duration }</td>
         <td class="center-vert">@for(summary <- execution.summaryOpt) { <a href="@routes.Application.execution(execution.id)"><span title="@summary.full">@summary.abbreviated</span></a> }</td>

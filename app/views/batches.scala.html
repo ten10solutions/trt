@@ -117,7 +117,7 @@
 	      @for(batch <- batches.drop(pagination.startFrom).take(pagination.pageSize)) {
 	        <tr class="batch-row" id="batch-@batch.id">
 	          <td style="text-align: center; width: 50px"><input class="batchCheckbox" type="checkbox" name="selectedBatch" value="@batch.id"/></td>
-	          <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.Application.batch(batch.id)"><img src="@routes.Assets.at("images/" + batch.passFailBallIcon)" alt="@batch.passFailText" title="@batch.passFailText"/></a></td>
+	          <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.Application.batch(batch.id)"><img src="@routes.Assets.at("images/" + batch.passFailIcon)" alt="@batch.passFailText" title="@batch.passFailText"/></a></td>
 	          <td class="batch-name-cell">@for(name <- batch.nameOpt){ <a href="@routes.Application.batch(batch.id)">@name</a> }</td>
                   <td class="configuration-cell">@for(configuration <- batch.configurationOpt){<a href="@routes.Application.tests(configuration = Some(configuration))">@configuration</a>}</td>
 	          <td class="time-cell"><span title="@batch.executionTime.absolute">@batch.executionTime.relative</span></td>

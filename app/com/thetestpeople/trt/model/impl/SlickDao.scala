@@ -131,7 +131,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     for (group ← groupOpt)
       query = query.filter(_._1.group === group)
     // Workaround for Slick exception if no analysis: "scala.slick.SlickException: Read NULL value for ResultSet column":
-    query = query.filter(_._2.testId.isNotNull)
+    query = query.filter(_._2.testId.?.isDefined)
     val results: Map[TestStatus, Int] =
       query.groupBy(_._2.status).map { case (status, results) ⇒ status -> results.length }.run.toMap
     def count(status: TestStatus) = results.collect { case (`status`, count) ⇒ count }.headOption.getOrElse(0)
@@ -237,7 +237,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       for {
         (test, execution) ← tests leftJoin executions on (_.id === _.testId)
         if test.id inSet testIds
-        if execution.id.isNull
+        if execution.id.?.isEmpty
       } yield test.id
 
     val testIdsToDelete = testsWithoutExecutionsQuery.run

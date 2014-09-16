@@ -17,3 +17,12 @@ object BallIcons {
   val FailBall = "balls/red.png"
 
 }
+
+object TickIcons {
+
+  def icon(passed: Boolean) = if (passed) Pass else Fail
+
+  val Pass = "ticks/pass.png"
+  val Fail = "ticks/fail.png"
+
+}
