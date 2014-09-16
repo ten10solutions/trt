@@ -3,7 +3,8 @@
   tests: List[TestView], 
   configuration: Configuration, 
   testStatusOpt: Option[TestStatus], 
-  groupOpt: Option[String], 
+  nameOpt: Option[String], 
+  groupOpt: Option[String],
   canRerun: Boolean, 
   pagination: PaginationData,
   historicalTestCountsTimelineOpt: Option[HistoricalTestCountsTimelineView])(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
@@ -23,6 +24,7 @@
     routes.Application.tests(
       configuration = Some(configuration), 
       status = testStatusOpt, 
+      name = nameOpt,
       group = groupOpt, 
       page = Some(page), 
       pageSize = Some(pageSize))) 
@@ -46,7 +48,7 @@
           <td>
             <span class="tag label label-info" style="margin-bottom: 0px">
               <span>@group</span>
-              <a href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, group = None)" style="opacity: 0.6;" title="Remove filter by group">
+              <a href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = None)" style="opacity: 0.6;" title="Remove filter by group">
                 <i class="remove glyphicon glyphicon-remove-sign glyphicon-white"></i>
               </a> 
             </span>
@@ -56,24 +58,24 @@
         @if(testsSummary.passCount > 0){
           <tr>
             <td>Passed</td>       
-            <td><a href="@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Pass), group = groupOpt)"><span class="badge badge-success">@testsSummary.passCount</span></a></td>
+            <td><a href="@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Pass), name = nameOpt, group = groupOpt)"><span class="badge badge-success">@testsSummary.passCount</span></a></td>
           </tr>
         }
         @if(testsSummary.warnCount > 0){
           <tr>          
             <td>Warning</td>
-            <td><a href="@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Warn), group = groupOpt)"><span class="badge badge-warning">@testsSummary.warnCount</span></a></td>
+            <td><a href="@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Warn), name = nameOpt, group = groupOpt)"><span class="badge badge-warning">@testsSummary.warnCount</span></a></td>
           </tr>
         }
         @if(testsSummary.failCount > 0){
           <tr>
             <td>Failed</td>
-            <td><a href="@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Fail), group = groupOpt)"><span class="badge badge-error">@testsSummary.failCount</span></a></td>
+            <td><a href="@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Fail), name = nameOpt, group = groupOpt)"><span class="badge badge-error">@testsSummary.failCount</span></a></td>
           </tr>
         }
         <tr>
           <td style="width: 100px;">Total</td>
-          <td><a id="total-test-count" href="@routes.Application.tests(configuration = Some(configuration), group = groupOpt)"><span class="badge badge-inverse">@testsSummary.totalCount</span></a></td>
+          <td><a id="total-test-count" href="@routes.Application.tests(configuration = Some(configuration), name = nameOpt, group = groupOpt)"><span class="badge badge-inverse">@testsSummary.totalCount</span></a></td>
         </tr>
       </table>
     </div> <!-- col -->
@@ -88,40 +90,66 @@
               fail: @testsSummary.failCount,
             },
             {
-              pass: "@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Pass), group = groupOpt)",
-              warn: "@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Warn), group = groupOpt)",
-              fail: "@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Fail), group = groupOpt)",
+              pass: "@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Pass), name = nameOpt, group = groupOpt)",
+              warn: "@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Warn), name = nameOpt, group = groupOpt)",
+              fail: "@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Fail), name = nameOpt, group = groupOpt)",
             }
           );
         });
       </script>
     </div> <!-- col -->
   </div> <!-- row -->
-  @*  	     
-  @for(historicalTestCounts <- historicalTestCountsOpt) {
-     <div align="center"><div id="history-chart" style="width: 1024px; height: 180px"></div></div>
-      <script>
-         $(document).ready(function(){
-           var passes = [
-             @for((time, count) <- historicalTestCounts.passes if count > 0) {
-               [ new Date(@time), @count ],
-             }
-           ];
-           var warnings = [
-             @for((time, count) <- historicalTestCounts.warnings if count > 0) {
-               [ new Date(@time), @count ],
-             }
-           ];
-           var fails = [
-             @for((time, count) <- historicalTestCounts.failures if count > 0) {
-               [ new Date(@time), @count ],
-             }
-           ];
-           createHistoryChart("history-chart", passes, warnings, fails);
-         });
-      </script>
-  }*@
-  
+
+    
+  <form id="filter-form" role="form" action="@routes.Application.tests(configuration = Some(configuration))">
+     <div class="form-group">
+       <label for="test-name-field">Test name</label>
+       <input name="name" id="test-name-field" value="@{nameOpt.getOrElse("")}" class="form-control typeahead" type="text" placeholder="Test name"/>
+     </div>
+     <input name="configuration" value="@configuration" type="hidden"/>
+     @for(group <- groupOpt) {
+       <input name="group" value="@group" type="hidden"/>
+     }
+     <button id="filter-tests" type="submit" class="btn btn-default">Filter Tests</button>
+  </form>
+  <br/>
+
+<script>
+var engine = new Bloodhound({
+  name: 'testNames',
+  limit: 12,
+  remote: {
+     url: 'http://localhost:9000/webApi/tests/names?query=%QUERY',
+     filter: function(resp) {
+       result = [];
+       for (i = 0; i < resp.length; i++)
+          result.push({ val: resp[i] });
+       return result;
+     }
+  },
+  datumTokenizer: function(d) {
+    return Bloodhound.tokenizers.whitespace(d.val);
+  },
+  queryTokenizer: Bloodhound.tokenizers.whitespace
+});
+ 
+engine.initialize();
+
+$('#test-name-field').typeahead({
+  hint: true,
+  highlight: true,
+  minLength: 1
+},
+{
+  name: 'testNames',
+  displayKey: 'val',
+  source: engine.ttAdapter()
+});
+
+
+</script>  
+
+
   @if(canRerun) {
     <button style="margin-bottom: 12px" id="rerunSelected" type="button" class="btn btn-default" title="Rerun selected tests on Jenkins" onclick="performTestAction('@routes.JenkinsController.rerunSelectedTests()')"><i class="glyphicon glyphicon-refresh"></i> Rerun Selected</button>
   }
@@ -130,33 +158,23 @@
 
   @testsPaginationWidget
   
-  @*  
-  <form>
-    <select name="pageSize" id="page-size-select" class="form-control">
-      <option value="10">10</option>
-      <option value="20">20</option>
-      <option value="50">50</option>
-    </select>
-  </form>
-  *@
-  
   <ul class="nav nav-tabs">
     <li @if(testStatusOpt.isEmpty){ class="active" }>
-      <a href="@routes.Application.tests(configuration = Some(configuration), group = groupOpt)">All</a>
+      <a href="@routes.Application.tests(configuration = Some(configuration), name = nameOpt, group = groupOpt)">All</a>
     </li>
     @if(testsSummary.passCount > 0) {
       <li @if(testStatusOpt == Some(TestStatus.Pass)){ class="active" }>
-        <a href="@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Pass), group = groupOpt)">Pass<br/></a>
+        <a href="@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Pass), name = nameOpt, group = groupOpt)">Pass<br/></a>
       </li>
     }
     @if(testsSummary.warnCount > 0) {
       <li @if(testStatusOpt == Some(TestStatus.Warn)){ class="active" }>
-        <a href="@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Warn), group = groupOpt)">Warn<br/></a>
+        <a href="@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Warn), name = nameOpt, group = groupOpt)">Warn<br/></a>
       </li>
     }
     @if(testsSummary.failCount > 0) {
       <li @if(testStatusOpt == Some(TestStatus.Fail)){ class="active" }>
-        <a href="@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Fail), group = groupOpt)">Fail</a>
+        <a href="@routes.Application.tests(configuration = Some(configuration), status = Some(TestStatus.Fail), name = nameOpt, group = groupOpt)">Fail</a>
       </li>
     }
   </ul>
@@ -182,7 +200,7 @@
             <td style="text-align: center; width: 50px"><input class="testCheckbox" type="checkbox" name="selectedTest" value="@test.id"/></td>
             <td class="pass-fail-cell">@for(icon <- test.ballIconOpt){<a href="@routes.Application.test(test.id, configuration = Some(configuration))"><img src="@routes.Assets.at("images/" + icon)"/></a>}</td>
             <td class="pass-fail-cell">@for(weatherIcon <- test.weatherIconOpt){<img src="@routes.Assets.at("images/" + weatherIcon)"/>}</td>
-            <td class="center-vert">@for(group <- test.groupOpt) {<a href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, group = Some(group.full))"><span title="@group.full">@group.abbreviate(maxLength = 35)</span></a>}</td>
+            <td class="center-vert">@for(group <- test.groupOpt) {<a href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = Some(group.full))"><span title="@group.full">@group.abbreviate(maxLength = 35)</span></a>}</td>
             <td class="center-vert"><a class="test-link" href="@routes.Application.test(test.id, configuration = Some(configuration))" title="@test.name.full">@test.name.abbreviate(maxLength = 40)</a></td>
             <td class="consecutive-failures-cell">@for(consecutiveFailures <- test.consecutiveFailuresOpt){@consecutiveFailures}</td>
             <td class="failing-since-cell">@for(failingSince <- test.failingSinceOpt){<span title="@failingSince.absolute">@failingSince.relative</span>}</td>

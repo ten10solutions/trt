@@ -17,6 +17,8 @@ trait Dao extends ExecutionDao with JenkinsDao {
    */
   def getTestIds(): Seq[Id[Test]]
 
+  def getTestNames(pattern: String): Seq[String]
+  
   /**
    * Get tests and any analysis for the given configuration and filters.
    *
@@ -28,6 +30,7 @@ trait Dao extends ExecutionDao with JenkinsDao {
   def getAnalysedTests(
     configuration: Configuration = Configuration.Default,
     testStatusOpt: Option[TestStatus] = None,
+    nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
     limitOpt: Option[Int] = None): Seq[TestAndAnalysis]
@@ -48,6 +51,7 @@ trait Dao extends ExecutionDao with JenkinsDao {
    */
   def getTestCounts(
     configuration: Configuration = Configuration.Default,
+    nameOpt: Option[String] = None,
     groupOpt: Option[String] = None): TestCounts
 
   def getTestsById(testIds: Seq[Id[Test]]): Seq[Test]

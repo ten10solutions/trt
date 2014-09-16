@@ -105,14 +105,26 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   def getTestIds(): Seq[Id[Test]] =
     tests.map(_.id).run
 
+  def getTestNames(pattern: String): Seq[String] = {
+    val sqlPattern = globToSqlPattern(pattern)
+    tests.filter(_.name.toLowerCase like sqlPattern.toLowerCase).map(_.name).run
+  }
+
+  private def globToSqlPattern(pattern: String) = pattern.replace("*", "%")
+
   def getAnalysedTests(
     configuration: Configuration,
     testStatusOpt: Option[TestStatus] = None,
+    nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
     limitOpt: Option[Int] = None): List[TestAndAnalysis] = {
 
     var query = testsAndAnalyses.filter(_._2.configuration === configuration).filterNot(_._1.deleted)
+    for (name ← nameOpt) {
+      val sqlPattern = globToSqlPattern(name)
+      query = query.filter(_._1.name.toLowerCase like sqlPattern.toLowerCase)
+    }
     for (group ← groupOpt)
       query = query.filter(_._1.group === group)
     for (status ← testStatusOpt)
@@ -126,8 +138,12 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
 
   def getTestsById(testIds: Seq[Id[Test]]): Seq[Test] = tests.filter(_.id inSet testIds).run
 
-  def getTestCounts(configuration: Configuration, groupOpt: Option[String] = None): TestCounts = {
+  def getTestCounts(configuration: Configuration, nameOpt: Option[String] = None, groupOpt: Option[String] = None): TestCounts = {
     var query = testsAndAnalyses.filter(_._2.configuration === configuration).filterNot(_._1.deleted)
+    for (name ← nameOpt) {
+      val sqlPattern = globToSqlPattern(name)
+      query = query.filter(_._1.name.toLowerCase like sqlPattern.toLowerCase)
+    }
     for (group ← groupOpt)
       query = query.filter(_._1.group === group)
     // Workaround for Slick exception if no analysis: "scala.slick.SlickException: Read NULL value for ResultSet column":

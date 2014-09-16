@@ -53,6 +53,7 @@ class MockDao extends Dao {
   def getAnalysedTests(
     configuration: Configuration,
     testStatusOpt: Option[TestStatus] = None,
+    nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
     limitOpt: Option[Int]): Seq[TestAndAnalysis] = {
@@ -75,7 +76,7 @@ class MockDao extends Dao {
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts] =
     getConfigurations().map { c ⇒ c -> getTestCounts(c) }.toMap
 
-  def getTestCounts(configuration: Configuration, groupOpt: Option[String] = None): TestCounts = {
+  def getTestCounts(configuration: Configuration, nameOpt: Option[String] = None, groupOpt: Option[String] = None): TestCounts = {
     val tests = getAnalysedTests(configuration, groupOpt = groupOpt)
     val passed = tests.count(_.analysisOpt.exists(_.status == TestStatus.Pass))
     val warning = tests.count(_.analysisOpt.exists(_.status == TestStatus.Warn))
@@ -304,4 +305,5 @@ class MockDao extends Dao {
 
   def getConfigurations(testId: Id[Test]): Seq[Configuration] = executions.filter(_.testId == testId).map(_.configuration).distinct.sorted
 
+  def getTestNames(pattern: String): Seq[String] = ???
 }
