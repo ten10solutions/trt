@@ -133,8 +133,10 @@ class MockDao extends Dao {
     executionsForTest.sortBy(_.execution.executionTime).reverse
   }
 
+  private def isDeleted(testId: Id[Test]) = tests.find(_.id == testId).exists(_.deleted)
+
   def iterateAllExecutions[T](f: Iterator[ExecutionLite] ⇒ T): T =
-    f(executions.sortBy(e ⇒ (e.configuration, e.testId, e.executionTime)).map(executionLite).iterator)
+    f(executions.filterNot(e ⇒ isDeleted(e.testId)).sortBy(e ⇒ (e.configuration, e.testId, e.executionTime)).map(executionLite).iterator)
 
   private def executionLite(execution: Execution) =
     ExecutionLite(
@@ -299,7 +301,7 @@ class MockDao extends Dao {
   }
 
   def getConfigurations(): Seq[Configuration] = executions.map(_.configuration).distinct.sorted
-   
+
   def getConfigurations(testId: Id[Test]): Seq[Configuration] = executions.filter(_.testId == testId).map(_.configuration).distinct.sorted
 
 }

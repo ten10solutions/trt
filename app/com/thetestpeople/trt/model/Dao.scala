@@ -13,7 +13,7 @@ trait Dao extends ExecutionDao with JenkinsDao {
   def getTestAndAnalysis(id: Id[Test], configuration: Configuration = Configuration.Default): Option[TestAndAnalysis]
 
   /**
-   * @return the IDs of all tests in the DB
+   * @return the IDs of all tests in the DB (including deleted tests).
    */
   def getTestIds(): Seq[Id[Test]]
 

@@ -82,6 +82,20 @@ trait ExecutionDaoTest { self: AbstractDaoTest ⇒
     executionsOut should equal(executionsIn)
   }
 
+  "Iterating all executions" should "exclude deleted tests" in transaction { dao ⇒
+    val testId1 = dao.ensureTestIsRecorded(F.test())
+    val testId2 = dao.ensureTestIsRecorded(F.test())
+    val batchId = dao.newBatch(F.batch())
+    dao.newExecution(F.execution(batchId, testId1))
+    dao.newExecution(F.execution(batchId, testId1))
+    dao.newExecution(F.execution(batchId, testId2))
+    dao.markTestsAsDeleted(Seq(testId1))
+    
+    val executions = dao.iterateAllExecutions(_.toList) 
+    
+    executions.map(_.testId) should equal(Seq(testId2))
+  }
+
   "Getting executions for a test" should "return them most recent first" in transaction { dao ⇒
     val testId = dao.ensureTestIsRecorded(F.test())
     val batchId1 = dao.newBatch(F.batch())
