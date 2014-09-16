@@ -105,16 +105,30 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   def getTestIds(): Seq[Id[Test]] =
     tests.map(_.id).run
 
+  def getTestNames(pattern: String): Seq[String] =
+    tests.filter(_.name.toLowerCase like globToSqlPattern(pattern)).map(_.name).run
+
+  def getGroups(pattern: String): Seq[String] =
+    tests
+      .filter(_.group.isDefined)
+      .filter(_.group.toLowerCase like globToSqlPattern(pattern))
+      .groupBy(_.group).map(_._1).run.flatten
+
+  private def globToSqlPattern(pattern: String) = pattern.replace("*", "%").toLowerCase
+
   def getAnalysedTests(
     configuration: Configuration,
     testStatusOpt: Option[TestStatus] = None,
+    nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
     limitOpt: Option[Int] = None): List[TestAndAnalysis] = {
 
     var query = testsAndAnalyses.filter(_._2.configuration === configuration).filterNot(_._1.deleted)
+    for (name ← nameOpt)
+      query = query.filter(_._1.name.toLowerCase like globToSqlPattern(name))
     for (group ← groupOpt)
-      query = query.filter(_._1.group === group)
+      query = query.filter(_._1.group.toLowerCase like globToSqlPattern(group))
     for (status ← testStatusOpt)
       query = query.filter(_._2.status === status)
     query = query.sortBy(_._1.name).sortBy(_._1.group)
@@ -126,10 +140,14 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
 
   def getTestsById(testIds: Seq[Id[Test]]): Seq[Test] = tests.filter(_.id inSet testIds).run
 
-  def getTestCounts(configuration: Configuration, groupOpt: Option[String] = None): TestCounts = {
-    var query = testsAndAnalyses.filter(_._2.configuration === configuration).filterNot(_._1.deleted)
+  def getTestCounts(configuration: Configuration, nameOpt: Option[String] = None, groupOpt: Option[String] = None): TestCounts = {
+    var query = testsAndAnalyses
+    query = query.filter(_._2.configuration === configuration)
+    query = query.filterNot(_._1.deleted)
+    for (name ← nameOpt)
+      query = query.filter(_._1.name.toLowerCase like globToSqlPattern(name))
     for (group ← groupOpt)
-      query = query.filter(_._1.group === group)
+      query = query.filter(_._1.group.toLowerCase like globToSqlPattern(group))
     // Workaround for Slick exception if no analysis: "scala.slick.SlickException: Read NULL value for ResultSet column":
     query = query.filter(_._2.testId.?.isDefined)
     val results: Map[TestStatus, Int] =

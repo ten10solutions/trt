@@ -9,7 +9,7 @@ GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 GET     /configurations             @controllers.Application.configurations()
 
-GET     /tests                      @controllers.Application.tests(configuration: Option[Configuration] ?= None, status: Option[TestStatus] ?= None, group: Option[String] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
+GET     /tests                      @controllers.Application.tests(configuration: Option[Configuration] ?= None, status: Option[TestStatus] ?= None, name: Option[String] ?= None, group: Option[String] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 POST    /tests/delete               @controllers.Application.deleteTests()
 
 GET     /test/:id                   @controllers.Application.test(id: Id[Test], configuration: Option[Configuration] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
@@ -30,6 +30,9 @@ POST    /systemConfiguration        @controllers.Application.updateSystemConfigu
 
 GET     /admin                      @controllers.Application.admin()
 POST    /deleteAll                  @controllers.Application.deleteAll()
+
+GET     /webApi/tests/names         @controllers.Application.testNames(query: String)
+GET     /webApi/tests/groups        @controllers.Application.groups(query: String)
 
 GET     /api/batches                @controllers.JsonController.getBatches()
 POST    /api/batches                @controllers.JsonController.addBatch()

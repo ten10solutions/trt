@@ -8,6 +8,8 @@ import com.thetestpeople.trt.model.jenkins._
 import com.github.nscala_time.time.Imports._
 import java.util.concurrent.locks.ReentrantLock
 import java.util.concurrent.locks.Lock
+import org.apache.oro.text.GlobCompiler
+import java.util.regex.Pattern
 
 class MockDao extends Dao {
 
@@ -53,13 +55,15 @@ class MockDao extends Dao {
   def getAnalysedTests(
     configuration: Configuration,
     testStatusOpt: Option[TestStatus] = None,
+    nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
     limitOpt: Option[Int]): Seq[TestAndAnalysis] = {
     val allResults =
       for {
         test ← tests
-        if groupOpt.forall(group ⇒ test.groupOpt == Some(group))
+        if groupOpt.forall(pattern ⇒ test.groupOpt.exists(group ⇒ matchesPattern(pattern, group)))
+        if nameOpt.forall(pattern ⇒ matchesPattern(pattern, test.name))
         analysisOpt = analyses.find(a ⇒ a.testId == test.id && a.configuration == configuration)
         if testStatusOpt.forall(status ⇒ analysisOpt.exists(_.status == status))
       } yield TestAndAnalysis(test, analysisOpt)
@@ -75,8 +79,8 @@ class MockDao extends Dao {
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts] =
     getConfigurations().map { c ⇒ c -> getTestCounts(c) }.toMap
 
-  def getTestCounts(configuration: Configuration, groupOpt: Option[String] = None): TestCounts = {
-    val tests = getAnalysedTests(configuration, groupOpt = groupOpt)
+  def getTestCounts(configuration: Configuration, nameOpt: Option[String] = None, groupOpt: Option[String] = None): TestCounts = {
+    val tests = getAnalysedTests(configuration, nameOpt = nameOpt, groupOpt = groupOpt)
     val passed = tests.count(_.analysisOpt.exists(_.status == TestStatus.Pass))
     val warning = tests.count(_.analysisOpt.exists(_.status == TestStatus.Warn))
     val failed = tests.count(_.analysisOpt.exists(_.status == TestStatus.Fail))
@@ -302,6 +306,26 @@ class MockDao extends Dao {
 
   def getConfigurations(): Seq[Configuration] = executions.map(_.configuration).distinct.sorted
 
-  def getConfigurations(testId: Id[Test]): Seq[Configuration] = executions.filter(_.testId == testId).map(_.configuration).distinct.sorted
+  def getConfigurations(testId: Id[Test]): Seq[Configuration] =
+    executions.filter(_.testId == testId).map(_.configuration).distinct.sorted
 
+  private def matchesPattern(pattern: String, text: String) =
+    globToRegex(pattern).matcher(text).matches()
+
+  private def globToRegex(pattern: String): Pattern =
+    Pattern.compile(GlobCompiler.globToPerl5(pattern.toCharArray, GlobCompiler.CASE_INSENSITIVE_MASK), Pattern.CASE_INSENSITIVE)
+
+  def getTestNames(pattern: String): Seq[String] = {
+    val regexPattern = globToRegex(pattern)
+    def matches(s: String) = regexPattern.matcher(s).matches()
+    for (test ← tests if matches(test.name))
+      yield test.name
+  }
+
+  def getGroups(pattern: String): Seq[String] = {
+    val regexPattern = globToRegex(pattern)
+    def matches(s: String) = regexPattern.matcher(s).matches()
+    for (test ← tests; group ← test.groupOpt if matches(group))
+      yield group
+  }
 }

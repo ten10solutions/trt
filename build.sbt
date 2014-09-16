@@ -33,7 +33,8 @@ libraryDependencies ++= List(
   "org.apache.lucene" % "lucene-core" % "4.7.0",
   "org.apache.lucene" % "lucene-analyzers-common" % "4.7.0",
   "com.google.guava" % "guava" % "16.0.1",
-  "org.liquibase" % "liquibase-core" % "3.1.1")
+  "org.liquibase" % "liquibase-core" % "3.1.1",
+  "oro" % "oro" % "2.0.8")
 
 libraryDependencies ++= List(
   "org.scalatest" %% "scalatest" % "2.2.1" % "test",

@@ -9,6 +9,7 @@ import play.Logger
 import play.api.mvc._
 import viewModel._
 import java.net.URI
+import play.api.libs.json._
 
 object Application {
 
@@ -197,24 +198,25 @@ class Application(service: Service, adminService: AdminService) extends Controll
     s"Deleted ${batchIds.size} $batchWord"
   }
 
-  def tests(configurationOpt: Option[Configuration], testStatusOpt: Option[TestStatus], groupOpt: Option[String], pageOpt: Option[Int], pageSizeOpt: Option[Int]) =
+  def tests(configurationOpt: Option[Configuration], testStatusOpt: Option[TestStatus], nameOpt: Option[String], groupOpt: Option[String], pageOpt: Option[Int], pageSizeOpt: Option[Int]) =
     Action { implicit request ⇒
       Utils.time("Application.tests()") {
-        logger.debug(s"tests(configuration = $configurationOpt, status = $testStatusOpt, group = $groupOpt, page = $pageOpt, pageSize = $pageSizeOpt)")
+        logger.debug(s"tests(configuration = $configurationOpt, status = $testStatusOpt, name = $nameOpt, group = $groupOpt, page = $pageOpt, pageSize = $pageSizeOpt)")
         Pagination.validate(pageOpt, pageSizeOpt) match {
           case Left(errorMessage) ⇒
             BadRequest(errorMessage)
           case Right(pagination) ⇒
             val configuration = configurationOpt.getOrElse(Configuration.Default)
-            Ok(handleTests(testStatusOpt, configuration, groupOpt, pagination))
+            Ok(handleTests(testStatusOpt, configuration, nameOpt, groupOpt, pagination))
         }
       }
     }
 
-  private def handleTests(testStatusOpt: Option[TestStatus], configuration: Configuration, groupOpt: Option[String], pagination: Pagination)(implicit request: Request[_]) = {
+  private def handleTests(testStatusOpt: Option[TestStatus], configuration: Configuration, nameOpt: Option[String], groupOpt: Option[String], pagination: Pagination)(implicit request: Request[_]) = {
     val (testCounts, tests) = service.getTests(
       configuration = configuration,
       testStatusOpt = testStatusOpt,
+      nameOpt = nameOpt,
       groupOpt = groupOpt,
       startingFrom = pagination.firstItem,
       limit = pagination.pageSize)
@@ -223,7 +225,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
     val testsSummary = TestsSummaryView(configuration, testCounts)
     val paginationData = pagination.paginationData(testCounts.countFor(testStatusOpt))
     val historicalTestCountsOpt = service.getHistoricalTestCounts(configuration).map(HistoricalTestCountsTimelineView.apply)
-    views.html.tests(testsSummary, testViews.toList, configuration, testStatusOpt, groupOpt, service.canRerun, paginationData, historicalTestCountsOpt)
+    views.html.tests(testsSummary, testViews.toList, configuration, testStatusOpt, nameOpt, groupOpt, service.canRerun, paginationData, historicalTestCountsOpt)
   }
 
   def admin() = Action { implicit request ⇒
@@ -263,5 +265,15 @@ class Application(service: Service, adminService: AdminService) extends Controll
     } yield get(previousUrl)
 
   private def get(url: String) = new Call("GET", url)
+
+  def testNames(query: String) = Action { implicit request ⇒
+    logger.debug(s"testNames($query)")
+    Ok(Json.toJson(service.getTestNames(query)))
+  }
+
+  def groups(query: String) = Action { implicit request ⇒
+    logger.debug(s"groups($query)")
+    Ok(Json.toJson(service.getGroups(query)))
+  }
 
 }

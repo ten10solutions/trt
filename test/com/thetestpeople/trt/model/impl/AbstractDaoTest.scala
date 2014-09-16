@@ -81,6 +81,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     batch.durationOpt should equal(None)
     batch.nameOpt should equal(None)
   }
+
   "Getting all analysed tests" should "work" in transaction { dao ⇒
     val dao = createDao
     def addTest() = {
@@ -111,6 +112,37 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     val tests = dao.getAnalysedTests(groupOpt = Some("Group 1")).map(_.test)
 
     tests.map(_.id) should contain theSameElementsAs (List(testId1, testId2))
+  }
+
+  "Getting tests" should "allow you to filter by group with wildcards" in transaction { dao ⇒
+    val dao = createDao
+    def addTest(group: String) = {
+      val testId = dao.ensureTestIsRecorded(F.test(groupOpt = Some(group)))
+      dao.upsertAnalysis(F.analysis(testId))
+      testId
+    }
+    val testId1 = addTest("Foobar")
+    val testId2 = addTest("Foobaz")
+    val testId3 = addTest("Quux")
+
+    val tests = dao.getAnalysedTests(groupOpt = Some("Foo*")).map(_.test)
+
+    tests.map(_.id) should contain theSameElementsAs (Seq(testId1, testId2))
+  }
+
+  "Getting tests" should "allow you to filter by test name" in transaction { dao ⇒
+    val dao = createDao
+    def addTest(name: String) = {
+      val testId = dao.ensureTestIsRecorded(F.test(name = name))
+      dao.upsertAnalysis(F.analysis(testId))
+      testId
+    }
+    val testId1 = addTest("some test 1")
+    val testId2 = addTest("some test 2")
+    val testId3 = addTest("Another thing")
+
+    val testIds = dao.getAnalysedTests(nameOpt = Some("*test*")).map(_.test.id)
+    testIds should contain theSameElementsAs (Seq(testId1, testId2))
   }
 
   "Getting tests" should "allow you to filter by status" in transaction { dao ⇒
@@ -221,24 +253,39 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
       DummyData.Configuration2 -> TestCounts(passed = 1, warning = 1, failed = 1)))
   }
 
+  "Getting test counts" should "allow filtering by test name" in transaction { dao ⇒
+    val dao = createDao
+    def addTest(name: String, status: TestStatus) {
+      val testId = dao.ensureTestIsRecorded(F.test(name = name))
+      dao.upsertAnalysis(F.analysis(testId, status))
+    }
+    addTest("test1", TestStatus.Pass)
+    addTest("test2", TestStatus.Warn)
+    addTest("test3", TestStatus.Fail)
+    addTest("somethingElse", TestStatus.Pass)
+
+    val testCounts = dao.getTestCounts(nameOpt = Some("test*"))
+
+    testCounts should equal(TestCounts(passed = 1, warning = 1, failed = 1))
+  }
+
   "Getting test counts" should "allow filtering by group" in transaction { dao ⇒
     val dao = createDao
     def addTest(group: String, status: TestStatus) {
       val testId = dao.ensureTestIsRecorded(F.test(groupOpt = Some(group)))
       dao.upsertAnalysis(F.analysis(testId, status))
     }
-    addTest("group1", TestStatus.Pass)
-    addTest("group1", TestStatus.Warn)
-    addTest("group1", TestStatus.Warn)
-    addTest("group1", TestStatus.Fail)
-    addTest("group1", TestStatus.Fail)
-    addTest("group1", TestStatus.Fail)
-    addTest("group2", TestStatus.Pass)
+    addTest("groupOne", TestStatus.Pass)
+    addTest("groupOne", TestStatus.Warn)
+    addTest("groupOne", TestStatus.Warn)
+    addTest("groupOne", TestStatus.Fail)
+    addTest("groupOne", TestStatus.Fail)
+    addTest("groupOne", TestStatus.Fail)
+    addTest("groupTwo", TestStatus.Pass)
 
-    val testCounts = dao.getTestCounts(groupOpt = Some("group1"))
+    val testCounts = dao.getTestCounts(groupOpt = Some("groupO*"))
 
     testCounts should equal(TestCounts(passed = 1, warning = 2, failed = 3))
-
   }
 
   "Getting test counts" should "tolerate unanalysed tests" in transaction { dao ⇒
@@ -499,4 +546,35 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     dao.getConfigurations(testId) should contain theSameElementsAs (List(DummyData.Configuration1, DummyData.Configuration2))
   }
 
+  "Getting test names" should "find exact matches" in transaction { dao ⇒
+    dao.ensureTestIsRecorded(F.test(name = "a"))
+    dao.ensureTestIsRecorded(F.test(name = "b"))
+    dao.ensureTestIsRecorded(F.test(name = "ab"))
+    dao.ensureTestIsRecorded(F.test(name = "ba"))
+
+    dao.getTestNames("a") should equal(Seq("a"))
+  }
+
+  "it" should "do case-insensitive matching" in transaction { dao ⇒
+    dao.ensureTestIsRecorded(F.test(name = "a"))
+    dao.ensureTestIsRecorded(F.test(name = "A"))
+
+    dao.getTestNames("a") should contain theSameElementsAs (Seq("a", "A"))
+  }
+
+  it should "find matches with wildcards" in transaction { dao ⇒
+    dao.ensureTestIsRecorded(F.test(name = "testsomething"))
+    dao.ensureTestIsRecorded(F.test(name = "sometest"))
+    dao.ensureTestIsRecorded(F.test(name = "mytest1"))
+    dao.ensureTestIsRecorded(F.test(name = "nope"))
+
+    dao.getTestNames("*test*") should contain theSameElementsAs (Seq("testsomething", "sometest", "mytest1"))
+  }
+
+  "Getting group names" should "find matches with wildcards" in transaction { dao ⇒
+    dao.ensureTestIsRecorded(F.test(groupOpt = Some("myTEST")))
+    dao.ensureTestIsRecorded(F.test(groupOpt = Some("test")))
+
+    dao.getGroups("*test*") should contain theSameElementsAs (Seq("myTEST", "test"))
+  }
 }

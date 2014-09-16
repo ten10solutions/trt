@@ -18,16 +18,28 @@ trait Dao extends ExecutionDao with JenkinsDao {
   def getTestIds(): Seq[Id[Test]]
 
   /**
+   * @return all test names matching the given pattern (case-insensitive, allows * wildcards)
+   */
+  def getTestNames(pattern: String): Seq[String]
+
+  /**
+   * @return all groups matching the given pattern (case-insensitive, allows * wildcards)
+   */
+  def getGroups(pattern: String): Seq[String]
+
+  /**
    * Get tests and any analysis for the given configuration and filters.
    *
    * Excludes deleted tests
    *
-   * @param groupOpt -- if Some(group), filter returned tests to those matching the given group.
+   * @param nameOpt -- if Some(name), filter returned tests to those matching the given name (case insensitive, allows * wildcards)
+   * @param groupOpt -- if Some(group), filter returned tests to those matching the given group (case insensitive, allows * wildcards)
    * @param testStatusOpt -- if Some(testStatus), filter returned tests to those matching the given status.
    */
   def getAnalysedTests(
     configuration: Configuration = Configuration.Default,
     testStatusOpt: Option[TestStatus] = None,
+    nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
     limitOpt: Option[Int] = None): Seq[TestAndAnalysis]
@@ -44,10 +56,14 @@ trait Dao extends ExecutionDao with JenkinsDao {
   /**
    * Gets test counts for a given configuration (and filters).
    *
+   * @param nameOpt -- if Some(name), filter returned tests to those matching the given name (case insensitive, allows * wildcards)
+   * @param groupOpt -- if Some(group), filter returned tests to those matching the given group (case insensitive, allows * wildcards)
+   *
    * Excludes deleted tests
    */
   def getTestCounts(
     configuration: Configuration = Configuration.Default,
+    nameOpt: Option[String] = None,
     groupOpt: Option[String] = None): TestCounts
 
   def getTestsById(testIds: Seq[Id[Test]]): Seq[Test]

@@ -32,6 +32,7 @@ trait Service extends JenkinsService {
   def getTests(
     configuration: Configuration = Configuration.Default,
     testStatusOpt: Option[TestStatus] = None,
+    nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
     limit: Int = Integer.MAX_VALUE): (TestCounts, Seq[TestAndAnalysis])
@@ -39,7 +40,7 @@ trait Service extends JenkinsService {
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts]
 
   def markTestsAsDeleted(ids: Seq[Id[Test]], deleted: Boolean = true)
-  
+
   def getHistoricalTestCounts(): Map[Configuration, HistoricalTestCountsTimeline]
 
   def getHistoricalTestCounts(configuration: Configuration): Option[HistoricalTestCountsTimeline]
@@ -60,5 +61,8 @@ trait Service extends JenkinsService {
    * Return true iff there is at least one execution recorded
    */
   def hasExecutions(): Boolean
+
+  def getTestNames(pattern: String): Seq[String]
   
+  def getGroups(pattern: String): Seq[String]
 }

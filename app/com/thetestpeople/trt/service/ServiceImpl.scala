@@ -42,16 +42,19 @@ class ServiceImpl(
   def getTests(
     configuration: Configuration,
     testStatusOpt: Option[TestStatus] = None,
+    nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     startingFrom: Int,
     limit: Int): (TestCounts, Seq[TestAndAnalysis]) = transaction {
 
     val testCounts = dao.getTestCounts(
       configuration = configuration,
+      nameOpt = nameOpt,
       groupOpt = groupOpt)
     val tests = dao.getAnalysedTests(
       configuration = configuration,
       testStatusOpt = testStatusOpt,
+      nameOpt = nameOpt,
       groupOpt = groupOpt,
       startingFrom = startingFrom,
       limitOpt = Some(limit))
@@ -116,5 +119,26 @@ class ServiceImpl(
   }
 
   def hasExecutions(): Boolean = transaction { dao.countExecutions() > 0 }
+
+  def getTestNames(pattern: String): Seq[String] = transaction {
+    val matches = dao.getTestNames("*" + pattern + "*").distinct
+    if (pattern.contains("*"))
+      matches.sorted
+    else
+      helpfullySort(pattern, matches)
+  }
+
+  def getGroups(pattern: String): Seq[String] = transaction {
+    val matches = dao.getGroups("*" + pattern + "*").distinct
+    if (pattern.contains("*"))
+      matches.sorted
+    else
+      helpfullySort(pattern, matches)
+  }
+  
+  private def helpfullySort(pattern: String, matches: Seq[String]): Seq[String] = {
+    val (prefixes, infixes) = matches.partition(_ startsWith pattern)
+    prefixes.sorted ++ infixes.sorted
+  }
 
 }
