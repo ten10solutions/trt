@@ -23,15 +23,15 @@ trait JenkinsDao {
   /**
    * @return all the URLs of builds imported from Jenkins
    */
-  def getJenkinsBuildUrls(): List[URI]
+  def getJenkinsBuildUrls(): Seq[URI]
 
-  def getJenkinsJobs(): List[JenkinsJob]
+  def getJenkinsJobs(): Seq[JenkinsJob]
   
   def getJenkinsBuilds(jobUrl: URI): Seq[JenkinsBuild]
 
   def newJenkinsImportSpec(spec: JenkinsImportSpec): Id[JenkinsImportSpec]
 
-  def getJenkinsImportSpecs(): List[JenkinsImportSpec]
+  def getJenkinsImportSpecs(): Seq[JenkinsImportSpec]
 
   def getJenkinsImportSpec(id: Id[JenkinsImportSpec]): Option[JenkinsImportSpec]
 

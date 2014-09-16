@@ -119,7 +119,7 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
       url = DummyData.JobUrl,
       name = DummyData.JobName))
 
-    val List(job) = dao.getJenkinsJobs()
+    val Seq(job) = dao.getJenkinsJobs()
     job.id should equal(jobId)
     job.url should equal(DummyData.JobUrl)
     job.name should equal(DummyData.JobName)
@@ -129,7 +129,7 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
     val jobId = dao.ensureJenkinsJob(F.jenkinsJob(url = DummyData.JobUrl))
     val jobIdAgain = dao.ensureJenkinsJob(F.jenkinsJob(url = DummyData.JobUrl))
     jobIdAgain should equal(jobId)
-    val List(job) = dao.getJenkinsJobs()
+    val Seq(job) = dao.getJenkinsJobs()
     job.id should equal(jobId)
   }
 

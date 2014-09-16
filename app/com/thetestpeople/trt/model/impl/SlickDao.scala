@@ -106,8 +106,8 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     query.firstOption.map(TestAndAnalysis.tupled)
   }
 
-  def getTestIds(): List[Id[Test]] =
-    tests.map(_.id).run.toList
+  def getTestIds(): Seq[Id[Test]] =
+    tests.map(_.id).run
 
   def getAnalysedTests(
     configuration: Configuration,
@@ -128,7 +128,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     query.map { case (test, analysis) ⇒ (test, analysis.?) }.run.map(TestAndAnalysis.tupled).toList
   }
 
-  def getTestsById(testIds: List[Id[Test]]): List[Test] = tests.filter(_.id inSet testIds).run.toList
+  def getTestsById(testIds: Seq[Id[Test]]): Seq[Test] = tests.filter(_.id inSet testIds).run
 
   def getTestCounts(configuration: Configuration, groupOpt: Option[String] = None): TestCounts = {
     var query = testsAndAnalyses.filter(_._2.configuration === configuration).filterNot(_._1.deleted)
@@ -151,13 +151,13 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
         if !test.deleted
       } yield (test, analysis)
     case class CountRecord(configuration: Configuration, status: TestStatus, count: Int)
-    val countRecords: List[CountRecord] =
+    val countRecords: Seq[CountRecord] =
       baseQuery.groupBy {
         case (test, analysis) ⇒ (analysis.configuration, analysis.status)
       }.map {
         case ((configuration, status), results) ⇒ (configuration, status, results.length)
-      }.run.toList.map(CountRecord.tupled)
-    def testCounts(countRecords: List[CountRecord]): TestCounts = {
+      }.run.map(CountRecord.tupled)
+    def testCounts(countRecords: Seq[CountRecord]): TestCounts = {
       def count(status: TestStatus) = countRecords.find(_.status == status).map(_.count).getOrElse(0)
       TestCounts(
         passed = count(TestStatus.Pass),
@@ -205,7 +205,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     query.firstOption.map { case (batch, logRowOpt) ⇒ BatchAndLog(batch, logRowOpt.map(_.log)) }
   }
 
-  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): List[Batch] = {
+  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch] = {
     var baseQuery =
       jobOpt match {
         case Some(jobId) ⇒
@@ -220,7 +220,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       }
     for (configuration ← configurationOpt)
       baseQuery = baseQuery.filter(_.configuration === configuration)
-    baseQuery.sortBy(_.executionTime.desc).run.toList
+    baseQuery.sortBy(_.executionTime.desc).run
   }
 
   def newBatch(batch: Batch, logOpt: Option[String]): Id[Batch] = {
@@ -236,7 +236,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
    */
   private def removeNullChars(s: String) = s.filterNot(_ == '\u0000')
 
-  private def deleteTestsWithoutExecutions(testIds: List[Id[Test]]): List[Id[Test]] = {
+  private def deleteTestsWithoutExecutions(testIds: Seq[Id[Test]]): Seq[Id[Test]] = {
     val testsWithoutExecutionsQuery =
       for {
         (test, execution) ← tests leftJoin executions on (_.id === _.testId)
@@ -244,13 +244,13 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
         if execution.id.isNull
       } yield test.id
 
-    val testIdsToDelete = testsWithoutExecutionsQuery.run.toList
+    val testIdsToDelete = testsWithoutExecutionsQuery.run
     tests.filter(_.id inSet testIdsToDelete).delete
     testIdsToDelete
   }
 
-  def deleteBatches(batchIds: List[Id[Batch]]): List[Id[Test]] = {
-    val (executionIds, testIds) = executions.filter(_.batchId inSet batchIds).map(e ⇒ (e.id, e.testId)).run.toList.unzip
+  def deleteBatches(batchIds: Seq[Id[Batch]]): Seq[Id[Test]] = {
+    val (executionIds, testIds) = executions.filter(_.batchId inSet batchIds).map(e ⇒ (e.id, e.testId)).run.unzip
     jenkinsBuilds.filter(_.batchId inSet batchIds).delete
     analyses.filter(_.testId inSet testIds).delete
     executionLogs.filter(_.executionId inSet executionIds).delete
@@ -318,8 +318,8 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   def updateSystemConfiguration(newConfig: SystemConfiguration) =
     systemConfiguration.update(newConfig)
 
-  def getConfigurations(): List[Configuration] =
-    executions.groupBy(_.configuration).map(_._1).sorted.run.toList
+  def getConfigurations(): Seq[Configuration] =
+    executions.groupBy(_.configuration).map(_._1).sorted.run
 
   def getConfigurations(testId: Id[Test]): Seq[Configuration] = 
     executions.filter(_.testId === testId).groupBy(_.configuration).map(_._1).sorted.run

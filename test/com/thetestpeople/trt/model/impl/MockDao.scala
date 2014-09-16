@@ -21,18 +21,18 @@ class MockDao extends Dao {
       lock.unlock()
   }
 
-  private var executions: List[Execution] = List()
-  private var tests: List[Test] = List()
-  private var batches: List[Batch] = List()
-  private var analyses: List[Analysis] = List()
-  private var executionLogs: List[ExecutionLogRow] = List()
-  private var batchLogs: List[BatchLogRow] = List()
-  private var jenkinsJobs: List[JenkinsJob] = List()
-  private var jenkinsBuilds: List[JenkinsBuild] = List()
-  private var jenkinsImportSpecs: List[JenkinsImportSpec] = List()
+  private var executions: Seq[Execution] = List()
+  private var tests: Seq[Test] = List()
+  private var batches: Seq[Batch] = List()
+  private var analyses: Seq[Analysis] = List()
+  private var executionLogs: Seq[ExecutionLogRow] = List()
+  private var batchLogs: Seq[BatchLogRow] = List()
+  private var jenkinsJobs: Seq[JenkinsJob] = List()
+  private var jenkinsBuilds: Seq[JenkinsBuild] = List()
+  private var jenkinsImportSpecs: Seq[JenkinsImportSpec] = List()
   private var systemConfiguration = SystemConfiguration()
   private var jenkinsConfiguration = JenkinsConfiguration()
-  private var jenkinsConfigParams: List[JenkinsJobParam] = List()
+  private var jenkinsConfigParams: Seq[JenkinsJobParam] = List()
 
   def getEnrichedExecution(id: Id[Execution]): Option[EnrichedExecution] =
     for {
@@ -48,14 +48,14 @@ class MockDao extends Dao {
       analysisOpt = analyses.find(a ⇒ a.testId == test.id && a.configuration == configuration)
     } yield TestAndAnalysis(test, analysisOpt)
 
-  def getTestIds(): List[Id[Test]] = tests.map(_.id)
+  def getTestIds(): Seq[Id[Test]] = tests.map(_.id)
 
   def getAnalysedTests(
     configuration: Configuration,
     testStatusOpt: Option[TestStatus] = None,
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
-    limitOpt: Option[Int]): List[TestAndAnalysis] = {
+    limitOpt: Option[Int]): Seq[TestAndAnalysis] = {
     val allResults =
       for {
         test ← tests
@@ -70,7 +70,7 @@ class MockDao extends Dao {
     }
   }
 
-  def getTestsById(testIds: List[Id[Test]]): List[Test] = tests.filter(test ⇒ testIds.contains(test.id))
+  def getTestsById(testIds: Seq[Id[Test]]): Seq[Test] = tests.filter(test ⇒ testIds.contains(test.id))
 
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts] =
     getConfigurations().map { c ⇒ c -> getTestCounts(c) }.toMap
@@ -84,7 +84,7 @@ class MockDao extends Dao {
   }
 
   def upsertAnalysis(analysis: Analysis) {
-    analyses = analysis :: analyses.filterNot(_.testId == analysis.testId)
+    analyses = analysis +: analyses.filterNot(_.testId == analysis.testId)
   }
 
   def getBatch(id: Id[Batch]): Option[BatchAndLog] = batches.find(_.id == id).map { batch ⇒
@@ -92,7 +92,7 @@ class MockDao extends Dao {
     BatchAndLog(batch, logOpt)
   }
 
-  def getBatches(jobIdOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): List[Batch] = {
+  def getBatches(jobIdOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch] = {
     batches
       .filter(batch ⇒ jobIdOpt.forall(jobId ⇒ areAssociated(batch, jobId)))
       .filter(batch ⇒ configurationOpt.forall(configuration ⇒ batch.configurationOpt == Some(configuration)))
@@ -111,7 +111,7 @@ class MockDao extends Dao {
     false
   }
 
-  def getEnrichedExecutionsInBatch(batchId: Id[Batch], passedFilterOpt: Option[Boolean]): List[EnrichedExecution] =
+  def getEnrichedExecutionsInBatch(batchId: Id[Batch], passedFilterOpt: Option[Boolean]): Seq[EnrichedExecution] =
     for {
       batch ← batches.filter(_.id == batchId)
       execution ← executions.filter(_.batchId == batch.id)
@@ -119,10 +119,10 @@ class MockDao extends Dao {
       if passedFilterOpt.forall(expected ⇒ execution.passed == expected)
     } yield EnrichedExecution(execution, test.qualifiedName, batch.nameOpt, logOpt = None)
 
-  def getExecutionsForTest(id: Id[Test]): List[Execution] =
+  def getExecutionsForTest(id: Id[Test]): Seq[Execution] =
     executions.filter(_.testId == id).sortBy(_.executionTime).reverse
 
-  def getEnrichedExecutionsForTest(testId: Id[Test], configurationOpt: Option[Configuration]): List[EnrichedExecution] = {
+  def getEnrichedExecutionsForTest(testId: Id[Test], configurationOpt: Option[Configuration]): Seq[EnrichedExecution] = {
     val executionsForTest =
       for {
         test ← tests.filter(_.id == testId)
@@ -150,7 +150,7 @@ class MockDao extends Dao {
         configuration -> new Interval(executionTimes.min, executionTimes.max)
     }
 
-  def getEnrichedExecutions(configurationOpt: Option[Configuration], startingFrom: Int, limit: Int): List[EnrichedExecution] = {
+  def getEnrichedExecutions(configurationOpt: Option[Configuration], startingFrom: Int, limit: Int): Seq[EnrichedExecution] = {
     val all =
       for {
         batch ← batches
@@ -164,20 +164,20 @@ class MockDao extends Dao {
   def countExecutions(configurationOpt: Option[Configuration]): Int =
     executions.count(e ⇒ configurationOpt.forall(_ == e.configuration))
 
-  private def nextId[T <: EntityType](ids: List[Id[T]]): Id[T] = {
+  private def nextId[T <: EntityType](ids: Seq[Id[T]]): Id[T] = {
     val allIds = ids.map(_.value)
     Id(if (allIds.isEmpty) 1 else allIds.max + 1)
   }
 
   def newBatch(batch: Batch, logOpt: Option[String]): Id[Batch] = {
     val newId = nextId(batches.map(_.id))
-    batches ::= batch.copy(id = newId)
+    batches +:= batch.copy(id = newId)
     for (log ← logOpt)
-      batchLogs ::= BatchLogRow(newId, log)
+      batchLogs +:= BatchLogRow(newId, log)
     newId
   }
 
-  def deleteBatches(batchIds: List[Id[Batch]]) = {
+  def deleteBatches(batchIds: Seq[Id[Batch]]) = {
     val (executionIds, testIds) = executions.filter(batchIds contains _.batchId).map(e ⇒ (e.id, e.testId)).toList.unzip
     jenkinsBuilds = jenkinsBuilds.filterNot(batchIds contains _.batchId)
     analyses = analyses.filterNot(testIds contains _.testId)
@@ -193,7 +193,7 @@ class MockDao extends Dao {
 
   private def newTest(test: Test): Id[Test] = {
     val newId = nextId(tests.map(_.id))
-    tests ::= test.copy(id = newId)
+    tests +:= test.copy(id = newId)
     newId
   }
 
@@ -214,24 +214,24 @@ class MockDao extends Dao {
 
   def newExecution(execution: Execution, logOpt: Option[String]): Id[Execution] = {
     val newId = nextId(executions.map(_.id))
-    executions ::= execution.copy(id = newId)
+    executions +:= execution.copy(id = newId)
     for (log ← logOpt)
-      executionLogs ::= ExecutionLogRow(newId, log)
+      executionLogs +:= ExecutionLogRow(newId, log)
     newId
   }
 
   def getExecutionLog(id: Id[Execution]) = executionLogs.find(_.executionId == id).map(_.log)
 
   def newJenkinsBuild(jenkinsBuild: JenkinsBuild) {
-    jenkinsBuilds ::= jenkinsBuild
+    jenkinsBuilds +:= jenkinsBuild
   }
 
   def getJenkinsBuild(buildUrl: URI): Option[JenkinsBuild] =
     jenkinsBuilds.find(_.buildUrl == buildUrl)
 
-  def getJenkinsBuildUrls(): List[URI] = jenkinsBuilds.map(_.buildUrl)
+  def getJenkinsBuildUrls(): Seq[URI] = jenkinsBuilds.map(_.buildUrl)
 
-  def getJenkinsJobs(): List[JenkinsJob] = jenkinsJobs
+  def getJenkinsJobs(): Seq[JenkinsJob] = jenkinsJobs
 
   def getJenkinsBuilds(jobUrl: URI): Seq[JenkinsBuild] =
     for {
@@ -243,11 +243,11 @@ class MockDao extends Dao {
 
   def newJenkinsImportSpec(spec: JenkinsImportSpec): Id[JenkinsImportSpec] = {
     val newId = nextId(jenkinsImportSpecs.map(_.id))
-    jenkinsImportSpecs ::= spec.copy(id = newId)
+    jenkinsImportSpecs +:= spec.copy(id = newId)
     newId
   }
 
-  def getJenkinsImportSpecs: List[JenkinsImportSpec] = jenkinsImportSpecs
+  def getJenkinsImportSpecs: Seq[JenkinsImportSpec] = jenkinsImportSpecs
 
   def deleteJenkinsImportSpec(id: Id[JenkinsImportSpec]): Boolean = {
     val found = jenkinsImportSpecs.exists(_.id == id)
@@ -260,7 +260,7 @@ class MockDao extends Dao {
   def updateJenkinsImportSpec(updatedSpec: JenkinsImportSpec): Boolean =
     jenkinsImportSpecs.find(_.id == updatedSpec.id) match {
       case Some(spec) ⇒
-        jenkinsImportSpecs = updatedSpec :: jenkinsImportSpecs.filterNot(_.id == updatedSpec.id)
+        jenkinsImportSpecs = updatedSpec +: jenkinsImportSpecs.filterNot(_.id == updatedSpec.id)
         true
       case None ⇒
         false
@@ -270,7 +270,7 @@ class MockDao extends Dao {
     jenkinsImportSpecs.find(_.id == id) match {
       case Some(spec) ⇒
         val updatedSpec = spec.copy(lastCheckedOpt = lastCheckedOpt)
-        jenkinsImportSpecs = updatedSpec :: jenkinsImportSpecs.filterNot(_.id == id)
+        jenkinsImportSpecs = updatedSpec +: jenkinsImportSpecs.filterNot(_.id == id)
         true
       case None ⇒
         false
@@ -280,7 +280,7 @@ class MockDao extends Dao {
 
   def updateSystemConfiguration(newConfig: SystemConfiguration) { systemConfiguration = newConfig }
 
-  def getJenkinsConfiguration(): FullJenkinsConfiguration = FullJenkinsConfiguration(jenkinsConfiguration, jenkinsConfigParams)
+  def getJenkinsConfiguration(): FullJenkinsConfiguration = FullJenkinsConfiguration(jenkinsConfiguration, jenkinsConfigParams.toList)
 
   def updateJenkinsConfiguration(config: FullJenkinsConfiguration) {
     jenkinsConfiguration = config.config
@@ -293,12 +293,12 @@ class MockDao extends Dao {
         jobAgain.id
       case None ⇒
         val newId = nextId(jenkinsJobs.map(_.id))
-        jenkinsJobs ::= job.copy(id = newId)
+        jenkinsJobs +:= job.copy(id = newId)
         newId
     }
   }
 
-  def getConfigurations(): List[Configuration] = executions.map(_.configuration).distinct.sorted
+  def getConfigurations(): Seq[Configuration] = executions.map(_.configuration).distinct.sorted
    
   def getConfigurations(testId: Id[Test]): Seq[Configuration] = executions.filter(_.testId == testId).map(_.configuration).distinct.sorted
 

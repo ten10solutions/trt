@@ -45,7 +45,7 @@
         <td>In other configurations</td>
         <td>
           @for(otherConfiguration <- otherConfigurations) {
-            <a href="@routes.Application.test(id = test.id, configuration = Some(otherConfiguration))">@otherConfiguration</a>
+            <a class="other-configuration-link" href="@routes.Application.test(id = test.id, configuration = Some(otherConfiguration))">@otherConfiguration</a>
           }
         </td>
       </tr>

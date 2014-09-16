@@ -50,11 +50,10 @@
         
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="dropdown">
-              <a id="menu-choose-configuration" href="#" class="dropdown-toggle" data-toggle="dropdown">Configurations <b class="caret"></b></a>
+            <li class="@if(currentPage == "Configurations") {active}"><a id="menu-configurations" href="@routes.Application.configurations()">Configurations</a></li>
+            <li class="dropdown @if(currentPage == "Tests") {active}">
+              <a id="menu-tests" href="#" class="dropdown-toggle" data-toggle="dropdown">Tests <b class="caret"></b></a>
               <ul class="dropdown-menu">
-                <li><a id="configuration-menu-all" href="@routes.Application.configurations()">All</a></li>
-                <li class="divider"></li>
                 @for(configuration <- globalViewContext.configurations) {
                   <li><a class="configuration-menu-item" href="@routes.Application.tests(configuration=Some(configuration))">@configuration</a></li>
                 }

@@ -15,7 +15,7 @@ trait Dao extends ExecutionDao with JenkinsDao {
   /**
    * @return the IDs of all tests in the DB
    */
-  def getTestIds(): List[Id[Test]]
+  def getTestIds(): Seq[Id[Test]]
 
   /**
    * Get tests and any analysis for the given configuration and filters.
@@ -30,7 +30,7 @@ trait Dao extends ExecutionDao with JenkinsDao {
     testStatusOpt: Option[TestStatus] = None,
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
-    limitOpt: Option[Int] = None): List[TestAndAnalysis]
+    limitOpt: Option[Int] = None): Seq[TestAndAnalysis]
 
   /**
    * Gets test counts for all configurations.
@@ -50,7 +50,7 @@ trait Dao extends ExecutionDao with JenkinsDao {
     configuration: Configuration = Configuration.Default,
     groupOpt: Option[String] = None): TestCounts
 
-  def getTestsById(testIds: List[Id[Test]]): List[Test]
+  def getTestsById(testIds: Seq[Id[Test]]): Seq[Test]
 
   /**
    * Checks whether a test is already recorded for the given test's qualifiedName.
@@ -73,7 +73,7 @@ trait Dao extends ExecutionDao with JenkinsDao {
    * @param configurationOpt -- if Some(configuration), then only return batches that are associated with the given configuration
    * Otherwise, return all batches.
    */
-  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): List[Batch]
+  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch]
 
   /**
    * Add a record for a new batch (the existing ID is ignored)
@@ -89,13 +89,13 @@ trait Dao extends ExecutionDao with JenkinsDao {
    *
    * @return IDs of tests that haven't been deleted, but have had an associated execution deleted.
    */
-  def deleteBatches(batchIds: List[Id[Batch]]): List[Id[Test]]
+  def deleteBatches(batchIds: Seq[Id[Batch]]): Seq[Id[Test]]
 
   def getSystemConfiguration(): SystemConfiguration
 
   def updateSystemConfiguration(newConfig: SystemConfiguration)
 
-  def getConfigurations(): List[Configuration]
+  def getConfigurations(): Seq[Configuration]
 
   /**
    * Return the configurations of executions that have been recorded of the given test.

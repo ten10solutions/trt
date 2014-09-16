@@ -126,7 +126,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
     val jobs = service.getJenkinsJobs()
     val paginationData = pagination.paginationData(batches.size)
     val hideChartInitially = batches.size >= HideBatchChartThreshold
-    views.html.batches(batches, jobIdOpt, configurationOpt, jobs, paginationData, hideChartInitially)
+    views.html.batches(batches.toList, jobIdOpt, configurationOpt, jobs, paginationData, hideChartInitially)
   }
 
   def executions(configurationOpt: Option[Configuration], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
@@ -223,7 +223,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
     val testsSummary = TestsSummaryView(configuration, testCounts)
     val paginationData = pagination.paginationData(testCounts.countFor(testStatusOpt))
     val historicalTestCountsOpt = service.getHistoricalTestCounts(configuration).map(HistoricalTestCountsTimelineView.apply)
-    views.html.tests(testsSummary, testViews, configuration, testStatusOpt, groupOpt, service.canRerun, paginationData, historicalTestCountsOpt)
+    views.html.tests(testsSummary, testViews.toList, configuration, testStatusOpt, groupOpt, service.canRerun, paginationData, historicalTestCountsOpt)
   }
 
   def admin() = Action { implicit request ⇒

@@ -28,7 +28,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
       name = DummyData.TestName,
       groupOpt = Some(DummyData.Group)))
 
-    val List(test) = dao.getTestsById(List(testId))
+    val Seq(test) = dao.getTestsById(List(testId))
     test.name should equal(DummyData.TestName)
     test.groupOpt should equal(Some(DummyData.Group))
   }
@@ -174,7 +174,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     val testId2 = dao.ensureTestIsRecorded(F.test())
     val testId3 = dao.ensureTestIsRecorded(F.test())
 
-    val List(test1) = dao.getTestsById(List(testId1))
+    val Seq(test1) = dao.getTestsById(List(testId1))
     test1.id should equal(testId1)
   }
 
@@ -253,7 +253,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
 
     val testId = dao.ensureTestIsRecorded(test)
 
-    val List(testAgain) = dao.getTestsById(List(testId))
+    val Seq(testAgain) = dao.getTestsById(List(testId))
     testAgain.qualifiedName should equal(test.qualifiedName)
   }
 
@@ -262,7 +262,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
 
     val testId = dao.ensureTestIsRecorded(test)
 
-    val List(testAgain) = dao.getTestsById(List(testId))
+    val Seq(testAgain) = dao.getTestsById(List(testId))
     testAgain.qualifiedName should equal(test.qualifiedName)
   }
 
@@ -272,7 +272,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
 
     val testId2 = dao.ensureTestIsRecorded(test)
 
-    val List(testAgain) = dao.getTestsById(List(testId2))
+    val Seq(testAgain) = dao.getTestsById(List(testId2))
     testAgain.qualifiedName should equal(test.qualifiedName)
     dao.getTestIds() should contain theSameElementsAs (List(testId1, testId2))
   }
@@ -323,7 +323,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     val batchId1 = dao.newBatch(F.batch(configurationOpt = Some(DummyData.Configuration1)))
     val batchId2 = dao.newBatch(F.batch(configurationOpt = Some(DummyData.Configuration2)))
 
-    val List(batch) = dao.getBatches(configurationOpt = Some(DummyData.Configuration1))
+    val Seq(batch) = dao.getBatches(configurationOpt = Some(DummyData.Configuration1))
 
     batch.id should equal(batchId1)
   }
@@ -434,7 +434,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     val batchId3 = dao.newBatch(F.batch())
     dao.newExecution(F.execution(batchId3, testId3))
 
-    val List(affectedTestId) = dao.deleteBatches(List(batchId1))
+    val Seq(affectedTestId) = dao.deleteBatches(List(batchId1))
 
     affectedTestId should be(testId1) // It hasn't been deleted, but it has had some executions removed
     dao.getTestAndAnalysis(testId2) should be(None) // It has had all its executions removed, so it has been removed too
@@ -462,7 +462,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
   "Deleting a test" should "mark it as deleted" in transaction { dao ⇒
     val testId = dao.ensureTestIsRecorded(F.test(deleted = false))
     dao.markTestsAsDeleted(Seq(testId))
-    val List(test) = dao.getTestsById(List(testId))
+    val Seq(test) = dao.getTestsById(List(testId))
     test.deleted should be(true)
   }
 
@@ -470,14 +470,14 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     val testId1 = dao.ensureTestIsRecorded(F.test(deleted = false))
     val testId2 = dao.ensureTestIsRecorded(F.test(deleted = false))
     dao.markTestsAsDeleted(Seq(testId1))
-    val List(test) = dao.getTestsById(List(testId2))
+    val Seq(test) = dao.getTestsById(List(testId2))
     test.deleted should be(false)
   }
 
   "Undeleting a test" should "work" in transaction { dao ⇒
     val testId = dao.ensureTestIsRecorded(F.test(deleted = true))
     dao.markTestsAsDeleted(Seq(testId), deleted = false)
-    val List(test) = dao.getTestsById(List(testId))
+    val Seq(test) = dao.getTestsById(List(testId))
     test.deleted should be(false)
   }
 

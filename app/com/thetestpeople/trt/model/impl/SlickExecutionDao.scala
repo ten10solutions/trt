@@ -35,7 +35,7 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
       if batch.id === execution.batchId
     } yield (execution, test, batch)
 
-  def getEnrichedExecutionsInBatch(batchId: Id[Batch], passedFilterOpt: Option[Boolean]): List[EnrichedExecution] = {
+  def getEnrichedExecutionsInBatch(batchId: Id[Batch], passedFilterOpt: Option[Boolean]): Seq[EnrichedExecution] = {
     var query =
       for {
         (execution, test, batch) ← executionTestBatchJoin
@@ -90,7 +90,7 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
       case (configuration, Some(earliest), Some(latest)) ⇒ configuration -> new Interval(earliest, latest)
     }.toMap
 
-  def getEnrichedExecutions(configurationOpt: Option[Configuration], startingFrom: Int, limit: Int): List[EnrichedExecution] = {
+  def getEnrichedExecutions(configurationOpt: Option[Configuration], startingFrom: Int, limit: Int): Seq[EnrichedExecution] = {
     var query =
       for ((execution, test, batch) ← executionTestBatchJoin)
         yield (execution, test.name, test.group, batch.name)
@@ -119,10 +119,10 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
     Compiled(getExecutionsForTest _)
   }
 
-  def getExecutionsForTest(id: Id[Test]): List[Execution] =
+  def getExecutionsForTest(id: Id[Test]): Seq[Execution] =
     getExecutionsForTestCompiled(id).run.toList
 
-  def getEnrichedExecutionsForTest(id: Id[Test], configurationOpt: Option[Configuration]): List[EnrichedExecution] = {
+  def getEnrichedExecutionsForTest(id: Id[Test], configurationOpt: Option[Configuration]): Seq[EnrichedExecution] = {
     var query =
       for {
         (execution, test, batch) ← executionTestBatchJoin

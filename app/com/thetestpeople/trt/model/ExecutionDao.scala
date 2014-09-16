@@ -23,7 +23,7 @@ trait ExecutionDao {
   /**
    * @return executions of the given test, ordered most recent first
    */
-  def getExecutionsForTest(id: Id[Test]): List[Execution]
+  def getExecutionsForTest(id: Id[Test]): Seq[Execution]
 
   def getExecutionLog(id: Id[Execution]): Option[String]
 
@@ -36,20 +36,20 @@ trait ExecutionDao {
    * @param configurationOpt -- if defined, filter executions to those against the given configuration
    * @return executions, ordered most recent first. No execution logs will be provided.
    */
-  def getEnrichedExecutions(configurationOpt: Option[Configuration] = None, startingFrom: Int = 0, limit: Int = Integer.MAX_VALUE): List[EnrichedExecution]
+  def getEnrichedExecutions(configurationOpt: Option[Configuration] = None, startingFrom: Int = 0, limit: Int = Integer.MAX_VALUE): Seq[EnrichedExecution]
 
   /**
    * @param configurationOpt -- if defined, restrict executions to only those against the given configuration
    * @return executions of the given test, ordered most recent first. No execution logs will be provided.
    */
-  def getEnrichedExecutionsForTest(id: Id[Test], configurationOpt: Option[Configuration] = None): List[EnrichedExecution]
+  def getEnrichedExecutionsForTest(id: Id[Test], configurationOpt: Option[Configuration] = None): Seq[EnrichedExecution]
 
   /**
    * @param passedFilterOpt -- if Some(true), return executions that passed. If Some(false), return only executions
    * that failed. If None, return all executions.
    * @return executions in the given batch. No execution logs will be provided.
    */
-  def getEnrichedExecutionsInBatch(batchId: Id[Batch], passedFilterOpt: Option[Boolean] = None): List[EnrichedExecution]
+  def getEnrichedExecutionsInBatch(batchId: Id[Batch], passedFilterOpt: Option[Boolean] = None): Seq[EnrichedExecution]
 
   /**
    * @param configurationOpt -- if defined, only count executions against the given configuration.

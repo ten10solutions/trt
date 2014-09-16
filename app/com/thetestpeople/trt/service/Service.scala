@@ -23,7 +23,7 @@ trait Service extends JenkinsService {
   /**
    * Return batches, ordered most recent first
    */
-  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): List[Batch]
+  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch]
 
   def deleteBatches(batchIds: List[Id[Batch]])
 
@@ -34,7 +34,7 @@ trait Service extends JenkinsService {
     testStatusOpt: Option[TestStatus] = None,
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
-    limit: Int = Integer.MAX_VALUE): (TestCounts, List[TestAndAnalysis])
+    limit: Int = Integer.MAX_VALUE): (TestCounts, Seq[TestAndAnalysis])
 
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts]
 
@@ -54,10 +54,11 @@ trait Service extends JenkinsService {
 
   def updateSystemConfiguration(newConfig: SystemConfiguration)
 
-  def getConfigurations(): List[Configuration]
+  def getConfigurations(): Seq[Configuration]
 
   /**
    * Return true iff there is at least one execution recorded
    */
   def hasExecutions(): Boolean
+  
 }

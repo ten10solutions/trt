@@ -28,14 +28,14 @@ class ServiceImpl(
     transaction {
       val executions = dao.getEnrichedExecutions(configurationOpt, startingFrom, limit)
       val executionCount = dao.countExecutions(configurationOpt)
-      ExecutionsAndTotalCount(executions, executionCount)
+      ExecutionsAndTotalCount(executions.toList, executionCount)
     }
 
   def getTestAndExecutions(id: Id[Test], configuration: Configuration): Option[TestAndExecutions] = transaction {
     dao.getTestAndAnalysis(id, configuration) map { test ⇒
       val executions = dao.getEnrichedExecutionsForTest(id, Some(configuration))
       val otherConfigurations = dao.getConfigurations(id).filterNot(_ == configuration)
-      TestAndExecutions(test, executions, otherConfigurations)
+      TestAndExecutions(test, executions.toList, otherConfigurations)
     }
   }
 
@@ -44,7 +44,7 @@ class ServiceImpl(
     testStatusOpt: Option[TestStatus] = None,
     groupOpt: Option[String] = None,
     startingFrom: Int,
-    limit: Int): (TestCounts, List[TestAndAnalysis]) = transaction {
+    limit: Int): (TestCounts, Seq[TestAndAnalysis]) = transaction {
 
     val testCounts = dao.getTestCounts(
       configuration = configuration,
@@ -61,7 +61,10 @@ class ServiceImpl(
 
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts] = transaction { dao.getTestCountsByConfiguration() }
 
-  def markTestsAsDeleted(ids: Seq[Id[Test]], deleted: Boolean) = transaction { dao.markTestsAsDeleted(ids, deleted) }
+  def markTestsAsDeleted(ids: Seq[Id[Test]], deleted: Boolean) = transaction {
+    logger.info("Marking tests as deleted: " + ids.mkString(", "))
+    dao.markTestsAsDeleted(ids, deleted)
+  }
 
   def addBatch(incomingBatch: Incoming.Batch): Id[Batch] = transaction {
     batchRecorder.recordBatch(incomingBatch).id
@@ -72,11 +75,11 @@ class ServiceImpl(
       dao.getBatch(id).map {
         case BatchAndLog(batch, logOpt) ⇒
           val executions = dao.getEnrichedExecutionsInBatch(id, passedFilterOpt)
-          BatchAndExecutions(batch, executions, logOpt)
+          BatchAndExecutions(batch, executions.toList, logOpt)
       }
     }
 
-  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): List[Batch] =
+  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch] =
     transaction { dao.getBatches(jobOpt, configurationOpt) }
 
   def deleteBatches(batchIds: List[Id[Batch]]) = {
@@ -84,7 +87,7 @@ class ServiceImpl(
       dao.deleteBatches(batchIds)
     }
     logger.info(s"Deleted batches ${batchIds.mkString(", ")}")
-    analysisService.scheduleAnalysis(testIds)
+    analysisService.scheduleAnalysis(testIds.toList)
   }
 
   def getSystemConfiguration(): SystemConfiguration = transaction { dao.getSystemConfiguration() }
@@ -94,12 +97,12 @@ class ServiceImpl(
       dao.updateSystemConfiguration(newConfig)
       dao.getTestIds()
     }
-    logger.info(s"Updated system configuration to $newConfig")
-    analysisService.scheduleAnalysis(testIds)
+    analysisService.scheduleAnalysis(testIds.toList)
     analysisService.clearHistoricalTestCounts()
+    logger.info(s"Updated system configuration to $newConfig")
   }
 
-  def getConfigurations(): List[Configuration] = transaction { dao.getConfigurations() }
+  def getConfigurations(): Seq[Configuration] = transaction { dao.getConfigurations() }
 
   def getHistoricalTestCounts(): Map[Configuration, HistoricalTestCountsTimeline] =
     analysisService.getHistoricalTestCountsByConfig

@@ -17,7 +17,7 @@ class DeleteTestTest extends AbstractBrowserTest {
       site.restApi.addBatch(batch)
 
       {
-        val testsScreen = site.launch().mainMenu.clickConfigurations().chooseConfiguration(DummyData.Configuration1)
+        val testsScreen = site.launch().mainMenu.clickTests().chooseConfiguration(DummyData.Configuration1)
         testsScreen.total should equal(1)
         val Seq(testRow) = testsScreen.testRows
         val testScreen = testRow.clickTestLink()
@@ -25,7 +25,7 @@ class DeleteTestTest extends AbstractBrowserTest {
       }
 
       {
-        val testsScreen = site.launch().mainMenu.clickConfigurations().chooseConfiguration(DummyData.Configuration1)
+        val testsScreen = site.launch().mainMenu.clickTests().chooseConfiguration(DummyData.Configuration1)
         testsScreen.total should equal(0)
       }
 

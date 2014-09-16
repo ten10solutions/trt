@@ -17,6 +17,6 @@ object ControllerHelper {
       id ← Id.parse[Test](idString)
     } yield id
 
-  def globalViewContext(service: Service): GlobalViewContext = GlobalViewContext(service.getConfigurations(), service.hasExecutions())
+  def globalViewContext(service: Service): GlobalViewContext = GlobalViewContext(service.getConfigurations().toList, service.hasExecutions())
 
 }

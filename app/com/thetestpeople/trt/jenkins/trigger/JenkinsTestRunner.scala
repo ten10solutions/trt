@@ -10,7 +10,7 @@ class JenkinsTestRunner(dao: Dao, http: Http) extends HasLogger {
 
   def rerunTests(testIds: List[Id[Test]]): TriggerResult = {
     val FullJenkinsConfiguration(jenkinsConfig, params) = dao.getJenkinsConfiguration
-    val tests = dao.getTestsById(testIds)
+    val tests = dao.getTestsById(testIds).toList
     val parameters = ParameterSubstitutor.constructParameters(params, tests)
     val jobUrl = jenkinsConfig.rerunJobUrlOpt.getOrElse(
       throw new RuntimeException("No rerun job has been configured"))

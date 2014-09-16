@@ -30,7 +30,7 @@ trait SlickJenkinsDao { this: SlickDao ⇒
     getJenkinsBuildCompiled(buildUrl).firstOption
   }
 
-  def getJenkinsBuildUrls(): List[URI] = jenkinsBuilds.map(_.buildUrl).run.toList
+  def getJenkinsBuildUrls(): Seq[URI] = jenkinsBuilds.map(_.buildUrl).run
 
   def getJenkinsBuilds(jobUrl: URI): Seq[JenkinsBuild] = {
     val query =
@@ -43,13 +43,13 @@ trait SlickJenkinsDao { this: SlickDao ⇒
     query.run
   }
 
-  def getJenkinsJobs(): List[JenkinsJob] = jenkinsJobs.run.toList
+  def getJenkinsJobs(): Seq[JenkinsJob] = jenkinsJobs.run
 
   def newJenkinsImportSpec(spec: JenkinsImportSpec): Id[JenkinsImportSpec] =
     (jenkinsImportSpecs returning jenkinsImportSpecs.map(_.id)).insert(spec)
 
-  def getJenkinsImportSpecs(): List[JenkinsImportSpec] =
-    jenkinsImportSpecs.run.toList
+  def getJenkinsImportSpecs(): Seq[JenkinsImportSpec] =
+    jenkinsImportSpecs.run
 
   def deleteJenkinsImportSpec(id: Id[JenkinsImportSpec]): Boolean = {
     val query = jenkinsImportSpecs.filter(_.id === id)
@@ -81,8 +81,8 @@ trait SlickJenkinsDao { this: SlickDao ⇒
   def getJenkinsConfiguration(): FullJenkinsConfiguration = {
     val config = jenkinsConfiguration.firstOption.getOrElse(
       throw new IllegalStateException("No Jenkins configuration present"))
-    val params = jenkinsJobParams.run.toList
-    FullJenkinsConfiguration(config, params)
+    val params = jenkinsJobParams.run
+    FullJenkinsConfiguration(config, params.toList)
   }
 
   def updateJenkinsConfiguration(config: FullJenkinsConfiguration): Unit = synchronized {

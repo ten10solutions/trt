@@ -9,7 +9,7 @@ import com.thetestpeople.trt.model.Configuration
 import org.openqa.selenium.By
 import scala.collection.JavaConverters._
 
-class ConfigurationsMenu(implicit automationContext: AutomationContext) extends AbstractComponent {
+class TestsMenu(implicit automationContext: AutomationContext) extends AbstractComponent {
 
   def chooseConfiguration(configuration: Configuration): TestsScreen = {
     chooseConfiguration(configuration.configuration)
@@ -22,12 +22,6 @@ class ConfigurationsMenu(implicit automationContext: AutomationContext) extends 
       .getOrElse(throw new RuntimeException(s"Could not find menu item for configuration '$configuration'"))
     menuItem.click()
     new TestsScreen
-  }
-
-  def chooseAllConfigurations(): ConfigurationsScreen = {
-    log("Click 'All'")
-    webDriver.waitForDisplayedAndEnabled(id(s"configuration-menu-all"))
-    new ConfigurationsScreen
   }
 
 }
@@ -51,9 +45,9 @@ class MainMenu(implicit automationContext: AutomationContext) extends AbstractCo
     new BatchesScreen
   }
 
-  def clickConfigurations() = {
-    clickMenuItem("menu-choose-configuration", itemName = "Configurations")
-    new ConfigurationsMenu
+  def clickTests() = {
+    clickMenuItem("menu-tests", itemName = "Tests")
+    new TestsMenu
   }
 
   def clickExecutions(): ExecutionsScreen = {
