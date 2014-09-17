@@ -122,9 +122,10 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
-    limitOpt: Option[Int] = None): List[TestAndAnalysis] = {
-
-    var query = testsAndAnalyses.filter(_._2.configuration === configuration).filterNot(_._1.deleted)
+    limitOpt: Option[Int] = None): Seq[TestAndAnalysis] = {
+    var query = testsAndAnalyses
+    query = query.filter(_._2.configuration === configuration)
+    query = query.filterNot(_._1.deleted)
     for (name ← nameOpt)
       query = query.filter(_._1.name.toLowerCase like globToSqlPattern(name))
     for (group ← groupOpt)
@@ -135,7 +136,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     query = query.drop(startingFrom)
     for (limit ← limitOpt)
       query = query.take(limit)
-    query.map { case (test, analysis) ⇒ (test, analysis.?) }.run.map(TestAndAnalysis.tupled).toList
+    query.map { case (test, analysis) ⇒ (test, analysis.?) }.run.map(TestAndAnalysis.tupled)
   }
 
   def getTestsById(testIds: Seq[Id[Test]]): Seq[Test] = tests.filter(_.id inSet testIds).run
