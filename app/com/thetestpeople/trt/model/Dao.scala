@@ -19,6 +19,8 @@ trait Dao extends ExecutionDao with JenkinsDao {
 
   def getTestNames(pattern: String): Seq[String]
   
+  def getGroups(pattern: String): Seq[String] 
+  
   /**
    * Get tests and any analysis for the given configuration and filters.
    *

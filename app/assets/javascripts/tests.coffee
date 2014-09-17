@@ -28,3 +28,48 @@ $(document).ready ->
 
   $("#filter-form").submit (e) ->
     $("#test-name-field").removeAttr "name" if $("#test-name-field").val() is ""
+    $("#group-name-field").removeAttr "name" if $("#group-name-field").val() is ""
+
+  nameEngine.initialize()
+  groupEngine.initialize()
+
+  $("#test-name-field").typeahead
+    hint: true
+    highlight: true
+    minLength: 1
+  ,
+    name: "testNames"
+    displayKey: "val"
+    source: nameEngine.ttAdapter()
+
+  $("#group-name-field").typeahead
+    hint: true
+    highlight: true
+    minLength: 1
+  ,
+    name: "groups"
+    displayKey: "val"
+    source: groupEngine.ttAdapter()
+
+nameEngine = new Bloodhound(
+  name: "testNames"
+  limit: 12
+  remote:
+    url: "http://localhost:9000/webApi/tests/names?query=%QUERY"
+    filter: (resp) ->
+      ( {val: s} for s in resp )
+  datumTokenizer: (d) -> Bloodhound.tokenizers.whitespace d.val
+  queryTokenizer: Bloodhound.tokenizers.whitespace
+)
+
+groupEngine = new Bloodhound(
+  name: "groups"
+  limit: 12
+  remote:
+    url: "http://localhost:9000/webApi/tests/groups?query=%QUERY"
+    filter: (resp) ->
+      ( {val: s} for s in resp )
+  datumTokenizer: (d) -> Bloodhound.tokenizers.whitespace d.val
+  queryTokenizer: Bloodhound.tokenizers.whitespace
+)
+

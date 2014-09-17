@@ -100,55 +100,28 @@
     </div> <!-- col -->
   </div> <!-- row -->
 
-    
-  <form id="filter-form" role="form" action="@routes.Application.tests(configuration = Some(configuration))">
-     <div class="form-group">
-       <label for="test-name-field">Test name</label>
-       <input name="name" id="test-name-field" value="@{nameOpt.getOrElse("")}" class="form-control typeahead" type="text" placeholder="Test name"/>
-     </div>
-     <input name="configuration" value="@configuration" type="hidden"/>
-     @for(group <- groupOpt) {
-       <input name="group" value="@group" type="hidden"/>
-     }
-     <button id="filter-tests" type="submit" class="btn btn-default">Filter Tests</button>
-  </form>
-  <br/>
 
-<script>
-var engine = new Bloodhound({
-  name: 'testNames',
-  limit: 12,
-  remote: {
-     url: 'http://localhost:9000/webApi/tests/names?query=%QUERY',
-     filter: function(resp) {
-       result = [];
-       for (i = 0; i < resp.length; i++)
-          result.push({ val: resp[i] });
-       return result;
-     }
-  },
-  datumTokenizer: function(d) {
-    return Bloodhound.tokenizers.whitespace(d.val);
-  },
-  queryTokenizer: Bloodhound.tokenizers.whitespace
-});
- 
-engine.initialize();
-
-$('#test-name-field').typeahead({
-  hint: true,
-  highlight: true,
-  minLength: 1
-},
-{
-  name: 'testNames',
-  displayKey: 'val',
-  source: engine.ttAdapter()
-});
-
-
-</script>  
-
+<br/>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Search</h3>
+  </div>
+  <div class="panel-body">
+    <form id="filter-form" role="form" action="@routes.Application.tests(configuration = Some(configuration))">
+       <div class="form-group">
+         <label for="test-name-field">Test name</label>
+         <input name="name" id="test-name-field" value="@{nameOpt.getOrElse("")}" class="form-control typeahead" type="text" placeholder="Test name"/>
+       </div>
+       <div class="form-group">
+         <label for="group-name-field">Group</label>
+         <input name="group" id="group-name-field" value="@{groupOpt.getOrElse("")}" class="form-control typeahead" type="text" placeholder="Group"/>
+       </div>
+       <input name="configuration" value="@configuration" type="hidden"/>
+       <button id="filter-tests" type="submit" class="btn btn-default">Filter Tests</button>
+    </form>
+  </div>
+</div>    
+<br/>
 
   @if(canRerun) {
     <button style="margin-bottom: 12px" id="rerunSelected" type="button" class="btn btn-default" title="Rerun selected tests on Jenkins" onclick="performTestAction('@routes.JenkinsController.rerunSelectedTests()')"><i class="glyphicon glyphicon-refresh"></i> Rerun Selected</button>

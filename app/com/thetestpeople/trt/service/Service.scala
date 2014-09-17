@@ -64,4 +64,5 @@ trait Service extends JenkinsService {
 
   def getTestNames(pattern: String): Seq[String]
   
+  def getGroups(pattern: String): Seq[String]
 }

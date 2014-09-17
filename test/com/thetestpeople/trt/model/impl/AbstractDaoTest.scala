@@ -499,4 +499,21 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     dao.getConfigurations(testId) should contain theSameElementsAs (List(DummyData.Configuration1, DummyData.Configuration2))
   }
 
+  "Getting test names" should "find exact matches" in transaction { dao ⇒
+    dao.ensureTestIsRecorded(F.test(name = "a"))
+    dao.ensureTestIsRecorded(F.test(name = "b"))
+    dao.ensureTestIsRecorded(F.test(name = "ab"))
+    dao.ensureTestIsRecorded(F.test(name = "ba"))
+
+    dao.getTestNames("a") should equal(Seq("a"))
+  }
+
+  it should "find matches with wildcards" in transaction { dao ⇒
+    dao.ensureTestIsRecorded(F.test(name = "testsomething"))
+    dao.ensureTestIsRecorded(F.test(name = "sometest"))
+    dao.ensureTestIsRecorded(F.test(name = "mytest1"))
+    dao.ensureTestIsRecorded(F.test(name = "nope"))
+
+    dao.getTestNames("*test*") should contain theSameElementsAs (Seq("testsomething", "sometest", "mytest1"))
+  }
 }

@@ -32,6 +32,7 @@ GET     /admin                      @controllers.Application.admin()
 POST    /deleteAll                  @controllers.Application.deleteAll()
 
 GET     /webApi/tests/names         @controllers.Application.testNames(query: String)
+GET     /webApi/tests/groups        @controllers.Application.groups(query: String)
 
 GET     /api/batches                @controllers.JsonController.getBatches()
 POST    /api/batches                @controllers.JsonController.addBatch()

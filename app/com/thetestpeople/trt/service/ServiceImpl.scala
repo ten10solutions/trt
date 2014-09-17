@@ -128,6 +128,14 @@ class ServiceImpl(
       helpfullySort(pattern, matches)
   }
 
+  def getGroups(pattern: String): Seq[String] = transaction {
+    val matches = dao.getGroups("*" + pattern + "*").distinct
+    if (pattern.contains("*"))
+      matches.sorted
+    else
+      helpfullySort(pattern, matches)
+  }
+  
   private def helpfullySort(pattern: String, matches: Seq[String]): Seq[String] = {
     val (prefixes, infixes) = matches.partition(_ startsWith pattern)
     prefixes.sorted ++ infixes.sorted

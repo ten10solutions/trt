@@ -306,4 +306,6 @@ class MockDao extends Dao {
   def getConfigurations(testId: Id[Test]): Seq[Configuration] = executions.filter(_.testId == testId).map(_.configuration).distinct.sorted
 
   def getTestNames(pattern: String): Seq[String] = ???
+  
+  def getGroups(pattern: String): Seq[String] = ???
 }

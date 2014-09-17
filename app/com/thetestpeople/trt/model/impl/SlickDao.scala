@@ -105,12 +105,16 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   def getTestIds(): Seq[Id[Test]] =
     tests.map(_.id).run
 
-  def getTestNames(pattern: String): Seq[String] = {
-    val sqlPattern = globToSqlPattern(pattern)
-    tests.filter(_.name.toLowerCase like sqlPattern.toLowerCase).map(_.name).run
-  }
+  def getTestNames(pattern: String): Seq[String] =
+    tests.filter(_.name.toLowerCase like globToSqlPattern(pattern)).map(_.name).run
 
-  private def globToSqlPattern(pattern: String) = pattern.replace("*", "%")
+  def getGroups(pattern: String): Seq[String] =
+    tests
+      .filter(_.group.isDefined)
+      .filter(_.group.toLowerCase like globToSqlPattern(pattern))
+      .groupBy(_.group).map(_._1).run.flatten
+
+  private def globToSqlPattern(pattern: String) = pattern.replace("*", "%").toLowerCase
 
   def getAnalysedTests(
     configuration: Configuration,
@@ -121,12 +125,10 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     limitOpt: Option[Int] = None): List[TestAndAnalysis] = {
 
     var query = testsAndAnalyses.filter(_._2.configuration === configuration).filterNot(_._1.deleted)
-    for (name ← nameOpt) {
-      val sqlPattern = globToSqlPattern(name)
-      query = query.filter(_._1.name.toLowerCase like sqlPattern.toLowerCase)
-    }
+    for (name ← nameOpt)
+      query = query.filter(_._1.name.toLowerCase like globToSqlPattern(name))
     for (group ← groupOpt)
-      query = query.filter(_._1.group === group)
+      query = query.filter(_._1.group.toLowerCase like globToSqlPattern(group))
     for (status ← testStatusOpt)
       query = query.filter(_._2.status === status)
     query = query.sortBy(_._1.name).sortBy(_._1.group)

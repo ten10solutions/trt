@@ -267,6 +267,13 @@ class Application(service: Service, adminService: AdminService) extends Controll
   private def get(url: String) = new Call("GET", url)
 
   def testNames(query: String) = Action { implicit request ⇒
+    logger.debug(s"testNames($query)")
     Ok(Json.toJson(service.getTestNames(query)))
   }
+
+  def groups(query: String) = Action { implicit request ⇒
+    logger.debug(s"groups($query)")
+    Ok(Json.toJson(service.getGroups(query)))
+  }
+
 }
