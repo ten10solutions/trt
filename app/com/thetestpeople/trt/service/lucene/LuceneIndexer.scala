@@ -18,7 +18,7 @@ import java.io.File
 class LuceneIndexer {
 
   private def addExecution(indexWriter: IndexWriter, execution: EnrichedExecution) {
-    val document = new Document()
+    val document = new Document
     val qualifiedName = execution.qualifiedName
     document.add(new TextField("name", qualifiedName.name, Field.Store.YES))
     for (group ← qualifiedName.groupOpt)
@@ -42,4 +42,5 @@ class LuceneIndexer {
       addExecution(indexWriter, execution)
     indexWriter.close()
   }
+  
 }
