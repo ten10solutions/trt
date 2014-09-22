@@ -7,7 +7,7 @@ class BatchView(batch: Batch, _executions: List[EnrichedExecution] = Nil, logOpt
 
   def id = batch.id
 
-  val executions: List[ExecutionView] = _executions.sortBy(_.qualifiedName).map(ExecutionView)
+  val executions: List[ExecutionView] = _executions.sortBy(_.qualifiedName).map(e => ExecutionView(e))
 
   def urlOpt: Option[String] = batch.urlOpt.map(_.toString)
 

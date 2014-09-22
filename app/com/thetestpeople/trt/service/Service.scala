@@ -14,6 +14,8 @@ case class BatchAndExecutions(batch: Batch, executions: List[EnrichedExecution],
 
 case class ExecutionsAndTotalCount(executions: List[EnrichedExecution], total: Int)
 
+case class ExecutionAndFragment(execution: EnrichedExecution, fragment: String)
+
 trait Service extends JenkinsService {
 
   def addBatch(batch: Incoming.Batch): Id[Batch]
@@ -65,4 +67,7 @@ trait Service extends JenkinsService {
   def getTestNames(pattern: String): Seq[String]
   
   def getGroups(pattern: String): Seq[String]
+  
+  def searchLogs(query: String, startingFrom: Int = 0, limit: Int = Integer.MAX_VALUE): (Seq[ExecutionAndFragment], Int)
+  
 }

@@ -55,6 +55,11 @@ class MainMenu(implicit automationContext: AutomationContext) extends AbstractCo
     new ExecutionsScreen
   }
 
+  def clickSearchLogs(): SearchLogsScreen = {
+    clickMenuItem("menu-search-logs", itemName = "Search Logs")
+    new SearchLogsScreen()
+  }
+  
   def clickConfig(): ConfigMenu = {
     clickMenuItem("menu-config", itemName = "Config")
     new ConfigMenu()

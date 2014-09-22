@@ -9,6 +9,9 @@ import java.net.URI
 import com.thetestpeople.trt.utils.http.Http
 import com.thetestpeople.trt.jenkins.importer.JenkinsImportStatusManager
 import com.thetestpeople.trt.jenkins.importer.JenkinsImportQueue
+import com.thetestpeople.trt.service.indexing.LogIndexer
+import com.thetestpeople.trt.service.indexing.ExecutionHit
+import com.thetestpeople.trt.service.indexing.SearchResult
 
 class ServiceImpl(
   protected val dao: Dao,
@@ -17,7 +20,8 @@ class ServiceImpl(
   protected val analysisService: AnalysisService,
   protected val jenkinsImportStatusManager: JenkinsImportStatusManager,
   protected val batchRecorder: BatchRecorder,
-  protected val jenkinsImportQueue: JenkinsImportQueue)
+  protected val jenkinsImportQueue: JenkinsImportQueue,
+  protected val logIndexer: LogIndexer)
     extends Service with HasLogger with JenkinsServiceImpl {
 
   import dao.transaction
@@ -86,11 +90,12 @@ class ServiceImpl(
     transaction { dao.getBatches(jobOpt, configurationOpt) }
 
   def deleteBatches(batchIds: List[Id[Batch]]) = {
-    val testIds = transaction {
+    val DeleteBatchResult(remainingTestIds, executionIds) = transaction {
       dao.deleteBatches(batchIds)
     }
     logger.info(s"Deleted batches ${batchIds.mkString(", ")}")
-    analysisService.scheduleAnalysis(testIds.toList)
+    logIndexer.deleteExecutions(executionIds)
+    analysisService.scheduleAnalysis(remainingTestIds.toList)
   }
 
   def getSystemConfiguration(): SystemConfiguration = transaction { dao.getSystemConfiguration() }
@@ -135,10 +140,25 @@ class ServiceImpl(
     else
       helpfullySort(pattern, matches)
   }
-  
+
+  /**
+   * Sort autocomplete suggestions in a hopefully-useful way: prefix matches first, then infix matches.
+   */
   private def helpfullySort(pattern: String, matches: Seq[String]): Seq[String] = {
     val (prefixes, infixes) = matches.partition(_ startsWith pattern)
     prefixes.sorted ++ infixes.sorted
+  }
+
+  def searchLogs(query: String, startingFrom: Int = 0, limit: Int = Integer.MAX_VALUE): (Seq[ExecutionAndFragment], Int) = {
+    val SearchResult(executionHits, total) = logIndexer.searchExecutions(query, startingFrom, limit)
+    val executions = transaction { dao.getEnrichedExecutions(executionHits.map(_.executionId)) }
+    val executionAndFragments =
+      for {
+        execution ← executions
+        ExecutionHit(executionId, fragment) ← executionHits
+        if execution.id == executionId
+      } yield ExecutionAndFragment(execution, fragment)
+    (executionAndFragments, total)
   }
 
 }

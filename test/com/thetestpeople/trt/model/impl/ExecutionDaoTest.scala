@@ -90,9 +90,9 @@ trait ExecutionDaoTest { self: AbstractDaoTest ⇒
     dao.newExecution(F.execution(batchId, testId1))
     dao.newExecution(F.execution(batchId, testId2))
     dao.markTestsAsDeleted(Seq(testId1))
-    
-    val executions = dao.iterateAllExecutions(_.toList) 
-    
+
+    val executions = dao.iterateAllExecutions(_.toList)
+
     executions.map(_.testId) should equal(Seq(testId2))
   }
 
@@ -246,6 +246,19 @@ trait ExecutionDaoTest { self: AbstractDaoTest ⇒
     val executions = dao.getEnrichedExecutionsForTest(testId, configurationOpt = Some(DummyData.Configuration1))
 
     executions.map(_.id) should equal(List(executionId1))
+  }
+
+  "Getting enriched executions" should "work for a list of IDs" in transaction { dao ⇒
+    val testId = dao.ensureTestIsRecorded(F.test())
+    val batchId = dao.newBatch(F.batch())
+    def addExecution() = dao.newExecution(F.execution(batchId, testId))
+    val executionId1 = addExecution()
+    val executionId2 = addExecution()
+    val executionId3 = addExecution()
+
+    val executions = dao.getEnrichedExecutions(Seq(executionId1, executionId2))
+
+    executions.map(_.id) should contain theSameElementsAs(Seq(executionId1, executionId2))
   }
 
 }

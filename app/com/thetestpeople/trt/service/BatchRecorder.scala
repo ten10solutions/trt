@@ -4,17 +4,30 @@ import com.thetestpeople.trt.analysis.AnalysisService
 import com.thetestpeople.trt.model._
 import com.thetestpeople.trt.utils._
 import scala.PartialFunction.condOpt
+import com.thetestpeople.trt.service.indexing.LogIndexer
 
-class BatchRecorder(dao: Dao, clock: Clock, analysisService: AnalysisService) extends HasLogger {
+class BatchRecorder(dao: Dao, clock: Clock, analysisService: AnalysisService, logIndexer: LogIndexer) extends HasLogger {
 
   def recordBatch(incomingBatch: Incoming.Batch): Batch = Utils.time("recordBatch") {
-    val (testIds, batch) = dao.transaction {
+    val (executionIds, testIds, batch) = dao.transaction {
       val batch = createNewBatch(incomingBatch)
-      val (testIds, executionIds) = incomingBatch.executions.map(recordTestAndExecution(_, batch, incomingBatch.configurationOpt)).unzip
-      (testIds, batch)
+      def recordExecution(execution: Incoming.Execution) = recordTestAndExecution(execution, batch, incomingBatch.configurationOpt)
+      val (testIds, executionIds) = incomingBatch.executions.map(recordExecution).unzip
+      (executionIds, testIds, batch)
     }
     analysisService.scheduleAnalysis(testIds)
+    indexExecutions(executionIds)
     batch
+  }
+
+  private def indexExecutions(executionIds: List[Id[Execution]]) {
+    val executions = dao.transaction {
+      for {
+        executionId ← executionIds
+        execution ← dao.getEnrichedExecution(executionId)
+      } yield execution
+    }
+    logIndexer.addExecutions(executions)
   }
 
   private def recordTestAndExecution(incomingExecution: Incoming.Execution, batch: Batch, batchConfigurationOpt: Option[Configuration]): (Id[Test], Id[Execution]) = {

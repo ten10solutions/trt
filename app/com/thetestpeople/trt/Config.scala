@@ -44,4 +44,20 @@ object Config {
 
   }
 
+  object Lucene {
+
+    final val IndexDirectory = "lucene.indexDirectory"
+
+    final val InMemory = "lucene.inMemory"
+      
+  }
+
+  object Http {
+
+    final val UseCache = "http.useCache"
+
+    final val Timeout = "http.timeout"
+
+  }
+
 }

@@ -33,6 +33,11 @@ trait ExecutionDao {
   def getEnrichedExecution(id: Id[Execution]): Option[EnrichedExecution]
 
   /**
+   * @return executions matching given ids. No execution logs will be included.
+   */
+  def getEnrichedExecutions(ids: Seq[Id[Execution]]): Seq[EnrichedExecution]
+  
+  /**
    * @param configurationOpt -- if defined, filter executions to those against the given configuration
    * @return executions, ordered most recent first. No execution logs will be provided.
    */

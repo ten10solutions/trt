@@ -481,10 +481,22 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     val batchId3 = dao.newBatch(F.batch())
     dao.newExecution(F.execution(batchId3, testId3))
 
-    val Seq(affectedTestId) = dao.deleteBatches(List(batchId1))
+    val DeleteBatchResult(Seq(affectedTestId), _) = dao.deleteBatches(List(batchId1))
 
     affectedTestId should be(testId1) // It hasn't been deleted, but it has had some executions removed
     dao.getTestAndAnalysis(testId2) should be(None) // It has had all its executions removed, so it has been removed too
+  }
+
+  "Deleting a batch" should "return the ids of the deleted execution IDs" in transaction { dao ⇒
+    val batchId = dao.newBatch(F.batch())
+    val testId = dao.ensureTestIsRecorded(F.test())
+    val executionId1 = dao.newExecution(F.execution(batchId, testId))
+    val executionId2 = dao.newExecution(F.execution(batchId, testId))
+    val executionId3 = dao.newExecution(F.execution(batchId, testId))
+
+    val DeleteBatchResult(_, deletedExecutionIds) = dao.deleteBatches(List(batchId))
+
+    deletedExecutionIds should contain theSameElementsAs (Seq(executionId1, executionId2, executionId3))
   }
 
   "Inserting then updating two analyses" should "not cause a primary key error" in transaction { dao ⇒

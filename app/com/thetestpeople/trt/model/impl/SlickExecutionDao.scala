@@ -35,6 +35,18 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
       if batch.id === execution.batchId
     } yield (execution, test, batch)
 
+  private def makeEnrichedExecution(execution: Execution, testName: String, testGroupOpt: Option[String], batchNameOpt: Option[String]): EnrichedExecution =
+    EnrichedExecution(execution, QualifiedName(testName, testGroupOpt), batchNameOpt, logOpt = None)
+
+  def getEnrichedExecutions(ids: Seq[Id[Execution]]): Seq[EnrichedExecution] = {
+    var query =
+      for {
+        (execution, test, batch) ← executionTestBatchJoin
+        if execution.id inSet ids
+      } yield (execution, test.name, test.group, batch.name)
+    query.run.map((makeEnrichedExecution _).tupled)
+  }
+
   def getEnrichedExecutionsInBatch(batchId: Id[Batch], passedFilterOpt: Option[Boolean]): Seq[EnrichedExecution] = {
     var query =
       for {
@@ -43,10 +55,7 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
       } yield (execution, test.name, test.group, batch.name)
     for (passedFilter ← passedFilterOpt)
       query = query.filter { case (execution, _, _, _) ⇒ execution.passed === passedFilter }
-    query.run.toList.map {
-      case (execution, testName, testGroupOpt, batchNameOpt) ⇒
-        EnrichedExecution(execution, QualifiedName(testName, testGroupOpt), batchNameOpt, logOpt = None)
-    }
+    query.run.map((makeEnrichedExecution _).tupled)
   }
 
   // Workaround for setting setFetchSize (from https://github.com/slick/slick/issues/809)
@@ -98,10 +107,7 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
       query = query.filter(_._1.configuration === configuration)
     query = query.sortBy(_._1.executionTime.desc)
     query = query.drop(startingFrom).take(limit)
-    query.run.toList.map {
-      case (execution, testName, testGroupOpt, batchNameOpt) ⇒
-        EnrichedExecution(execution, QualifiedName(testName, testGroupOpt), batchNameOpt, logOpt = None)
-    }
+    query.run.map((makeEnrichedExecution _).tupled)
   }
 
   def countExecutions(configurationOpt: Option[Configuration]): Int =
@@ -131,9 +137,6 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
     for (configuration ← configurationOpt)
       query = query.filter(_._1.configuration === configuration)
     query = query.sortBy(_._1.executionTime.desc)
-    query.run.toList.map {
-      case (execution, testName, testGroupOpt, batchNameOpt) ⇒
-        EnrichedExecution(execution, QualifiedName(testName, testGroupOpt), batchNameOpt, logOpt = None)
-    }
+    query.run.toList.map((makeEnrichedExecution _).tupled)
   }
 }

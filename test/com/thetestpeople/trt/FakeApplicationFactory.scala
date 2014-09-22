@@ -13,7 +13,8 @@ object FakeApplicationFactory {
       Db.Default.Driver -> "org.h2.Driver",
       Db.Default.Url -> TestJdbcUrl,
       Db.Default.User -> "",
-      Db.Default.Password -> ""),
+      Db.Default.Password -> "",
+      Lucene.InMemory -> "true"),
     additionalPlugins = Seq(classOf[DontStopBoneCPPlugin].getName))
 
 }

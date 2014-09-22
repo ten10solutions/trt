@@ -37,3 +37,5 @@
 -Dconfig.file=/etc/trt/application.conf
 
 -Ddb.default.h2Path=/var/lib/trt/tests
+
+-Dlucene.indexDirectory=/var/lib/trt/luceneIndex

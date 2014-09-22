@@ -53,6 +53,7 @@
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
             <li class="@if(currentPage == "Configurations") {active}"><a id="menu-configurations" href="@routes.Application.configurations()">Configurations</a></li>
+            @if(globalViewContext.configurations.nonEmpty) {
             <li class="dropdown @if(currentPage == "Tests") {active}">
               <a id="menu-tests" href="#" class="dropdown-toggle" data-toggle="dropdown">Tests <b class="caret"></b></a>
               <ul class="dropdown-menu">
@@ -61,8 +62,10 @@
                 }
               </ul>
             </li>
+            }
             <li class="@if(currentPage == "Batches") {active}"><a id="menu-batches" href="@routes.Application.batches()">Batches</a></li>
             <li class="@if(currentPage == "Executions") {active}"><a id="menu-executions" href="@routes.Application.executions()">Executions</a></li>
+            <li class="@if(currentPage == "SearchLogs") {active}"><a id="menu-search-logs" href="@routes.Application.searchLogs()">Search Logs</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right">
             <li class="dropdown">

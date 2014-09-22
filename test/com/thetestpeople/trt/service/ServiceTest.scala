@@ -13,6 +13,7 @@ import com.thetestpeople.trt.model._
 import com.thetestpeople.trt.analysis.AnalysisService
 import com.thetestpeople.trt.jenkins.importer.JenkinsImportStatusManager
 import com.thetestpeople.trt.jenkins.importer.FakeJenkinsImportQueue
+import com.thetestpeople.trt.service.indexing.LuceneLogIndexer
 
 @RunWith(classOf[JUnitRunner])
 class ServiceTest extends FlatSpec with ShouldMatchers {
@@ -103,11 +104,15 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
     service.updateSystemConfiguration(SystemConfiguration(
       passDurationThreshold = 0.minutes, passCountThreshold = 1,
       failureDurationThreshold = 0.minutes, failureCountThreshold = 1))
-    def addBatch(passed: Boolean, executionTime: DateTime): Id[Batch] = service.addBatch(F.batch(executions =
-      List(F.execution(passed = passed, executionTimeOpt = Some(executionTime)))))
+
+    def addBatch(passed: Boolean, executionTime: DateTime): Id[Batch] =
+      service.addBatch(
+        F.batch(executions = List(F.execution(passed = passed, executionTimeOpt = Some(executionTime)))))
+
     val batchId1 = addBatch(passed = true, executionTime = 2.days.ago)
     val batchId2 = addBatch(passed = false, executionTime = 1.day.ago)
     val List(testId) = service.getTestIdsInBatch(batchId1)
+
     service.getStatus(testId) should equal(TestStatus.Fail)
     service.getBatches().map(_.id) should contain theSameElementsAs List(batchId1, batchId2)
 
@@ -115,6 +120,20 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
 
     service.getStatus(testId) should equal(TestStatus.Pass)
     service.getBatches().map(_.id) should contain theSameElementsAs List(batchId1)
+  }
+
+  "Deleting batches" should "delete its executions from the search index" in {
+    val service = setup().service
+    def addBatch(): Id[Batch] =
+      service.addBatch(F.batch(executions = List(F.execution(logOpt = Some("foo")))))
+    val batchId1 = addBatch()
+    val batchId2 = addBatch()
+
+    service.searchLogs("foo")._2 should equal(2)
+
+    service.deleteBatches(List(batchId2))
+
+    service.searchLogs("foo")._2 should equal(1)
   }
 
   "Updating system configuration" should "update the status of tests" in {
@@ -142,8 +161,9 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
     val http = AlwaysFailingHttp
     val analysisService = new AnalysisService(dao, clock, async = false)
     val jenkinsImportStatusManager = new JenkinsImportStatusManager(clock)
-    val batchRecorder = new BatchRecorder(dao, clock, analysisService)
-    val service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, FakeJenkinsImportQueue)
+    val logIndexer = LuceneLogIndexer.memoryBackedIndexer
+    val batchRecorder = new BatchRecorder(dao, clock, analysisService, logIndexer)
+    val service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, FakeJenkinsImportQueue, logIndexer)
     Setup(service)
   }
 
