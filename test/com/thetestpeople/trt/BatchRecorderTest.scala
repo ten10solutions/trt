@@ -12,6 +12,7 @@ import com.github.nscala_time.time.Imports._
 import java.net.URI
 import com.thetestpeople.trt.utils.UriUtils._
 import com.thetestpeople.trt.model.impl.DummyData
+import com.thetestpeople.trt.service.indexing.LuceneLogIndexer
 
 @RunWith(classOf[JUnitRunner])
 class BatchRecorderTest extends FlatSpec with Matchers {
@@ -121,7 +122,7 @@ class BatchRecorderTest extends FlatSpec with Matchers {
 
     val List(execution) = dao.getEnrichedExecutionsInBatch(batch.id)
     execution.execution.configuration should equal(DummyData.Configuration1)
-    
+
   }
 
   private def checkBatchDataWasCaptured(batch: Batch, inBatch: Incoming.Batch) {
@@ -154,7 +155,8 @@ class BatchRecorderTest extends FlatSpec with Matchers {
   private def getTestContext(clock: Clock = FakeClock()): (Dao, BatchRecorder, AnalysisService) = {
     val dao: Dao = new MockDao
     val analysisService = new AnalysisService(dao, clock, async = false)
-    val batchRecorder = new BatchRecorder(dao, clock, analysisService)
+    val logIndexer = LuceneLogIndexer.memoryBackedIndexer 
+    val batchRecorder = new BatchRecorder(dao, clock, analysisService, logIndexer)
     (dao, batchRecorder, analysisService)
   }
 

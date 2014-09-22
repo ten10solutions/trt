@@ -17,10 +17,26 @@ import play.api.mvc.Controller
 import com.thetestpeople.trt.jenkins.importer.JenkinsImportWorker
 import com.thetestpeople.trt.jenkins.importer.JenkinsImportWorker
 import com.thetestpeople.trt.jenkins.importer.JenkinsImporter
+import java.io.File
+import com.thetestpeople.trt.service.indexing.LuceneLogIndexer
 
 object Factory {
 
-  final val JdbcUrl = "db.default.url"
+  object Db {
+
+    object Default {
+
+      final val Url = "db.default.url"
+
+    }
+
+  }
+
+  object Lucene {
+
+    final val IndexFile = "lucene.indexFile"
+
+  }
 
   object Http {
 
@@ -39,8 +55,8 @@ class Factory(configuration: Configuration) {
 
   import Factory._
 
-  lazy val jdbcUrl: String = configuration.getString(JdbcUrl).getOrElse(
-    throw new RuntimeException(s"No value set for property '$JdbcUrl'"))
+  lazy val jdbcUrl: String = configuration.getString(Db.Default.Url).getOrElse(
+    throw new RuntimeException(s"No value set for property '${Db.Default.Url}'"))
 
   import play.api.Play.current
   lazy val dataSource = DB.getDataSource()
@@ -68,9 +84,9 @@ class Factory(configuration: Configuration) {
 
   lazy val analysisService = new AnalysisService(dao, clock, async = true)
 
-  lazy val service: Service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, jenkinsImportWorker)
+  lazy val service: Service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, jenkinsImportWorker, logIndexer)
 
-  lazy val adminService = new AdminServiceImpl(dao)
+  lazy val adminService = new AdminServiceImpl(dao, logIndexer)
 
   lazy val controller = new Application(service, adminService)
 
@@ -80,11 +96,16 @@ class Factory(configuration: Configuration) {
 
   lazy val jsonController = new JsonController(service, adminService)
 
-  lazy val batchRecorder = new BatchRecorder(dao, clock, analysisService)
+  lazy val batchRecorder = new BatchRecorder(dao, clock, analysisService, logIndexer)
 
   lazy val jenkinsImporter = new JenkinsImporter(clock, http, dao, jenkinsImportStatusManager, batchRecorder)
-  
+
   lazy val jenkinsImportWorker = new JenkinsImportWorker(dao, jenkinsImporter)
+
+  lazy val luceneIndexLocation: String = configuration.getString(Lucene.IndexFile).getOrElse(
+    throw new RuntimeException(s"No value set for property '${Lucene.IndexFile}'"))
+
+  lazy val logIndexer = LuceneLogIndexer.fileBackedIndexer(new File(luceneIndexLocation))
 
   def getControllerInstance[A](clazz: Class[A]): A = controllerMap(clazz).asInstanceOf[A]
 

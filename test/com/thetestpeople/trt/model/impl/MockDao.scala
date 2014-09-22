@@ -117,10 +117,21 @@ class MockDao extends Dao {
 
   def getEnrichedExecutionsInBatch(batchId: Id[Batch], passedFilterOpt: Option[Boolean]): Seq[EnrichedExecution] =
     for {
-      batch ← batches.filter(_.id == batchId)
-      execution ← executions.filter(_.batchId == batch.id)
+      batch ← batches
+      if batch.id == batchId
+      execution ← executions
+      if execution.batchId == batch.id
       test ← tests.find(_.id == execution.testId)
       if passedFilterOpt.forall(expected ⇒ execution.passed == expected)
+    } yield EnrichedExecution(execution, test.qualifiedName, batch.nameOpt, logOpt = None)
+
+  def getEnrichedExecutions(ids: Seq[Id[Execution]]): Seq[EnrichedExecution] =
+    for {
+      batch ← batches
+      execution ← executions.filter(_.batchId == batch.id)
+      if execution.batchId == batch.id
+      if ids.contains(execution.id)
+      test ← tests.find(_.id == execution.testId)
     } yield EnrichedExecution(execution, test.qualifiedName, batch.nameOpt, logOpt = None)
 
   def getExecutionsForTest(id: Id[Test]): Seq[Execution] =
@@ -194,7 +205,7 @@ class MockDao extends Dao {
 
     val (deleteTestIds, affectedTestIds) = testIds.partition(getExecutionsForTest(_).isEmpty)
     tests = tests.filterNot(deleteTestIds contains _.id)
-    affectedTestIds
+    DeleteBatchResult(affectedTestIds, executionIds)
   }
 
   private def newTest(test: Test): Id[Test] = {

@@ -264,7 +264,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     testIdsToDelete
   }
 
-  def deleteBatches(batchIds: Seq[Id[Batch]]): Seq[Id[Test]] = {
+  def deleteBatches(batchIds: Seq[Id[Batch]]): DeleteBatchResult = {
     val (executionIds, testIds) = executions.filter(_.batchId inSet batchIds).map(e ⇒ (e.id, e.testId)).run.unzip
     jenkinsBuilds.filter(_.batchId inSet batchIds).delete
     analyses.filter(_.testId inSet testIds).delete
@@ -273,7 +273,8 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     batchLogs.filter(_.batchId inSet batchIds).delete
     batches.filter(_.id inSet batchIds).delete
     val deletedTestIds = deleteTestsWithoutExecutions(testIds).toSet
-    testIds.filterNot(deletedTestIds.contains)
+    val remainingTestIds = testIds.filterNot(deletedTestIds.contains)
+    DeleteBatchResult(remainingTestIds, executionIds)
   }
 
   private val testInserter = (tests returning tests.map(_.id)).insertInvoker

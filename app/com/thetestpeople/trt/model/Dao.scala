@@ -105,7 +105,7 @@ trait Dao extends ExecutionDao with JenkinsDao {
    *
    * @return IDs of tests that haven't been deleted, but have had an associated execution deleted.
    */
-  def deleteBatches(batchIds: Seq[Id[Batch]]): Seq[Id[Test]]
+  def deleteBatches(batchIds: Seq[Id[Batch]]): DeleteBatchResult
 
   def getSystemConfiguration(): SystemConfiguration
 
@@ -119,3 +119,5 @@ trait Dao extends ExecutionDao with JenkinsDao {
   def getConfigurations(testId: Id[Test]): Seq[Configuration]
 
 }
+
+case class DeleteBatchResult(remainingTestIds: Seq[Id[Test]], deletedExecutionIds: Seq[Id[Execution]])

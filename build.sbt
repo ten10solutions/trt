@@ -30,8 +30,10 @@ libraryDependencies ++= List(
   "com.github.nscala-time" %% "nscala-time" % "1.4.0",
   "commons-validator" % "commons-validator" % "1.4.0",
   "commons-io" % "commons-io" % "2.2",
-  "org.apache.lucene" % "lucene-core" % "4.7.0",
-  "org.apache.lucene" % "lucene-analyzers-common" % "4.7.0",
+  "org.apache.lucene" % "lucene-core" % "4.9.0",
+  "org.apache.lucene" % "lucene-analyzers-common" % "4.9.0",
+  "org.apache.lucene" % "lucene-highlighter" % "4.9.0",
+  "org.apache.lucene" % "lucene-queryparser" % "4.9.0",
   "com.google.guava" % "guava" % "16.0.1",
   "org.liquibase" % "liquibase-core" % "3.1.1",
   "oro" % "oro" % "2.0.8")

@@ -27,6 +27,24 @@ class Application(service: Service, adminService: AdminService) extends Controll
     Redirect(routes.Application.configurations())
   }
 
+  def searchLogs(queryOpt: Option[String], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
+    logger.debug(s"searchLogs($queryOpt, page = $pageOpt, pageSize = $pageSizeOpt)")
+    Pagination.validate(pageOpt, pageSizeOpt, defaultPageSize = 8) match {
+      case Left(errorMessage) ⇒
+        BadRequest(errorMessage)
+      case Right(pagination) ⇒
+        val (executionViews, totalHits) = queryOpt match {
+          case Some(query) ⇒
+            val (executionAndFragments, totalHits) = service.searchLogs(query, startingFrom = pagination.firstItem, limit = pagination.pageSize)
+            (executionAndFragments.map(ExecutionView.fromExecutionAndFragment), totalHits)
+          case None ⇒ (Seq(), 0)
+        }
+        logger.debug("Hit count: " + totalHits)
+        val paginationData = pagination.paginationData(totalHits)
+        Ok(views.html.searchLogs(queryOpt = queryOpt, executionViews, paginationData))
+    }
+  }
+
   def configurations() = Action { implicit request ⇒
     logger.debug(s"configurations()")
 
@@ -70,7 +88,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
   private def handleTest(testId: Id[Test], configuration: Configuration, pagination: Pagination)(implicit request: Request[_]) =
     service.getTestAndExecutions(testId, configuration) map {
       case TestAndExecutions(test, executions, otherConfigurations) ⇒
-        val executionViews = executions.map(ExecutionView)
+        val executionViews = executions.map(e ⇒ ExecutionView(e))
         val testView = new TestView(test)
         val paginationData = pagination.paginationData(executions.size)
         views.html.test(testView, executionViews, Some(configuration), otherConfigurations, service.canRerun, paginationData)

@@ -18,6 +18,7 @@ POST    /test/:id/undelete          @controllers.Application.undeleteTest(id: Id
 
 GET     /execution/:id              @controllers.Application.execution(id: Id[Execution])
 GET     /executions                 @controllers.Application.executions(configuration: Option[Configuration] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
+GET     /executions/logs            @controllers.Application.searchLogs(query: Option[String] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 
 GET     /batch/:id                  @controllers.Application.batch(id: Id[Batch], passed: Option[Boolean] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 GET     /batch/:id/log              @controllers.Application.batchLog(id: Id[Batch])

@@ -6,12 +6,12 @@ object Pagination {
 
   val DefaultPageSize = 20
 
-  def validate(pageOpt: Option[Int], pageSizeOpt: Option[Int]): Either[String, Pagination] = {
+  def validate(pageOpt: Option[Int], pageSizeOpt: Option[Int], defaultPageSize: Int = DefaultPageSize): Either[String, Pagination] = {
     val page = pageOpt.getOrElse(1)
     if (page < 1)
       Left(s"Page must be > 0, but was '$page'")
     else {
-      val pageSize = pageSizeOpt.getOrElse(DefaultPageSize)
+      val pageSize = pageSizeOpt.getOrElse(defaultPageSize)
       if (pageSize < 0)
         Left(s"Page size must be > 0, but was '$pageSize'")
       else

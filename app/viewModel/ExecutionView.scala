@@ -2,8 +2,15 @@ package viewModel
 
 import com.thetestpeople.trt.utils.DateUtils
 import com.thetestpeople.trt.model._
+import com.thetestpeople.trt.service.ExecutionAndFragment
 
-case class ExecutionView(execution: EnrichedExecution) extends AbstractExecutionView(execution.execution) with HasTestName {
+object ExecutionView {
+  
+  def fromExecutionAndFragment(execution: ExecutionAndFragment) = ExecutionView(execution.execution, Some(execution.fragment))
+  
+}
+
+case class ExecutionView(execution: EnrichedExecution, fragmentOpt: Option[String] = None) extends AbstractExecutionView(execution.execution) with HasTestName {
 
   def id = execution.execution.id
 
@@ -22,4 +29,5 @@ case class ExecutionView(execution: EnrichedExecution) extends AbstractExecution
   def logOpt = execution.logOpt
 
   def configuration: Configuration = execution.configuration
+  
 }
