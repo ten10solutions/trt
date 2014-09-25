@@ -41,12 +41,12 @@ onChartClick = (executionUrls) -> (event, pos, item) ->
 createSeries = (fails, passes) -> 
   [
     {
-      label: "Duration, failures (seconds)"
+      label: "Failures"
       data: fails
       color: "#b94a48"
     }
     {
-      label: "Duration, passes (seconds)"
+      label: "Passes"
       data: passes
       color: "#609000"
     }

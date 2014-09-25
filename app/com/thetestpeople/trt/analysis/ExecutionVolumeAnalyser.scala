@@ -25,6 +25,7 @@ class ExecutionVolumeAnalyser(dao: Dao) extends HasLogger {
     for {
       analysisResult ← analysisResultOpt
       volume ← analysisResult.getExecutionVolume(configurationOpt)
+      if volume.countsByDate.nonEmpty
     } yield volume
 
 }
