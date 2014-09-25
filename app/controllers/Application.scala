@@ -158,9 +158,10 @@ class Application(service: Service, adminService: AdminService) extends Controll
   private def handleExecutions(configurationOpt: Option[Configuration], pagination: Pagination)(implicit request: Request[_]) = {
     val ExecutionsAndTotalCount(executions, totalExecutionCount) =
       service.getExecutions(configurationOpt, startingFrom = pagination.firstItem, limit = pagination.pageSize)
+    val executionVolume = service.getExecutionVolume(configurationOpt)
     val paginationData = pagination.paginationData(totalExecutionCount)
     val executionViews = executions.map(new ExecutionView(_))
-    views.html.executions(executionViews, totalExecutionCount, configurationOpt, paginationData)
+    views.html.executions(executionViews, totalExecutionCount, configurationOpt, paginationData, executionVolume)
   }
 
   private def getSelectedBatchIds(request: Request[AnyContent]): List[Id[Batch]] =

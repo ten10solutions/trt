@@ -22,7 +22,8 @@
     "bootbox": "~4.3.0",
     "fontawesome": "~4.2.0",
     "typeahead.js": "~0.10.5",
-    "typeahead.js-bootstrap3.less": "~0.2.3"
+    "typeahead.js-bootstrap3.less": "~0.2.3",
+    "flot-axislabels": "*"
   },
   "resolutions": {
     "bootstrap": "~3.2.0"

@@ -30,26 +30,3 @@ td.pie-cell {
   vertical-align: middle !important;
   text-align: center;
 }
-
-.chart-tooltip {
-  position: absolute;
-  border: 1px solid #fdd;
-  padding: 2px;
-  background-color: #fee;
-  opacity: 0.80;
-}
-
-.zoom-out-button {
-  position: absolute;
-  cursor: pointer;
-  font-size: smaller;
-  padding: 2px;
-  background-color: #eeeeee;
-  opacity: 0.6;
-  left:25px;
-  top:16px;
-}
-
-.zoom-out-button:hover {
-  opacity: 1;
-}

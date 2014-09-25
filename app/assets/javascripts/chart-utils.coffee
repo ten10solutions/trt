@@ -47,3 +47,6 @@ window.formatDate = (date) ->
   time = new Date(date).toLocaleTimeString()
   date = new Date(date).toLocaleDateString()
   "#{time} #{date}" 
+
+window.formatDateWithoutTime = (date) ->
+  new Date(date).toLocaleDateString()

@@ -18,6 +18,7 @@ import play.api.db._
 import play.api.mvc.Controller
 import java.io.File
 import com.thetestpeople.trt.service.indexing.LogIndexer
+import com.thetestpeople.trt.analysis.ExecutionVolumeAnalyser
 
 /**
  * Lightweight dependency injection: constructs the objects used by the application
@@ -55,7 +56,7 @@ class Factory(configuration: Configuration) {
 
   lazy val analysisService = new AnalysisService(dao, clock, async = true)
 
-  lazy val service: Service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, jenkinsImportWorker, logIndexer)
+  lazy val service: Service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, jenkinsImportWorker, logIndexer, executionVolumeAnalyser)
 
   lazy val adminService = new AdminServiceImpl(dao, logIndexer)
 
@@ -84,6 +85,8 @@ class Factory(configuration: Configuration) {
       LuceneLogIndexer.memoryBackedIndexer
     else
       LuceneLogIndexer.fileBackedIndexer(new File(luceneIndexLocation))
+
+  lazy val executionVolumeAnalyser = new ExecutionVolumeAnalyser(dao)
 
   def getControllerInstance[A](clazz: Class[A]): A = controllerMap(clazz).asInstanceOf[A]
 

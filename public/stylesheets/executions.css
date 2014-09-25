@@ -5,3 +5,13 @@ span.search-result {
 pre {
   white-space: pre-wrap;
 }
+
+#executions-chart {
+  width: 760px;
+  height: 300px;
+  margin-bottom: 14px;
+}
+
+#executions-chart.not-shown  {
+  border:1px solid #ddd;
+}

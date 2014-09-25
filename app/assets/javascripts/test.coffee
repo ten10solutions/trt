@@ -6,6 +6,9 @@ chartOptions =
     clickable: true
   xaxis:
     mode: "time"
+    axisLabel: "Date"
+  yaxis:
+    axisLabel: "Duration (seconds)"
   series:
     bars:
       show: true
@@ -13,6 +16,8 @@ chartOptions =
       show: true
   selection:
     mode: "xy"
+  axisLabels:
+    show: true
 
 onChartHover = (event, pos, item) ->
   if item

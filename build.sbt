@@ -53,7 +53,8 @@ TwirlKeys.templateImports ++= Seq(
   "viewModel._", 
   "com.thetestpeople.trt.model._",
   "com.thetestpeople.trt.model.jenkins._",
-  "java.net.URI")
+  "java.net.URI",
+  "com.thetestpeople.trt.analysis._")
 
 // Eclipse integration:
 

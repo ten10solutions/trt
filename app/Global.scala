@@ -17,6 +17,7 @@ object Global extends GlobalSettings with HasLogger {
     initialiseJenkinsImportWorker(app)
     initialiseJenkinsPoller(app)
     initialiseCountsCalculatorPoller(app)
+    initialiseExecutionVolumePoller(app)
   }
 
   private def initialiseJenkinsImportWorker(app: Application) {
@@ -51,6 +52,19 @@ object Global extends GlobalSettings with HasLogger {
     }
     Akka.system(app).scheduler.schedule(initialDelay, interval) {
       factory.service.recomputeHistoricalTestCounts()
+    }
+    logger.info("Scheduled historical test counts")
+  }
+
+  private def initialiseExecutionVolumePoller(app: Application) {
+    val conf = app.configuration
+    val interval = 30.minutes
+
+    Akka.system(app).scheduler.scheduleOnce(Duration.Zero) {
+      factory.service.recomputeExecutionVolumes()
+    }
+    Akka.system(app).scheduler.schedule(interval, interval) {
+      factory.service.recomputeExecutionVolumes()
     }
     logger.info("Scheduled historical test counts")
   }

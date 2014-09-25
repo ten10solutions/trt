@@ -21,7 +21,8 @@ class ServiceImpl(
   protected val jenkinsImportStatusManager: JenkinsImportStatusManager,
   protected val batchRecorder: BatchRecorder,
   protected val jenkinsImportQueue: JenkinsImportQueue,
-  protected val logIndexer: LogIndexer)
+  protected val logIndexer: LogIndexer,
+  protected val executionVolumeAnalyser: ExecutionVolumeAnalyser)
     extends Service with HasLogger with JenkinsServiceImpl {
 
   import dao.transaction
@@ -123,6 +124,11 @@ class ServiceImpl(
     analysisService.recomputeHistoricalTestCounts()
   }
 
+  def recomputeExecutionVolumes() {
+    logger.info("Computing execution volumes")
+    executionVolumeAnalyser.computeExecutionVolumes()
+  }
+
   def hasExecutions(): Boolean = transaction { dao.countExecutions() > 0 }
 
   def getTestNames(pattern: String): Seq[String] = transaction {
@@ -160,5 +166,8 @@ class ServiceImpl(
       } yield ExecutionAndFragment(execution, fragment)
     (executionAndFragments, total)
   }
+
+  def getExecutionVolume(configurationOpt: Option[Configuration]): Option[ExecutionVolume] =
+    executionVolumeAnalyser.getExecutionVolume(configurationOpt)
 
 }

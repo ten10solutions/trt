@@ -1,6 +1,7 @@
 @(testsSummaries: List[TestsSummaryView], historicalTestCountTimelines: Map[Configuration, HistoricalTestCountsTimelineView])(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
 
 @css = {
+  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/chart-common.css")">
   <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/configurations.css")">
 }
 

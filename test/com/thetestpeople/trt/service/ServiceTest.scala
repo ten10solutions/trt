@@ -14,6 +14,7 @@ import com.thetestpeople.trt.analysis.AnalysisService
 import com.thetestpeople.trt.jenkins.importer.JenkinsImportStatusManager
 import com.thetestpeople.trt.jenkins.importer.FakeJenkinsImportQueue
 import com.thetestpeople.trt.service.indexing.LuceneLogIndexer
+import com.thetestpeople.trt.analysis.ExecutionVolumeAnalyser
 
 @RunWith(classOf[JUnitRunner])
 class ServiceTest extends FlatSpec with ShouldMatchers {
@@ -163,7 +164,8 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
     val jenkinsImportStatusManager = new JenkinsImportStatusManager(clock)
     val logIndexer = LuceneLogIndexer.memoryBackedIndexer
     val batchRecorder = new BatchRecorder(dao, clock, analysisService, logIndexer)
-    val service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, FakeJenkinsImportQueue, logIndexer)
+    val executionVolumeAnalyser = new ExecutionVolumeAnalyser(dao)
+    val service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, FakeJenkinsImportQueue, logIndexer, executionVolumeAnalyser)
     Setup(service)
   }
 

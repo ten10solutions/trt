@@ -6,6 +6,9 @@ chartOptions =
     clickable: true
   xaxis:
     mode: "time"
+    axisLabel: "Date"
+  yaxis:
+    axisLabel: "# of executions in batch"
   series:
     stack: true
     lines:
@@ -20,6 +23,8 @@ chartOptions =
       show: true
   selection:
     mode: "xy"
+  axisLabels:
+    show: true
 
 onChartHover = (passes, fails) -> (event, pos, item) ->
   if item
