@@ -43,9 +43,8 @@ class HistoricalTestAnalyserTest extends FlatSpec with Matchers {
     val execution4 = execution(passed = false, executionTime = 1.day.ago)
     val executions = List(execution1, execution2, execution3, execution4).map(executionLite)
     val sampleSize = executions.size + 1 // this should cause the samples to fall between the executions
-    val historicalAnalyser = new HistoricalTestAnalyser(analysisConfig, sampleSize = executions.size + 1)
 
-    val List(counts1, counts2, counts3, counts4, counts5) = analyse(historicalAnalyser, executions)(Configuration.Default).counts
+    val List(counts1, counts2, counts3, counts4, counts5) = analyse(executions, analysisConfig, sampleSize = executions.size + 1)(Configuration.Default).counts
 
     counts1.when should equal(execution1.executionTime)
     counts1.testCounts should equal(TestCounts(warning = 1))
@@ -71,9 +70,7 @@ class HistoricalTestAnalyserTest extends FlatSpec with Matchers {
       passDurationThreshold = 0.hours, passCountThreshold = 1)
     val execution1 = execution(passed = true)
     val executions = List(executionLite(execution1))
-    val historicalAnalyser = new HistoricalTestAnalyser(analysisConfig, sampleSize = 200)
-
-    val List(counts) = analyse(historicalAnalyser, executions)(Configuration.Default).counts
+    val List(counts) = analyse(executions, analysisConfig)(Configuration.Default).counts
 
     counts.when should equal(execution1.executionTime)
     counts.testCounts should equal(TestCounts(passed = 1))
@@ -91,16 +88,16 @@ class HistoricalTestAnalyserTest extends FlatSpec with Matchers {
   }
 
   private def calculateTestCountsViaHistoricalAnalyser(analysisConfig: AnalysisConfiguration, executions: List[Execution]): TestCounts = {
-    val historicalAnalyser = new HistoricalTestAnalyser(analysisConfig)
-    analyse(historicalAnalyser, executions.map(executionLite))(Configuration.Default).counts.last.testCounts
+    analyse(executions.map(executionLite), analysisConfig)(Configuration.Default).counts.last.testCounts
   }
 
-  private def analyse(testAnalyser: HistoricalTestAnalyser, executions: List[ExecutionLite]) = {
+  private def analyse(executions: List[ExecutionLite], analysisConfig: AnalysisConfiguration, sampleSize: Int = 200) = {
     val executionIntervalsByConfig =
       for ((configuration, configExecutions) ← executions.groupBy(_.configuration))
         yield configuration -> executionInterval(configExecutions)
+    val historicalAnalyser = new HistoricalTestAnalyser(executionIntervalsByConfig, analysisConfig, sampleSize)
     val executionsIterator = executions.sortBy(e ⇒ (e.configuration, e.testId, e.executionTime)).iterator
-    testAnalyser.analyseAll(executionsIterator, executionIntervalsByConfig)
+    historicalAnalyser.process(executionsIterator)
   }
 
   private def executionInterval(executions: List[ExecutionLite]): Interval = {

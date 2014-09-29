@@ -16,8 +16,7 @@ object Global extends GlobalSettings with HasLogger {
 
     initialiseJenkinsImportWorker(app)
     initialiseJenkinsPoller(app)
-    initialiseCountsCalculatorPoller(app)
-    initialiseExecutionVolumePoller(app)
+    initialiseAnalyseExecutionsPoller(app)
   }
 
   private def initialiseJenkinsImportWorker(app: Application) {
@@ -42,31 +41,18 @@ object Global extends GlobalSettings with HasLogger {
     }
   }
 
-  private def initialiseCountsCalculatorPoller(app: Application) {
+  private def initialiseAnalyseExecutionsPoller(app: Application) {
     val conf = app.configuration
     val initialDelay = conf.getDuration(CountsCalculator.Poller.InitialDelay, default = 5.seconds)
     val interval = conf.getDuration(CountsCalculator.Poller.Interval, default = 2.minutes)
 
     Akka.system(app).scheduler.scheduleOnce(Duration.Zero) {
-      factory.service.recomputeHistoricalTestCounts()
+      factory.service.analyseAllExecutions()
     }
     Akka.system(app).scheduler.schedule(initialDelay, interval) {
-      factory.service.recomputeHistoricalTestCounts()
+      factory.service.analyseAllExecutions()
     }
-    logger.info("Scheduled historical test counts")
-  }
-
-  private def initialiseExecutionVolumePoller(app: Application) {
-    val conf = app.configuration
-    val interval = 30.minutes
-
-    Akka.system(app).scheduler.scheduleOnce(Duration.Zero) {
-      factory.service.recomputeExecutionVolumes()
-    }
-    Akka.system(app).scheduler.schedule(interval, interval) {
-      factory.service.recomputeExecutionVolumes()
-    }
-    logger.info("Scheduled historical test counts")
+    logger.info("Scheduled analysis of all executions")
   }
 
   override def onStop(app: Application) {

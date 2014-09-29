@@ -12,6 +12,8 @@ import com.thetestpeople.trt.jenkins.importer.JenkinsImportQueue
 import com.thetestpeople.trt.service.indexing.LogIndexer
 import com.thetestpeople.trt.service.indexing.ExecutionHit
 import com.thetestpeople.trt.service.indexing.SearchResult
+import org.joda.time.DateTime
+import org.joda.time.Duration
 
 class ServiceImpl(
   protected val dao: Dao,
@@ -21,8 +23,7 @@ class ServiceImpl(
   protected val jenkinsImportStatusManager: JenkinsImportStatusManager,
   protected val batchRecorder: BatchRecorder,
   protected val jenkinsImportQueue: JenkinsImportQueue,
-  protected val logIndexer: LogIndexer,
-  protected val executionVolumeAnalyser: ExecutionVolumeAnalyser)
+  protected val logIndexer: LogIndexer)
     extends Service with HasLogger with JenkinsServiceImpl {
 
   import dao.transaction
@@ -119,14 +120,9 @@ class ServiceImpl(
   def getHistoricalTestCounts(configuration: Configuration): Option[HistoricalTestCountsTimeline] =
     analysisService.getHistoricalTestCountsByConfig.get(configuration)
 
-  def recomputeHistoricalTestCounts() {
-    logger.info("Computing historical test counts")
-    analysisService.recomputeHistoricalTestCounts()
-  }
-
-  def recomputeExecutionVolumes() {
-    logger.info("Computing execution volumes")
-    executionVolumeAnalyser.computeExecutionVolumes()
+  def analyseAllExecutions() {
+    logger.info("Analysing all executions")
+    analysisService.analyseAllExecutions()
   }
 
   def hasExecutions(): Boolean = transaction { dao.countExecutions() > 0 }
@@ -168,6 +164,11 @@ class ServiceImpl(
   }
 
   def getExecutionVolume(configurationOpt: Option[Configuration]): Option[ExecutionVolume] =
-    executionVolumeAnalyser.getExecutionVolume(configurationOpt)
+    analysisService.getExecutionVolume(configurationOpt)
+
+  def staleTests(configuration: Configuration): (Option[ExecutionTimeMAD], Seq[TestAndAnalysis]) = transaction {
+    val analysedTests = dao.getAnalysedTests()
+    new StaleTestCalculator().findStaleTests(analysedTests)
+  }
 
 }

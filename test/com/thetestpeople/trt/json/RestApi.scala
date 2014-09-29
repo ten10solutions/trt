@@ -40,4 +40,10 @@ case class RestApi(siteUrl: URI, client: WSClient = WS.client) {
     Await.result(future, Timeout)
   }
 
+  def analyseAllExecutions() {
+    val call: Call = controllers.routes.Application.analyseAllExecutions()
+    val future = client.url((siteUrl / call.url).toString).post("")
+    Await.result(future, Timeout)
+  }
+  
 }

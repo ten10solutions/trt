@@ -9,7 +9,7 @@ import com.github.nscala_time.time.Imports._
 import scala.collection.immutable.SortedMap
 
 @RunWith(classOf[JUnitRunner])
-class ExecutionVolumeCalculatorTest extends FlatSpec with Matchers {
+class ExecutionVolumeAnalyserTest extends FlatSpec with Matchers {
 
   "Counting executions" should "work" in {
     val now = new DateTime
@@ -19,7 +19,7 @@ class ExecutionVolumeCalculatorTest extends FlatSpec with Matchers {
       execution(now, DummyData.Configuration2),
       execution(now - 24.hours, DummyData.Configuration1))
 
-    val result = new ExecutionVolumeCalculator().countExecutions(executions.iterator)
+    val result = new ExecutionVolumeAnalyser().process(executions.iterator)
 
     val today = now.toLocalDate
     val yesterday = (now - 24.hours).toLocalDate

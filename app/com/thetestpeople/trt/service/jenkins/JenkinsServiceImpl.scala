@@ -25,6 +25,7 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
     transaction {
       val specId = dao.newJenkinsImportSpec(spec.copy(lastCheckedOpt = None))
       logger.info(s"Added new import spec for ${spec.jobUrl}, id = ${spec.id}")
+      jenkinsImportQueue.add(specId)
       specId
     }
 

@@ -8,6 +8,7 @@ import org.joda.time.Duration
 import java.net.URI
 import com.thetestpeople.trt.analysis.HistoricalTestCountsTimeline
 import com.thetestpeople.trt.analysis.ExecutionVolume
+import com.thetestpeople.trt.analysis.ExecutionTimeMAD
 
 case class TestAndExecutions(test: TestAndAnalysis, executions: List[EnrichedExecution], otherConfigurations: Seq[Configuration])
 
@@ -48,9 +49,7 @@ trait Service extends JenkinsService {
 
   def getHistoricalTestCounts(configuration: Configuration): Option[HistoricalTestCountsTimeline]
 
-  def recomputeHistoricalTestCounts()
-
-  def recomputeExecutionVolumes()
+  def analyseAllExecutions()
 
   def getExecutions(configurationOpt: Option[Configuration], startingFrom: Int, limit: Int): ExecutionsAndTotalCount
 
@@ -73,5 +72,8 @@ trait Service extends JenkinsService {
   
   def searchLogs(query: String, startingFrom: Int = 0, limit: Int = Integer.MAX_VALUE): (Seq[ExecutionAndFragment], Int)
   
-  def getExecutionVolume(configurationOpt: Option[Configuration]): Option[ExecutionVolume] 
+  def getExecutionVolume(configurationOpt: Option[Configuration]): Option[ExecutionVolume]
+  
+  def staleTests(configuration: Configuration): (Option[ExecutionTimeMAD], Seq[TestAndAnalysis]) 
+  
 }

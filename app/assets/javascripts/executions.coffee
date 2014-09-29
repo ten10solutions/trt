@@ -3,20 +3,22 @@ chartOptions =
     backgroundColor:
       colors: ["#fff", "#eee"]
     hoverable: true
-    clickable: true
   xaxis:
     mode: "time"
     axisLabel: "Date"
   yaxis:
     axisLabel: "# of executions"
   series:
-    lines:
+    bars:
       show: true
+      align: "center"
+      barWidth: 24*60*60*1000
       fill: true
+      lineWidth: 1
       fillColor:
         colors: [
-          { opacity: 0.1 }
           { opacity: 0.8 }
+          { opacity: 0.1 }
         ]
     points:
       show: false
@@ -36,7 +38,7 @@ window.createExecutionVolumeChart = (data) ->
   series = [
     label: "Execution counts"
     data: data
-    color: "#5555ff"
+    color: "#2A9DFA"
   ]
   plot = $.plot $("#executions-chart"), series, chartOptions
   $("#executions-chart").bind "plothover", onChartHover([data])

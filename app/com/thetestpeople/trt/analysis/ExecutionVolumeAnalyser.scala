@@ -1,31 +1,41 @@
 package com.thetestpeople.trt.analysis
 
-import java.util.concurrent.locks.ReentrantLock
-import java.util.concurrent.locks.Lock
-import com.thetestpeople.trt.utils.LockUtils._
-import com.thetestpeople.trt.model._
-import com.thetestpeople.trt.utils.HasLogger
+import com.thetestpeople.trt.model.ExecutionLite
+import org.joda.time.LocalDate
+import com.thetestpeople.trt.model.Configuration
+import scala.collection.immutable.SortedMap
+import com.github.nscala_time.time.Imports._
 
-class ExecutionVolumeAnalyser(dao: Dao) extends HasLogger {
+case class ExecutionVolume(countsByDate: SortedMap[LocalDate, Int])
 
-  private val lock: Lock = new ReentrantLock
-  private var analysisResultOpt: Option[ExecutionVolumeAnalysisResult] = None
+case class ExecutionVolumeAnalysisResult(all: ExecutionVolume, byConfiguration: Map[Configuration, ExecutionVolume]) {
 
-  def computeExecutionVolumes() =
-    lock.withLock {
-      val analysisResult = dao.transaction {
-        dao.iterateAllExecutions { executions ⇒
-          new ExecutionVolumeCalculator().countExecutions(executions)
-        }
-      }
-      analysisResultOpt = Some(analysisResult)
+  def getExecutionVolume(configurationOpt: Option[Configuration]): Option[ExecutionVolume] = configurationOpt match {
+    case None                ⇒ Some(all)
+    case Some(configuration) ⇒ byConfiguration.get(configuration)
+  }
+
+}
+
+class ExecutionVolumeAnalyser extends ExecutionAnalyser[ExecutionVolumeAnalysisResult] {
+
+  private var allCounts: SortedMap[LocalDate, Int] = SortedMap()
+  private var countsByConfiguration: Map[Configuration, SortedMap[LocalDate, Int]] = Map()
+
+  def executionGroup(executionGroup: ExecutionGroup) {
+    for (execution ← executionGroup.executions) {
+      val date = execution.executionTime.toLocalDate
+      allCounts += date -> (allCounts.getOrElse(date, 0) + 1)
+      val configuration = execution.configuration
+      var counts = countsByConfiguration.getOrElse(configuration, SortedMap[LocalDate, Int]())
+      counts += date -> (counts.getOrElse(date, 0) + 1)
+      countsByConfiguration += configuration -> counts
     }
+  }
 
-  def getExecutionVolume(configurationOpt: Option[Configuration]): Option[ExecutionVolume] =
-    for {
-      analysisResult ← analysisResultOpt
-      volume ← analysisResult.getExecutionVolume(configurationOpt)
-      if volume.countsByDate.nonEmpty
-    } yield volume
-
+  def finalise(): ExecutionVolumeAnalysisResult = {
+    ExecutionVolumeAnalysisResult(
+      all = ExecutionVolume(allCounts),
+      byConfiguration = countsByConfiguration.map { case (configuration, counts) ⇒ configuration -> ExecutionVolume(counts) })
+  }
 }

@@ -17,14 +17,15 @@ import java.util.concurrent.locks.Lock
  */
 class AnalysisService(dao: Dao, clock: Clock, async: Boolean = true) extends HasLogger {
 
-  private val historicalTestCountsLock: Lock = new ReentrantLock
+  private val analysisResultLock: Lock = new ReentrantLock
 
   private var historicalTestCountsByConfig: Map[Configuration, HistoricalTestCountsTimeline] = Map()
-
+  private var executionVolumeAnalysisResultOpt: Option[ExecutionVolumeAnalysisResult] = None
+  
   /**
    * Queue of tests which need their analysis updating
    */
-  private val testQueue: CoalescingBlockingQueue[Id[Test]] = new CoalescingBlockingQueue()
+  private val testQueue: CoalescingBlockingQueue[Id[Test]] = new CoalescingBlockingQueue
 
   private def launchAnalyserThread() {
     new Thread(new Runnable() {
@@ -79,29 +80,47 @@ class AnalysisService(dao: Dao, clock: Clock, async: Boolean = true) extends Has
     logger.debug(s"Updated analysis for test $testId")
   }
 
-  def recomputeHistoricalTestCounts() {
-    val counts = dao.transaction {
-      val systemConfiguration = dao.getSystemConfiguration
-      val historicalTestAnalyser = new HistoricalTestAnalyser(systemConfiguration)
-      val executionIntervalsByConfig = dao.getExecutionIntervalsByConfig
-      dao.iterateAllExecutions { executions ⇒
-        historicalTestAnalyser.analyseAll(executions, executionIntervalsByConfig)
+  private def getHistoricalTestAnalyser() = {
+    val systemConfiguration = dao.getSystemConfiguration
+    val executionIntervalsByConfig = dao.getExecutionIntervalsByConfig
+    new HistoricalTestAnalyser(executionIntervalsByConfig, systemConfiguration)
+  }
+
+  def analyseAllExecutions() = dao.transaction {
+    val executionVolumeAnalyser = new ExecutionVolumeAnalyser
+    val historicalTestAnalyser = getHistoricalTestAnalyser()
+    dao.iterateAllExecutions { executions ⇒
+      for (executionGroup ← new ExecutionGroupIterator(executions)) {
+        historicalTestAnalyser.executionGroup(executionGroup)
+        executionVolumeAnalyser.executionGroup(executionGroup)
       }
     }
-    historicalTestCountsLock.withLock {
-      historicalTestCountsByConfig = counts
+    analysisResultLock.withLock {
+      historicalTestCountsByConfig = historicalTestAnalyser.finalise
+      executionVolumeAnalysisResultOpt = Some(executionVolumeAnalyser.finalise)
     }
   }
 
-  def clearHistoricalTestCounts() {
-    historicalTestCountsLock.withLock {
-      historicalTestCountsByConfig = Map()
-    }
+  def deleteAll() = analysisResultLock.withLock {
+    logger.debug("Clearing analysis results")
+    historicalTestCountsByConfig = Map()
+    executionVolumeAnalysisResultOpt = None
   }
 
-  def getHistoricalTestCountsByConfig: Map[Configuration, HistoricalTestCountsTimeline] =
-    historicalTestCountsLock.withLock {
-      historicalTestCountsByConfig
-    }
+  def clearHistoricalTestCounts() = analysisResultLock.withLock {
+    historicalTestCountsByConfig = Map()
+  }
+
+  def getHistoricalTestCountsByConfig: Map[Configuration, HistoricalTestCountsTimeline] = analysisResultLock.withLock {
+    historicalTestCountsByConfig
+  }
+
+  def getExecutionVolume(configurationOpt: Option[Configuration]): Option[ExecutionVolume] = analysisResultLock.withLock {
+    for {
+      analysisResult ← executionVolumeAnalysisResultOpt
+      volume ← analysisResult.getExecutionVolume(configurationOpt)
+      if volume.countsByDate.nonEmpty
+    } yield volume
+  }
 
 }

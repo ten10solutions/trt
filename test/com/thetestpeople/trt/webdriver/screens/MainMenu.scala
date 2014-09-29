@@ -9,6 +9,16 @@ import com.thetestpeople.trt.model.Configuration
 import org.openqa.selenium.By
 import scala.collection.JavaConverters._
 
+class ReportsMenu(implicit automationContext: AutomationContext) extends AbstractComponent {
+  
+  def clickStaleTests() = {
+    log("Click 'Stale Tests'")
+    webDriver.waitForDisplayedAndEnabled(id("stale-tests-report")).click()
+    new StaleTestsScreen
+  }
+  
+}
+
 class TestsMenu(implicit automationContext: AutomationContext) extends AbstractComponent {
 
   def chooseConfiguration(configuration: Configuration): TestsScreen = {
@@ -43,6 +53,11 @@ class MainMenu(implicit automationContext: AutomationContext) extends AbstractCo
   def clickBatches(): BatchesScreen = {
     clickMenuItem("menu-batches", itemName = "Batches")
     new BatchesScreen
+  }
+
+  def clickReports() = {
+    clickMenuItem("menu-reports", itemName = "Reports")
+    new ReportsMenu
   }
 
   def clickTests() = {

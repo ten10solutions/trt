@@ -294,4 +294,44 @@ class Application(service: Service, adminService: AdminService) extends Controll
     Ok(Json.toJson(service.getGroups(query)))
   }
 
+  def analyseAllExecutions() = Action { implicit request ⇒
+    logger.debug(s"analyseAllExecutions()")
+    service.analyseAllExecutions()
+    Ok(Json.toJson("OK"))
+  }
+
+  private def getDefaultConfiguration: Option[Configuration] = {
+    val configurations = service.getConfigurations().sorted
+    if (configurations.contains(Configuration.Default))
+      Some(Configuration.Default)
+    else
+      configurations.headOption
+  }
+
+  def staleTests(configurationOpt: Option[Configuration], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
+    logger.debug(s"staleTests($configurationOpt, page = $pageOpt, pageSize = $pageSizeOpt)")
+    Pagination.validate(pageOpt, pageSizeOpt) match {
+      case Left(errorMessage) ⇒
+        BadRequest(errorMessage)
+      case Right(pagination) ⇒
+        configurationOpt match {
+          case None ⇒
+            getDefaultConfiguration match {
+              case None ⇒
+                Redirect(routes.Application.configurations())
+              case Some(defaultConfiguration) ⇒
+                Redirect(routes.Application.staleTests(Some(defaultConfiguration)))
+            }
+          case Some(configuration) ⇒
+            val (madOpt, tests) = service.staleTests(configuration)
+            val pageTests = tests.drop(pagination.firstItem).take(pagination.pageSize)
+            val testViews = pageTests.map(new TestView(_))
+            val paginationData = pagination.paginationData(tests.size)
+            val madViewOpt = madOpt.map(mad => MADView(mad))
+            Ok(views.html.staleTests(madViewOpt, testViews, configuration, paginationData))
+        }
+    }
+
+  }
+
 }

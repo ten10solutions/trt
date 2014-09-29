@@ -89,8 +89,8 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
       formWithErrors ⇒
         BadRequest(html.editJenkinsImportSpec(formWithErrors, None)),
       jenkinsImport ⇒ {
-        service.newJenkinsImportSpec(jenkinsImport.newSpec)
-        Redirect(JenkinsController.jenkinsImportSpecs).flashing("success" -> "Created new import specification")
+        val specId = service.newJenkinsImportSpec(jenkinsImport.newSpec)
+        Redirect(JenkinsController.getJenkinsImportSpec(specId)).flashing("success" -> "Created new import specification")
       })
   }
 
