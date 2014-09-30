@@ -25,38 +25,38 @@ class JenkinsImporter(
   import dao.transaction
 
   def importBuilds(specId: Id[JenkinsImportSpec]) {
-    val importSpecOpt = transaction(dao.getJenkinsImportSpec(specId))
-    val importSpec = importSpecOpt.getOrElse {
+    val specOpt = transaction(dao.getJenkinsImportSpec(specId))
+    val spec = specOpt.getOrElse {
       logger.warn(s"No import spec found $specId, skipping")
       return
     }
-    logger.debug(s"Examining ${importSpec.jobUrl} for new builds")
-    importStatusManager.importStarted(importSpec.id, importSpec.jobUrl)
+    logger.debug(s"Examining ${spec.jobUrl} for new builds")
+    importStatusManager.importStarted(spec.id, spec.jobUrl)
     try {
-      doImportBuilds(importSpec)
-      importStatusManager.importComplete(importSpec.id)
+      doImportBuilds(spec)
+      importStatusManager.importComplete(spec.id)
     } catch {
       case e: Exception ⇒
-        logger.error(s"Problem importing from ${importSpec.jobUrl}", e)
-        importStatusManager.importErrored(importSpec.id, e)
+        logger.error(s"Problem importing from ${spec.jobUrl}", e)
+        importStatusManager.importErrored(spec.id, e)
     }
   }
 
-  private def doImportBuilds(importSpec: JenkinsImportSpec) {
+  private def doImportBuilds(spec: JenkinsImportSpec) {
     val alreadyImportedBuildUrls = transaction { dao.getJenkinsBuildUrls() }.toSet
-    def alreadyImported(buildLink: JenkinsBuildLink) = alreadyImportedBuildUrls.contains(buildLink.buildUrl)
-    val jenkinsScraper = getJenkinsScraper(importSpec.importConsoleLog)
+    def alreadyImported(link: JenkinsBuildLink) = alreadyImportedBuildUrls.contains(link.buildUrl)
+    val jenkinsScraper = getJenkinsScraper(spec.importConsoleLog)
 
-    val job = jenkinsScraper.getJenkinsJob(importSpec.jobUrl)
+    val job = jenkinsScraper.getJenkinsJob(spec.jobUrl)
 
     val buildLinks = job.buildLinks.filterNot(alreadyImported).sortBy(_.buildNumber).reverse
 
-    for (buildLink ← buildLinks)
-      importStatusManager.buildExists(importSpec.id, buildLink.buildUrl, buildLink.buildNumber)
-    for (buildLink ← buildLinks)
-      importBuild(buildLink, job, importSpec, jenkinsScraper)
+    for (link ← buildLinks)
+      importStatusManager.buildExists(spec.id, link.buildUrl, link.buildNumber)
+    for (link ← buildLinks)
+      importBuild(link, job, spec, jenkinsScraper)
 
-    transaction { dao.updateJenkinsImportSpec(importSpec.id, Some(clock.now)) }
+    transaction { dao.updateJenkinsImportSpec(spec.id, Some(clock.now)) }
   }
 
   private def getJenkinsScraper(importConsoleLog: Boolean): JenkinsScraper = {

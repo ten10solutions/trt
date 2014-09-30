@@ -44,12 +44,12 @@ class JenkinsImportWorker(
   def run() {
     logger.debug("Jenkins import worker started")
     while (continue) {
-      val importSpecId = importSpecQueue.take()
-      logger.info(s"Checking if there is anything to import from import spec $importSpecId")
+      val specId = importSpecQueue.take()
+      logger.info(s"Checking if there is anything to import from import spec $specId")
       try
-        jenkinsImporter.importBuilds(importSpecId)
+        jenkinsImporter.importBuilds(specId)
       catch {
-        case e: Exception ⇒ logger.error("Problem importing from import spec $importSpecId", e)
+        case e: Exception ⇒ logger.error(s"Problem importing from import spec $specId", e)
       }
     }
     logger.debug("Jenkins import worker finished")
