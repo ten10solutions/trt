@@ -13,7 +13,11 @@ object StaleTestCalculator {
 
 }
 
-class StaleTestCalculator(deviationsCutoff: Int = 3) {
+/**
+ * @param deviationsThreshold -- how many standard deviations (or equivalent) we need to be before the median execution time to classify a test as stale
+ * @param absoluteThreshold -- how much earlier than the median execution time we need to be (in absolute duration) to classify a test as stale 
+ */
+class StaleTestCalculator(deviationsThreshold: Int = 3, absoluteThreshold: Duration = 48.hours) {
 
   import StaleTestCalculator._
 
@@ -53,7 +57,8 @@ class StaleTestCalculator(deviationsCutoff: Int = 3) {
         test ← analysedTests
         analysis ← test.analysisOpt
         deviation = mad.medianExecutionTime.getMillis - analysis.lastExecutionTime.getMillis
-        if deviation > mad.medianDeviation.getMillis * deviationsCutoff
+        if deviation > mad.medianDeviation.getMillis * deviationsThreshold
+        if analysis.lastExecutionTime < mad.medianExecutionTime - absoluteThreshold
       } yield test
     tests.sortBy(_.test.name).sortBy(_.test.groupOpt).sortBy(_.analysisOpt.get.lastExecutionTime)
   }
