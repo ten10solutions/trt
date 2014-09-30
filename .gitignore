@@ -18,7 +18,6 @@ bin
 *.h2.db
 *.trace.db
 *.lock.db
-webcache*/
 public/bower_components/
 luceneIndex/
 *~
