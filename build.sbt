@@ -76,6 +76,8 @@ resourceDirectory in Test <<= baseDirectory(_ / "testResources")
 
 testFrameworks := Seq(TestFrameworks.ScalaTest)
 
+fork in Test := false
+
 // Deb packaging:
 
 packageDescription := "Reporting and analysis of automated test results"
