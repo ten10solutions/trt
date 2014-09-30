@@ -90,7 +90,7 @@ class LuceneLogIndexer(directory: Directory) extends LogIndexer with HasLogger {
   def searchExecutions(queryString: String, startingFrom: Int = 0, limit: Int = Integer.MAX_VALUE): SearchResult = {
     val reader = DirectoryReader.open(directory)
     val searcher = new IndexSearcher(reader)
-    val query = combineQuery(tokenizePhrase(queryString))
+    val query = combineQuery(tokenizePhrase(preprocess(queryString)))
     val sort = new Sort(new SortField(ExecutionTime, SortField.Type.LONG, true))
     val resultLimit = math.min(startingFrom.toLong + limit, Integer.MAX_VALUE).toInt
     val topDocs = searcher.search(query, resultLimit, sort)
@@ -125,11 +125,13 @@ class LuceneLogIndexer(directory: Directory) extends LogIndexer with HasLogger {
     document.add(new StringField(Configuration, execution.configuration.configuration, Field.Store.YES))
     for (summary ← execution.summaryOpt)
       document.add(new StringField(Summary, summary, Field.Store.YES))
-    document.add(new TextField(Log, log, Field.Store.YES))
+    document.add(new TextField(Log, preprocess(log), Field.Store.YES))
     document.add(new LongField(ExecutionTime, execution.executionTime.getMillis, Field.Store.YES))
     document
   }
 
+  private def preprocess(log: String): String = log.replace('.', ' ')
+  
   def deleteExecutions(ids: Seq[Id[Execution]]) {
     logger.debug("Deleting indexed executions: " + ids.mkString(", "))
     withIndexWriter { indexWriter ⇒

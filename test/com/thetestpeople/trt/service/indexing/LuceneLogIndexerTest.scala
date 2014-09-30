@@ -98,6 +98,16 @@ class LuceneLogIndexerTest extends FlatSpec with ShouldMatchers {
     hit.executionId should equal(execution3.id)
   }
 
+  "Searching for parts of a dotted identifier" should "succeed" in {
+    val indexer = LuceneLogIndexer.memoryBackedIndexer
+    val execution = makeExecution(log = "java.lang.NullPointerException")
+    indexer.addExecutions(Seq(execution))
+
+    indexer.searchExecutions("java.lang.NullPointerException").total should equal(1)
+    indexer.searchExecutions("NullPointerException").total should equal(1)
+
+  }
+
   private var executionIdCounter = 0
 
   private def makeExecution(log: String, executionTime: DateTime = DummyData.ExecutionTime): EnrichedExecution = {
