@@ -175,7 +175,7 @@ class MockDao extends Dao {
         if configurationOpt.forall(c ⇒ c == execution.configuration)
         test ← tests.find(_.id == execution.testId)
       } yield EnrichedExecution(execution, test.qualifiedName, batch.nameOpt, logOpt = None)
-    all.sortBy(_.executionTime).reverse.drop(startingFrom).take(limit)
+    all.sortBy(_.qualifiedName.name).sortBy(_.qualifiedName.groupOpt).reverse.sortBy(_.executionTime).reverse.drop(startingFrom).take(limit)
   }
 
   def countExecutions(configurationOpt: Option[Configuration]): Int =

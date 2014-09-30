@@ -196,6 +196,20 @@ trait ExecutionDaoTest { self: AbstractDaoTest ⇒
     executions.map(_.id) should equal(List(executionId1, executionId2, executionId3))
   }
 
+  it should "sort by execution time, then test group, then test name" in transaction { dao ⇒
+    val testId1 = dao.ensureTestIsRecorded(F.test(name = "Alice", groupOpt = Some("Aardvark")))
+    val testId2 = dao.ensureTestIsRecorded(F.test(name = "Bob", groupOpt = Some("Aardvark")))
+    val testId3 = dao.ensureTestIsRecorded(F.test(name = "Charlie", groupOpt = Some("Beard")))
+    val batchId = dao.newBatch(F.batch())
+    val executionId2 = dao.newExecution(F.execution(batchId, testId2))
+    val executionId1 = dao.newExecution(F.execution(batchId, testId1))
+    val executionId3 = dao.newExecution(F.execution(batchId, testId3))
+
+    val executions = dao.getEnrichedExecutions()
+
+    executions.map(_.id) should equal(List(executionId1, executionId2, executionId3))
+  }
+
   it should "allow filtering by configuration" in transaction { dao ⇒
     val testId = dao.ensureTestIsRecorded(F.test())
     val batchId = dao.newBatch(F.batch())
@@ -258,7 +272,7 @@ trait ExecutionDaoTest { self: AbstractDaoTest ⇒
 
     val executions = dao.getEnrichedExecutions(Seq(executionId1, executionId2))
 
-    executions.map(_.id) should contain theSameElementsAs(Seq(executionId1, executionId2))
+    executions.map(_.id) should contain theSameElementsAs (Seq(executionId1, executionId2))
   }
 
 }

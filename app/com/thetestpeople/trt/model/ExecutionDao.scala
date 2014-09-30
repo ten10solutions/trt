@@ -39,7 +39,7 @@ trait ExecutionDao {
   
   /**
    * @param configurationOpt -- if defined, filter executions to those against the given configuration
-   * @return executions, ordered most recent first. No execution logs will be provided.
+   * @return executions, ordered most recent first, then by test group, then by test name. No execution logs will be provided.
    */
   def getEnrichedExecutions(configurationOpt: Option[Configuration] = None, startingFrom: Int = 0, limit: Int = Integer.MAX_VALUE): Seq[EnrichedExecution]
 
