@@ -74,6 +74,8 @@ resourceDirectory in Test <<= baseDirectory(_ / "testResources")
 
 (testOptions in Test) += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/report")
 
+testFrameworks := Seq(TestFrameworks.ScalaTest)
+
 // Deb packaging:
 
 packageDescription := "Reporting and analysis of automated test results"
