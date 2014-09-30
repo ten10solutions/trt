@@ -66,7 +66,7 @@
             }
             <li class="@if(currentPage == "Batches") {active}"><a id="menu-batches" href="@routes.Application.batches()">Batches</a></li>
             <li class="@if(currentPage == "Executions") {active}"><a id="menu-executions" href="@routes.Application.executions()">Executions</a></li>
-            <li class="@if(currentPage == "SearchLogs") {active}"><a id="menu-search-logs" href="@routes.Application.searchLogs()">Search Logs</a></li>
+            <li class="@if(currentPage == "SearchLogs") {active}"><a id="menu-search-logs" href="@routes.Application.searchLogs()"><span class="glyphicon glyphicon-search"></span> Search Logs</a></li>
             <li class="dropdown @if(currentPage == "Reports") {active}">
               <a id="menu-reports" href="#" class="dropdown-toggle" data-toggle="dropdown">Reports <b class="caret"></b></a>
               <ul class="dropdown-menu">

@@ -167,7 +167,7 @@ class ServiceImpl(
     analysisService.getExecutionVolume(configurationOpt)
 
   def staleTests(configuration: Configuration): (Option[ExecutionTimeMAD], Seq[TestAndAnalysis]) = transaction {
-    val analysedTests = dao.getAnalysedTests()
+    val analysedTests = dao.getAnalysedTests(configuration = configuration)
     new StaleTestCalculator().findStaleTests(analysedTests)
   }
 

@@ -27,10 +27,10 @@
     <tr>
       <td>Configuration</td>
       <td>
-        <form target="@routes.Application.staleTests()" method="get">
+        <form id="filter-form" action="@routes.Application.staleTests()" method="get">
           <select id="configuration-select" class="form-control" name="configuration">
             @for(otherConfiguration <- globalViewContext.configurations) {
-              <option value="@otherConfiguration" @if(configuration == configuration){selected}>@configuration</option>
+              <option value="@otherConfiguration" @if(configuration == otherConfiguration){selected}>@otherConfiguration</option>
             }
           </select>
         </form>
@@ -53,9 +53,13 @@
   </div>
 
   <br/>
+
+@if(tests.nonEmpty) {
+
   <button style="margin-bottom: 12px; margin-top: 12px" id="deleteSelected" type="button" class="btn btn-default" title="Mark selected tests as deleted" onclick="performTestAction('@routes.Application.deleteTests()')"><i class="glyphicon glyphicon-trash"></i> Mark selected tests as deleted</button>
 
   <div style="clear: both;"></div>
+
   @testsPaginationWidget
 
   <form style="margin-bottom: 0px; display: inline" id="testActionForm" action="nope" method="post">
@@ -91,4 +95,15 @@
 
   @testsPaginationWidget
 
+}  else {
+
+<div class="panel panel-info">
+  <div class="panel-heading">No stale tests found</div>
+  <div class="panel-body">
+    No stale tests found in this configuration.
+  </div>
+</div>
+
+
+}
 }

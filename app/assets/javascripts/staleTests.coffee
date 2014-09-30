@@ -16,3 +16,5 @@ $(document).ready ->
   $(".testCheckbox").click ->
     setButtonEnableState()
 
+  $("#configuration-select").change ->
+    $("#filter-form").submit()
