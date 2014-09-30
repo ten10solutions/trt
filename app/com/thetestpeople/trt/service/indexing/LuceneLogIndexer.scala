@@ -2,9 +2,7 @@ package com.thetestpeople.trt.service.indexing
 
 import java.io.File
 import java.io.StringReader
-
 import scala.collection.mutable.ListBuffer
-
 import org.apache.lucene.analysis.standard.StandardAnalyzer
 import org.apache.lucene.analysis.tokenattributes.CharTermAttribute
 import org.apache.lucene.document._
@@ -13,9 +11,9 @@ import org.apache.lucene.search._
 import org.apache.lucene.search.highlight._
 import org.apache.lucene.store._
 import org.apache.lucene.util.Version
-
 import com.thetestpeople.trt.model._
 import com.thetestpeople.trt.utils._
+import org.apache.lucene.analysis.core.SimpleAnalyzer
 
 object LuceneLogIndexer {
 
@@ -47,7 +45,7 @@ class LuceneLogIndexer(directory: Directory) extends LogIndexer with HasLogger {
 
   import LuceneLogIndexer._
 
-  private val analyzer = new StandardAnalyzer(Version.LUCENE_4_9)
+  private val analyzer = new SimpleAnalyzer(Version.LUCENE_4_9)
 
   // Ensure that the directory is set-up for queries
   withIndexWriter { indexWriter ⇒ }
@@ -90,7 +88,7 @@ class LuceneLogIndexer(directory: Directory) extends LogIndexer with HasLogger {
   def searchExecutions(queryString: String, startingFrom: Int = 0, limit: Int = Integer.MAX_VALUE): SearchResult = {
     val reader = DirectoryReader.open(directory)
     val searcher = new IndexSearcher(reader)
-    val query = combineQuery(tokenizePhrase(preprocess(queryString)))
+    val query = combineQuery(tokenizePhrase(queryString))
     val sort = new Sort(new SortField(ExecutionTime, SortField.Type.LONG, true))
     val resultLimit = math.min(startingFrom.toLong + limit, Integer.MAX_VALUE).toInt
     val topDocs = searcher.search(query, resultLimit, sort)
@@ -125,13 +123,11 @@ class LuceneLogIndexer(directory: Directory) extends LogIndexer with HasLogger {
     document.add(new StringField(Configuration, execution.configuration.configuration, Field.Store.YES))
     for (summary ← execution.summaryOpt)
       document.add(new StringField(Summary, summary, Field.Store.YES))
-    document.add(new TextField(Log, preprocess(log), Field.Store.YES))
+    document.add(new TextField(Log, log, Field.Store.YES))
     document.add(new LongField(ExecutionTime, execution.executionTime.getMillis, Field.Store.YES))
     document
   }
 
-  private def preprocess(log: String): String = log.replace('.', ' ')
-  
   def deleteExecutions(ids: Seq[Id[Execution]]) {
     logger.debug("Deleting indexed executions: " + ids.mkString(", "))
     withIndexWriter { indexWriter ⇒
