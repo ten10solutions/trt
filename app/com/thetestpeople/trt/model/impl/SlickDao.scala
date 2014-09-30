@@ -11,6 +11,7 @@ import com.thetestpeople.trt.utils.LockUtils._
 import javax.sql.DataSource
 import java.net.URI
 import scala.slick.util.CloseableIterator
+import scala.slick.driver.H2Driver
 
 class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extends Dao
     with DaoAdmin with HasLogger with SlickJenkinsDao with SlickExecutionDao with Mappings {
@@ -67,24 +68,51 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
 
   def transaction[T](p: ⇒ T): T = database.withDynTransaction { p }
 
-  def deleteAll() = transaction {
-    jenkinsImportSpecs.delete
-    jenkinsBuilds.delete
-    jenkinsJobs.delete
-    jenkinsJobParams.delete
-    jenkinsConfiguration.delete
-    systemConfiguration.delete
-    batchLogs.delete
-    executionLogs.delete
-    analyses.delete
-    executions.delete
-    batches.delete
-    tests.delete
-    val DefaultSystemConfiguration = SystemConfiguration()
-    systemConfiguration.insert(DefaultSystemConfiguration)
+  def deleteAll() = {
 
-    val DefaultJenkinsConfiguration = JenkinsConfiguration()
-    jenkinsConfiguration.insert(DefaultJenkinsConfiguration)
+    transaction {
+      jenkinsImportSpecs.delete
+      jenkinsBuilds.delete
+      jenkinsJobs.delete
+      jenkinsJobParams.delete
+      batchLogs.delete
+      analyses.delete
+    }
+
+    if (driver.isInstanceOf[H2Driver]) {
+      // H2 really struggles with bulk deleting large numbers of executions, so we do it in batches:
+      var continue = true
+      while (continue) {
+        transaction {
+          val ids = executions.map(_.id).take(5000).run
+          if (ids.isEmpty)
+            continue = false
+          else {
+            executionLogs.filter(_.executionId inSet ids).delete
+            executions.filter(_.id inSet ids).delete
+          }
+        }
+        logger.debug("Deleted 5000 executions")
+      }
+    } else {
+      transaction {
+        executionLogs.delete
+        executions.delete
+      }
+    }
+
+    transaction {
+      batches.delete
+      tests.delete
+      jenkinsConfiguration.delete
+      systemConfiguration.delete
+      val DefaultSystemConfiguration = SystemConfiguration()
+      systemConfiguration.insert(DefaultSystemConfiguration)
+
+      val DefaultJenkinsConfiguration = JenkinsConfiguration()
+      jenkinsConfiguration.insert(DefaultJenkinsConfiguration)
+    }
+
     logger.info("Deleted all data")
   }
 
