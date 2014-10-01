@@ -72,7 +72,7 @@ trait Dao extends ExecutionDao with JenkinsDao {
    * Checks whether a test is already recorded for the given test's qualifiedName.
    * If not, a new Test record is persisted (the given ID is ignored).
    *
-   * @returns ID of either an existing or newly-added test.
+   * @return ID of either an existing or newly-added test.
    */
   def ensureTestIsRecorded(test: Test): Id[Test]
 
@@ -94,7 +94,7 @@ trait Dao extends ExecutionDao with JenkinsDao {
   /**
    * Add a record for a new batch (the existing ID is ignored)
    *
-   * @returns ID of the newly added batch.
+   * @return ID of the newly added batch.
    */
   def newBatch(batch: Batch, logOpt: Option[String] = None): Id[Batch]
 

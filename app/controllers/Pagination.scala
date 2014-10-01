@@ -22,7 +22,7 @@ object Pagination {
 }
 
 /**
- * @page -- page number, 1-indexed
+ * @param page -- page number, 1-indexed
  */
 case class Pagination(page: Int, pageSize: Int) {
 

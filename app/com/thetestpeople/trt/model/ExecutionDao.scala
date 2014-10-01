@@ -67,7 +67,7 @@ trait ExecutionDao {
    *
    * Any id in the given execution is ignored.
    *
-   * @returns id of the newly added execution.
+   * @return id of the newly added execution.
    */
   def newExecution(execution: Execution, logOpt: Option[String] = None): Id[Execution]
 
