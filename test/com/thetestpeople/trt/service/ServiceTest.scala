@@ -155,6 +155,17 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
     service.getStatus(testId) should equal(TestStatus.Fail)
   }
 
+  "Execution logs" should "be removed from the search index if the execution is deleted" in {
+    val service = setup().service
+    val batchId = service.addBatch(F.batch(executions = List(
+      F.execution(F.test(), logOpt = Some("foo bar baz")))))
+    service.searchLogs("foo")._2 should equal(1)
+
+    service.deleteBatches(List(batchId))
+
+    service.searchLogs("foo")._2 should equal(0)
+  }
+
   private def setup() = TestServiceFactory.setup()
 
 }
