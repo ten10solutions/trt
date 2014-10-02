@@ -196,7 +196,8 @@ trait ExecutionDaoTest { self: AbstractDaoTest ⇒
     executions.map(_.id) should equal(List(executionId1, executionId2, executionId3))
   }
 
-  it should "sort by execution time, then test group, then test name" in transaction { dao ⇒
+  // Would like to do this to make execution retrieval order more stable, but it impacts SQL performance
+  it should "sort by execution time, then test group, then test name" ignore transaction { dao ⇒
     val testId1 = dao.ensureTestIsRecorded(F.test(name = "Alice", groupOpt = Some("Aardvark")))
     val testId2 = dao.ensureTestIsRecorded(F.test(name = "Bob", groupOpt = Some("Aardvark")))
     val testId3 = dao.ensureTestIsRecorded(F.test(name = "Charlie", groupOpt = Some("Beard")))

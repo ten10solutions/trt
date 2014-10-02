@@ -105,16 +105,18 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
         yield (execution, test.name, test.group, batch.name)
     for (configuration ← configurationOpt)
       query = query.filter(_._1.configuration === configuration)
-    query = query.sortBy(_._2).sortBy(_._3).sortBy(_._1.executionTime.desc)
+    query = query.sortBy(_._1.executionTime.desc)
     query = query.drop(startingFrom).take(limit)
     query.run.map((makeEnrichedExecution _).tupled)
   }
 
-  def countExecutions(configurationOpt: Option[Configuration]): Int =
+  def countExecutions(configurationOpt: Option[Configuration]): Int = {
     (configurationOpt match {
       case None                ⇒ executions
       case Some(configuration) ⇒ executions.filter(_.configuration === configuration)
-    }).map(_.id).countDistinct.run
+    }).length.run
+    //    StaticQuery.queryNA[Int]("""select count(*) from "executions"""").first
+  }
 
   def getExecutionLog(id: Id[Execution]): Option[String] =
     executionLogs.filter(_.executionId === id).map(_.log).firstOption
