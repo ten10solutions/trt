@@ -211,6 +211,15 @@ class Application(service: Service, adminService: AdminService) extends Controll
     Redirect(redirectTarget).flashing("success" -> successMessage)
   }
 
+  def deleteBatch(batchId: Id[Batch]) = Action { implicit request ⇒
+    logger.debug(s"deleteBatch($batchId)")
+    val batchIds = List(batchId)
+    service.deleteBatches(batchIds)
+
+    val successMessage = deleteBatchesSuccessMessage(batchIds)
+    Redirect(routes.Application.batches()).flashing("success" -> successMessage)
+  }
+
   private def deleteBatchesSuccessMessage(batchIds: List[Id[Batch]]): String = {
     val batchWord = if (batchIds.size == 1) "batch" else "batches"
     s"Deleted ${batchIds.size} $batchWord"
