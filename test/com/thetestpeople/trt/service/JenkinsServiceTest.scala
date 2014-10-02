@@ -30,16 +30,6 @@ class JenkinsServiceTest extends FlatSpec with ShouldMatchers {
     specAgain.copy(id = spec.id, lastCheckedOpt = spec.lastCheckedOpt) should equal(spec)
   }
 
-  private def setup(http: Http = AlwaysFailingHttp, clock: Clock = FakeClock()) = {
-    val dao = new MockDao
-    val analysisService = new AnalysisService(dao, clock, async = false)
-    val logIndexer = LuceneLogIndexer.memoryBackedIndexer
-    val batchRecorder = new BatchRecorder(dao, clock, analysisService, logIndexer)
-    val jenkinsImportStatusManager = new JenkinsImportStatusManager(clock)
-    val service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, FakeJenkinsImportQueue, logIndexer)
-    Setup(service, batchRecorder)
-  }
-
-  case class Setup(service: Service, batchRecorder: BatchRecorder)
+  private def setup() = TestServiceFactory.setup()
 
 }

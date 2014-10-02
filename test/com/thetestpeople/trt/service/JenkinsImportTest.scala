@@ -25,7 +25,9 @@ class JenkinsImportTest extends FlatSpec with ShouldMatchers {
 
     val clock = FakeClock()
     val http = new ClasspathCachingHttp("")
-    val Setup(service, jenkinsImporter, _) = setup(http, clock)
+    val serviceBundle = setup(http, clock)
+    val service = serviceBundle.service
+    val jenkinsImporter = serviceBundle.jenkinsImporter
 
     val specId = service.newJenkinsImportSpec(F.jenkinsImportSpec(
       jobUrl = new URI("http://ci.pentaho.com/job/pentaho-big-data-plugin/"),
@@ -58,18 +60,5 @@ class JenkinsImportTest extends FlatSpec with ShouldMatchers {
 
   }
 
-  private def setup(http: Http = AlwaysFailingHttp, clock: Clock = FakeClock()) = {
-    val dao = new MockDao
-    val analysisService = new AnalysisService(dao, clock, async = false)
-    val logIndexer = LuceneLogIndexer.memoryBackedIndexer
-    val batchRecorder = new BatchRecorder(dao, clock, analysisService, logIndexer)
-    val jenkinsImportStatusManager = new JenkinsImportStatusManager(clock)
-    val importQueue = FakeJenkinsImportQueue
-    val jenkinsImporter = new JenkinsImporter(clock, http, dao, jenkinsImportStatusManager, batchRecorder)
-    val service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, importQueue, logIndexer)
-    Setup(service, jenkinsImporter, batchRecorder)
-  }
-
-  case class Setup(service: Service, jenkinsImporter: JenkinsImporter, batchRecorder: BatchRecorder)
-
+  private def setup(http: Http = AlwaysFailingHttp, clock: Clock = FakeClock()) = TestServiceFactory.setup(http = http, clock = clock)
 }

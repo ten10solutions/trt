@@ -155,18 +155,6 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
     service.getStatus(testId) should equal(TestStatus.Fail)
   }
 
-  private def setup() = {
-    val dao = new MockDao
-    val clock = FakeClock()
-    val http = AlwaysFailingHttp
-    val analysisService = new AnalysisService(dao, clock, async = false)
-    val jenkinsImportStatusManager = new JenkinsImportStatusManager(clock)
-    val logIndexer = LuceneLogIndexer.memoryBackedIndexer
-    val batchRecorder = new BatchRecorder(dao, clock, analysisService, logIndexer)
-    val service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, FakeJenkinsImportQueue, logIndexer)
-    Setup(service)
-  }
-
-  case class Setup(service: Service)
+  private def setup() = TestServiceFactory.setup()
 
 }
