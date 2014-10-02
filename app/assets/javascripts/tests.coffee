@@ -44,6 +44,9 @@ $(document).ready ->
     $("#test-name-field").removeAttr "name" if $("#test-name-field").val() is ""
     $("#group-name-field").removeAttr "name" if $("#group-name-field").val() is ""
 
+  $("#configuration-select").change ->
+    $("#configuration-form").submit()
+
   nameEngine.initialize()
   groupEngine.initialize()
 

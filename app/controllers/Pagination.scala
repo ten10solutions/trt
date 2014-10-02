@@ -4,7 +4,7 @@ import viewModel.PaginationData
 
 object Pagination {
 
-  val DefaultPageSize = 20
+  val DefaultPageSize = 12
 
   def validate(pageOpt: Option[Int], pageSizeOpt: Option[Int], defaultPageSize: Int = DefaultPageSize): Either[String, Pagination] = {
     val page = pageOpt.getOrElse(1)

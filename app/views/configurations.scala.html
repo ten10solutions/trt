@@ -38,7 +38,7 @@
     <tbody>
     @for((testsSummary, index) <- testsSummaries.zipWithIndex) {
       <tr>
-        <td class="pass-fail-cell"><img src="@routes.Assets.at("images/" + testsSummary.ballIcon)"/></td>
+        <td class="pass-fail-cell"><a href="@routes.Application.tests(configuration = Some(testsSummary.configuration))"><img src="@routes.Assets.at("images/" + testsSummary.ballIcon)"/></a></td>
         <td class="configuration-cell"><a href="@routes.Application.tests(configuration = Some(testsSummary.configuration))">@testsSummary.configuration</a></td>
         <td>
           <div id="history-chart-@index" style="width: 480px; height: 120px">
