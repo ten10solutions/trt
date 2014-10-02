@@ -589,4 +589,22 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
 
     dao.getGroups("*test*") should contain theSameElementsAs (Seq("myTEST", "test"))
   }
+
+  "Caching" should "not prevent updates from being visible" in transaction { dao ⇒
+    val testId = dao.ensureTestIsRecorded(F.test())
+    val batchId = dao.newBatch(F.batch())
+
+    dao.getConfigurations() should equal(Seq())
+    dao.countExecutions() should equal(0)
+
+    val executionId = dao.newExecution(F.execution(batchId, testId, configuration = DummyData.Configuration1))
+
+    dao.getConfigurations() should equal(Seq(DummyData.Configuration1))
+    dao.countExecutions() should equal(1)
+
+    dao.deleteBatches(List(batchId))
+
+    dao.getConfigurations() should equal(Seq())
+    dao.countExecutions() should equal(0)
+  }
 }

@@ -6,6 +6,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Request
 import viewModel.GlobalViewContext
 import com.thetestpeople.trt.service.Service
+import com.thetestpeople.trt.utils.Utils
 
 object ControllerHelper {
 

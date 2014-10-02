@@ -68,7 +68,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
 
   def transaction[T](p: ⇒ T): T = database.withDynTransaction { p }
 
-  def deleteAll() = {
+  def deleteAll() = Cache.invalidate(configurationsCache, executionCountCache) {
 
     transaction {
       jenkinsImportSpecs.delete
@@ -292,18 +292,19 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     testIdsToDelete
   }
 
-  def deleteBatches(batchIds: Seq[Id[Batch]]): DeleteBatchResult = {
-    val (executionIds, testIds) = executions.filter(_.batchId inSet batchIds).map(e ⇒ (e.id, e.testId)).run.unzip
-    jenkinsBuilds.filter(_.batchId inSet batchIds).delete
-    analyses.filter(_.testId inSet testIds).delete
-    executionLogs.filter(_.executionId inSet executionIds).delete
-    executions.filter(_.id inSet executionIds).delete
-    batchLogs.filter(_.batchId inSet batchIds).delete
-    batches.filter(_.id inSet batchIds).delete
-    val deletedTestIds = deleteTestsWithoutExecutions(testIds).toSet
-    val remainingTestIds = testIds.filterNot(deletedTestIds.contains)
-    DeleteBatchResult(remainingTestIds, executionIds)
-  }
+  def deleteBatches(batchIds: Seq[Id[Batch]]): DeleteBatchResult =
+    Cache.invalidate(configurationsCache, executionCountCache) {
+      val (executionIds, testIds) = executions.filter(_.batchId inSet batchIds).map(e ⇒ (e.id, e.testId)).run.unzip
+      jenkinsBuilds.filter(_.batchId inSet batchIds).delete
+      analyses.filter(_.testId inSet testIds).delete
+      executionLogs.filter(_.executionId inSet executionIds).delete
+      executions.filter(_.id inSet executionIds).delete
+      batchLogs.filter(_.batchId inSet batchIds).delete
+      batches.filter(_.id inSet batchIds).delete
+      val deletedTestIds = deleteTestsWithoutExecutions(testIds).toSet
+      val remainingTestIds = testIds.filterNot(deletedTestIds.contains)
+      DeleteBatchResult(remainingTestIds, executionIds)
+    }
 
   private val testInserter = (tests returning tests.map(_.id)).insertInvoker
 
@@ -322,7 +323,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   private val executionInserter = (executions returning executions.map(_.id)).insertInvoker
   private val executionLogInserter = executionLogs.insertInvoker
 
-  def newExecution(execution: Execution, logOpt: Option[String]): Id[Execution] = {
+  def newExecution(execution: Execution, logOpt: Option[String]): Id[Execution] = Cache.invalidate(configurationsCache, executionCountCache) {
     val executionId = executionInserter.insert(execution)
     for (log ← logOpt)
       executionLogInserter.insert(ExecutionLogRow(executionId, removeNullChars(log)))
@@ -362,7 +363,11 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   def updateSystemConfiguration(newConfig: SystemConfiguration) =
     systemConfiguration.update(newConfig)
 
-  def getConfigurations(): Seq[Configuration] =
+  private val configurationsCache: Cache[Seq[Configuration]] = Cache { rawGetConfigurations() }
+
+  def getConfigurations(): Seq[Configuration] = configurationsCache.get
+
+  private def rawGetConfigurations(): Seq[Configuration] =
     executions.groupBy(_.configuration).map(_._1).sorted.run
 
   def getConfigurations(testId: Id[Test]): Seq[Configuration] =

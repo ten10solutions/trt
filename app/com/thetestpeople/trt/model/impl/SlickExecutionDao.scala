@@ -112,12 +112,16 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
 
   def countExecutions(configurationOpt: Option[Configuration]): Int = {
     (configurationOpt match {
-      case None                ⇒ executions
-      case Some(configuration) ⇒ executions.filter(_.configuration === configuration)
-    }).length.run
+      case None                ⇒ executionCountCache.get
+      case Some(configuration) ⇒ executions.filter(_.configuration === configuration).length.run
+    })
     //    StaticQuery.queryNA[Int]("""select count(*) from "executions"""").first
   }
 
+  private def countAllExecutions(): Int = executions.length.run
+  
+  protected val executionCountCache: Cache[Int] = Cache { countAllExecutions() }
+  
   def getExecutionLog(id: Id[Execution]): Option[String] =
     executionLogs.filter(_.executionId === id).map(_.log).firstOption
 

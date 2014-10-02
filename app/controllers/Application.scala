@@ -327,7 +327,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
             val pageTests = tests.drop(pagination.firstItem).take(pagination.pageSize)
             val testViews = pageTests.map(new TestView(_))
             val paginationData = pagination.paginationData(tests.size)
-            val madViewOpt = madOpt.map(mad => MADView(mad))
+            val madViewOpt = madOpt.map(mad ⇒ MADView(mad))
             Ok(views.html.staleTests(madViewOpt, testViews, configuration, paginationData))
         }
     }
