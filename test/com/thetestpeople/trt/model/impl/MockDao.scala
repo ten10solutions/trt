@@ -81,9 +81,9 @@ class MockDao extends Dao {
 
   def getTestCounts(configuration: Configuration, nameOpt: Option[String] = None, groupOpt: Option[String] = None): TestCounts = {
     val tests = getAnalysedTests(configuration, nameOpt = nameOpt, groupOpt = groupOpt)
-    val passed = tests.count(_.analysisOpt.exists(_.status == TestStatus.Pass))
-    val warning = tests.count(_.analysisOpt.exists(_.status == TestStatus.Warn))
-    val failed = tests.count(_.analysisOpt.exists(_.status == TestStatus.Fail))
+    val passed = tests.count(_.analysisOpt.exists(_.status == TestStatus.Healthy))
+    val warning = tests.count(_.analysisOpt.exists(_.status == TestStatus.Warning))
+    val failed = tests.count(_.analysisOpt.exists(_.status == TestStatus.Broken))
     TestCounts(passed, warning, failed)
   }
 

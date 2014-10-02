@@ -25,17 +25,17 @@ chartOptions = (showLabels) ->
 window.createPieChart = (chartId, counts, urls, showLabels = true) ->
   slices = [
     {
-      label: "Pass"
+      label: "Healthy"
       data: counts.pass
       color: "#609000"
     }
     {
-      label: "Warn"
+      label: "Warning"
       data: counts.warn
       color: "#FFBF00"
     }
     {
-      label: "Fail"
+      label: "Broken"
       data: counts.fail
       color: "#b94a48"
     }
@@ -44,9 +44,9 @@ window.createPieChart = (chartId, counts, urls, showLabels = true) ->
 
   $("#" + chartId).bind "plotclick", (event, pos, obj) ->
     return unless obj
-    if obj.series.label is "Pass"
+    if obj.series.label is "Healthy"
       window.location = urls.pass
-    else if obj.series.label is "Warn"
+    else if obj.series.label is "Warning"
       window.location = urls.warn
-    else if obj.series.label is "Fail"
+    else if obj.series.label is "Broken"
       window.location = urls.fail

@@ -7,9 +7,9 @@ object BallIcons {
   def icon(passed: Boolean) = if (passed) PassBall else FailBall
 
   def icon(status: TestStatus) = status match {
-    case TestStatus.Pass ⇒ BallIcons.PassBall
-    case TestStatus.Warn ⇒ BallIcons.WarnBall
-    case TestStatus.Fail ⇒ BallIcons.FailBall
+    case TestStatus.Healthy ⇒ BallIcons.PassBall
+    case TestStatus.Warning ⇒ BallIcons.WarnBall
+    case TestStatus.Broken ⇒ BallIcons.FailBall
   }
 
   val PassBall = "balls/green.png"

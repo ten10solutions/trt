@@ -59,7 +59,7 @@ object TestDataFactory {
 
   def analysis(
     testId: Id[Test],
-    status: TestStatus = TestStatus.Pass,
+    status: TestStatus = TestStatus.Healthy,
     configuration: Configuration = Configuration.Default,
     weather: Double = DummyData.Weather,
     consecutiveFailures: Int = DummyData.ConsecutiveFailures,

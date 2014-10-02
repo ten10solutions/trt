@@ -28,9 +28,9 @@
         <th class="pass-fail-col"><!--  ball icon --></th>
         <th class="configuration-col">Configuration</th>
         <th></th>
-        <th class="configuration-count-col">Passes</th>
-        <th class="configuration-count-col">Warnings</th>
-        <th class="configuration-count-col">Failures</th>
+        <th class="configuration-count-col">Healthy</th>
+        <th class="configuration-count-col">Warning</th>
+        <th class="configuration-count-col">Broken</th>
         <th class="configuration-count-col">Total</th>
         <th class="pie-col"></th>
       </tr>
@@ -72,9 +72,9 @@
           </script>
           }
         </td>
-        <td class="configuration-count-cell">@if(testsSummary.passCount > 0){<a href="@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Pass))"><span class="badge badge-success">@testsSummary.passCount</span></a>}</td>
-        <td class="configuration-count-cell">@if(testsSummary.warnCount > 0){<a href="@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Warn))"><span class="badge badge-warning">@testsSummary.warnCount</span></a>}</td>
-        <td class="configuration-count-cell">@if(testsSummary.failCount > 0){<a href="@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Fail))"><span class="badge badge-error">@testsSummary.failCount</span></a>}</td>
+        <td class="configuration-count-cell">@if(testsSummary.passCount > 0){<a href="@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Healthy))"><span class="badge badge-success">@testsSummary.passCount</span></a>}</td>
+        <td class="configuration-count-cell">@if(testsSummary.warnCount > 0){<a href="@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Warning))"><span class="badge badge-warning">@testsSummary.warnCount</span></a>}</td>
+        <td class="configuration-count-cell">@if(testsSummary.failCount > 0){<a href="@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Broken))"><span class="badge badge-error">@testsSummary.failCount</span></a>}</td>
         <td class="configuration-count-cell"><a href="@routes.Application.tests(configuration = Some(testsSummary.configuration))"><span class="badge badge-inverse">@testsSummary.totalCount</span></a></td>
         <td class="pie-cell"><div id="pie-chart-@index" style="width: 120px; height: 120px"></div></td>
 	      <script>
@@ -86,9 +86,9 @@
 	              fail: @testsSummary.failCount,
 	            },
 	            {
-	              pass: "@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Pass))",
-	              warn: "@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Warn))",
-	              fail: "@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Fail))",
+	              pass: "@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Healthy))",
+	              warn: "@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Warning))",
+	              fail: "@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Broken))",
 	            }, false
 	          );
 	        });

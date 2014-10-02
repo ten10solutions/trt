@@ -18,9 +18,9 @@ class TestCountsBuilder(sampleTimesByConfig: Map[Configuration, List[DateTime]])
   def recordResult(configuration: Configuration, sampleTime: DateTime, status: TestStatus) {
     val mutableCounts = countsMap(configuration)(sampleTime)
     status match {
-      case TestStatus.Pass ⇒ mutableCounts.passes += 1
-      case TestStatus.Warn ⇒ mutableCounts.warnings += 1
-      case TestStatus.Fail ⇒ mutableCounts.failures += 1
+      case TestStatus.Healthy ⇒ mutableCounts.passes += 1
+      case TestStatus.Warning ⇒ mutableCounts.warnings += 1
+      case TestStatus.Broken ⇒ mutableCounts.failures += 1
     }
   }
 

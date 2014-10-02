@@ -82,9 +82,9 @@ class HistoricalTestAnalyserTest extends FlatSpec with Matchers {
     val testAnalyser = new TestAnalyser(new FakeClock, analysisConfig)
     val countsByStatus = executions.groupBy(_.testId).flatMap(x ⇒ testAnalyser.analyse(x._2)).groupBy(_.status).mapValues(_.size)
     TestCounts(
-      passed = countsByStatus(TestStatus.Pass),
-      warning = countsByStatus(TestStatus.Warn),
-      failed = countsByStatus(TestStatus.Fail))
+      passed = countsByStatus(TestStatus.Healthy),
+      warning = countsByStatus(TestStatus.Warning),
+      failed = countsByStatus(TestStatus.Broken))
   }
 
   private def calculateTestCountsViaHistoricalAnalyser(analysisConfig: AnalysisConfiguration, executions: List[Execution]): TestCounts = {

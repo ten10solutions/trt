@@ -83,7 +83,7 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
     val Some(TestAndExecutions(testAndAnalysis, List(execution), configurations)) = service.getTestAndExecutions(testId)
 
     val TestAndAnalysis(test, Some(analysis)) = testAndAnalysis
-    analysis.status should equal(TestStatus.Pass)
+    analysis.status should equal(TestStatus.Healthy)
     testId should equal(test.id)
     executionId should equal(execution.id)
   }
@@ -113,12 +113,12 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
     val batchId2 = addBatch(passed = false, executionTime = 1.day.ago)
     val List(testId) = service.getTestIdsInBatch(batchId1)
 
-    service.getStatus(testId) should equal(TestStatus.Fail)
+    service.getStatus(testId) should equal(TestStatus.Broken)
     service.getBatches().map(_.id) should contain theSameElementsAs List(batchId1, batchId2)
 
     service.deleteBatches(List(batchId2))
 
-    service.getStatus(testId) should equal(TestStatus.Pass)
+    service.getStatus(testId) should equal(TestStatus.Healthy)
     service.getBatches().map(_.id) should contain theSameElementsAs List(batchId1)
   }
 
@@ -148,11 +148,11 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
 
     val tolerantConfig = SystemConfiguration(failureDurationThreshold = 1.week.toStandardDuration, failureCountThreshold = 100)
     service.updateSystemConfiguration(tolerantConfig)
-    service.getStatus(testId) should equal(TestStatus.Warn)
+    service.getStatus(testId) should equal(TestStatus.Warning)
 
     val intolerantConfig = SystemConfiguration(failureDurationThreshold = 0.minutes, failureCountThreshold = 1)
     service.updateSystemConfiguration(intolerantConfig)
-    service.getStatus(testId) should equal(TestStatus.Fail)
+    service.getStatus(testId) should equal(TestStatus.Broken)
   }
 
   "Execution logs" should "be removed from the search index if the execution is deleted" in {

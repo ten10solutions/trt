@@ -11,16 +11,16 @@ object TestAnalyser {
       val passedLongEnough = block.duration >= config.passDurationThreshold
       val passedOftenEnough = block.count >= config.passCountThreshold
       if (passedLongEnough && passedOftenEnough)
-        TestStatus.Pass
+        TestStatus.Healthy
       else
-        TestStatus.Warn
+        TestStatus.Warning
     } else {
       val failingTooLong = block.duration >= config.failureDurationThreshold
       val failedTooOften = block.count >= config.failureCountThreshold
       if (failingTooLong && failedTooOften)
-        TestStatus.Fail
+        TestStatus.Broken
       else
-        TestStatus.Warn
+        TestStatus.Warning
     }
 
 }

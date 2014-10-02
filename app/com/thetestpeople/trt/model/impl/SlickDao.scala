@@ -55,7 +55,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
 
     implicit def durationMapper = MappedColumnType.base[Duration, Long](_.getMillis, Duration.millis)
 
-    implicit def statusMapper = MappedColumnType.base[TestStatus, String](_.toString, TestStatus.parse)
+    implicit def statusMapper = MappedColumnType.base[TestStatus, String](TestStatus.oldLabel, TestStatus.parseOld)
 
     implicit def configurationMapper = MappedColumnType.base[Configuration, String](_.configuration, Configuration.apply)
 
@@ -182,7 +182,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     val results: Map[TestStatus, Int] =
       query.groupBy(_._2.status).map { case (status, results) ⇒ status -> results.length }.run.toMap
     def count(status: TestStatus) = results.collect { case (`status`, count) ⇒ count }.headOption.getOrElse(0)
-    TestCounts(passed = count(TestStatus.Pass), warning = count(TestStatus.Warn), failed = count(TestStatus.Fail))
+    TestCounts(passed = count(TestStatus.Healthy), warning = count(TestStatus.Warning), failed = count(TestStatus.Broken))
   }
 
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts] = {
@@ -203,9 +203,9 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     def testCounts(countRecords: Seq[CountRecord]): TestCounts = {
       def count(status: TestStatus) = countRecords.find(_.status == status).map(_.count).getOrElse(0)
       TestCounts(
-        passed = count(TestStatus.Pass),
-        warning = count(TestStatus.Warn),
-        failed = count(TestStatus.Fail))
+        passed = count(TestStatus.Healthy),
+        warning = count(TestStatus.Warning),
+        failed = count(TestStatus.Broken))
     }
     countRecords.groupBy(_.configuration).map {
       case (configuration, countRecords) ⇒ configuration -> testCounts(countRecords)

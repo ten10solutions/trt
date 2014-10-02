@@ -14,11 +14,11 @@ case class TestsSummaryView(configuration: Configuration, testCounts: TestCounts
 
   val overallStatus: TestStatus =
     if (failCount > 0)
-      TestStatus.Fail
+      TestStatus.Broken
     else if (warnCount > 0)
-      TestStatus.Warn
+      TestStatus.Warning
     else
-      TestStatus.Pass
+      TestStatus.Healthy
 
   def ballIcon: String = BallIcons.icon(overallStatus)
 

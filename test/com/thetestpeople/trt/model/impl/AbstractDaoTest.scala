@@ -152,17 +152,17 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
       dao.upsertAnalysis(F.analysis(testId, status))
       testId
     }
-    val testId1 = addTest(TestStatus.Pass)
-    val testId2 = addTest(TestStatus.Warn)
-    val testId3 = addTest(TestStatus.Warn)
-    val testId4 = addTest(TestStatus.Fail)
-    val testId5 = addTest(TestStatus.Fail)
-    val testId6 = addTest(TestStatus.Fail)
+    val testId1 = addTest(TestStatus.Healthy)
+    val testId2 = addTest(TestStatus.Warning)
+    val testId3 = addTest(TestStatus.Warning)
+    val testId4 = addTest(TestStatus.Broken)
+    val testId5 = addTest(TestStatus.Broken)
+    val testId6 = addTest(TestStatus.Broken)
 
     def getTestIds(status: TestStatus) = dao.getAnalysedTests(testStatusOpt = Some(status)).map(_.test.id)
-    getTestIds(TestStatus.Pass) should contain theSameElementsAs (List(testId1))
-    getTestIds(TestStatus.Warn) should contain theSameElementsAs (List(testId2, testId3))
-    getTestIds(TestStatus.Fail) should contain theSameElementsAs (List(testId4, testId5, testId6))
+    getTestIds(TestStatus.Healthy) should contain theSameElementsAs (List(testId1))
+    getTestIds(TestStatus.Warning) should contain theSameElementsAs (List(testId2, testId3))
+    getTestIds(TestStatus.Broken) should contain theSameElementsAs (List(testId4, testId5, testId6))
   }
 
   "Getting tests" should "let you limit the number of results" in transaction { dao ⇒
@@ -216,12 +216,12 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
       val testId = dao.ensureTestIsRecorded(F.test())
       dao.upsertAnalysis(F.analysis(testId, status))
     }
-    addTest(TestStatus.Pass)
-    addTest(TestStatus.Warn)
-    addTest(TestStatus.Warn)
-    addTest(TestStatus.Fail)
-    addTest(TestStatus.Fail)
-    addTest(TestStatus.Fail)
+    addTest(TestStatus.Healthy)
+    addTest(TestStatus.Warning)
+    addTest(TestStatus.Warning)
+    addTest(TestStatus.Broken)
+    addTest(TestStatus.Broken)
+    addTest(TestStatus.Broken)
 
     val testCounts = dao.getTestCounts()
 
@@ -236,15 +236,15 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
       dao.newExecution(F.execution(batchId, testId, configuration = configuration))
       dao.upsertAnalysis(F.analysis(testId, status, configuration))
     }
-    addTest(DummyData.Configuration1, TestStatus.Pass)
-    addTest(DummyData.Configuration1, TestStatus.Warn)
-    addTest(DummyData.Configuration1, TestStatus.Warn)
-    addTest(DummyData.Configuration1, TestStatus.Fail)
-    addTest(DummyData.Configuration1, TestStatus.Fail)
-    addTest(DummyData.Configuration1, TestStatus.Fail)
-    addTest(DummyData.Configuration2, TestStatus.Pass)
-    addTest(DummyData.Configuration2, TestStatus.Warn)
-    addTest(DummyData.Configuration2, TestStatus.Fail)
+    addTest(DummyData.Configuration1, TestStatus.Healthy)
+    addTest(DummyData.Configuration1, TestStatus.Warning)
+    addTest(DummyData.Configuration1, TestStatus.Warning)
+    addTest(DummyData.Configuration1, TestStatus.Broken)
+    addTest(DummyData.Configuration1, TestStatus.Broken)
+    addTest(DummyData.Configuration1, TestStatus.Broken)
+    addTest(DummyData.Configuration2, TestStatus.Healthy)
+    addTest(DummyData.Configuration2, TestStatus.Warning)
+    addTest(DummyData.Configuration2, TestStatus.Broken)
 
     val testCountsByConfiguration = dao.getTestCountsByConfiguration()
 
@@ -259,10 +259,10 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
       val testId = dao.ensureTestIsRecorded(F.test(name = name))
       dao.upsertAnalysis(F.analysis(testId, status))
     }
-    addTest("test1", TestStatus.Pass)
-    addTest("test2", TestStatus.Warn)
-    addTest("test3", TestStatus.Fail)
-    addTest("somethingElse", TestStatus.Pass)
+    addTest("test1", TestStatus.Healthy)
+    addTest("test2", TestStatus.Warning)
+    addTest("test3", TestStatus.Broken)
+    addTest("somethingElse", TestStatus.Healthy)
 
     val testCounts = dao.getTestCounts(nameOpt = Some("test*"))
 
@@ -275,13 +275,13 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
       val testId = dao.ensureTestIsRecorded(F.test(groupOpt = Some(group)))
       dao.upsertAnalysis(F.analysis(testId, status))
     }
-    addTest("groupOne", TestStatus.Pass)
-    addTest("groupOne", TestStatus.Warn)
-    addTest("groupOne", TestStatus.Warn)
-    addTest("groupOne", TestStatus.Fail)
-    addTest("groupOne", TestStatus.Fail)
-    addTest("groupOne", TestStatus.Fail)
-    addTest("groupTwo", TestStatus.Pass)
+    addTest("groupOne", TestStatus.Healthy)
+    addTest("groupOne", TestStatus.Warning)
+    addTest("groupOne", TestStatus.Warning)
+    addTest("groupOne", TestStatus.Broken)
+    addTest("groupOne", TestStatus.Broken)
+    addTest("groupOne", TestStatus.Broken)
+    addTest("groupTwo", TestStatus.Healthy)
 
     val testCounts = dao.getTestCounts(groupOpt = Some("groupO*"))
 
@@ -386,7 +386,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
 
     dao.upsertAnalysis(F.analysis(
       testId = testId,
-      status = TestStatus.Pass,
+      status = TestStatus.Healthy,
       weather = DummyData.Weather,
       consecutiveFailures = DummyData.ConsecutiveFailures,
       failingSinceOpt = Some(failedExecutionTime),
@@ -398,7 +398,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
 
     val Some(TestAndAnalysis(_, Some(analysis))) = dao.getTestAndAnalysis(testId)
     analysis.testId should equal(testId)
-    analysis.status should equal(TestStatus.Pass)
+    analysis.status should equal(TestStatus.Healthy)
     analysis.weather should equal(DummyData.Weather)
     analysis.consecutiveFailures should equal(DummyData.ConsecutiveFailures)
     analysis.lastExecutionTime should equal(passedExecutionTime)
@@ -411,7 +411,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
 
     dao.upsertAnalysis(F.analysis(
       testId = testId,
-      status = TestStatus.Warn,
+      status = TestStatus.Warning,
       weather = DummyData.Weather,
       consecutiveFailures = DummyData.ConsecutiveFailures,
       failingSinceOpt = None,
@@ -423,7 +423,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
 
     val Some(TestAndAnalysis(_, Some(analysis2))) = dao.getTestAndAnalysis(testId)
     analysis2.testId should equal(testId)
-    analysis2.status should equal(TestStatus.Warn)
+    analysis2.status should equal(TestStatus.Warning)
     analysis2.weather should equal(DummyData.Weather)
     analysis2.consecutiveFailures should equal(DummyData.ConsecutiveFailures)
     analysis2.lastPassedTimeOpt should equal(None)

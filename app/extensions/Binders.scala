@@ -34,7 +34,7 @@ object Binders {
         case Some(status) ⇒ Right(status)
         case None         ⇒ Left(s"Unknown status type '$value'")
       }
-    override def unbind(key: String, status: TestStatus): String = status.toString
+    override def unbind(key: String, status: TestStatus): String = TestStatus.identifier(status)
   }
 
   implicit val testStatusQueryStringBinder: QueryStringBindable[TestStatus] = new QueryStringBindable[TestStatus] {
@@ -48,7 +48,7 @@ object Binders {
           case None         ⇒ Left(s"Unknown status type '$value'")
         }
       }
-    override def unbind(key: String, statusFilter: TestStatus): String = s"$key=$statusFilter"
+    override def unbind(key: String, statusFilter: TestStatus): String = s"$key=${TestStatus.identifier(statusFilter)}"
   }
 
   implicit val configurationQueryStringBinder: QueryStringBindable[Configuration] = new QueryStringBindable[Configuration] {

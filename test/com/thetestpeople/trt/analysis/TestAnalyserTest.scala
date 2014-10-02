@@ -23,7 +23,7 @@ class TestAnalyserTest extends FlatSpec with Matchers {
       pass(12.hours.ago),
       fail(24.hours.ago))
 
-    analysis.status should be(TestStatus.Pass)
+    analysis.status should be(TestStatus.Healthy)
 
   }
 
@@ -37,7 +37,7 @@ class TestAnalyserTest extends FlatSpec with Matchers {
       pass(3.hours.ago),
       fail(24.hours.ago))
 
-    analysis.status should be(TestStatus.Warn)
+    analysis.status should be(TestStatus.Warning)
 
   }
 
@@ -50,7 +50,7 @@ class TestAnalyserTest extends FlatSpec with Matchers {
       pass(12.hours.ago),
       fail(24.hours.ago))
 
-    analysis.status should be(TestStatus.Warn)
+    analysis.status should be(TestStatus.Warning)
 
   }
 
@@ -64,7 +64,7 @@ class TestAnalyserTest extends FlatSpec with Matchers {
       fail(12.hours.ago),
       pass(24.hours.ago))
 
-    analysis.status should be(TestStatus.Fail)
+    analysis.status should be(TestStatus.Broken)
   }
 
   "A test which has not failed for sufficiently long" should "be classifed as a warning" in {
@@ -77,7 +77,7 @@ class TestAnalyserTest extends FlatSpec with Matchers {
       fail(3.hours.ago),
       pass(24.hours.ago))
 
-    analysis.status should be(TestStatus.Warn)
+    analysis.status should be(TestStatus.Warning)
   }
 
   "A test which has not failed sufficiently frequently" should "be classifed as a warning" in {
@@ -89,7 +89,7 @@ class TestAnalyserTest extends FlatSpec with Matchers {
       fail(12.hours.ago),
       pass(24.hours.ago))
 
-    analysis.status should be(TestStatus.Warn)
+    analysis.status should be(TestStatus.Warning)
   }
 
   "A test which has never failed but has not reached the pass threshold" should "be classified as a warning" in {
@@ -99,7 +99,7 @@ class TestAnalyserTest extends FlatSpec with Matchers {
     val analysis = testAnalyser.analyse(
       pass(1.hour.ago))
 
-    analysis.status should be(TestStatus.Warn)
+    analysis.status should be(TestStatus.Warning)
 
   }
 
@@ -110,7 +110,7 @@ class TestAnalyserTest extends FlatSpec with Matchers {
     val analysis = testAnalyser.analyse(
       failed(1.hour.ago))
 
-    analysis.status should be(TestStatus.Warn)
+    analysis.status should be(TestStatus.Warning)
 
   }
 
@@ -120,7 +120,7 @@ class TestAnalyserTest extends FlatSpec with Matchers {
       fail(1.hour.ago),
       pass(12.hours.ago))
 
-    analysis.status should be(TestStatus.Fail)
+    analysis.status should be(TestStatus.Broken)
   }
 
   "Analyser" should "count zero consecutive failures" in {
