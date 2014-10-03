@@ -4,6 +4,11 @@
  
 @main("Jenkins Job", "Jenkins Job") {
 
+  <ol class="breadcrumb">
+    <li><a href="@routes.JenkinsController.jenkinsImportSpecs()">Jenkins Jobs</a></li>
+    <li class="active">@if(specOpt.isEmpty) { New } else { Edit }</li>
+  </ol>
+
   <h2>Jenkins Job</h2>  
 
   @helper.form(action = specOpt match { 

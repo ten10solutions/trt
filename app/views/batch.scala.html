@@ -27,7 +27,7 @@
           <tr><td>Name</td><td id="batch-name">@name</td></tr>
         }  
         @for(url <- batch.urlOpt) {
-          <tr><td>URL</td><td><a href="@url" id="batch-url">@url</a></td></tr>
+          <tr><td>URL</td><td><a href="@url" id="batch-url">@url <i class="fa fa-external-link"></i></a></td></tr>
         }  
         @for(configuration <- batch.configurationOpt) {
           <tr>

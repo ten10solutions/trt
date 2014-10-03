@@ -122,7 +122,7 @@
 	          <td class="batch-name-cell">@for(name <- batch.nameOpt){ <a href="@routes.Application.batch(batch.id)">@name</a> }</td>
                   <td class="configuration-cell">@for(configuration <- batch.configurationOpt){<a href="@routes.Application.tests(configuration = Some(configuration))">@configuration</a>}</td>
 	          <td class="time-cell"><span title="@batch.executionTime.absolute">@batch.executionTime.relative</span></td>
-	          <td class="url-cell">@for(url <- batch.urlOpt){<a href="@url">External Link</a>}</td>
+	          <td class="url-cell">@for(url <- batch.urlOpt){<a href="@url">External Link <i class="fa fa-external-link"></i></a>}</td>
 	          <td class="duration-cell">@for(duration <- batch.durationOpt) { @duration }</td>
 	          <td style="position: relative"><div style="position: relative; height: 48px;"><div class="pass-bar" style="float: left; width: @batch.passPercent%; height: 48px;"></div><div class="fail-bar" style="float: right; width: @batch.failPercent%; height: 48px;"></div></div></td>
 	          <td class="counts-cell">
