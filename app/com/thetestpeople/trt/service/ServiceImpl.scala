@@ -30,10 +30,10 @@ class ServiceImpl(
 
   def getExecution(id: Id[Execution]): Option[EnrichedExecution] = transaction { dao.getEnrichedExecution(id) }
 
-  def getExecutions(configurationOpt: Option[Configuration], startingFrom: Int, limit: Int): ExecutionsAndTotalCount =
+  def getExecutions(configurationOpt: Option[Configuration], resultOpt: Option[Boolean], startingFrom: Int, limit: Int): ExecutionsAndTotalCount =
     transaction {
-      val executions = dao.getEnrichedExecutions(configurationOpt, startingFrom, limit)
-      val executionCount = dao.countExecutions(configurationOpt)
+      val executions = dao.getEnrichedExecutions(configurationOpt, resultOpt, startingFrom, limit)
+      val executionCount = dao.countExecutions(configurationOpt, resultOpt)
       ExecutionsAndTotalCount(executions.toList, executionCount)
     }
 
@@ -82,9 +82,9 @@ class ServiceImpl(
   def getBatchAndExecutions(id: Id[Batch], passedFilterOpt: Option[Boolean] = None): Option[BatchAndExecutions] =
     transaction {
       dao.getBatch(id).map {
-        case BatchAndLog(batch, logOpt) ⇒
+        case BatchAndLog(batch, logOpt, importSpecIdOpt) ⇒
           val executions = dao.getEnrichedExecutionsInBatch(id, passedFilterOpt)
-          BatchAndExecutions(batch, executions.toList, logOpt)
+          BatchAndExecutions(batch, executions.toList, logOpt, importSpecIdOpt)
       }
     }
 

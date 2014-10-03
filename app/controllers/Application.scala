@@ -108,8 +108,8 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   private def handleBatch(batchId: Id[Batch], passedFilterOpt: Option[Boolean], pagination: Pagination)(implicit request: Request[_]) =
     service.getBatchAndExecutions(batchId, passedFilterOpt) map {
-      case BatchAndExecutions(batch, executions, logOpt) ⇒
-        val batchView = new BatchView(batch, executions, logOpt)
+      case BatchAndExecutions(batch, executions, logOpt, importSpecIdOpt) ⇒
+        val batchView = new BatchView(batch, executions, logOpt, importSpecIdOpt)
         val paginationData = pagination.paginationData(executions.size)
         val canRerun = service.canRerun
         views.html.batch(batchView, passedFilterOpt, canRerun, paginationData)
@@ -120,7 +120,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
     service.getBatchAndExecutions(batchId, None) match {
       case None ⇒
         NotFound(s"Could not find batch with id '$batchId'")
-      case Some(BatchAndExecutions(batch, executions, logOpt)) ⇒
+      case Some(BatchAndExecutions(batch, executions, logOpt, _)) ⇒
         logOpt match {
           case Some(log) ⇒
             val batchView = new BatchView(batch, List(), logOpt)
@@ -147,21 +147,21 @@ class Application(service: Service, adminService: AdminService) extends Controll
     views.html.batches(batches.toList, jobIdOpt, configurationOpt, jobs, paginationData, hideChartInitially)
   }
 
-  def executions(configurationOpt: Option[Configuration], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
-    logger.debug(s"executions(configuration = $configurationOpt, page = $pageOpt, pageSize = $pageSizeOpt)")
+  def executions(configurationOpt: Option[Configuration], resultOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
+    logger.debug(s"executions(configuration = $configurationOpt, result = $resultOpt page = $pageOpt, pageSize = $pageSizeOpt)")
     Pagination.validate(pageOpt, pageSizeOpt) match {
       case Left(errorMessage) ⇒ BadRequest(errorMessage)
-      case Right(pagination)  ⇒ Ok(handleExecutions(configurationOpt, pagination))
+      case Right(pagination)  ⇒ Ok(handleExecutions(configurationOpt, resultOpt, pagination))
     }
   }
 
-  private def handleExecutions(configurationOpt: Option[Configuration], pagination: Pagination)(implicit request: Request[_]) = {
+  private def handleExecutions(configurationOpt: Option[Configuration], resultOpt: Option[Boolean], pagination: Pagination)(implicit request: Request[_]) = {
     val ExecutionsAndTotalCount(executions, totalExecutionCount) =
-      service.getExecutions(configurationOpt, startingFrom = pagination.firstItem, limit = pagination.pageSize)
+      service.getExecutions(configurationOpt, resultOpt, startingFrom = pagination.firstItem, limit = pagination.pageSize)
     val executionVolume = service.getExecutionVolume(configurationOpt)
     val paginationData = pagination.paginationData(totalExecutionCount)
     val executionViews = executions.map(new ExecutionView(_))
-    views.html.executions(executionViews, totalExecutionCount, configurationOpt, paginationData, executionVolume)
+    views.html.executions(executionViews, totalExecutionCount, configurationOpt, resultOpt, paginationData, executionVolume)
   }
 
   private def getSelectedBatchIds(request: Request[AnyContent]): List[Id[Batch]] =

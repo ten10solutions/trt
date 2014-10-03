@@ -2,8 +2,9 @@ package viewModel
 
 import com.thetestpeople.trt.utils.DateUtils
 import com.thetestpeople.trt.model._
+import com.thetestpeople.trt.model.jenkins.JenkinsImportSpec
 
-class BatchView(batch: Batch, _executions: List[EnrichedExecution] = Nil, logOpt: Option[String] = None) extends AbstractExecutionView(batch) {
+class BatchView(batch: Batch, _executions: List[EnrichedExecution] = Nil, logOpt: Option[String] = None, val importSpecIdOpt: Option[Id[JenkinsImportSpec]] = None) extends AbstractExecutionView(batch) {
 
   def id = batch.id
 

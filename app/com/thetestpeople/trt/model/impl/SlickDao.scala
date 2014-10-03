@@ -71,8 +71,8 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   def deleteAll() = Cache.invalidate(configurationsCache, executionCountCache) {
 
     transaction {
-      jenkinsImportSpecs.delete
       jenkinsBuilds.delete
+      jenkinsImportSpecs.delete
       jenkinsJobs.delete
       jenkinsJobParams.delete
       batchLogs.delete
@@ -242,10 +242,10 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   def getBatch(id: Id[Batch]): Option[BatchAndLog] = {
     val query =
       for {
-        (batch, log) ← batches leftJoin batchLogs on (_.id === _.batchId)
+        ((batch, log), jenkinsBuild) ← batches leftJoin batchLogs on (_.id === _.batchId) leftJoin jenkinsBuilds on (_._1.id === _.batchId)
         if batch.id === id
-      } yield (batch, log.?)
-    query.firstOption.map { case (batch, logRowOpt) ⇒ BatchAndLog(batch, logRowOpt.map(_.log)) }
+      } yield (batch, log.?, jenkinsBuild.?)
+    query.firstOption.map { case (batch, logRowOpt, jenkinsBuildOpt) ⇒ BatchAndLog(batch, logRowOpt.map(_.log), jenkinsBuildOpt.flatMap(_.importSpecIdOpt)) }
   }
 
   def getBatches(jobOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch] = {

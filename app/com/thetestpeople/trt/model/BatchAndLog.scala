@@ -1,3 +1,5 @@
 package com.thetestpeople.trt.model
 
-case class BatchAndLog(batch: Batch, logOpt: Option[String])
+import com.thetestpeople.trt.model.jenkins.JenkinsImportSpec
+
+case class BatchAndLog(batch: Batch, logOpt: Option[String], importSpecIdOpt: Option[Id[JenkinsImportSpec]])

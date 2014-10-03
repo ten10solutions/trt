@@ -93,7 +93,8 @@ class MockDao extends Dao {
 
   def getBatch(id: Id[Batch]): Option[BatchAndLog] = batches.find(_.id == id).map { batch ⇒
     val logOpt = batchLogs.find(_.batchId == id).map(_.log)
-    BatchAndLog(batch, logOpt)
+    val importSpecIdOpt = jenkinsBuilds.find(_.batchId == id).flatMap(_.importSpecIdOpt)
+    BatchAndLog(batch, logOpt, importSpecIdOpt)
   }
 
   def getBatches(jobIdOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch] = {
@@ -167,19 +168,20 @@ class MockDao extends Dao {
         configuration -> new Interval(executionTimes.min, executionTimes.max)
     }
 
-  def getEnrichedExecutions(configurationOpt: Option[Configuration], startingFrom: Int, limit: Int): Seq[EnrichedExecution] = {
+  def getEnrichedExecutions(configurationOpt: Option[Configuration], resultOpt: Option[Boolean] = None, startingFrom: Int, limit: Int): Seq[EnrichedExecution] = {
     val all =
       for {
         batch ← batches
         execution ← executions.filter(_.batchId == batch.id)
         if configurationOpt.forall(c ⇒ c == execution.configuration)
+        if resultOpt.forall(c ⇒ c == execution.passed)
         test ← tests.find(_.id == execution.testId)
       } yield EnrichedExecution(execution, test.qualifiedName, batch.nameOpt, logOpt = None)
     all.sortBy(_.qualifiedName.name).sortBy(_.qualifiedName.groupOpt).reverse.sortBy(_.executionTime).reverse.drop(startingFrom).take(limit)
   }
 
-  def countExecutions(configurationOpt: Option[Configuration]): Int =
-    executions.count(e ⇒ configurationOpt.forall(_ == e.configuration))
+  def countExecutions(configurationOpt: Option[Configuration], resultOpt: Option[Boolean] = None): Int =
+    executions.count(e ⇒ configurationOpt.forall(_ == e.configuration) && resultOpt.forall(_  == e.passed))
 
   private def nextId[T <: EntityType](ids: Seq[Id[T]]): Id[T] = {
     val allIds = ids.map(_.value)

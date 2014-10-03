@@ -56,7 +56,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
       configurationOpt = Some(DummyData.Configuration1)),
       logOpt = Some(DummyData.Log))
 
-    val Some(BatchAndLog(batch, Some(log))) = dao.getBatch(batchId)
+    val Some(BatchAndLog(batch, Some(log), None)) = dao.getBatch(batchId)
     batch.urlOpt should equal(Some(DummyData.BuildUrl))
     batch.executionTime should equal(DummyData.ExecutionTime)
     batch.durationOpt should equal(Some(DummyData.Duration))
@@ -76,7 +76,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
       nameOpt = None),
       logOpt = None)
 
-    val Some(BatchAndLog(batch, None)) = dao.getBatch(batchId)
+    val Some(BatchAndLog(batch, None, None)) = dao.getBatch(batchId)
     batch.urlOpt should equal(None)
     batch.durationOpt should equal(None)
     batch.nameOpt should equal(None)

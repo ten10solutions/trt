@@ -99,29 +99,37 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
       case (configuration, Some(earliest), Some(latest)) ⇒ configuration -> new Interval(earliest, latest)
     }.toMap
 
-  def getEnrichedExecutions(configurationOpt: Option[Configuration], startingFrom: Int, limit: Int): Seq[EnrichedExecution] = {
+  def getEnrichedExecutions(configurationOpt: Option[Configuration], resultOpt: Option[Boolean] = None, startingFrom: Int, limit: Int): Seq[EnrichedExecution] = {
     var query =
       for ((execution, test, batch) ← executionTestBatchJoin)
         yield (execution, test.name, test.group, batch.name)
     for (configuration ← configurationOpt)
       query = query.filter(_._1.configuration === configuration)
+    for (result ← resultOpt)
+      query = query.filter(_._1.passed === result)
     query = query.sortBy(_._1.executionTime.desc)
     query = query.drop(startingFrom).take(limit)
     query.run.map((makeEnrichedExecution _).tupled)
   }
 
-  def countExecutions(configurationOpt: Option[Configuration]): Int = {
-    (configurationOpt match {
-      case None                ⇒ executionCountCache.get
-      case Some(configuration) ⇒ executions.filter(_.configuration === configuration).length.run
-    })
+  def countExecutions(configurationOpt: Option[Configuration], resultOpt: Option[Boolean] = None): Int = {
+    if (configurationOpt.isEmpty && resultOpt.isEmpty)
+      executionCountCache.get
+    else {
+      var query: Query[ExecutionMapping, Execution, Seq] = executions
+      for (configuration ← configurationOpt)
+        query = query.filter(_.configuration === configuration)
+      for (result ← resultOpt)
+        query = query.filter(_.passed === result)
+      query.length.run
+    }
     //    StaticQuery.queryNA[Int]("""select count(*) from "executions"""").first
   }
 
   private def countAllExecutions(): Int = executions.length.run
-  
+
   protected val executionCountCache: Cache[Int] = Cache { countAllExecutions() }
-  
+
   def getExecutionLog(id: Id[Execution]): Option[String] =
     executionLogs.filter(_.executionId === id).map(_.log).firstOption
 

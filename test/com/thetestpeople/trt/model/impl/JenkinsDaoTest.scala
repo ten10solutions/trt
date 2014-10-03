@@ -73,12 +73,14 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
   "Adding a Jenkins build" should "persist all the data" in transaction { dao ⇒
     val batchId = dao.newBatch(F.batch())
     val jobId = dao.ensureJenkinsJob(F.jenkinsJob())
+    val specId = dao.newJenkinsImportSpec(F.jenkinsImportSpec())
     val build = JenkinsBuild(
       jobId = jobId,
       batchId = batchId,
       buildNumber = DummyData.BuildNumber,
       importTime = DummyData.ImportTime,
-      buildUrl = DummyData.BuildUrl)
+      buildUrl = DummyData.BuildUrl,
+      importSpecIdOpt = Some(specId))
     dao.newJenkinsBuild(build)
 
     val Some(buildAgain) = dao.getJenkinsBuild(DummyData.BuildUrl)

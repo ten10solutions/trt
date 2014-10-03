@@ -92,7 +92,7 @@ class JenkinsImporter(
 
     val modelJob = model.jenkins.JenkinsJob(url = importSpec.jobUrl, name = job.name)
     val jobId = transaction { dao.ensureJenkinsJob(modelJob) }
-    val modelBuild = model.jenkins.JenkinsBuild(batchId, clock.now, buildUrl, buildLink.buildNumber, jobId)
+    val modelBuild = model.jenkins.JenkinsBuild(batchId, clock.now, buildUrl, buildLink.buildNumber, jobId, Some(importSpec.id))
     transaction { dao.newJenkinsBuild(modelBuild) }
     Some(batchId)
   }

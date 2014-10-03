@@ -107,7 +107,8 @@ object TestDataFactory {
     jobId: Id[JenkinsJob],
     importTime: DateTime = DummyData.ImportTime,
     buildUrl: URI = DummyData.BuildUrl,
-    buildNumber: Int = DummyData.BuildNumber) =
-    JenkinsBuild(batchId, importTime, buildUrl, buildNumber, jobId)
+    buildNumber: Int = DummyData.BuildNumber,
+    importSpecIdOpt: Option[Id[JenkinsImportSpec]] = None) =
+    JenkinsBuild(batchId, importTime, buildUrl, buildNumber, jobId, importSpecIdOpt)
 
 }

@@ -12,7 +12,7 @@ import com.thetestpeople.trt.analysis.ExecutionTimeMAD
 
 case class TestAndExecutions(test: TestAndAnalysis, executions: List[EnrichedExecution], otherConfigurations: Seq[Configuration])
 
-case class BatchAndExecutions(batch: Batch, executions: List[EnrichedExecution], logOpt: Option[String])
+case class BatchAndExecutions(batch: Batch, executions: List[EnrichedExecution], logOpt: Option[String], importSpecIdOpt: Option[Id[JenkinsImportSpec]])
 
 case class ExecutionsAndTotalCount(executions: List[EnrichedExecution], total: Int)
 
@@ -51,7 +51,7 @@ trait Service extends JenkinsService {
 
   def analyseAllExecutions()
 
-  def getExecutions(configurationOpt: Option[Configuration], startingFrom: Int, limit: Int): ExecutionsAndTotalCount
+  def getExecutions(configurationOpt: Option[Configuration], resultOpt: Option[Boolean], startingFrom: Int, limit: Int): ExecutionsAndTotalCount
 
   def getExecution(id: Id[Execution]): Option[EnrichedExecution]
 

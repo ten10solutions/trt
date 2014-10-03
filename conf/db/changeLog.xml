@@ -316,4 +316,12 @@
     </addColumn>
   </changeSet>
   
+  <changeSet author="matt" id="add-jenkins_builds-import_spec_id">
+    <addColumn tableName="jenkins_builds">
+      <column name="import_spec_id" type="INT" defaultValue="NULL">
+        <constraints nullable="true" />
+      </column>
+    </addColumn>
+  </changeSet>
+  
 </databaseChangeLog>

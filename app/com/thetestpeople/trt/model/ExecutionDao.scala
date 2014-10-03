@@ -39,9 +39,10 @@ trait ExecutionDao {
   
   /**
    * @param configurationOpt -- if defined, filter executions to those against the given configuration
+   * @param resultOpt -- if Some(true), only return passing executions; if Some(false), failing executions; else either 
    * @return executions, ordered most recent first, then by test group, then by test name. No execution logs will be provided.
    */
-  def getEnrichedExecutions(configurationOpt: Option[Configuration] = None, startingFrom: Int = 0, limit: Int = Integer.MAX_VALUE): Seq[EnrichedExecution]
+  def getEnrichedExecutions(configurationOpt: Option[Configuration] = None, resultOpt: Option[Boolean] = None, startingFrom: Int = 0, limit: Int = Integer.MAX_VALUE): Seq[EnrichedExecution]
 
   /**
    * @param configurationOpt -- if defined, restrict executions to only those against the given configuration
@@ -58,9 +59,10 @@ trait ExecutionDao {
 
   /**
    * @param configurationOpt -- if defined, only count executions against the given configuration.
+    * @param resultOpt -- if Some(true), only return passing executions; if Some(false), failing executions; else either 
    * @return count of the executions recorded
    */
-  def countExecutions(configurationOpt: Option[Configuration] = None): Int
+  def countExecutions(configurationOpt: Option[Configuration] = None, resultOpt: Option[Boolean] = None): Int
 
   /**
    * Add a record for a new test execution.
