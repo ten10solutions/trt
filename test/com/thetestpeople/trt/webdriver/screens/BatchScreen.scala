@@ -25,6 +25,12 @@ class BatchScreen(implicit automationContext: AutomationContext) extends Abstrac
     new BatchLogScreen
   }
 
+  def clickDelete(): BatchesScreen = {
+    log("Click 'Delete batch'")
+    webDriver.waitForDisplayedAndEnabled(id("delete-batch")).click()
+    new BatchesScreen
+  }
+  
   def executionRows: List[ExecutionRow] =
     for ((rowElement, index) ← webDriver.findElements_(cssSelector("tr.execution-row")).zipWithIndex)
       yield ExecutionRow(rowElement, index)
