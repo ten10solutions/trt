@@ -108,6 +108,31 @@ class LuceneLogIndexerTest extends FlatSpec with ShouldMatchers {
 
   }
 
+  "Searching for numbers" should "succeed" in {
+    val indexer = LuceneLogIndexer.memoryBackedIndexer
+    val execution = makeExecution(log = "10 12345 20")
+    indexer.addExecutions(Seq(execution))
+
+    indexer.searchExecutions("12345").total should equal(1)
+  }
+
+  "Searching for tokens containing numbers" should "succeed" in {
+    val indexer = LuceneLogIndexer.memoryBackedIndexer
+    val execution = makeExecution(log = "foo bar42 baz")
+    indexer.addExecutions(Seq(execution))
+
+    indexer.searchExecutions("bar42").total should equal(1)
+  }
+
+  "Search" should "be case insensitive" in {
+    val indexer = LuceneLogIndexer.memoryBackedIndexer
+    val execution = makeExecution(log = "FOO bar")
+    indexer.addExecutions(Seq(execution))
+
+    indexer.searchExecutions("foo").total should equal(1)
+    indexer.searchExecutions("BAR").total should equal(1)
+  }
+
   private var executionIdCounter = 0
 
   private def makeExecution(log: String, executionTime: DateTime = DummyData.ExecutionTime): EnrichedExecution = {

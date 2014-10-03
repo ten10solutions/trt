@@ -45,7 +45,7 @@ class LuceneLogIndexer(directory: Directory) extends LogIndexer with HasLogger {
 
   import LuceneLogIndexer._
 
-  private val analyzer = new SimpleAnalyzer(Version.LUCENE_4_9)
+  private val analyzer = new LogAnalyzer
 
   // Ensure that the directory is set-up for queries
   withIndexWriter { indexWriter ⇒ }
