@@ -10,26 +10,26 @@
     
     @helper.inputText(confForm("failureDurationThreshold"), 
       'class -> "form-control",
-      'placeholder -> "Broken duration threshold",
-	    '_label -> "Broken duration threshold",
+      'placeholder -> "Duration threshold",
+	    '_label -> "Duration threshold for Broken status",
 	    '_help -> "How long a test must have been failing before it is classified as Broken, rather than a Warning (e.g. 6 hours, 1 day, etc.)")
     
     @helper.inputText(confForm("failureCountThreshold"), 
       'class -> "form-control",
-      'placeholder -> "Broken count threshold",
-	    '_label -> "Broken count threshold",
+      'placeholder -> "Count threshold",
+	    '_label -> "Count threshold for Broken status",
       '_help -> "Number of consecutive failures required before a test is classed as Broken, rather than a Warning")
         
     @helper.inputText(confForm("passDurationThreshold"), 
       'class -> "form-control",
-      'placeholder -> "Healthy duration threshold",
-	    '_label -> "Healthy duration threshold", 
+      'placeholder -> "Duration threshold",
+	    '_label -> "Duration threshold for Healthy status", 
       '_help -> "How long a test must have been passing before it is classified as Healthy, rather than a Warning (e.g. 6 hours, 1 day, etc.)")
     
     @helper.inputText(confForm("passCountThreshold"), 
       'class -> "form-control",
-      'placeholder -> "Healthy count threshold",
-	    '_label -> "Healthy count threshold", 
+      'placeholder -> "Count threshold",
+	    '_label -> "Count threshold for Healthy status", 
       '_help -> "Number of consecutive passes required before a test is classed as Healthy, rather than a Warning")
         
     <div class="form-actions">
