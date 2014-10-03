@@ -14,3 +14,7 @@ $(document).ready ->
 
 window.rerunSelected = (action) ->
   $("#executionActionForm").attr("action", action).submit()
+
+window.deleteBatch = (action) ->
+  bootbox.confirm "Are you sure you want to delete this batch?", (confirmed) ->
+    $("#delete-batch-form").attr("action", action).submit() if confirmed

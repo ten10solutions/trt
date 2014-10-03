@@ -6,6 +6,7 @@ import org.openqa.selenium.By._
 import org.openqa.selenium.WebElement
 import com.thetestpeople.trt.webdriver.screens.RichSelenium._
 import com.thetestpeople.trt.utils.Utils
+import org.openqa.selenium.By
 
 class BatchScreen(implicit automationContext: AutomationContext) extends AbstractScreen with HasMainMenu {
 
@@ -25,10 +26,20 @@ class BatchScreen(implicit automationContext: AutomationContext) extends Abstrac
     new BatchLogScreen
   }
 
-  def clickDelete(): BatchesScreen = {
+  def clickDelete(): ConfirmDeleteDialog = {
     log("Click 'Delete batch'")
-    webDriver.waitForDisplayedAndEnabled(id("delete-batch")).click()
-    new BatchesScreen
+    webDriver.waitForDisplayedAndEnabled(id("delete-batch-button")).click()
+    new ConfirmDeleteDialog
+  }
+  
+  class ConfirmDeleteDialog(implicit automationContext: AutomationContext) extends AbstractComponent {
+    
+    def clickOK(): BatchesScreen = {
+      log("Click 'OK'")
+      webDriver.waitForDisplayedAndEnabled(By.cssSelector("div.bootbox-confirm button.btn-primary")).click()
+      new BatchesScreen
+    }
+    
   }
   
   def executionRows: List[ExecutionRow] =

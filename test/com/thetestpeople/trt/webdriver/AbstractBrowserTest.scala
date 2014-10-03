@@ -25,7 +25,7 @@ abstract class AbstractBrowserTest extends FlatSpec with Matchers {
   protected def automate(testBlock: Site ⇒ Any) =
     Helpers.running(TestServer(port, FakeApplicationFactory.fakeApplication)) {
       val webDriver: WebDriver = new PhantomJSDriver
-//            val webDriver: WebDriver = new FirefoxDriver
+      //            val webDriver: WebDriver = new FirefoxDriver
       try {
         val automationContext = AutomationContext(webDriver)
         val site = new Site(automationContext, siteUrl)

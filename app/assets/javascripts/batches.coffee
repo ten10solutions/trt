@@ -93,7 +93,7 @@ window.createPassFailChart = ->
 
 window.deleteSelected = (action) ->
   bootbox.confirm "Are you sure you want to delete the selected batch(es)?", (confirmed) ->
-    $("#batchActionForm").attr("action", action).submit()  if confirmed
+    $("#batch-action-form").attr("action", action).submit()  if confirmed
 
 window.showChart = (action) ->
   $("#chart-hidden-message").hide()
@@ -103,9 +103,9 @@ window.showChart = (action) ->
 $(document).ready ->
   setButtonEnableState = ->
     disabled = $("input:checkbox:checked").length is 0
-    $("button#deleteSelected").prop "disabled", disabled
+    $("button#delete-selected").prop "disabled", disabled
 
-  $("#selectAll").change ->
+  $("#select-all").change ->
     c = @checked
     checkboxes = $(this).closest("form").find(":checkbox")
     checkboxes.prop "checked", c

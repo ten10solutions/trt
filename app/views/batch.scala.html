@@ -76,8 +76,8 @@
     </div>
   </div>
 
-  <form action="@routes.Application.deleteBatch(batch.id)" role="form" method="post">
-     <button style="margin-bottom: 12px; margin-top: 12px" id="delete-batch" class="btn btn-default" type="submit" title="Delete batch"><i class="glyphicon glyphicon-trash"></i> Delete batch</button>
+  <form id="delete-batch-form" action="@routes.Application.deleteBatch(batch.id)" role="form" method="post">
+     <button style="margin-bottom: 12px; margin-top: 12px" id="delete-batch-button" class="btn btn-default" onclick="deleteBatch()" type="button" title="Delete batch"><i class="glyphicon glyphicon-trash"></i> Delete batch</button>
   </form>
   
   <h3>Test Executions</h3>
