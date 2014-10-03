@@ -1,6 +1,10 @@
 @()(implicit flash: Flash, globalViewContext: GlobalViewContext)
 
-@main("Admin", "Admin") {
+@scripts = {
+  <script src="@routes.Assets.at("javascripts/admin.js")"></script>
+}
+
+@main("Admin", "Admin", scripts = scripts) {
 
   <div class="alert alert-warning alert-dismissable">
     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
