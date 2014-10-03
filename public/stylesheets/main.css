@@ -207,3 +207,25 @@ td.url-cell {
   background: linear-gradient(to bottom,  rgba(255,163,163,1) 0%,rgba(219,0,3,1) 50%,rgba(153,0,2,1) 52%,rgba(219,0,3,1) 100%); /* W3C */
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffa3a3', endColorstr='#db0003',GradientType=0 ); /* IE6-9 */
 }
+
+footer {
+    padding-top: 6px;
+    color: #777;
+    text-align: center;
+    border-top: 1px solid #e5e5e5;
+}
+* {
+    margin: 0;
+}
+html, body {
+    height: 100%;
+}
+.wrapper {
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+    margin: 0 auto -32px; /* the bottom margin is the negative value of the footer's height */
+}
+footer, .push {
+    height: 32px; /* .push must be the same height as .footer */
+}
