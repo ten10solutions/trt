@@ -8,6 +8,13 @@ import play.api.libs.json.Json
 
 case class HttpResponse(status: Int, statusText: String, body: String = "") {
 
+  def checkOK =
+    if (status != 200) {
+      val bodyStart = body.take(200)
+      throw new HttpException(s"Problem with HTTP response: $status $statusText\n$bodyStart")
+    } else
+      this
+
   def bodyAsJson: JsValue = Json.parse(body)
 
   def bodyAsXml: Elem =
@@ -18,5 +25,5 @@ case class HttpResponse(status: Int, statusText: String, body: String = "") {
         val bodyStart = body.take(200)
         throw new HttpException(s"Problem parsing XML from response body: $bodyStart", e)
     }
-  
+
 }

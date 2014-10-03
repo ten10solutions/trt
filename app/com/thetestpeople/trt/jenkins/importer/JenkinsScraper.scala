@@ -95,26 +95,26 @@ class JenkinsScraper(
       new JenkinsBuildXmlParser().parseBuild(buildXml)
     catch {
       case e: ParseException ⇒
-        throw new JenkinsScraperException(s"Problem parsing Jenkins build XML from $buildUrl", e)
+        throw new JenkinsScraperException(s"Problem parsing Jenkins build XML from $buildUrl: ${e.getMessage}", e)
     }
 
   private def getJobXml(jobUrl: URI): Elem = {
     val url = jobUrl / "api/xml"
     try
-      http.get(url, basicAuthOpt = credentialsOpt).bodyAsXml
+      http.get(url, basicAuthOpt = credentialsOpt).checkOK.bodyAsXml
     catch {
       case e: HttpException ⇒
-        throw new JenkinsScraperException(s"Problem getting Jenkins job information from $url", e)
+        throw new JenkinsScraperException(s"Problem getting Jenkins job information from $url: ${e.getMessage}", e)
     }
   }
 
   private def getBuildXml(buildUrl: URI): Elem = {
     val url = buildUrl / "api/xml"
     try
-      http.get(url, basicAuthOpt = credentialsOpt).bodyAsXml
+      http.get(url, basicAuthOpt = credentialsOpt).checkOK.bodyAsXml
     catch {
       case e: HttpException ⇒
-        throw new JenkinsScraperException(s"Problem getting Jenkins build information from $url", e)
+        throw new JenkinsScraperException(s"Problem getting Jenkins build information from $url: ${e.getMessage}", e)
     }
   }
 
@@ -122,18 +122,18 @@ class JenkinsScraper(
 
   private def getTestResultsXml(buildUrl: URI): Elem =
     try
-      http.get(testResultsUrl(buildUrl), basicAuthOpt = credentialsOpt).bodyAsXml
+      http.get(testResultsUrl(buildUrl), basicAuthOpt = credentialsOpt).checkOK.bodyAsXml
     catch {
       case e: HttpException ⇒
-        throw new JenkinsScraperException(s"Problem getting Jenkins test results for build $buildUrl", e)
+        throw new JenkinsScraperException(s"Problem getting Jenkins test results for build $buildUrl: ${e.getMessage}", e)
     }
 
   private def getConsole(buildUrl: URI): String =
     try
-      http.get(buildUrl / "consoleText", basicAuthOpt = credentialsOpt).body
+      http.get(buildUrl / "consoleText", basicAuthOpt = credentialsOpt).checkOK.body
     catch {
       case e: HttpException ⇒
-        throw new JenkinsScraperException(s"Problem getting console log for $buildUrl", e)
+        throw new JenkinsScraperException(s"Problem getting console log for $buildUrl: ${e.getMessage}", e)
     }
 
 }
