@@ -8,7 +8,7 @@
 
 @executionsPaginationWidget = { 
   @paginationWidget(pagination)((page, pageSize) => 
-    routes.Application.executions(configuration = configurationOpt, page = Some(page), pageSize = Some(pageSize))) 
+    routes.Application.executions(configuration = configurationOpt, passed = resultOpt, page = Some(page), pageSize = Some(pageSize))) 
 }
 
 @css = {
