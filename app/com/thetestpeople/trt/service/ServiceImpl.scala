@@ -171,4 +171,17 @@ class ServiceImpl(
     new StaleTestCalculator().findStaleTests(analysedTests)
   }
 
+  def setExecutionComment(id: Id[Execution], text: String): Boolean = {
+    if (transaction(dao.getEnrichedExecution(id)).isEmpty)
+      false
+    else {
+      logger.info(s"Updating comment for execution $id")
+      text.trim match {
+        case "" ⇒ transaction { dao.deleteExecutionComment(id) }
+        case s  ⇒ transaction { dao.setExecutionComment(id, text) }
+      }
+      true
+    }
+  }
+
 }

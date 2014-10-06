@@ -29,12 +29,41 @@
       @for(duration <- execution.durationOpt) {
         <tr><td>Duration</td><td>@duration</td></tr>
       }
-      <tr><td>Configuration</td><td><a id="configuration-link" href="@routes.Application.tests(configuration = Some(execution.configuration))">@execution.configuration</a></td></tr>
+      <tr>
+        <td>Configuration</td>
+        <td><a id="configuration-link" href="@routes.Application.tests(configuration = Some(execution.configuration))">@execution.configuration</a></td>
+      </tr>
+      <tr>
+        <td>Comment</td>
+        <td>@for(comment <- execution.commentOpt) { <span style="white-space: pre-wrap">@comment</span> } <a id="edit-comment-link" data-toggle="modal" data-target="#comment-dialog"><i class="glyphicon glyphicon-pencil"></i> edit</a></td>
+      </tr>
    </table>
    
    @for(log <- execution.logOpt) {
      <h3>Log</h3>
      <pre id="log">@log</pre>
    }
+
+<!-- Modal -->
+<div class="modal fade" id="comment-dialog" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title">Edit comment</h4>
+      </div>
+      <div class="modal-body">
+        <form id="comment-form" role="form" method="POST" action="@routes.Application.setExecutionComment(execution.id)">
+          <textarea name="text" class="form-control" rows="6">@for(comment <- execution.commentOpt){@comment}</textarea>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button id="save-comment-button" type="button" class="btn btn-primary" onclick="$('#comment-form').submit()" >Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 }

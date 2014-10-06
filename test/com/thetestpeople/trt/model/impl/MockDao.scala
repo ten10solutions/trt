@@ -28,6 +28,7 @@ class MockDao extends Dao {
   private var batches: Seq[Batch] = List()
   private var analyses: Seq[Analysis] = List()
   private var executionLogs: Seq[ExecutionLogRow] = List()
+  private var executionComments: Seq[ExecutionComment] = List()
   private var batchLogs: Seq[BatchLogRow] = List()
   private var jenkinsJobs: Seq[JenkinsJob] = List()
   private var jenkinsBuilds: Seq[JenkinsBuild] = List()
@@ -42,7 +43,8 @@ class MockDao extends Dao {
       test ← tests.find(_.id == execution.testId)
       batch ← batches.find(_.id == execution.batchId)
       logOpt = executionLogs.find(_.executionId == id).map(_.log)
-    } yield EnrichedExecution(execution, test.qualifiedName, batch.nameOpt, logOpt)
+      commentOpt = executionComments.find(_.executionId == id).map(_.text)
+    } yield EnrichedExecution(execution, test.qualifiedName, batch.nameOpt, logOpt, commentOpt)
 
   def getTestAndAnalysis(id: Id[Test], configuration: Configuration): Option[TestAndAnalysis] =
     for {
@@ -124,7 +126,7 @@ class MockDao extends Dao {
       if execution.batchId == batch.id
       test ← tests.find(_.id == execution.testId)
       if passedFilterOpt.forall(expected ⇒ execution.passed == expected)
-    } yield EnrichedExecution(execution, test.qualifiedName, batch.nameOpt, logOpt = None)
+    } yield EnrichedExecution(execution, test.qualifiedName, batch.nameOpt, logOpt = None, commentOpt = None)
 
   def getEnrichedExecutions(ids: Seq[Id[Execution]]): Seq[EnrichedExecution] =
     for {
@@ -133,7 +135,7 @@ class MockDao extends Dao {
       if execution.batchId == batch.id
       if ids.contains(execution.id)
       test ← tests.find(_.id == execution.testId)
-    } yield EnrichedExecution(execution, test.qualifiedName, batch.nameOpt, logOpt = None)
+    } yield EnrichedExecution(execution, test.qualifiedName, batch.nameOpt, logOpt = None, commentOpt = None)
 
   def getExecutionsForTest(id: Id[Test]): Seq[Execution] =
     executions.filter(_.testId == id).sortBy(_.executionTime).reverse
@@ -145,7 +147,7 @@ class MockDao extends Dao {
         execution ← executions.filter(_.testId == testId)
         batch ← batches.find(_.id == execution.batchId)
         if configurationOpt.forall(_ == execution.configuration)
-      } yield EnrichedExecution(execution, test.qualifiedName, batch.nameOpt, logOpt = None)
+      } yield EnrichedExecution(execution, test.qualifiedName, batch.nameOpt, logOpt = None, commentOpt = None)
     executionsForTest.sortBy(_.execution.executionTime).reverse
   }
 
@@ -176,12 +178,12 @@ class MockDao extends Dao {
         if configurationOpt.forall(c ⇒ c == execution.configuration)
         if resultOpt.forall(c ⇒ c == execution.passed)
         test ← tests.find(_.id == execution.testId)
-      } yield EnrichedExecution(execution, test.qualifiedName, batch.nameOpt, logOpt = None)
+      } yield EnrichedExecution(execution, test.qualifiedName, batch.nameOpt, logOpt = None, commentOpt = None)
     all.sortBy(_.qualifiedName.name).sortBy(_.qualifiedName.groupOpt).reverse.sortBy(_.executionTime).reverse.drop(startingFrom).take(limit)
   }
 
   def countExecutions(configurationOpt: Option[Configuration], resultOpt: Option[Boolean] = None): Int =
-    executions.count(e ⇒ configurationOpt.forall(_ == e.configuration) && resultOpt.forall(_  == e.passed))
+    executions.count(e ⇒ configurationOpt.forall(_ == e.configuration) && resultOpt.forall(_ == e.passed))
 
   private def nextId[T <: EntityType](ids: Seq[Id[T]]): Id[T] = {
     val allIds = ids.map(_.value)
@@ -341,4 +343,10 @@ class MockDao extends Dao {
     for (test ← tests; group ← test.groupOpt if matches(group))
       yield group
   }
+
+  def setExecutionComment(id: Id[Execution], text: String) =
+    executionComments = ExecutionComment(id, text) +: executionComments.filterNot(_.executionId == id)
+
+  def deleteExecutionComment(id: Id[Execution]) = executionComments = executionComments.filterNot(_.executionId == id)
+
 }

@@ -13,7 +13,8 @@ case class EnrichedExecution(
     execution: Execution,
     qualifiedName: QualifiedName,
     batchNameOpt: Option[String],
-    logOpt: Option[String]) {
+    logOpt: Option[String],
+    commentOpt: Option[String]) {
 
   def id: Id[Execution] = execution.id
 

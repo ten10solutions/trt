@@ -138,7 +138,7 @@ class LuceneLogIndexerTest extends FlatSpec with ShouldMatchers {
   private def makeExecution(log: String, executionTime: DateTime = DummyData.ExecutionTime): EnrichedExecution = {
     val execution = F.execution(Id.dummy, Id.dummy, executionTime = executionTime).copy(id = Id[Execution](executionIdCounter))
     executionIdCounter += 1
-    EnrichedExecution(execution, DummyData.QualifiedTestName, batchNameOpt = None, logOpt = Some(log))
+    EnrichedExecution(execution, DummyData.QualifiedTestName, batchNameOpt = None, logOpt = Some(log), commentOpt = None)
   }
 
 }

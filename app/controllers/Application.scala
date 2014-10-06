@@ -343,4 +343,24 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   }
 
+  def setExecutionComment(executionId: Id[Execution]) = Action { implicit request ⇒
+    logger.debug(s"setExecutionComment($executionId)")
+    val textOpt =
+      for {
+        requestMap ← request.body.asFormUrlEncoded
+        texts ← requestMap.get("text")
+        text ← texts.headOption
+      } yield text
+    textOpt match {
+      case Some(text) ⇒
+        val result = service.setExecutionComment(executionId, text)
+        if (result)
+          Redirect(routes.Application.execution(executionId)).flashing("success" -> "Comment updated.")
+        else
+          NotFound(s"Could not find test execution with id '$executionId'")
+      case None ⇒
+        BadRequest("No 'text' parameter provided'")
+    }
+  }
+
 }

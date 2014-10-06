@@ -17,12 +17,12 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
   def getEnrichedExecution(id: Id[Execution]): Option[EnrichedExecution] = {
     val query =
       for {
-        ((execution, test, batch), log) ← executionTestBatchJoin leftJoin executionLogs on (_._1.id === _.executionId)
+        (((execution, test, batch), log), comment) ← executionTestBatchJoin leftJoin executionLogs on (_._1.id === _.executionId) leftJoin executionComments on (_._1._1.id === _.executionId)
         if execution.id === id
-      } yield (execution, test.name, test.group, batch.name, log.?)
+      } yield (execution, test.name, test.group, batch.name, log.?, comment.?)
     query.firstOption.map {
-      case (execution, testName, testGroupOpt, batchNameOpt, logOpt) ⇒
-        EnrichedExecution(execution, QualifiedName(testName, testGroupOpt), batchNameOpt, logOpt.map(_.log))
+      case (execution, testName, testGroupOpt, batchNameOpt, logOpt, commentOpt) ⇒
+        EnrichedExecution(execution, QualifiedName(testName, testGroupOpt), batchNameOpt, logOpt.map(_.log), commentOpt.map(_.text))
     }
   }
 
@@ -36,7 +36,7 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
     } yield (execution, test, batch)
 
   private def makeEnrichedExecution(execution: Execution, testName: String, testGroupOpt: Option[String], batchNameOpt: Option[String]): EnrichedExecution =
-    EnrichedExecution(execution, QualifiedName(testName, testGroupOpt), batchNameOpt, logOpt = None)
+    EnrichedExecution(execution, QualifiedName(testName, testGroupOpt), batchNameOpt, logOpt = None, commentOpt = None)
 
   def getEnrichedExecutions(ids: Seq[Id[Execution]]): Seq[EnrichedExecution] = {
     var query =
@@ -153,4 +153,14 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
     query = query.sortBy(_._1.executionTime.desc)
     query.run.toList.map((makeEnrichedExecution _).tupled)
   }
+  
+  def setExecutionComment(id: Id[Execution], text: String) = 
+    if (executionComments.filter(_.executionId === id).firstOption.isDefined)
+      executionComments.filter(_.executionId === id).map(_.text).update(text)
+    else 
+      executionComments.insert(ExecutionComment(id, text))
+  
+  def deleteExecutionComment(id: Id[Execution]) = executionComments.filter(_.executionId === id).delete
+
+  
 }

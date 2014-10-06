@@ -73,4 +73,8 @@ trait ExecutionDao {
    */
   def newExecution(execution: Execution, logOpt: Option[String] = None): Id[Execution]
 
+  def setExecutionComment(id: Id[Execution], text: String)
+  
+  def deleteExecutionComment(id: Id[Execution])
+  
 }

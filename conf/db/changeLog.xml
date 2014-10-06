@@ -323,5 +323,45 @@
       </column>
     </addColumn>
   </changeSet>
+
+  <changeSet author="matt" id="create-execution_comments">
+    <createTable tableName="execution_comments">
+      <column name="execution_id" type="INT">
+        <constraints primaryKey="true" primaryKeyName="execution_comments_pkey" />
+      </column>
+      <column name="comment" type="CLOB">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <addForeignKeyConstraint baseColumnNames="execution_id" baseTableName="execution_comments" constraintName="fk_execution_comments_id"
+      deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="executions" />
+  </changeSet>
+
+  <changeSet author="matt" id="create-batch_comments">
+    <createTable tableName="batch_comments">
+      <column name="batch_id" type="INT">
+        <constraints primaryKey="true" primaryKeyName="batch_comments_pkey" />
+      </column>
+      <column name="comment" type="CLOB">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <addForeignKeyConstraint baseColumnNames="batch_id" baseTableName="batch_comments" constraintName="fk_batch_comments_id"
+      deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="batches" />
+  </changeSet>
+
+  <changeSet author="matt" id="create-test_comments">
+    <createTable tableName="test_comments">
+      <column name="test_id" type="INT">
+        <constraints primaryKey="true" primaryKeyName="test_comments_pkey" />
+      </column>
+      <column name="comment" type="CLOB">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+    <addForeignKeyConstraint baseColumnNames="test_id" baseTableName="test_comments" constraintName="fk_test_comments_id"
+      deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="tests" />
+  </changeSet>
+
   
 </databaseChangeLog>

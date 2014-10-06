@@ -75,5 +75,10 @@ trait Service extends JenkinsService {
   def getExecutionVolume(configurationOpt: Option[Configuration]): Option[ExecutionVolume]
   
   def staleTests(configuration: Configuration): (Option[ExecutionTimeMAD], Seq[TestAndAnalysis]) 
+ 
+  /**
+   * @return true iff an execution with the given id was present in the DB
+   */
+  def setExecutionComment(id: Id[Execution], text: String): Boolean
   
 }

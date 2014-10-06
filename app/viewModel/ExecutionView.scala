@@ -28,6 +28,8 @@ case class ExecutionView(execution: EnrichedExecution, fragmentOpt: Option[Strin
 
   def logOpt = execution.logOpt
 
+  def commentOpt = execution.commentOpt
+  
   def configuration: Configuration = execution.configuration
   
 }

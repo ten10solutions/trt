@@ -39,6 +39,9 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     val analyses = TableQuery[AnalysisMapping]
     val executionLogs = TableQuery[ExecutionLogMapping]
     val batchLogs = TableQuery[BatchLogMapping]
+    val executionComments = TableQuery[ExecutionCommentMapping]
+    val batchComments = TableQuery[BatchCommentMapping]
+    val testComments = TableQuery[TestCommentMapping]
     val systemConfiguration = TableQuery[SystemConfigurationMapping]
 
     val jenkinsJobs = TableQuery[JenkinsJobMapping]
@@ -76,6 +79,9 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       jenkinsJobs.delete
       jenkinsJobParams.delete
       batchLogs.delete
+      executionComments.delete
+      batchComments.delete
+      testComments.delete
       analyses.delete
     }
 
@@ -288,6 +294,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       } yield test.id
 
     val testIdsToDelete = testsWithoutExecutionsQuery.run
+    testComments.filter(_.testId inSet testIdsToDelete).delete
     tests.filter(_.id inSet testIdsToDelete).delete
     testIdsToDelete
   }
@@ -298,8 +305,10 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       jenkinsBuilds.filter(_.batchId inSet batchIds).delete
       analyses.filter(_.testId inSet testIds).delete
       executionLogs.filter(_.executionId inSet executionIds).delete
+      executionComments.filter(_.executionId inSet executionIds).delete
       executions.filter(_.id inSet executionIds).delete
       batchLogs.filter(_.batchId inSet batchIds).delete
+      batchComments.filter(_.batchId inSet batchIds).delete
       batches.filter(_.id inSet batchIds).delete
       val deletedTestIds = deleteTestsWithoutExecutions(testIds).toSet
       val remainingTestIds = testIds.filterNot(deletedTestIds.contains)
