@@ -87,7 +87,7 @@ packageSummary := "Test Reporty Thing (trt)"
 
 maintainer := "Matt Russell <MattRussellUK@gmail.com>"
 
-debianPackageDependencies in Debian ++= Seq("default-jre-headless (>= 1.7)")
+debianPackageDependencies in Debian ++= Seq("java7-runtime-headless")
 
 linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
   packageMapping(

@@ -30,7 +30,7 @@
       pageSize = Some(pageSize))) 
 }
 
-@main("Tests", "Tests: @configuration", scripts = scripts, css = css) {
+@main("Tests: " + configuration, "Title", scripts = scripts, css = css) {
 
   <h2><img src="@routes.Assets.at("images/" + testsSummary.ballIcon)"/> Tests</h2>
   

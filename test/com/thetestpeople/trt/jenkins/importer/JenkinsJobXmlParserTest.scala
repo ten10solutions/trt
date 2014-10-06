@@ -19,14 +19,14 @@ class JenkinsJobXmlParserTest extends FlatSpec with Matchers {
     val buildUrls = buildLinks.map(_.buildUrl)
 
     val expectedUrls = List(
-      "http://ci.pentaho.com/job/pentaho-big-data-plugin/758/",
-      "http://ci.pentaho.com/job/pentaho-big-data-plugin/757/",
-      "http://ci.pentaho.com/job/pentaho-big-data-plugin/756/",
-      "http://ci.pentaho.com/job/pentaho-big-data-plugin/57/").map(uri)
+      "https://builds.apache.org/view/All/job/flume-trunk/666/",
+      "https://builds.apache.org/view/All/job/flume-trunk/665/",
+      "https://builds.apache.org/view/All/job/flume-trunk/664/",
+      "https://builds.apache.org/view/All/job/flume-trunk/663/").map(uri)
 
     buildUrls should contain theSameElementsAs expectedUrls
-    jobName should equal("pentaho-big-data-plugin")
-    url should equal(uri("http://ci.pentaho.com/job/pentaho-big-data-plugin/"))
+    jobName should equal("flume-trunk")
+    url should equal(uri("https://builds.apache.org/view/All/job/flume-trunk/"))
   }
 
   private def parse(xml: Elem): JenkinsJob = new JenkinsJobXmlParser().parse(xml)

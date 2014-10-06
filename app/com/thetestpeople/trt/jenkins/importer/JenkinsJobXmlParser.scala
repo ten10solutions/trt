@@ -8,7 +8,7 @@ import scala.xml.Node
 class JenkinsJobXmlParser {
 
   def parse(xml: Elem): JenkinsJob = {
-    val buildLinks = (xml \ "build").map(parseBuildLink)
+    val buildLinks = (xml \ "allBuild").map(parseBuildLink)
     val name = (xml \ "name").headOption.map(_.text).getOrElse(
       throw ParseException(s"Cannot find <name> element in Jenkins job XML"))
     val url = (xml \ "url").headOption.map(_.text).getOrElse(
