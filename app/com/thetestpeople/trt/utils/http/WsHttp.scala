@@ -17,10 +17,10 @@ class WsHttp(timeout: Duration = 60.seconds) extends Http with HasLogger {
   def get(url: URI, basicAuthOpt: Option[Credentials] = None): HttpResponse =
     try {
       val future = WS.url(url.toString).withBasicAuth(basicAuthOpt).get()
-      logger.debug("GET: " + url.toString)
+      // logger.debug("GET: " + url.toString)
       logger.debug(curlGet(url, basicAuthOpt))
       val response = await(future)
-      logger.debug("GET response: " + response.statusText)
+      // logger.debug("GET response: " + response.statusText)
       response
     } catch {
       case e: Exception ⇒
@@ -30,10 +30,10 @@ class WsHttp(timeout: Duration = 60.seconds) extends Http with HasLogger {
   def post(url: URI, basicAuthOpt: Option[Credentials] = None, bodyParams: Map[String, Seq[String]]): HttpResponse =
     try {
       val future = WS.url(url.toString).withBasicAuth(basicAuthOpt).post(bodyParams)
-      logger.debug("POST to: " + url.toString)
+      //logger.debug("POST to: " + url.toString)
       logger.debug(curlPost(url, basicAuthOpt, bodyParams))
       val response = await(future)
-      logger.debug("POST response: " + response.statusText)
+      //logger.debug("POST response: " + response.statusText)
       response
     } catch {
       case e: Exception ⇒

@@ -22,7 +22,7 @@ class StaleTestsScreenTest extends AbstractBrowserTest {
         F.execution(F.test(name = "test5"), executionTimeOpt = Some(5.weeks.ago))))
       site.restApi.addBatch(batch)
       
-      val staleTestsScreen = site.launch().mainMenu.clickReports().clickStaleTests()
+      val staleTestsScreen = site.launch().mainMenu.reports().staleTests()
       val Seq(row) = staleTestsScreen.testRows
       row.name should equal("test5")
     }

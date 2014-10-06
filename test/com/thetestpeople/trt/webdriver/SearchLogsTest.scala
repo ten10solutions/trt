@@ -17,7 +17,7 @@ class SearchLogsTest extends AbstractBrowserTest {
         F.execution(logOpt = Some("bar"))))
       site.restApi.addBatch(batch)
 
-      val searchScreen = site.launch().mainMenu.clickSearchLogs()
+      val searchScreen = site.launch().mainMenu.searchLogs()
       searchScreen.query = "foo"
       searchScreen.clickSearch()
       val Seq(executionRow) = searchScreen.executionRows

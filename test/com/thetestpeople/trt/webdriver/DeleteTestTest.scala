@@ -13,11 +13,11 @@ class DeleteTestTest extends AbstractBrowserTest {
   "A deleted test" should "not be visible on the tests screen" in {
     automate { site ⇒
 
-      val batch = F.batch(executions = List(F.execution(F.test())), configurationOpt = Some(DummyData.Configuration1))
+      val batch = F.batch(executions = List(F.execution(F.test())))
       site.restApi.addBatch(batch)
 
       {
-        val testsScreen = site.launch().mainMenu.clickTests().chooseConfiguration(DummyData.Configuration1)
+        val testsScreen = site.launch().mainMenu.tests()
         testsScreen.total should equal(1)
         val Seq(testRow) = testsScreen.testRows
         val testScreen = testRow.clickTestLink()
@@ -25,7 +25,7 @@ class DeleteTestTest extends AbstractBrowserTest {
       }
 
       {
-        val testsScreen = site.launch().mainMenu.clickTests().chooseConfiguration(DummyData.Configuration1)
+        val testsScreen = site.launch().mainMenu.tests()
         testsScreen.total should equal(0)
       }
 

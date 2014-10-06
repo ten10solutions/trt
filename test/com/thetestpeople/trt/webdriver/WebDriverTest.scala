@@ -12,17 +12,17 @@ class WebDriverTest extends AbstractBrowserTest {
   "The app" should "totally work" in {
     automate { site ⇒
       val testsScreen = site.launch()
-      val batchesScreen = testsScreen.mainMenu.clickBatches()
-      val executionsScreen = batchesScreen.mainMenu.clickExecutions()
-      val systemConfigScreen = executionsScreen.mainMenu.clickConfig().clickSystem()
-      systemConfigScreen.mainMenu.clickConfig().clickJenkins()
+      val batchesScreen = testsScreen.mainMenu.batches()
+      val executionsScreen = batchesScreen.mainMenu.executions()
+      val systemConfigScreen = executionsScreen.mainMenu.config().system()
+      systemConfigScreen.mainMenu.config().jenkins()
     }
 
   }
 
   "System configuration screen" should "let you update settings" in {
     automate { site ⇒
-      val systemConfigScreen = site.launch().mainMenu.clickConfig().clickSystem()
+      val systemConfigScreen = site.launch().mainMenu.config().system()
       systemConfigScreen.failureDurationThreshold = "1 hour"
       systemConfigScreen.failureCountThreshold = "1"
       systemConfigScreen.passDurationThreshold = "2 hours"
@@ -39,7 +39,7 @@ class WebDriverTest extends AbstractBrowserTest {
 
   "Jenkins auth screen" should "persist changes" in {
     automate { site ⇒
-      val jenkinsAuthScreen = site.launch().mainMenu.clickConfig().clickJenkins().selectAuthTab()
+      val jenkinsAuthScreen = site.launch().mainMenu.config().jenkins().selectAuthTab()
       jenkinsAuthScreen.username = DummyData.Username
       jenkinsAuthScreen.apiToken = DummyData.ApiToken
       jenkinsAuthScreen.clickSubmit()

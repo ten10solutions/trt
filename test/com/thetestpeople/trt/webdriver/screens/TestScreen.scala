@@ -7,6 +7,7 @@ import org.openqa.selenium.WebElement
 import com.thetestpeople.trt.webdriver.screens.RichSelenium._
 import com.thetestpeople.trt.utils.Utils
 import com.thetestpeople.trt.model.Configuration
+import org.openqa.selenium.support.ui.Select
 
 class TestScreen(implicit automationContext: AutomationContext) extends AbstractScreen with HasMainMenu {
 
@@ -16,10 +17,10 @@ class TestScreen(implicit automationContext: AutomationContext) extends Abstract
 
   def groupOpt: Option[String] = webDriver.findImmediateDisplayedAndEnabled(id("group")).map(_.getText)
 
-  def configurationOpt: Option[Configuration] = {
-    val configurationLinkOpt = webDriver.findImmediateDisplayedAndEnabled(id("configuration"))
-    configurationLinkOpt.map(elem ⇒ Configuration(elem.getText))
-  }
+  def configurationOpt: Option[Configuration] =
+    webDriver.findImmediateDisplayedAndEnabled(id("configuration-select")).map { select ⇒
+      Configuration(new Select(select).getFirstSelectedOption.getText)
+    }
 
   def comment: String = webDriver.findImmediate(id("comment-text")).map(_.getText).getOrElse("")
 

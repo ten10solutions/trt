@@ -10,13 +10,13 @@ import org.openqa.selenium.By
 import scala.collection.JavaConverters._
 
 class ReportsMenu(implicit automationContext: AutomationContext) extends AbstractComponent {
-  
-  def clickStaleTests() = {
+
+  def staleTests() = {
     log("Click 'Stale Tests'")
     webDriver.waitForDisplayedAndEnabled(id("stale-tests-report")).click()
     new StaleTestsScreen
   }
-  
+
 }
 
 class TestsMenu(implicit automationContext: AutomationContext) extends AbstractComponent {
@@ -50,45 +50,50 @@ class MainMenu(implicit automationContext: AutomationContext) extends AbstractCo
     webDriver.waitForDisplayedAndEnabled(id(itemId)).click()
   }
 
-  def clickBatches(): BatchesScreen = {
+  def batches(): BatchesScreen = {
     clickMenuItem("menu-batches", itemName = "Batches")
     new BatchesScreen
   }
 
-  def clickReports() = {
+  def reports() = {
     clickMenuItem("menu-reports", itemName = "Reports")
     new ReportsMenu
   }
 
-  def clickTests() = {
+  def tests() = {
+    clickMenuItem("menu-tests", itemName = "Tests")
+    new TestsScreen
+  }
+
+  def testsMenu() = {
     clickMenuItem("menu-tests", itemName = "Tests")
     new TestsMenu
   }
 
-  def clickExecutions(): ExecutionsScreen = {
+  def executions(): ExecutionsScreen = {
     clickMenuItem("menu-executions", itemName = "Executions")
     new ExecutionsScreen
   }
 
-  def clickSearchLogs(): SearchLogsScreen = {
+  def searchLogs(): SearchLogsScreen = {
     clickMenuItem("menu-search-logs", itemName = "Search Logs")
     new SearchLogsScreen()
   }
-  
-  def clickConfig(): ConfigMenu = {
-    clickMenuItem("menu-config", itemName = "Config")
+
+  def config(): ConfigMenu = {
+    clickMenuItem("menu-config", itemName = "Settings")
     new ConfigMenu()
   }
 
   class ConfigMenu {
 
-    def clickSystem(): SystemConfigurationScreen = {
+    def system(): SystemConfigurationScreen = {
       log(s"Click 'System'")
       webDriver.waitForDisplayedAndEnabled(id("menu-config-system")).click()
       new SystemConfigurationScreen
     }
 
-    def clickJenkins(): JenkinsJobsScreen = {
+    def jenkins(): JenkinsJobsScreen = {
       log(s"Click 'Jenkins'")
       webDriver.waitForDisplayedAndEnabled(id("menu-config-jenkins")).click()
       new JenkinsJobsScreen

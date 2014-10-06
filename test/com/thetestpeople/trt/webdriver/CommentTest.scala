@@ -17,7 +17,7 @@ class CommentTest extends AbstractBrowserTest {
       val batch = F.batch(executions = List(F.execution(F.test())))
       site.restApi.addBatch(batch)
 
-      val testsScreen = site.launch().mainMenu.clickTests().chooseConfiguration(Configuration.Default)
+      val testsScreen = site.launch().mainMenu.tests()
       val Seq(testRow) = testsScreen.testRows
       var testScreen = testRow.clickTestLink()
 
@@ -35,7 +35,7 @@ class CommentTest extends AbstractBrowserTest {
       val batch = F.batch()
       site.restApi.addBatch(batch)
 
-      val batchesScreen = site.launch().mainMenu.clickBatches()
+      val batchesScreen = site.launch().mainMenu.batches()
       val List(batchRow) = batchesScreen.batchRows
       var batchScreen = batchRow.viewBatch()
 
@@ -53,7 +53,7 @@ class CommentTest extends AbstractBrowserTest {
       val batch = F.batch(executions = List(F.execution()))
       site.restApi.addBatch(batch)
 
-      val executionsScreen = site.launch().mainMenu.clickExecutions()
+      val executionsScreen = site.launch().mainMenu.executions()
       val List(executionRow) = executionsScreen.executionRows
       var executionScreen = executionRow.viewExecution()
 
