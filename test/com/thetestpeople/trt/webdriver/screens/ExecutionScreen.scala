@@ -28,4 +28,12 @@ class ExecutionScreen(implicit automationContext: AutomationContext) extends Abs
 
   private def getTextOpt(locator: By) = webDriver.findImmediateDisplayedAndEnabled(locator).map(_.getText)
 
+  def comment: String = webDriver.findImmediate(id("comment-text")).map(_.getText).getOrElse("")
+
+  def editComment(): CommentDialog[ExecutionScreen] = {
+    log("Click 'Edit comment'")
+    webDriver.waitForDisplayedAndEnabled(id("edit-comment-link")).click()
+    new CommentDialog[ExecutionScreen]() { def returnScreen = new ExecutionScreen }
+  }
+
 }

@@ -21,6 +21,14 @@ class TestScreen(implicit automationContext: AutomationContext) extends Abstract
     configurationLinkOpt.map(elem ⇒ Configuration(elem.getText))
   }
 
+  def comment: String = webDriver.findImmediate(id("comment-text")).map(_.getText).getOrElse("")
+
+  def editComment(): CommentDialog[TestScreen] = {
+    log("Click 'Edit comment'")
+    webDriver.waitForDisplayedAndEnabled(id("edit-comment-link")).click()
+    new CommentDialog[TestScreen]() { def returnScreen = new TestScreen }
+  }
+
   def executionRows: List[ExecutionRow] =
     for ((rowElement, index) ← webDriver.findElements_(cssSelector("tr.execution-row")).zipWithIndex)
       yield ExecutionRow(rowElement, index)

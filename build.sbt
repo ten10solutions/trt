@@ -40,6 +40,7 @@ libraryDependencies ++= List(
 
 libraryDependencies ++= List(
   "org.scalatest" %% "scalatest" % "2.2.1" % "test",
+  "org.seleniumhq.selenium" % "selenium-java" % "2.43.1" % "test",
   "com.github.detro.ghostdriver" % "phantomjsdriver" % "1.1.0" % "test")
 
 routesImport ++= List(

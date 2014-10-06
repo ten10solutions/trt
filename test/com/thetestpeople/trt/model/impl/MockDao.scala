@@ -51,9 +51,9 @@ class MockDao extends Dao {
   def getTestAndAnalysis(id: Id[Test], configuration: Configuration): Option[TestAndAnalysis] =
     for {
       test ← tests.find(_.id == id)
-      analysisOpt = analyses.find(a ⇒ a.testId == test.id && a.configuration == configuration)
+      analysis <- analyses.find(a ⇒ a.testId == test.id && a.configuration == configuration)
       commentOpt = testComments.find(_.testId == id).map(_.text)
-    } yield TestAndAnalysis(test, analysisOpt, commentOpt)
+    } yield TestAndAnalysis(test, Some(analysis), commentOpt)
 
   def getTestIds(): Seq[Id[Test]] = tests.map(_.id)
 
@@ -209,11 +209,13 @@ class MockDao extends Dao {
     analyses = analyses.filterNot(testIds contains _.testId)
     executionLogs = executionLogs.filterNot(executionIds contains _.executionId)
     executions = executions.filterNot(executionIds contains _.id)
+    executionComments = executionComments.filterNot(executionIds contains _.executionId)
     batchLogs = batchLogs.filterNot(batchIds contains _.batchId)
     batches = batches.filterNot(batchIds contains _.id)
-
+    batchComments = batchComments.filterNot(batchIds contains _.batchId)
     val (deleteTestIds, affectedTestIds) = testIds.partition(getExecutionsForTest(_).isEmpty)
     tests = tests.filterNot(deleteTestIds contains _.id)
+    testComments = testComments.filterNot(testIds contains _.testId)
     DeleteBatchResult(affectedTestIds, executionIds)
   }
 

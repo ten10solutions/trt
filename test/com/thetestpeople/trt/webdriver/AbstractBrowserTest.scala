@@ -20,12 +20,15 @@ abstract class AbstractBrowserTest extends FlatSpec with Matchers {
 
   private val port = 9001
   private val siteUrl = new URI("http://localhost:" + port)
-  private val retainBrowser = false
+  private val retainBrowser: Boolean = java.lang.Boolean.parseBoolean(System.getenv("TRT_RETAIN_BROWSER"))
 
   protected def automate(testBlock: Site ⇒ Any) =
     Helpers.running(TestServer(port, FakeApplicationFactory.fakeApplication)) {
-      val webDriver: WebDriver = new PhantomJSDriver
-      //            val webDriver: WebDriver = new FirefoxDriver
+      val webDriver: WebDriver =
+        if ("firefox".equalsIgnoreCase(System.getenv("TRT_BROWSER")))
+          new FirefoxDriver
+        else
+          new PhantomJSDriver
       try {
         val automationContext = AutomationContext(webDriver)
         val site = new Site(automationContext, siteUrl)

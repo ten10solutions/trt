@@ -31,17 +31,17 @@ class BatchScreen(implicit automationContext: AutomationContext) extends Abstrac
     webDriver.waitForDisplayedAndEnabled(id("delete-batch-button")).click()
     new ConfirmDeleteDialog
   }
-  
+
   class ConfirmDeleteDialog(implicit automationContext: AutomationContext) extends AbstractComponent {
-    
+
     def clickOK(): BatchesScreen = {
       log("Click 'OK'")
       webDriver.waitForDisplayedAndEnabled(By.cssSelector("div.bootbox-confirm button.btn-primary")).click()
       new BatchesScreen
     }
-    
+
   }
-  
+
   def executionRows: List[ExecutionRow] =
     for ((rowElement, index) ← webDriver.findElements_(cssSelector("tr.execution-row")).zipWithIndex)
       yield ExecutionRow(rowElement, index)
@@ -81,4 +81,12 @@ class BatchScreen(implicit automationContext: AutomationContext) extends Abstrac
 
   }
 
+  def comment: String = webDriver.findImmediate(id("comment-text")).map(_.getText).getOrElse("")
+
+  def editComment(): CommentDialog[BatchScreen] = {
+    log("Click 'Edit comment'")
+    webDriver.waitForDisplayedAndEnabled(id("edit-comment-link")).click()
+    new CommentDialog[BatchScreen]() { def returnScreen = new BatchScreen }
+  }
+  
 }   

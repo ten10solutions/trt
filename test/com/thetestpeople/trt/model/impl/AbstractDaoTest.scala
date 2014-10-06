@@ -617,17 +617,32 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
   "Tests" should "be able to have comments attached" in transaction { dao ⇒
     val testId = dao.ensureTestIsRecorded(F.test())
     dao.upsertAnalysis(F.analysis(testId, configuration = Configuration.Default))
+    def getComment() = dao.getTestAndAnalysis(testId, Configuration.Default).get.commentOpt
 
-    {
-      val Some(test) = dao.getTestAndAnalysis(testId, Configuration.Default)
-      test.commentOpt should equal(None)
-    }
+    getComment() should equal(None)
 
     dao.setTestComment(testId, DummyData.Comment)
 
-    {
-      val Some(test) = dao.getTestAndAnalysis(testId, Configuration.Default)
-      test.commentOpt should equal(Some(DummyData.Comment))
-    }
+    getComment() should equal(Some(DummyData.Comment))
+
+    dao.deleteTestComment(testId)
+
+    getComment() should equal(None)
   }
+
+  "Batches" should "be able to have comments attached" in transaction { dao ⇒
+    val batchId = dao.newBatch(F.batch())
+    def getComment() = dao.getBatch(batchId).get.commentOpt
+
+    getComment() should equal(None)
+
+    dao.setBatchComment(batchId, DummyData.Comment)
+
+    getComment() should equal(Some(DummyData.Comment))
+
+    dao.deleteBatchComment(batchId)
+
+    getComment() should equal(None)
+  }
+
 }

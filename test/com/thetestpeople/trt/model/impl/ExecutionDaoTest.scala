@@ -276,4 +276,21 @@ trait ExecutionDaoTest { self: AbstractDaoTest ⇒
     executions.map(_.id) should contain theSameElementsAs (Seq(executionId1, executionId2))
   }
 
+  "Executions" should "be able to have comments attached" in transaction { dao ⇒
+    val testId = dao.ensureTestIsRecorded(F.test())
+    val batchId = dao.newBatch(F.batch())
+    val executionId = dao.newExecution(F.execution(batchId, testId))
+    def getComment() = dao.getEnrichedExecution(executionId).get.commentOpt
+
+    getComment() should equal(None)
+
+    dao.setExecutionComment(executionId, DummyData.Comment)
+
+    getComment() should equal(Some(DummyData.Comment))
+
+    dao.deleteExecutionComment(executionId)
+
+    getComment() should equal(None)
+  }
+
 }

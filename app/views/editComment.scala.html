@@ -10,11 +10,11 @@
       </div>
       <div class="modal-body">
         <form id="comment-form" role="form" method="POST" action="@action">
-          <textarea name="text" class="form-control" rows="6">@for(comment <- commentOpt){@comment}</textarea>
+          <textarea id="comment-text" name="text" class="form-control" rows="6">@for(comment <- commentOpt){@comment}</textarea>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button id="cancel-button" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
         <button id="save-comment-button" type="button" class="btn btn-primary" onclick="$('#comment-form').submit()" >Save</button>
       </div>
     </div>
