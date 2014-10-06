@@ -38,16 +38,14 @@
     @for(configuration <- configurationOpt) {
       <tr>
         <td>Configuration</td>
-        <td><a id="configuration" href="@routes.Application.tests(configuration = Some(configuration))">@configuration</a></td>
-      </tr>
-    }
-    @if(otherConfigurations.nonEmpty) {
-      <tr>
-        <td>In other configurations</td>
         <td>
-          @for(otherConfiguration <- otherConfigurations) {
-            <a class="other-configuration-link" href="@routes.Application.test(id = test.id, configuration = Some(otherConfiguration))">@otherConfiguration</a>
-          }
+   <form id="configuration-form" role="form" method="get" action="@routes.Application.test(id = test.id, configuration = Some(configuration))">
+       <select name="configuration" id="configuration-select" class="form-control">
+         @for(configuration <- (configuration +: otherConfigurations).sorted) {
+           <option value="@configuration" @if(Some(configuration) == configurationOpt){selected}>@configuration</option>
+         }
+       </select>
+   </form>
         </td>
       </tr>
     }

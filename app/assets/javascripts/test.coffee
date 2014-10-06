@@ -68,3 +68,6 @@ window.createDurationChart = (executionUrls, fails, passes) ->
   $("#duration-chart").bind "plothover", onChartHover
 
   initialiseTooltip()
+
+  $("#configuration-select").change ->
+    $("#configuration-form").submit()

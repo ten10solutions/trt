@@ -114,6 +114,12 @@ $(document).ready ->
     $("#job-select").removeAttr "name" if $("#job-select").val() is ""
     $("#configuration-select").removeAttr "name" if $("#configuration-select").val() is ""
 
+  $("#job-select").change ->
+    $("#filter-form").submit()
+
+  $("#configuration-select").change ->
+    $("#filter-form").submit()
+
   setButtonEnableState()
   $(".batchCheckbox").click ->
     setButtonEnableState()

@@ -34,6 +34,9 @@ $(document).ready ->
   $("form#filter-form").submit (e) ->
     $("#configuration-select").removeAttr "name" if $("#configuration-select").val() is ""
 
+  $("#configuration-select").change ->
+    $("#filter-form").submit()
+
 window.createExecutionVolumeChart = (data) ->  
   series = [
     label: "Execution counts"
