@@ -30,7 +30,7 @@ class StaleTestCalculatorTest extends FlatSpec with Matchers {
     val batch = F.batch()
     val execution = F.execution(batch.id, test.id)
     val analysis: Analysis = F.analysis(test.id, lastPassedExecutionIdOpt = Some(execution.id), lastPassedTimeOpt = Some(executionTime))
-    TestAndAnalysis(test, Some(analysis))
+    TestAndAnalysis(test, Some(analysis), None)
   }
 
 }

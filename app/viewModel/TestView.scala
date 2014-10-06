@@ -13,7 +13,7 @@ class TestView(testInfo: TestAndAnalysis) extends HasTestName {
   def id = test.id
 
   def deleted = testInfo.test.deleted
-  
+
   def ballIconOpt: Option[String] = testInfo.analysisOpt.map(_.status).map(BallIcons.icon)
 
   def weatherIconOpt: Option[String] = testInfo.analysisOpt.map(_.weather).map(WeatherIcons.weatherIcon)
@@ -51,5 +51,7 @@ class TestView(testInfo: TestAndAnalysis) extends HasTestName {
       analysis ← testInfo.analysisOpt
       failingSince ← analysis.failingSinceOpt
     } yield TimeDescription(failingSince)
+
+  def commentOpt: Option[String] = testInfo.commentOpt
 
 }

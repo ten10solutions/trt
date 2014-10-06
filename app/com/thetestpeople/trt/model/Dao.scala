@@ -10,6 +10,9 @@ trait Dao extends ExecutionDao with JenkinsDao {
    */
   def transaction[T](block: ⇒ T): T
 
+  /**
+   * @return test and analysis for this configuration. Returns None if there are no analysed results for the given test and configuration.
+   */
   def getTestAndAnalysis(id: Id[Test], configuration: Configuration = Configuration.Default): Option[TestAndAnalysis]
 
   /**
@@ -121,6 +124,10 @@ trait Dao extends ExecutionDao with JenkinsDao {
   def setBatchComment(id: Id[Batch], text: String)
 
   def deleteBatchComment(id: Id[Batch])
+
+  def setTestComment(id: Id[Test], text: String)
+
+  def deleteTestComment(id: Id[Test])
 
 }
 

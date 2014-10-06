@@ -129,11 +129,11 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   def getTestAndAnalysis(id: Id[Test], configuration: Configuration): Option[TestAndAnalysis] = {
     val query =
       for {
-        (test, analysis) ← testsAndAnalyses
+        ((test, analysis), comment) ← testsAndAnalyses leftJoin testComments on (_._1.id === _.testId)
         if test.id === id
         if analysis.configuration === configuration
-      } yield (test, analysis.?)
-    query.firstOption.map(TestAndAnalysis.tupled)
+      } yield (test, analysis.?, comment.?)
+    query.firstOption.map { case (test, analysisOpt, commentOpt) ⇒ TestAndAnalysis(test, analysisOpt, commentOpt.map(_.text)) }
   }
 
   def getTestIds(): Seq[Id[Test]] =
@@ -170,7 +170,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     query = query.drop(startingFrom)
     for (limit ← limitOpt)
       query = query.take(limit)
-    query.map { case (test, analysis) ⇒ (test, analysis.?) }.run.map(TestAndAnalysis.tupled)
+    query.map { case (test, analysis) ⇒ (test, analysis.?) }.run.map { case (test, analysisOpt) ⇒ TestAndAnalysis(test, analysisOpt, commentOpt = None) }
   }
 
   def getTestsById(testIds: Seq[Id[Test]]): Seq[Test] = tests.filter(_.id inSet testIds).run
@@ -242,7 +242,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       case Some(group) ⇒ getTestWithGroupCompiled(name, group)
       case None        ⇒ getTestWithoutGroupCompiled(name)
     }
-    query.firstOption.map(TestAndAnalysis.tupled)
+    query.firstOption.map { case (test, analysisOpt) ⇒ TestAndAnalysis(test, analysisOpt, commentOpt = None) }
   }
 
   def getBatch(id: Id[Batch]): Option[BatchAndLog] = {
@@ -389,6 +389,14 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       batchComments.insert(BatchComment(id, text))
 
   def deleteBatchComment(id: Id[Batch]) = batchComments.filter(_.batchId === id).delete
+
+  def setTestComment(id: Id[Test], text: String) =
+    if (testComments.filter(_.testId === id).firstOption.isDefined)
+      testComments.filter(_.testId === id).map(_.text).update(text)
+    else
+      testComments.insert(TestComment(id, text))
+
+  def deleteTestComment(id: Id[Test]) = testComments.filter(_.testId === id).delete
 
 }
 

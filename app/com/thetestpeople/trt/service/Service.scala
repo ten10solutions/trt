@@ -85,4 +85,9 @@ trait Service extends JenkinsService {
    * @return true iff a batch with the given id was present in the DB
    */
   def setBatchComment(id: Id[Batch], text: String): Boolean
+
+  /**
+   * @return true iff a batch with the given id was present in the DB
+   */
+  def setTestComment(id: Id[Test], text: String): Boolean
 }

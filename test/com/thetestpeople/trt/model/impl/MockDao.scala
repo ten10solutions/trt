@@ -25,6 +25,7 @@ class MockDao extends Dao {
 
   private var executions: Seq[Execution] = List()
   private var tests: Seq[Test] = List()
+  private var testComments: Seq[TestComment] = List()
   private var batches: Seq[Batch] = List()
   private var analyses: Seq[Analysis] = List()
   private var executionLogs: Seq[ExecutionLogRow] = List()
@@ -51,7 +52,8 @@ class MockDao extends Dao {
     for {
       test ← tests.find(_.id == id)
       analysisOpt = analyses.find(a ⇒ a.testId == test.id && a.configuration == configuration)
-    } yield TestAndAnalysis(test, analysisOpt)
+      commentOpt = testComments.find(_.testId == id).map(_.text)
+    } yield TestAndAnalysis(test, analysisOpt, commentOpt)
 
   def getTestIds(): Seq[Id[Test]] = tests.map(_.id)
 
@@ -69,7 +71,8 @@ class MockDao extends Dao {
         if nameOpt.forall(pattern ⇒ matchesPattern(pattern, test.name))
         analysisOpt = analyses.find(a ⇒ a.testId == test.id && a.configuration == configuration)
         if testStatusOpt.forall(status ⇒ analysisOpt.exists(_.status == status))
-      } yield TestAndAnalysis(test, analysisOpt)
+        commentOpt = testComments.find(_.testId == test.id).map(_.text)
+      } yield TestAndAnalysis(test, analysisOpt, commentOpt)
     val sortedResults = allResults.sortBy(_.test.name).sortBy(_.test.groupOpt)
     limitOpt match {
       case Some(limit) ⇒ sortedResults.drop(startingFrom).take(limit)
@@ -355,5 +358,10 @@ class MockDao extends Dao {
     batchComments = BatchComment(id, text) +: batchComments.filterNot(_.batchId == id)
 
   def deleteBatchComment(id: Id[Batch]) = batchComments = batchComments.filterNot(_.batchId == id)
+
+  def setTestComment(id: Id[Test], text: String) =
+    testComments = TestComment(id, text) +: testComments.filterNot(_.testId == id)
+
+  def deleteTestComment(id: Id[Test]) = testComments = testComments.filterNot(_.testId == id)
 
 }

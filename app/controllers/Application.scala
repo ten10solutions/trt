@@ -340,7 +340,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
             Ok(views.html.staleTests(madViewOpt, testViews, configuration, paginationData))
         }
     }
-
   }
 
   def setExecutionComment(executionId: Id[Execution]) = Action { implicit request ⇒
@@ -360,8 +359,8 @@ class Application(service: Service, adminService: AdminService) extends Controll
   private def getText(request: Request[AnyContent]): Option[String] =
     for {
       requestMap ← request.body.asFormUrlEncoded
-      texts ← requestMap.get("text")
-      text ← texts.headOption
+      values ← requestMap.get("text")
+      text ← values.headOption
     } yield text
 
   def setBatchComment(batchId: Id[Batch]) = Action { implicit request ⇒
@@ -373,6 +372,20 @@ class Application(service: Service, adminService: AdminService) extends Controll
           Redirect(routes.Application.batch(batchId)).flashing("success" -> "Comment updated.")
         else
           NotFound(s"Could not find batch with id '$batchId'")
+      case None ⇒
+        BadRequest("No 'text' parameter provided'")
+    }
+  }
+
+  def setTestComment(testId: Id[Test], configurationOpt: Option[Configuration]) = Action { implicit request ⇒
+    logger.debug(s"setTestComment($testId)")
+    getText(request) match {
+      case Some(text) ⇒
+        val result = service.setTestComment(testId, text)
+        if (result)
+          Redirect(routes.Application.test(testId, configurationOpt)).flashing("success" -> "Comment updated.")
+        else
+          NotFound(s"Could not find test with id '$testId'")
       case None ⇒
         BadRequest("No 'text' parameter provided'")
     }

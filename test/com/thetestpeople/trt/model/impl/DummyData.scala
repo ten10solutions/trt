@@ -52,4 +52,6 @@ object DummyData {
   
   val Configuration1 = Configuration("Configuration1")
   val Configuration2 = Configuration("Configuration2")
+  
+  val Comment = "Comment"
 }

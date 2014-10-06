@@ -171,7 +171,7 @@ class ServiceImpl(
     new StaleTestCalculator().findStaleTests(analysedTests)
   }
 
-  def setExecutionComment(id: Id[Execution], text: String): Boolean = 
+  def setExecutionComment(id: Id[Execution], text: String): Boolean =
     if (transaction(dao.getEnrichedExecution(id)).isEmpty)
       false
     else {
@@ -183,7 +183,7 @@ class ServiceImpl(
       true
     }
 
-  def setBatchComment(id: Id[Batch], text: String): Boolean = 
+  def setBatchComment(id: Id[Batch], text: String): Boolean =
     if (transaction(dao.getBatch(id)).isEmpty)
       false
     else {
@@ -191,6 +191,18 @@ class ServiceImpl(
       text.trim match {
         case "" ⇒ transaction { dao.deleteBatchComment(id) }
         case s  ⇒ transaction { dao.setBatchComment(id, text) }
+      }
+      true
+    }
+
+  def setTestComment(id: Id[Test], text: String): Boolean =
+    if (transaction(dao.getTestsById(Seq(id))).isEmpty)
+      false
+    else {
+      logger.info(s"Updating comment for test $id")
+      text.trim match {
+        case "" ⇒ transaction { dao.deleteTestComment(id) }
+        case s  ⇒ transaction { dao.setTestComment(id, text) }
       }
       true
     }

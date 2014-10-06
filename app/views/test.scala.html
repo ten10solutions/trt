@@ -91,6 +91,10 @@
       <td>Number of executions recorded</td>
       <td>@pagination.totalItems</td>
     </tr>
+    <tr>
+      <td>Comment</td>
+      <td>@for(comment <- test.commentOpt) { <span style="white-space: pre-wrap">@comment</span> } <a id="edit-comment-link" data-toggle="modal" data-target="#comment-dialog"><i class="glyphicon glyphicon-pencil"></i> edit</a></td>
+    </tr>
   </table>
   @if(canRerun) {
     <form action="@routes.JenkinsController.rerunTest(test.id)" role="form" method="post">
@@ -171,4 +175,7 @@
   </table>
   
   @executionsPaginationWidget
+
+  @editComment(test.commentOpt, routes.Application.setTestComment(test.id, configurationOpt))
+
 }
