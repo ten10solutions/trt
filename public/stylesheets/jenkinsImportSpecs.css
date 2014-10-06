@@ -43,22 +43,17 @@ td.configuration-cell {
   width: 100px;
 }
 
-th.sync-col {
-  text-align: center;
-  width: 100px;
-}
-
 td.sync-cell {
   text-align: center;
   width: 100px;
 }
 
-th.delete-col {
+td.delete-cell {
   text-align: center;
   width: 100px;
 }
 
-td.delete-cell {
+td.configure-cell {
   text-align: center;
   width: 100px;
 }

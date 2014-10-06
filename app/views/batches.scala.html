@@ -12,7 +12,7 @@
 
 @batchesPaginationWidget = { 
   @paginationWidget(pagination)((page, pageSize) => 
-    routes.Application.batches(job = jobIdOpt, page = Some(page), pageSize = Some(pageSize))) 
+    routes.Application.batches(job = jobIdOpt, configuration = configurationOpt, page = Some(page), pageSize = Some(pageSize))) 
 }
 
 @main("Batches", "Batches", scripts = scripts, css = css) {
