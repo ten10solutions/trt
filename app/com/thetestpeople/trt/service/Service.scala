@@ -12,7 +12,7 @@ import com.thetestpeople.trt.analysis.ExecutionTimeMAD
 
 case class TestAndExecutions(test: TestAndAnalysis, executions: List[EnrichedExecution], otherConfigurations: Seq[Configuration])
 
-case class BatchAndExecutions(batch: Batch, executions: List[EnrichedExecution], logOpt: Option[String], importSpecIdOpt: Option[Id[JenkinsImportSpec]])
+case class BatchAndExecutions(batch: Batch, executions: List[EnrichedExecution], logOpt: Option[String], importSpecIdOpt: Option[Id[JenkinsImportSpec]], commentOpt: Option[String])
 
 case class ExecutionsAndTotalCount(executions: List[EnrichedExecution], total: Int)
 
@@ -67,18 +67,22 @@ trait Service extends JenkinsService {
   def hasExecutions(): Boolean
 
   def getTestNames(pattern: String): Seq[String]
-  
+
   def getGroups(pattern: String): Seq[String]
-  
+
   def searchLogs(query: String, startingFrom: Int = 0, limit: Int = Integer.MAX_VALUE): (Seq[ExecutionAndFragment], Int)
-  
+
   def getExecutionVolume(configurationOpt: Option[Configuration]): Option[ExecutionVolume]
-  
-  def staleTests(configuration: Configuration): (Option[ExecutionTimeMAD], Seq[TestAndAnalysis]) 
- 
+
+  def staleTests(configuration: Configuration): (Option[ExecutionTimeMAD], Seq[TestAndAnalysis])
+
   /**
    * @return true iff an execution with the given id was present in the DB
    */
   def setExecutionComment(id: Id[Execution], text: String): Boolean
-  
+
+  /**
+   * @return true iff a batch with the given id was present in the DB
+   */
+  def setBatchComment(id: Id[Batch], text: String): Boolean
 }

@@ -82,9 +82,9 @@ class ServiceImpl(
   def getBatchAndExecutions(id: Id[Batch], passedFilterOpt: Option[Boolean] = None): Option[BatchAndExecutions] =
     transaction {
       dao.getBatch(id).map {
-        case BatchAndLog(batch, logOpt, importSpecIdOpt) ⇒
+        case BatchAndLog(batch, logOpt, importSpecIdOpt, commentOpt) ⇒
           val executions = dao.getEnrichedExecutionsInBatch(id, passedFilterOpt)
-          BatchAndExecutions(batch, executions.toList, logOpt, importSpecIdOpt)
+          BatchAndExecutions(batch, executions.toList, logOpt, importSpecIdOpt, commentOpt)
       }
     }
 
@@ -171,7 +171,7 @@ class ServiceImpl(
     new StaleTestCalculator().findStaleTests(analysedTests)
   }
 
-  def setExecutionComment(id: Id[Execution], text: String): Boolean = {
+  def setExecutionComment(id: Id[Execution], text: String): Boolean = 
     if (transaction(dao.getEnrichedExecution(id)).isEmpty)
       false
     else {
@@ -182,6 +182,17 @@ class ServiceImpl(
       }
       true
     }
-  }
+
+  def setBatchComment(id: Id[Batch], text: String): Boolean = 
+    if (transaction(dao.getBatch(id)).isEmpty)
+      false
+    else {
+      logger.info(s"Updating comment for batch $id")
+      text.trim match {
+        case "" ⇒ transaction { dao.deleteBatchComment(id) }
+        case s  ⇒ transaction { dao.setBatchComment(id, text) }
+      }
+      true
+    }
 
 }

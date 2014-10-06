@@ -118,6 +118,10 @@ trait Dao extends ExecutionDao with JenkinsDao {
    */
   def getConfigurations(testId: Id[Test]): Seq[Configuration]
 
+  def setBatchComment(id: Id[Batch], text: String)
+
+  def deleteBatchComment(id: Id[Batch])
+
 }
 
 case class DeleteBatchResult(remainingTestIds: Seq[Id[Test]], deletedExecutionIds: Seq[Id[Execution]])

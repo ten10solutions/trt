@@ -50,6 +50,10 @@
             <td><a href="@routes.Application.batchLog(batch.id)" id="batch-log-link">View</a></td>
           </tr>
         }
+        <tr>
+          <td>Comment</td>
+          <td>@for(comment <- batch.commentOpt) { <span style="white-space: pre-wrap">@comment</span> } <a id="edit-comment-link" data-toggle="modal" data-target="#comment-dialog"><i class="glyphicon glyphicon-pencil"></i> edit</a></td>
+        </tr>
 
       </table>
       @if(canRerun) {
@@ -132,5 +136,7 @@
   </form>
   
   @executionsPaginationWidget
+
+  @editComment(batch.commentOpt, routes.Application.setBatchComment(batch.id))
   
 }

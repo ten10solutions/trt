@@ -30,6 +30,7 @@ class MockDao extends Dao {
   private var executionLogs: Seq[ExecutionLogRow] = List()
   private var executionComments: Seq[ExecutionComment] = List()
   private var batchLogs: Seq[BatchLogRow] = List()
+  private var batchComments: Seq[BatchComment] = List()
   private var jenkinsJobs: Seq[JenkinsJob] = List()
   private var jenkinsBuilds: Seq[JenkinsBuild] = List()
   private var jenkinsImportSpecs: Seq[JenkinsImportSpec] = List()
@@ -96,7 +97,8 @@ class MockDao extends Dao {
   def getBatch(id: Id[Batch]): Option[BatchAndLog] = batches.find(_.id == id).map { batch ⇒
     val logOpt = batchLogs.find(_.batchId == id).map(_.log)
     val importSpecIdOpt = jenkinsBuilds.find(_.batchId == id).flatMap(_.importSpecIdOpt)
-    BatchAndLog(batch, logOpt, importSpecIdOpt)
+    val commentOpt = batchComments.find(_.batchId == id).map(_.text)
+    BatchAndLog(batch, logOpt, importSpecIdOpt, commentOpt)
   }
 
   def getBatches(jobIdOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch] = {
@@ -348,5 +350,10 @@ class MockDao extends Dao {
     executionComments = ExecutionComment(id, text) +: executionComments.filterNot(_.executionId == id)
 
   def deleteExecutionComment(id: Id[Execution]) = executionComments = executionComments.filterNot(_.executionId == id)
+
+  def setBatchComment(id: Id[Batch], text: String) =
+    batchComments = BatchComment(id, text) +: batchComments.filterNot(_.batchId == id)
+
+  def deleteBatchComment(id: Id[Batch]) = batchComments = batchComments.filterNot(_.batchId == id)
 
 }

@@ -108,8 +108,8 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   private def handleBatch(batchId: Id[Batch], passedFilterOpt: Option[Boolean], pagination: Pagination)(implicit request: Request[_]) =
     service.getBatchAndExecutions(batchId, passedFilterOpt) map {
-      case BatchAndExecutions(batch, executions, logOpt, importSpecIdOpt) ⇒
-        val batchView = new BatchView(batch, executions, logOpt, importSpecIdOpt)
+      case BatchAndExecutions(batch, executions, logOpt, importSpecIdOpt, commentOpt) ⇒
+        val batchView = new BatchView(batch, executions, logOpt, importSpecIdOpt, commentOpt)
         val paginationData = pagination.paginationData(executions.size)
         val canRerun = service.canRerun
         views.html.batch(batchView, passedFilterOpt, canRerun, paginationData)
@@ -120,10 +120,10 @@ class Application(service: Service, adminService: AdminService) extends Controll
     service.getBatchAndExecutions(batchId, None) match {
       case None ⇒
         NotFound(s"Could not find batch with id '$batchId'")
-      case Some(BatchAndExecutions(batch, executions, logOpt, _)) ⇒
+      case Some(BatchAndExecutions(batch, executions, logOpt, importSpecIdOpt, commentOpt)) ⇒
         logOpt match {
           case Some(log) ⇒
-            val batchView = new BatchView(batch, List(), logOpt)
+            val batchView = new BatchView(batch, List(), logOpt, importSpecIdOpt, commentOpt)
             Ok(views.html.batchLog(batchView, log))
           case None ⇒
             NotFound(s"Batch $batchId does not have an associated log recorded")
@@ -345,19 +345,34 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   def setExecutionComment(executionId: Id[Execution]) = Action { implicit request ⇒
     logger.debug(s"setExecutionComment($executionId)")
-    val textOpt =
-      for {
-        requestMap ← request.body.asFormUrlEncoded
-        texts ← requestMap.get("text")
-        text ← texts.headOption
-      } yield text
-    textOpt match {
+    getText(request) match {
       case Some(text) ⇒
         val result = service.setExecutionComment(executionId, text)
         if (result)
           Redirect(routes.Application.execution(executionId)).flashing("success" -> "Comment updated.")
         else
           NotFound(s"Could not find test execution with id '$executionId'")
+      case None ⇒
+        BadRequest("No 'text' parameter provided'")
+    }
+  }
+
+  private def getText(request: Request[AnyContent]): Option[String] =
+    for {
+      requestMap ← request.body.asFormUrlEncoded
+      texts ← requestMap.get("text")
+      text ← texts.headOption
+    } yield text
+
+  def setBatchComment(batchId: Id[Batch]) = Action { implicit request ⇒
+    logger.debug(s"setBatchComment($batchId)")
+    getText(request) match {
+      case Some(text) ⇒
+        val result = service.setBatchComment(batchId, text)
+        if (result)
+          Redirect(routes.Application.batch(batchId)).flashing("success" -> "Comment updated.")
+        else
+          NotFound(s"Could not find batch with id '$batchId'")
       case None ⇒
         BadRequest("No 'text' parameter provided'")
     }

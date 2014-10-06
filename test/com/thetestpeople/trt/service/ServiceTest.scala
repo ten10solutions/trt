@@ -54,7 +54,7 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
     val inBatch = F.batch(executions = List(inExecution), logOpt = Some(DummyData.Log))
     val batchId = service.addBatch(inBatch)
 
-    val Some(BatchAndExecutions(batch, List(execution), Some(log), None)) = service.getBatchAndExecutions(batchId)
+    val Some(BatchAndExecutions(batch, List(execution), Some(log), None, None)) = service.getBatchAndExecutions(batchId)
 
     log should equal(DummyData.Log)
     execution.qualifiedName should equal(inTest.qualifiedName)

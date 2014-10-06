@@ -248,10 +248,10 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   def getBatch(id: Id[Batch]): Option[BatchAndLog] = {
     val query =
       for {
-        ((batch, log), jenkinsBuild) ← batches leftJoin batchLogs on (_.id === _.batchId) leftJoin jenkinsBuilds on (_._1.id === _.batchId)
+        (((batch, log), jenkinsBuild), comment) ← batches leftJoin batchLogs on (_.id === _.batchId) leftJoin jenkinsBuilds on (_._1.id === _.batchId) leftJoin batchComments on (_._1._1.id === _.batchId)
         if batch.id === id
-      } yield (batch, log.?, jenkinsBuild.?)
-    query.firstOption.map { case (batch, logRowOpt, jenkinsBuildOpt) ⇒ BatchAndLog(batch, logRowOpt.map(_.log), jenkinsBuildOpt.flatMap(_.importSpecIdOpt)) }
+      } yield (batch, log.?, jenkinsBuild.?, comment.?)
+    query.firstOption.map { case (batch, logRowOpt, jenkinsBuildOpt, commentOpt) ⇒ BatchAndLog(batch, logRowOpt.map(_.log), jenkinsBuildOpt.flatMap(_.importSpecIdOpt), commentOpt = commentOpt.map(_.text)) }
   }
 
   def getBatches(jobOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch] = {
@@ -381,6 +381,14 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
 
   def getConfigurations(testId: Id[Test]): Seq[Configuration] =
     executions.filter(_.testId === testId).groupBy(_.configuration).map(_._1).sorted.run
+
+  def setBatchComment(id: Id[Batch], text: String) =
+    if (batchComments.filter(_.batchId === id).firstOption.isDefined)
+      batchComments.filter(_.batchId === id).map(_.text).update(text)
+    else
+      batchComments.insert(BatchComment(id, text))
+
+  def deleteBatchComment(id: Id[Batch]) = batchComments.filter(_.batchId === id).delete
 
 }
 
