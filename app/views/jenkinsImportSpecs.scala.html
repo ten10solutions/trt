@@ -24,18 +24,20 @@
   <table style="margin-top: 20px" class="table table-striped table-bordered table-hover table-condensed">
     <thead>
       <tr>
-        <th>Jenkins job URL</th>
+        <th>Job</th>
+        <th class="view-log-col">View&nbsp;log</th>
         <th class="last-checked-col">Last checked</th>
         <th class="polling-interval-col">Polling interval</th>
         <th class="import-console-col">Import console log?</th>
         <th class="configuration-col">Configuration</th>
-        <th colspan=4></th>
+        <th colspan=3></th>
       </tr>
     </thead>
     <tbody>
       @for(spec <- specs) {
         <tr>
-          <td><a href="@spec.jobUrl">@spec.jobUrl <i class="fa fa-external-link"></i></a></td>
+          <td class=""><a href="@spec.jobUrl">@spec.jobName <i class="fa fa-external-link"></i></a></td>
+          <td class="view-log-cell"><a href="@routes.JenkinsController.getJenkinsImportSpec(spec.id)">Log</a></td>
           <td class="last-checked-cell">
           @if(spec.inProgress) {
             <div class="progress">
@@ -49,7 +51,6 @@
           <td class="import-console-cell">@if(spec.importConsoleLog) { <i class="glyphicon glyphicon-ok"></i> }</td>
           <td class="configuration-cell">@spec.configuration</td>
           <td class="configure-cell"><a href="@routes.JenkinsController.editJenkinsImportSpec(spec.id)">Configure</a></td>
-          <td class="import-status-cell"><a href="@routes.JenkinsController.getJenkinsImportSpec(spec.id)">Imported builds</a></td>
           <td class="sync-cell">
             <form action="@routes.JenkinsController.syncJenkins(spec.id)" method="post">
               <button class="btn btn-default" title="Check for new builds now"><i class="glyphicon glyphicon-refresh"></i> Sync</button>

@@ -53,7 +53,7 @@
         
         <div class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li class="@if(currentPage == "Configurations") {active}"><a id="menu-configurations" href="@routes.Application.configurations()">Configurations</a></li>
+            <li class="@if(currentPage == "Dashboard") {active}"><a id="menu-configurations" href="@routes.Application.configurations()"><span class="fa fa-dashboard"></span> Dashboard</a></li>
             @if(globalViewContext.configurations.nonEmpty) {
             <li class="dropdown @if(currentPage == "Tests") {active}">
               <a id="menu-tests" href="#" class="dropdown-toggle" data-toggle="dropdown">Tests <b class="caret"></b></a>

@@ -1,3 +1,10 @@
+th.view-log-col {
+  text-align: center;
+}
+
+td.view-log-cell {
+  text-align: center;
+}
 
 th.last-checked-col {
   text-align: center;
@@ -26,12 +33,12 @@ td.import-console-cell {
   text-align: center;
 }
 
-th.configure-col {
+th.configuration-col {
   text-align: center;
   width: 100px;
 }
 
-td.configure-cell {
+td.configuration-cell {
   text-align: center;
   width: 100px;
 }

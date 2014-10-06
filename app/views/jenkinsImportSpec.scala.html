@@ -15,7 +15,7 @@
   <li class="active">@name</li>
 </ol>
 
-<h2>Imported Builds</h2>  
+<h2>Jenkins Import Log</h2>  
 
 <table style="margin-top: 15px" class="table table-striped table-bordered table-hover">
   <tr>
@@ -31,28 +31,22 @@
     <td>
       @jobImportInfo.importState.description
       @if(jobImportInfo.importState == ImportState.NotStarted) {
-       @* 
-        <div class="progress">
-          <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
-          </div>
-        </div>
-       *@
       }
       @if(jobImportInfo.importState == ImportState.InProgress) {
         <div class="progress">
-          <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: @{progress}%">
+          <div class="progress-bar progress-bar-striped active" role="progressbar" style="width: @{progress}%">
           </div>
         </div>
       }
       @if(jobImportInfo.importState == ImportState.Complete) {
         <div class="progress">
-          <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+          <div class="progress-bar progress-bar-success" role="progressbar" style="width: 100%">
           </div>
         </div>
       }
       @if(jobImportInfo.importState == ImportState.Errored) {
         <div class="progress">
-          <div class="progress-bar progress-bar-danger" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+          <div class="progress-bar progress-bar-danger" role="progressbar" style="width: 100%">
           </div>
         </div>
       }
@@ -109,20 +103,20 @@
       @if(build.importState == ImportState.NotStarted) {
         @*
         <div class="progress">
-          <div class="progress-bar progress-bar-striped" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+          <div class="progress-bar progress-bar-striped" role="progressbar" style="width: 0%">
           </div>
         </div>
         *@
       }
       @if(build.importState == ImportState.InProgress) {
         <div class="progress">
-          <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100" style="width: 50%">
+          <div class="progress-bar progress-bar-striped active" role="progressbar" style="width: 50%">
           </div>
         </div>
       }
       @if(build.importState == ImportState.Complete) {
         <div class="progress">
-          <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+          <div class="progress-bar progress-bar-success" role="progressbar" style="width: 100%">
           </div>
         </div>
       }
