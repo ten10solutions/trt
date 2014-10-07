@@ -40,7 +40,7 @@ class AnalysisService(dao: Dao, clock: Clock, async: Boolean = true) extends Has
 
   private def handleOneQueueItem() {
     val testId = testQueue.take()
-    logger.debug("Remaining # of tests to analyse: " + testQueue.size)
+    // logger.debug("Remaining # of tests to analyse: " + testQueue.size)
     try
       analyseTest(testId)
     catch {
@@ -49,7 +49,7 @@ class AnalysisService(dao: Dao, clock: Clock, async: Boolean = true) extends Has
     }
   }
 
-  def scheduleAnalysis(testIds: List[Id[Test]]) =
+  def scheduleAnalysis(testIds: Seq[Id[Test]]) =
     if (async)
       testIds.foreach(testQueue.offer)
     else
@@ -76,7 +76,8 @@ class AnalysisService(dao: Dao, clock: Clock, async: Boolean = true) extends Has
       lastPassedTimeOpt = analysis.lastPassedExecutionOpt.map(_.executionTime),
       lastFailedExecutionIdOpt = analysis.lastFailedExecutionOpt.map(_.id),
       lastFailedTimeOpt = analysis.lastFailedExecutionOpt.map(_.executionTime),
-      whenAnalysed = analysis.whenAnalysed))
+      whenAnalysed = analysis.whenAnalysed,
+      medianDurationOpt = analysis.medianDurationOpt))
     logger.debug(s"Updated analysis for test $testId")
   }
 

@@ -400,7 +400,8 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
       lastPassedTimeOpt = Some(passedExecutionTime),
       lastFailedExecutionIdOpt = Some(failedExecutionId),
       lastFailedTimeOpt = Some(failedExecutionTime),
-      whenAnalysed = DummyData.WhenAnalysed))
+      whenAnalysed = DummyData.WhenAnalysed,
+      medianDurationOpt = Some(DummyData.Duration)))
 
     val Some(TestAndAnalysis(_, Some(analysis), _)) = dao.getTestAndAnalysis(testId)
     analysis.testId should equal(testId)
@@ -414,6 +415,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     analysis.lastFailedTimeOpt should equal(Some(failedExecutionTime))
     analysis.lastFailedExecutionIdOpt should equal(Some(failedExecutionId))
     analysis.whenAnalysed should equal(DummyData.WhenAnalysed)
+    analysis.medianDurationOpt should equal(Some(DummyData.Duration))
 
     dao.upsertAnalysis(F.analysis(
       testId = testId,
@@ -425,7 +427,8 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
       lastPassedTimeOpt = None,
       lastFailedExecutionIdOpt = None,
       lastFailedTimeOpt = None,
-      whenAnalysed = DummyData.WhenAnalysed))
+      whenAnalysed = DummyData.WhenAnalysed,
+      medianDurationOpt = None))
 
     val Some(TestAndAnalysis(_, Some(analysis2), _)) = dao.getTestAndAnalysis(testId)
     analysis2.testId should equal(testId)
@@ -437,6 +440,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     analysis2.lastFailedTimeOpt should equal(None)
     analysis2.lastFailedExecutionIdOpt should equal(None)
     analysis2.whenAnalysed should equal(DummyData.WhenAnalysed)
+    analysis2.medianDurationOpt should equal(None)
 
   }
 

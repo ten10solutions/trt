@@ -266,6 +266,12 @@ class Application(service: Service, adminService: AdminService) extends Controll
     Redirect(routes.Application.admin).flashing("success" -> "All data deleted")
   }
 
+  def analyseAll() = Action { implicit request ⇒
+    logger.debug("analyseAll()")
+    adminService.analyseAll()
+    Redirect(routes.Application.admin).flashing("success" -> "Analysis of all tests scheduled")
+  }
+
   def updateSystemConfiguration() = Action { implicit request ⇒
     logger.debug(s"updateSystemConfiguration()")
     SystemConfigurationForm.form.bindFromRequest().fold(

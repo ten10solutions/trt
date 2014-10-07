@@ -3,6 +3,8 @@ package com.thetestpeople.trt.analysis
 import com.thetestpeople.trt.model._
 import com.github.nscala_time.time.Imports._
 import com.thetestpeople.trt.service.Clock
+import com.thetestpeople.trt.utils.StatsUtils
+import org.joda.time.Duration
 
 object TestAnalyser {
 
@@ -40,6 +42,7 @@ class TestAnalyser(clock: Clock, config: AnalysisConfiguration) {
       val failingSinceOpt = recentFailures.lastOption.map(_.executionTime)
       val status = calculateTestStatus(recentFailures, recentPasses)
       val weather = calculateWeather(sortedExecutions)
+      val medianDurationOpt = medianDuration(sortedExecutions)
       TestAnalysis(
         status = status,
         weather = weather,
@@ -47,10 +50,16 @@ class TestAnalyser(clock: Clock, config: AnalysisConfiguration) {
         failingSinceOpt = failingSinceOpt,
         lastPassedExecutionOpt = lastPassedExecutionOpt,
         lastFailedExecutionOpt = lastFailedExecutionOpt,
-        whenAnalysed = clock.now)
+        whenAnalysed = clock.now,
+        medianDurationOpt = medianDurationOpt)
     }
   }
 
+  private def medianDuration(executions: List[Execution]): Option[Duration] = {
+    val durations = executions.flatMap(_.durationOpt).map(_.getMillis.toDouble)
+    StatsUtils.median(durations).map(m => Duration.millis(m.longValue))
+  }
+  
   private def calculateWeather(sortedExecutions: List[Execution]): Double = {
     val recentExecutions = sortedExecutions.take(10)
     recentExecutions.count(_.passed).toDouble / recentExecutions.size

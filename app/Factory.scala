@@ -57,7 +57,7 @@ class Factory(configuration: Configuration) {
 
   lazy val service: Service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, jenkinsImportWorker, logIndexer)
 
-  lazy val adminService = new AdminServiceImpl(dao, logIndexer, analysisService)
+  lazy val adminService = new AdminServiceImpl(dao, dao, logIndexer, analysisService)
 
   lazy val controller = new Application(service, adminService)
 

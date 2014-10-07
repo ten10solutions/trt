@@ -208,6 +208,16 @@ class TestAnalyserTest extends FlatSpec with Matchers {
     analysis.failingSinceOpt should equal(Some(startedFailing))
   }
 
+  "Analysis" should "calculate median duration of a test" in {
+    val analysis = getTestAnalyser().analyse(
+      execution(durationOpt = None),
+      execution(durationOpt = Some(5.minutes)),
+      execution(durationOpt = Some(6.minutes)),
+      execution(durationOpt = Some(12.hours)))
+
+    analysis.medianDurationOpt should be(Some(6.minutes: Duration))
+  }
+
   implicit class RichTestAnalyser(testAnalyser: TestAnalyser) {
 
     def analyse(executions: Execution*): TestAnalysis = testAnalyser.analyse(executions.toList).get

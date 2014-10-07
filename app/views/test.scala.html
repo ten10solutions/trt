@@ -85,6 +85,12 @@
         <td><a href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a></td>
       </tr>
     }
+    @for(medianDuration <- test.medianDurationOpt) {
+      <tr>
+        <td>Average duration</td>
+        <td>@medianDuration</td>
+      </tr>
+    }
     <tr>
       <td>Number of executions recorded</td>
       <td>@pagination.totalItems</td>

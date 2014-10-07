@@ -4,4 +4,6 @@ trait AdminService {
 
   def deleteAll()
 
+  def analyseAll()
+  
 }

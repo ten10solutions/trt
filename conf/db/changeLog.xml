@@ -363,5 +363,12 @@
       deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="tests" />
   </changeSet>
 
+  <changeSet author="matt" id="add-analysis-median_duration">
+    <addColumn tableName="analysis">
+      <column name="median_duration" type="BIGINT" defaultValue="NULL">
+        <constraints nullable="true" />
+      </column>
+    </addColumn>
+  </changeSet>
   
 </databaseChangeLog>

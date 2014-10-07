@@ -7,7 +7,7 @@ import com.thetestpeople.trt.utils.HasLogger
 import com.thetestpeople.trt.service.indexing.LogIndexer
 import com.thetestpeople.trt.analysis.AnalysisService
 
-class AdminServiceImpl(daoAdmin: DaoAdmin, logIndexer: LogIndexer, analysisService: AnalysisService) extends AdminService with HasLogger {
+class AdminServiceImpl(daoAdmin: DaoAdmin, dao: Dao, logIndexer: LogIndexer, analysisService: AnalysisService) extends AdminService with HasLogger {
 
   def deleteAll() {
     daoAdmin.deleteAll()
@@ -16,4 +16,8 @@ class AdminServiceImpl(daoAdmin: DaoAdmin, logIndexer: LogIndexer, analysisServi
     logger.info("Deleted all data")
   }
 
+  def analyseAll() {
+    analysisService.scheduleAnalysis(dao.transaction { dao.getTestIds() } )
+  }
+  
 }

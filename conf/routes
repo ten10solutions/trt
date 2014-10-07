@@ -1,4 +1,5 @@
 # Routes
+#
 # This file defines all application routes (Higher priority routes first)
 # ~~~~
 
@@ -36,6 +37,7 @@ POST    /systemConfiguration        @controllers.Application.updateSystemConfigu
 
 GET     /admin                      @controllers.Application.admin()
 POST    /deleteAll                  @controllers.Application.deleteAll()
+POST    /analyseAll                 @controllers.Application.analyseAll()
 
 GET     /webApi/tests/names         @controllers.Application.testNames(query: String)
 GET     /webApi/tests/groups        @controllers.Application.groups(query: String)

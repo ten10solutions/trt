@@ -3,6 +3,7 @@ package viewModel
 import com.thetestpeople.trt.model._
 import com.github.nscala_time.time.Imports._
 import org.joda.time.LocalDate
+import com.thetestpeople.trt.utils.DateUtils
 
 class TestView(testInfo: TestAndAnalysis) extends HasTestName {
 
@@ -53,5 +54,8 @@ class TestView(testInfo: TestAndAnalysis) extends HasTestName {
     } yield TimeDescription(failingSince)
 
   def commentOpt: Option[String] = testInfo.commentOpt
+
+  def medianDurationOpt: Option[String] =
+    testInfo.analysisOpt.flatMap(_.medianDurationOpt).map(DateUtils.describeDuration)
 
 }

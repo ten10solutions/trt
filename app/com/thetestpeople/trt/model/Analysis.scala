@@ -14,7 +14,8 @@ case class Analysis(
     lastPassedTimeOpt: Option[DateTime],
     lastFailedExecutionIdOpt: Option[Id[Execution]],
     lastFailedTimeOpt: Option[DateTime],
-    whenAnalysed: DateTime) extends EntityType {
+    whenAnalysed: DateTime,
+    medianDurationOpt: Option[Duration]) extends EntityType {
 
   private lazy val lastPassed: Boolean =
     (lastPassedTimeOpt, lastFailedTimeOpt) match {

@@ -68,7 +68,8 @@ object TestDataFactory {
     lastPassedTimeOpt: Option[DateTime] = None,
     lastFailedExecutionIdOpt: Option[Id[Execution]] = None,
     lastFailedTimeOpt: Option[DateTime] = None,
-    whenAnalysed: DateTime = DummyData.WhenAnalysed): Analysis =
+    whenAnalysed: DateTime = DummyData.WhenAnalysed,
+    medianDurationOpt: Option[Duration] = Some(DummyData.Duration)): Analysis =
     Analysis(
       testId = testId,
       configuration = configuration,
@@ -80,7 +81,8 @@ object TestDataFactory {
       lastPassedTimeOpt = lastPassedTimeOpt,
       lastFailedExecutionIdOpt = lastFailedExecutionIdOpt,
       lastFailedTimeOpt = lastFailedTimeOpt,
-      whenAnalysed = whenAnalysed)
+      whenAnalysed = whenAnalysed,
+      medianDurationOpt = medianDurationOpt)
 
   def jenkinsImportSpec(
     jobUrl: URI = DummyData.JobUrl,
