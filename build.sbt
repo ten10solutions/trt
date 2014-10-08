@@ -14,6 +14,8 @@ scalacOptions ++= List("-deprecation", "-feature")
 
 scalaVersion := "2.11.1"
 
+// == Dependencies ============================================================================
+
 libraryDependencies ++= List(
   ws,
   jdbc,
@@ -43,6 +45,8 @@ libraryDependencies ++= List(
   "org.seleniumhq.selenium" % "selenium-java" % "2.43.1" % "test",
   "com.github.detro.ghostdriver" % "phantomjsdriver" % "1.1.0" % "test")
 
+// == Imports =================================================================================
+
 routesImport ++= List(
   "extensions.Binders._",
   "extensions.Aliases._",
@@ -57,13 +61,15 @@ TwirlKeys.templateImports ++= Seq(
   "java.net.URI",
   "com.thetestpeople.trt.analysis._")
 
+// == Less support ============================================================================
+
 JsEngineKeys.engineType := JsEngineKeys.EngineType.Node
 
 includeFilter in (Assets, LessKeys.less) := "*.less"
 
 excludeFilter in (Assets, LessKeys.less) := "_*.less"
 
-// Eclipse integration:
+// == Eclipse integration =====================================================================
 
 EclipseKeys.withSource := true
 
@@ -74,18 +80,23 @@ EclipseKeys.eclipseOutput := Some("bin")
 // Change resources dir from default for easy integration with Eclipse
 resourceDirectory in Test <<= baseDirectory(_ / "testResources")
 
+// == Test settings ===========================================================================
+
 // Override specs2 options
 // & Stop problem with tests executing twice because of "JUnitRunner" annotation:
-
 (testOptions in Test) := Seq(Tests.Argument(TestFrameworks.JUnit, "--ignore-runners=org.scalatest.junit.JUnitRunner")) 
 
+// Generate HTML report
 (testOptions in Test) += Tests.Argument(TestFrameworks.ScalaTest, "-h", "target/report")
+
+// More verbose output
+testOptions in Test += Tests.Argument(TestFrameworks.ScalaTest, "-oDF")
 
 testFrameworks := Seq(TestFrameworks.ScalaTest)
 
 fork in Test := false
 
-// Deb packaging:
+// == Debian packaging ========================================================================
 
 packageDescription := "Reporting and analysis of automated test results"
 
