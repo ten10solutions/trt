@@ -18,11 +18,10 @@ object SSTParamHelper {
   /**
    * Escape characters to target Python re (which doesn't support \Q \E)
    */
-  private def escapeRegex(s: String): String = {
+  private def escapeRegex(s: String): String =
     s.flatMap {
       case c @ ('.' | '^' | '$' | '*' | '+' | '?' | '(' | ')' | '[' | '{' | '\\' | '|') ⇒ "\\" + c
       case c ⇒ c.toString
     }
-  }
 
 }

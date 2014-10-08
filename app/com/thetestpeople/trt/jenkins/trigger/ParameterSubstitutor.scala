@@ -15,5 +15,8 @@ object ParameterSubstitutor {
     template
       .replace("$" + MavenParamHelper.VariableName, MavenParamHelper.mavenTestNames(names))
       .replace("$" + SSTParamHelper.VariableName, SSTParamHelper.sstRegexes(names))
+      .replace("$SPACE_SEPARATED_GROUPS", spaceSeparatedGroups(names))
 
+  private def spaceSeparatedGroups(names: Seq[QualifiedName]): String =
+    names.flatMap(_.groupOpt).distinct.mkString(" ")
 }
