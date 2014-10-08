@@ -16,19 +16,14 @@ class DeleteTestTest extends AbstractBrowserTest {
       val batch = F.batch(executions = List(F.execution(F.test())))
       site.restApi.addBatch(batch)
 
-      {
-        val testsScreen = site.launch().mainMenu.tests()
-        testsScreen.total should equal(1)
-        val Seq(testRow) = testsScreen.testRows
-        val testScreen = testRow.clickTestLink()
-        testScreen.delete()
-      }
+      var testsScreen = site.launch().mainMenu.tests()
+      testsScreen.total should equal(1)
+      val Seq(testRow) = testsScreen.testRows
+      val testScreen = testRow.clickTestLink()
+      testScreen.delete()
 
-      {
-        val testsScreen = site.launch().mainMenu.tests()
-        testsScreen.total should equal(0)
-      }
-
+      testsScreen = testScreen.mainMenu.tests()
+      testsScreen.total should equal(0)
     }
   }
 
