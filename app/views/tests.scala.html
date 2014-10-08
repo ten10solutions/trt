@@ -39,31 +39,30 @@
         <tr>
           <td>Configuration</td>
           <td>
-        <form id="configuration-form" action="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = groupOpt)" method="get">
-          @for(name <- nameOpt) { <input name="name" value="@name" type="hidden"/> }
-          @for(group <- groupOpt) { <input name="group" value="@group" type="hidden"/> }
-          @for(status <- testStatusOpt) { <input name="status" value="@status" type="hidden"/> }
-          <select id="configuration-select" class="form-control" name="configuration">
-            @for(otherConfiguration <- globalViewContext.configurations) {
-              <option value="@otherConfiguration" @if(configuration == otherConfiguration){selected}>@otherConfiguration</option>
-            }
-          </select>
-        </form>
-
+            <form id="configuration-form" action="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = groupOpt)" method="get">
+              @for(name <- nameOpt) { <input name="name" value="@name" type="hidden"/> }
+              @for(group <- groupOpt) { <input name="group" value="@group" type="hidden"/> }
+              @for(status <- testStatusOpt) { <input name="status" value="@status" type="hidden"/> }
+              <select id="configuration-select" class="form-control" name="configuration">
+                @for(otherConfiguration <- globalViewContext.configurations) {
+                  <option value="@otherConfiguration" @if(configuration == otherConfiguration){selected}>@otherConfiguration</option>
+                }
+              </select>
+            </form>
           </td>
         </tr>
-        <!-- http://jsfiddle.net/7zkCU/14/ -->
         @for(group <- groupOpt) {
           <tr>
-          <td>Group</td>
-          <td>
-            <span class="tag label label-info" style="margin-bottom: 0px">
-              <span>@group</span>
-              <a href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = None)" style="opacity: 0.6;" title="Remove filter by group">
-                <i class="remove glyphicon glyphicon-remove-sign glyphicon-white"></i>
-              </a> 
-            </span>
-          </td>
+            <td>Group</td>
+            <td>
+              <!-- http://jsfiddle.net/7zkCU/14/ -->
+              <span class="tag label label-info" style="margin-bottom: 0px">
+                <span>@group</span>
+                <a href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = None)" style="opacity: 0.6;" title="Remove filter by group">
+                  <i class="remove glyphicon glyphicon-remove-sign glyphicon-white"></i>
+                </a> 
+              </span>
+            </td>
           </tr>
         }
         @if(testsSummary.passCount > 0){
@@ -89,7 +88,7 @@
           <td><a id="total-test-count" href="@routes.Application.tests(configuration = Some(configuration), name = nameOpt, group = groupOpt)"><span class="badge badge-inverse">@testsSummary.totalCount</span></a></td>
         </tr>
       </table>
-    </div> <!-- col -->
+    </div> <!-- col-md-9 -->
     <div class="col-md-3">
       <div id="pie-chart" style="margin-top: 6px; width: 200px; height: 200px"></div>
       <script>
@@ -108,40 +107,40 @@
           );
         });
       </script>
-    </div> <!-- col -->
+    </div> <!-- col-md-3 -->
   </div> <!-- row -->
 
+  <br/>
 
-<br/>
+  <div class="panel-group">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <a data-toggle="collapse" data-target="#collapseOne">
+            Search Options
+          </a>
+        </h4>
+      </div>
+      <div id="collapseOne" class="panel-collapse collapse">
+        <div class="panel-body">
+          <form id="filter-form" role="form" action="@routes.Application.tests(configuration = Some(configuration))">
+             <div class="form-group">
+               <label for="test-name-field">Test name</label>
+               <input name="name" id="test-name-field" value="@{nameOpt.getOrElse("")}" class="form-control typeahead" type="text" placeholder="Test name"/>
+             </div>
+             <div class="form-group">
+               <label for="group-name-field">Group</label>
+               <input name="group" id="group-name-field" value="@{groupOpt.getOrElse("")}" class="form-control typeahead" type="text" placeholder="Group"/>
+             </div>
+             <input name="configuration" value="@configuration" type="hidden"/>
+             <button id="filter-tests" type="submit" class="btn btn-default">Search</button>
+          </form>
+        </div>
+      </div>
+    </div>    
+  </div>
 
-<div class="panel-group">
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h4 class="panel-title">
-    <a data-toggle="collapse" data-target="#collapseOne">
-      Search Options
-    </a>
-    </h4>
-  </div>
-  <div id="collapseOne" class="panel-collapse collapse">
-  <div class="panel-body">
-    <form id="filter-form" role="form" action="@routes.Application.tests(configuration = Some(configuration))">
-       <div class="form-group">
-         <label for="test-name-field">Test name</label>
-         <input name="name" id="test-name-field" value="@{nameOpt.getOrElse("")}" class="form-control typeahead" type="text" placeholder="Test name"/>
-       </div>
-       <div class="form-group">
-         <label for="group-name-field">Group</label>
-         <input name="group" id="group-name-field" value="@{groupOpt.getOrElse("")}" class="form-control typeahead" type="text" placeholder="Group"/>
-       </div>
-       <input name="configuration" value="@configuration" type="hidden"/>
-       <button id="filter-tests" type="submit" class="btn btn-default">Search</button>
-    </form>
-  </div>
-  </div>
-</div>    
-</div>
-<br/>
+  <br/>
 
   @if(tests.nonEmpty) {
 
@@ -202,7 +201,7 @@
             <td class="last-passfail-cell">@for((executionId, time) <- test.lastPassedExecutionOpt){<a class="last-passed-link" href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a>}</td>
             <td class="last-passfail-cell">@for((executionId, time) <- test.lastFailedExecutionOpt){<a href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a>}</td>
           </tr>
-        }
+         }
       <tbody>
     </table>
   </form>
@@ -211,12 +210,12 @@
 
   } else {
 
-<div class="panel panel-info">
-  <div class="panel-heading">No results found</div>
-  <div class="panel-body">
-    No tests found matching your filters.
-  </div>
-</div>
+    <div class="panel panel-info">
+      <div class="panel-heading">No results found</div>
+      <div class="panel-body">
+        No tests found matching your filters.
+      </div>
+    </div>
 
   }
   
