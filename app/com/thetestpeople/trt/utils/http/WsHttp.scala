@@ -17,10 +17,8 @@ class WsHttp(timeout: Duration = 60.seconds) extends Http with HasLogger {
   def get(url: URI, basicAuthOpt: Option[Credentials] = None): HttpResponse =
     try {
       val future = WS.url(url.toString).withBasicAuth(basicAuthOpt).get()
-      // logger.debug("GET: " + url.toString)
       logger.debug(curlGet(url, basicAuthOpt))
       val response = await(future)
-      // logger.debug("GET response: " + response.statusText)
       response
     } catch {
       case e: Exception ⇒
@@ -30,10 +28,8 @@ class WsHttp(timeout: Duration = 60.seconds) extends Http with HasLogger {
   def post(url: URI, basicAuthOpt: Option[Credentials] = None, bodyParams: Map[String, Seq[String]]): HttpResponse =
     try {
       val future = WS.url(url.toString).withBasicAuth(basicAuthOpt).post(bodyParams)
-      //logger.debug("POST to: " + url.toString)
       logger.debug(curlPost(url, basicAuthOpt, bodyParams))
       val response = await(future)
-      //logger.debug("POST response: " + response.statusText)
       response
     } catch {
       case e: Exception ⇒
@@ -52,11 +48,11 @@ class WsHttp(timeout: Duration = 60.seconds) extends Http with HasLogger {
     }
   }
 
-  private def curlUserClause(c: Credentials) = s"--user ${c.username}:${c.password}"
+  private def curlUserClause(c: Credentials) = s"--user '${c.username}:${c.password}'"
 
   private def curlGet(url: URI, basicAuthOpt: Option[Credentials]): String = {
     val userClause = basicAuthOpt.map(curlUserClause).getOrElse("")
-    s"curl -v -X GET ${url.toString} $userClause"
+    s"curl -v --globoff -X GET '$url' $userClause"
   }
 
   private def curlPost(url: URI, basicAuthOpt: Option[Credentials], bodyParams: Map[String, Seq[String]]) = {
@@ -66,7 +62,7 @@ class WsHttp(timeout: Duration = 60.seconds) extends Http with HasLogger {
         (paramName, paramValues) ← bodyParams.toList
         paramValue ← paramValues
       } yield s"--data-urlencode '${paramName}=${paramValue}'"
-    s"curl -v -X POST $url $userClause ${paramClauses.mkString(" ")}"
+    s"curl -v --globoff -X POST '$url' $userClause ${paramClauses.mkString(" ")}"
   }
 
 }
