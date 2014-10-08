@@ -2,14 +2,13 @@ package com.thetestpeople.trt.json
 
 import java.net.URI
 import org.joda.time._
-
 import com.thetestpeople.trt.service._
 import com.thetestpeople.trt.utils.HasLogger
 import com.thetestpeople.trt.model._
-
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.mvc._
+import com.thetestpeople.trt.analysis.HistoricalTestCounts
 
 object JsonSerializers {
 
@@ -56,7 +55,7 @@ object JsonSerializers {
     (__ \ "name").formatNullable[String] and
     (__ \ "log").formatNullable[String] and
     (__ \ "executionTime").formatNullable[DateTime] and
-    (__ \ "duration").formatNullable[Duration] and 
+    (__ \ "duration").formatNullable[Duration] and
     (__ \ "configuration").formatNullable[Configuration])(Incoming.Batch, unlift(Incoming.Batch.unapply))
 
   implicit val batchFormat: Format[Batch] = (
@@ -71,4 +70,13 @@ object JsonSerializers {
     (__ \ "failCount").format[Int] and
     (__ \ "configuration").formatNullable[Configuration])(Batch, unlift(Batch.unapply))
 
+  implicit val testCountsFormat: Format[TestCounts] = (
+    (__ \ "healthy").format[Int] and
+    (__ \ "warning").format[Int] and
+    (__ \ "broken").format[Int])(TestCounts, unlift(TestCounts.unapply))
+
+  implicit val historicalTestCountsFormat: Format[HistoricalTestCounts] = (
+    (__ \ "when").format[DateTime] and
+    (__ \ "counts").format[TestCounts])(HistoricalTestCounts, unlift(HistoricalTestCounts.unapply))
+    
 }

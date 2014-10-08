@@ -10,6 +10,7 @@ import play.api.mvc._
 import viewModel._
 import java.net.URI
 import play.api.libs.json._
+import com.thetestpeople.trt.json.JsonSerializers._
 
 object Application {
 
@@ -52,11 +53,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
         case (configuration, testCounts) ⇒ TestsSummaryView(configuration, testCounts)
       }.toList.sortBy(_.configuration)
 
-    val historicalCountsByConfiguration: Map[Configuration, HistoricalTestCountsTimelineView] =
-      for ((configuration, historicalTestCounts) ← service.getHistoricalTestCounts())
-        yield configuration -> HistoricalTestCountsTimelineView(historicalTestCounts)
-
-    Ok(views.html.configurations(testsSummaries, historicalCountsByConfiguration))
+    Ok(views.html.configurations(testsSummaries))
   }
 
   def execution(executionId: Id[Execution]) = Action { implicit request ⇒
@@ -251,8 +248,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
     val testViews = tests.map(new TestView(_))
     val testsSummary = TestsSummaryView(configuration, testCounts)
     val paginationData = pagination.paginationData(testCounts.countFor(testStatusOpt))
-    val historicalTestCountsOpt = service.getHistoricalTestCounts(configuration).map(HistoricalTestCountsTimelineView.apply)
-    views.html.tests(testsSummary, testViews.toList, configuration, testStatusOpt, nameOpt, groupOpt, service.canRerun, paginationData, historicalTestCountsOpt)
+    views.html.tests(testsSummary, testViews.toList, configuration, testStatusOpt, nameOpt, groupOpt, service.canRerun, paginationData)
   }
 
   def admin() = Action { implicit request ⇒
@@ -307,6 +303,12 @@ class Application(service: Service, adminService: AdminService) extends Controll
   def groups(query: String) = Action { implicit request ⇒
     logger.debug(s"groups($query)")
     Ok(Json.toJson(service.getGroups(query)))
+  }
+
+  def configurationChart(configuration: Configuration) = Action { implicit request ⇒
+    logger.debug(s"configurationChart($configuration)")
+    val counts = service.getHistoricalTestCounts().get(configuration).map(_.counts).getOrElse(List())
+    Ok(Json.toJson(counts))
   }
 
   def analyseAllExecutions() = Action { implicit request ⇒

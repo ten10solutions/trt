@@ -6,8 +6,7 @@
   nameOpt: Option[String], 
   groupOpt: Option[String],
   canRerun: Boolean, 
-  pagination: PaginationData,
-  historicalTestCountsTimelineOpt: Option[HistoricalTestCountsTimelineView])(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
+  pagination: PaginationData)(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
 
 @scripts = {
   <script src="@routes.Assets.at("javascripts/tests.js")"></script>
