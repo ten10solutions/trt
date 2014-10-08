@@ -209,7 +209,7 @@ td.url-cell {
 }
 
 footer {
-    padding-top: 6px;
+    padding-top: 8px;
     color: #777;
     text-align: center;
     border-top: 1px solid #e5e5e5;
@@ -223,13 +223,15 @@ html, body {
     height: 100%;
 }
 
+@footer-height: 40px;
+
 .wrapper {
     min-height: 100%;
     height: auto !important;
     height: 100%;
-    margin: 0 auto -32px; /* the bottom margin is the negative value of the footer's height */
+    margin: 0 auto -@footer-height; /* the bottom margin is the negative value of the footer's height */
 }
 
 footer, .push {
-    height: 32px; /* .push must be the same height as .footer */
+    height: @footer-height; /* .push must be the same height as .footer */
 }
