@@ -8,6 +8,9 @@ chartOptions =
     mode: "time"
     axisLabel: "Date"
   yaxis:
+    minTickSize: 1
+    tickDecimals: 0
+    min: 0  
     axisLabel: "# of executions in batch"
   series:
     stack: true

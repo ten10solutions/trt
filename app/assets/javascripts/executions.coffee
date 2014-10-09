@@ -8,6 +8,9 @@ chartOptions =
     axisLabel: "Date"
   yaxis:
     axisLabel: "# of executions"
+    minTickSize: 1
+    tickDecimals: 0
+    min: 0  
   series:
     bars:
       show: true

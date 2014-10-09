@@ -6,6 +6,10 @@ chartOptions =
     clickable: true
   xaxis:
     mode: "time"
+  yaxis:
+    minTickSize: 1
+    tickDecimals: 0
+    min: 0
   series:
     stack: true
     lines:

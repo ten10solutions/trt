@@ -1,3 +1,13 @@
+durationFormatter = (val, axis) -> formatDuration(val)
+
+formatDuration = (val) ->
+  if val < 1
+    (val * 1000).toFixed(0) + " ms"
+  else if val < 10
+    val.toFixed(1) + " s"
+  else
+    val.toFixed(0) + " s"
+
 chartOptions =
   grid:
     backgroundColor:
@@ -6,9 +16,12 @@ chartOptions =
     clickable: true
   xaxis:
     mode: "time"
-    axisLabel: "Date"
+    axisLabel: "Time test was executed"
   yaxis:
-    axisLabel: "Duration (seconds)"
+    axisLabel: "Test duration"
+    tickFormatter: durationFormatter
+    #tickDecimals: 0 # Don't do this
+    min: 0
   series:
     bars:
       show: true
@@ -23,7 +36,7 @@ onChartHover = (event, pos, item) ->
   if item
     eventDate = item.datapoint[0]
     seconds = item.datapoint[1]
-    tooltipText = "#{seconds} seconds #{formatDate(eventDate)}"
+    tooltipText = "#{formatDuration(seconds)} &mdash; #{formatDate(eventDate)}"
     $("#chart-tooltip").html(tooltipText).css(
       top: item.pageY + 5
       left: item.pageX + 5
