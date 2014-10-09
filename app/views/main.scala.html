@@ -55,14 +55,14 @@
           <ul class="nav navbar-nav">
             <li class="@if(currentPage == "Dashboard") {active}"><a id="menu-configurations" href="@routes.Application.configurations()"><span class="fa fa-dashboard"></span> Dashboard</a></li>
             @if(globalViewContext.configurations.size > 1) {
-            <li class="dropdown @if(currentPage == "Tests") {active}">
-              <a id="menu-tests" href="#" class="dropdown-toggle" data-toggle="dropdown">Tests <b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                @for(configuration <- globalViewContext.configurations) {
-                  <li><a class="configuration-menu-item" href="@routes.Application.tests(configuration=Some(configuration))">@configuration</a></li>
-                }
-              </ul>
-            </li>
+              <li class="dropdown @if(currentPage == "Tests") {active}">
+                <a id="menu-tests" href="#" class="dropdown-toggle" data-toggle="dropdown">Tests <b class="caret"></b></a>
+                <ul class="dropdown-menu">
+                  @for(configuration <- globalViewContext.configurations) {
+                    <li><a class="configuration-menu-item" href="@routes.Application.tests(configuration=Some(configuration))">@configuration</a></li>
+                  }
+                </ul>
+              </li>
             }
             @if(globalViewContext.singleConfigurationMode) {
               <li class="@if(currentPage == "Tests") {active}"><a id="menu-tests" href="@routes.Application.tests(configuration=globalViewContext.configurations.headOption)">Tests</a></li>
