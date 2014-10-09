@@ -5,6 +5,13 @@ import com.github.nscala_time.time.Imports._
 import org.joda.time.LocalDate
 import com.thetestpeople.trt.utils.DateUtils
 
+case class WeatherInfo(weather: Double) {
+  
+  def iconPath: String = WeatherIcons.weatherIcon(weather)
+  
+  def passRate: String = "Pass rate: " + (weather * 100).toInt + "%"
+}
+
 class TestView(testInfo: TestAndAnalysis) extends HasTestName {
 
   private val test = testInfo.test
@@ -17,7 +24,7 @@ class TestView(testInfo: TestAndAnalysis) extends HasTestName {
 
   def ballIconOpt: Option[String] = testInfo.analysisOpt.map(_.status).map(BallIcons.icon)
 
-  def weatherIconOpt: Option[String] = testInfo.analysisOpt.map(_.weather).map(WeatherIcons.weatherIcon)
+  def weatherInfoOpt: Option[WeatherInfo] = testInfo.analysisOpt.map(_.weather).map(WeatherInfo)
 
   def consecutiveFailuresOpt: Option[Int] =
     for {

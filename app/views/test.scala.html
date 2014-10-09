@@ -49,10 +49,10 @@
         </tr>
       }
     }
-    @for(weatherIcon <- test.weatherIconOpt) {
+    @for(weatherInfo <- test.weatherInfoOpt) {
       <tr>
         <td class="center-vert">Weather</td>
-        <td><img src="@routes.Assets.at("images/" + weatherIcon)"/></td>
+        <td><img title="@weatherInfo.passRate" src="@routes.Assets.at("images/" + weatherInfo.iconPath)"/></td>
       </tr>
     }
     @for(consecutiveFailures <- test.consecutiveFailuresOpt) {
