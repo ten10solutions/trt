@@ -9,4 +9,7 @@ case class GlobalViewContext(configurations: List[Configuration], hasExecutions:
   
   def noData = !hasExecutions
   
+  def singleConfigurationMode = configurations.size == 1
+  
+  def multipleConfigurationMode = !singleConfigurationMode
 }

@@ -56,9 +56,6 @@
         </tr>
 
       </table>
-      @if(canRerun) {
-        <button style="margin-bottom: 12px" id="rerunSelected" type="button" class="btn btn-default" title="Rerun selected tests on Jenkins" onclick="rerunSelected('@routes.JenkinsController.rerunSelectedTests()')"><i class="glyphicon glyphicon-refresh"></i> Rerun Selected</button>
-      }
     </div>
     <div class="col-md-3">   
       <div id="pie-chart" style="width: 200px; height: 200px"></div>
@@ -80,6 +77,9 @@
     </div>
   </div>
 
+  @if(canRerun) {
+    <button style="margin-bottom: 12px" id="rerunSelected" type="button" class="btn btn-default" title="Rerun selected tests on Jenkins" onclick="rerunSelected('@routes.JenkinsController.rerunSelectedTests()')"><i class="glyphicon glyphicon-refresh"></i> Rerun Selected</button>
+  }
   <form id="delete-batch-form" action="@routes.Application.deleteBatch(batch.id)" role="form" method="post">
      <button style="margin-bottom: 12px; margin-top: 12px" id="delete-batch-button" class="btn btn-default" onclick="deleteBatch()" type="button" title="Delete batch"><i class="glyphicon glyphicon-trash"></i> Delete batch</button>
   </form>

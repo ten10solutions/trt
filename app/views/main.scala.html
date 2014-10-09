@@ -64,7 +64,7 @@
               </ul>
             </li>
             }
-            @if(globalViewContext.configurations.size == 1) {
+            @if(globalViewContext.singleConfigurationMode) {
               <li class="@if(currentPage == "Tests") {active}"><a id="menu-tests" href="@routes.Application.tests(configuration=globalViewContext.configurations.headOption)">Tests</a></li>
             } 
             <li class="@if(currentPage == "Batches") {active}"><a id="menu-batches" href="@routes.Application.batches()">Batches</a></li>

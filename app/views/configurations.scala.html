@@ -26,7 +26,9 @@
     <thead>
       <tr>
         <th class="pass-fail-col"><!--  ball icon --></th>
-        <th class="configuration-col">Configuration</th>
+        @if(globalViewContext.multipleConfigurationMode) {
+          <th class="configuration-col">Configuration</th>
+        }
         <th></th>
         <th class="configuration-count-col">Healthy</th>
         <th class="configuration-count-col">Warning</th>
@@ -39,9 +41,11 @@
     @for((testsSummary, index) <- testsSummaries.zipWithIndex) {
       <tr>
         <td class="pass-fail-cell"><a href="@routes.Application.tests(configuration = Some(testsSummary.configuration))"><img src="@routes.Assets.at("images/" + testsSummary.ballIcon)"/></a></td>
-        <td class="configuration-cell"><a href="@routes.Application.tests(configuration = Some(testsSummary.configuration))">@testsSummary.configuration</a></td>
+        @if(globalViewContext.multipleConfigurationMode) {
+          <td class="configuration-cell"><a href="@routes.Application.tests(configuration = Some(testsSummary.configuration))">@testsSummary.configuration</a></td>
+        }
         <td>
-          <div id="history-chart-@index" style="width: 480px; height: 120px">
+          <div id="history-chart-@index" @if(globalViewContext.singleConfigurationMode) { style="width: 640x; height: 200px" } else { style="width: 480px; height: 120px" }>
             <div align="center">
               <i style="margin-top: 48px" class="glyphicon glyphicon-picture"></i> Data not yet available
             </div>
