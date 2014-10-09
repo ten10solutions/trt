@@ -38,29 +38,29 @@ onChartHover = (seriesData) -> (event, pos, item) ->
     $("#chart-tooltip").hide()
 
 initialiseTooltip = ->
-  $("<div class='chart-tooltip' id='chart-tooltip'/>").appendTo "body"
+  $("<div class='chart-tooltip' id='chart-tooltip'/>").appendTo "body" unless $('#chart-tooltip').length
 
-window.createHistoryChart = (chartId, passes, warnings, fails) ->  
+window.createHistoryChart = (chartId, healthy, warnings, broken) ->  
   series = []
   seriesData = []
-  if passes.length > 0  # omit empty series otherwise JFlot displays no data
+  if healthy.length > 0  # omit empty series otherwise JFlot displays no data
     series.push
-      label: "Passes"
-      data: passes
+      label: "Healthy"
+      data: healthy
       color: "#609000"
-    seriesData.push(passes)
+    seriesData.push(healthy)
   if warnings.length > 0
     series.push
       label: "Warnings"
       data: warnings
       color: "#FFBF00"
     seriesData.push(warnings)
-  if fails.length > 0
+  if broken.length > 0
     series.push
       label: "Failures"
-      data: fails
+      data: broken
       color: "#b94a48"
-    seriesData.push(fails)
+    seriesData.push(broken)
   plot = $.plot $("#" + chartId), series, chartOptions
 
   addZoomSupport
@@ -70,6 +70,7 @@ window.createHistoryChart = (chartId, passes, warnings, fails) ->
     chartOptions: chartOptions
     minX: 10 * 60 * 1000
     minY: 10
+  $("#" + chartId).unbind "plothover"
   $("#" + chartId).bind "plothover", onChartHover(seriesData)
 
   initialiseTooltip()

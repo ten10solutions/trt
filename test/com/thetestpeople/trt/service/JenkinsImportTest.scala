@@ -22,7 +22,7 @@ import com.thetestpeople.trt.service.indexing.LuceneLogIndexer
 class JenkinsImportTest extends FlatSpec with ShouldMatchers {
 
   // TODO: need to capture some more data to run this test with new API usage
-  "Importing from jenkins" should "work" ignore {
+  "Importing from jenkins" should "work" in {
 
     val clock = FakeClock()
     val http = new ClasspathCachingHttp("")
@@ -35,31 +35,34 @@ class JenkinsImportTest extends FlatSpec with ShouldMatchers {
       pollingInterval = 2.minutes,
       importConsoleLog = false))
 
-    http.prefix = "webcache-pentaho-846-848"
+    http.prefix = "webcache-pentaho-1214-1216"
 
     service.syncAllJenkins()
     jenkinsImporter.importBuilds(specId)
 
     service.getBatches().flatMap(_.nameOpt) should equal(List(
-      "pentaho-big-data-plugin #848",
-      "pentaho-big-data-plugin #847",
-      "pentaho-big-data-plugin #846",
+      "pentaho-big-data-plugin #1216",
+      "pentaho-big-data-plugin #1215",
+      "pentaho-big-data-plugin #1214",
       "pentaho-big-data-plugin #57"))
 
-    http.prefix = "webcache-pentaho-847-849"
+    http.prefix = "webcache-pentaho-1217-1219"
     clock += 10.minutes
 
     service.syncAllJenkins()
     jenkinsImporter.importBuilds(specId)
 
     service.getBatches().flatMap(_.nameOpt) should equal(List(
-      "pentaho-big-data-plugin #849",
-      "pentaho-big-data-plugin #848",
-      "pentaho-big-data-plugin #847",
-      "pentaho-big-data-plugin #846",
+      "pentaho-big-data-plugin #1219",
+      "pentaho-big-data-plugin #1218",
+      "pentaho-big-data-plugin #1217",
+      "pentaho-big-data-plugin #1216",
+      "pentaho-big-data-plugin #1215",
+      "pentaho-big-data-plugin #1214",
       "pentaho-big-data-plugin #57"))
 
   }
 
-  private def setup(http: Http = AlwaysFailingHttp, clock: Clock = FakeClock()) = TestServiceFactory.setup(http = http, clock = clock)
+  private def setup(http: Http = AlwaysFailingHttp, clock: Clock = FakeClock()) = 
+    TestServiceFactory.setup(http = http, clock = clock)
 }
