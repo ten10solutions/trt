@@ -35,8 +35,8 @@ class TestScreen(implicit automationContext: AutomationContext) extends Abstract
       yield ExecutionRow(rowElement, index)
 
   def delete() {
-    log("Click 'Delete'")
-    webDriver.waitForDisplayedAndEnabled(id("deleteTest")).click()
+    log("Click 'Mark test as deleted'")
+    webDriver.waitForDisplayedAndEnabled(id("delete-test")).click()
     webDriver.waitForDisplayedAndEnabled(id("alert-success"))
   }
 

@@ -110,12 +110,12 @@
     <input type="hidden" name="previousURL" value="@request.uri"/>
   </form>
   @if(canRerun) {
-    <button style="margin-bottom: 12px" id="rerunTest" type="button" onclick="$(rerun-test-form).submit()" class="btn btn-default" title="Rerun test on Jenkins"><i class="glyphicon glyphicon-refresh"></i> Rerun test</button>
+    <button style="margin-bottom: 12px" id="rerun-test" type="button" onclick="$('#rerun-test-form').submit()" class="btn btn-default" title="Rerun test on Jenkins"><i class="glyphicon glyphicon-refresh"></i> Rerun test</button>
   }
   @if(test.deleted) {
-    <button style="margin-bottom: 12px" id="deleteTest" type="button" onclick="$(rerun-test-form).submit()" class="btn btn-default" title="Mark test as not deleted"><i class="fa fa-undo"></i> Undelete test</button>
+    <button style="margin-bottom: 12px" id="undelete-test" type="button" onclick="$('#undelete-test-form').submit()" class="btn btn-default" title="Mark test as not deleted"><i class="fa fa-undo"></i> Undelete test</button>
   } else {
-    <button style="margin-bottom: 12px" id="deleteTest" type="button" onclick="$(rerun-test-form).submit()" class="btn btn-default" title="Mark test as deleted"><i class="glyphicon glyphicon-trash"></i> Mark test as deleted</button>
+    <button style="margin-bottom: 12px" id="delete-test" type="button" onclick="$('#delete-test-form').submit()" class="btn btn-default" title="Mark test as deleted"><i class="glyphicon glyphicon-trash"></i> Mark test as deleted</button>
   }
   </div> <!-- col-md-5 -->
   <div class="col-md-7">

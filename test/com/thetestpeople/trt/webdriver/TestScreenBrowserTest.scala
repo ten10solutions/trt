@@ -31,7 +31,7 @@ class TestScreenBrowserTest extends AbstractBrowserTest {
 
       testScreen.name should equal(test.name)
       testScreen.groupOpt should equal(test.groupOpt)
-      testScreen.configurationOpt should equal(execution.configurationOpt)
+      testScreen.configurationOpt should equal(None) // No configuration shown in single-configuration mode
       val List(executionRow2) = testScreen.executionRows
       executionRow2.passed should be(true)
 
