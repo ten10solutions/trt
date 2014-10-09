@@ -52,7 +52,7 @@
     @for(weatherInfo <- test.weatherInfoOpt) {
       <tr>
         <td class="center-vert">Weather</td>
-        <td><img title="@weatherInfo.passRate" src="@routes.Assets.at("images/" + weatherInfo.iconPath)"/></td>
+        <td><img title="@weatherInfo.passRate" src="@routes.Assets.at("images/" + weatherInfo.iconPath)"/> (@weatherInfo.passRate)</td>
       </tr>
     }
     @for(consecutiveFailures <- test.consecutiveFailuresOpt) {
