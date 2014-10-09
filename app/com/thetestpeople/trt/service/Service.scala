@@ -39,7 +39,8 @@ trait Service extends JenkinsService {
     nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
-    limit: Int = Integer.MAX_VALUE): (TestCounts, Seq[TestAndAnalysis])
+    limit: Int = Integer.MAX_VALUE,
+    sortBy: SortBy.Test = SortBy.Test.Group()): (TestCounts, Seq[TestAndAnalysis])
 
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts]
 

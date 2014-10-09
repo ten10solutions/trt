@@ -48,6 +48,7 @@ libraryDependencies ++= List(
 // == Imports =================================================================================
 
 routesImport ++= List(
+  "viewModel.Sort",
   "extensions.Binders._",
   "extensions.Aliases._",
   "com.thetestpeople.trt.model._",

@@ -6,7 +6,9 @@
   nameOpt: Option[String], 
   groupOpt: Option[String],
   canRerun: Boolean, 
-  pagination: PaginationData)(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
+  pagination: PaginationData,
+  sortOpt: Option[Sort],
+  descendingOpt: Option[Boolean])(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
 
 @scripts = {
   <script src="@routes.Assets.at("javascripts/tests.js")"></script>
@@ -26,10 +28,35 @@
       name = nameOpt,
       group = groupOpt, 
       page = Some(page), 
-      pageSize = Some(pageSize))) 
+      pageSize = Some(pageSize),
+      sort = sortOpt,
+      descending = descendingOpt)) 
 }
 
-@main("Tests: " + configuration, "Tests", scripts = scripts, css = css) {
+@sortLink(sort: Sort) = {
+  @if(sortOpt.getOrElse(Sort.Group) == sort) {
+    @if(descendingOpt.getOrElse(false)) {
+      <a class="sort-link" href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = groupOpt, sort = Some(sort))">
+        <i class="fa fa-sort-desc"></i>
+      </a> 
+    } else {
+      <a class="sort-link" href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = groupOpt, sort = Some(sort), descending = Some(true))">
+        <i class="fa fa-sort-asc"></i>
+      </a> 
+    } 
+  } else {
+    <a class="sort-link" href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = groupOpt, sort = Some(sort))">
+      <i class="fa fa-sort"></i>
+    </a> 
+  }
+}
+
+@weatherSortLink = { @sortLink(Sort.Weather) }
+
+@groupSortLink = { @sortLink(Sort.Group) }
+
+
+@main(if(globalViewContext.multipleConfigurationMode) "Tests" + configuration else "Tests", "Tests", scripts = scripts, css = css) {
 
   <h2><img src="@routes.Assets.at("images/" + testsSummary.ballIcon)"/> Tests</h2>
   
@@ -182,8 +209,8 @@
         <tr>
           <th style="text-align: center"><input class="testCheckbox" id="selectAll" type="checkbox" title="Select all"/></th>
           <th class="pass-fail-col">Status</th>
-          <th class="pass-fail-col">Weather</th>
-          <th class="group-col">Group</th>
+          <th class="pass-fail-col" style="white-space: nowrap">Weather&nbsp;@weatherSortLink</th>
+          <th class="group-col">Group&nbsp;@groupSortLink</th>
           <th class="name-col">Name</th>
           <th class="consecutive-failures-col">Consecutive failures</th>
           <th class="failing-since-col">Started failing</th>

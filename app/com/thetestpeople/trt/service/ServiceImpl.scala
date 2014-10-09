@@ -51,7 +51,8 @@ class ServiceImpl(
     nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     startingFrom: Int,
-    limit: Int): (TestCounts, Seq[TestAndAnalysis]) = transaction {
+    limit: Int,
+    sortBy: SortBy.Test = SortBy.Test.Group()): (TestCounts, Seq[TestAndAnalysis]) = transaction {
 
     val testCounts = dao.getTestCounts(
       configuration = configuration,
@@ -63,7 +64,8 @@ class ServiceImpl(
       nameOpt = nameOpt,
       groupOpt = groupOpt,
       startingFrom = startingFrom,
-      limitOpt = Some(limit))
+      limitOpt = Some(limit),
+      sortBy = sortBy)
 
     (testCounts, tests)
   }

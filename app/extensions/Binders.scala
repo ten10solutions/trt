@@ -8,10 +8,9 @@ import java.net.URI
 import java.net.URISyntaxException
 import com.thetestpeople.trt.model.Configuration
 import com.thetestpeople.trt.model.TestStatus
+import viewModel.Sort
 
 object Binders {
-
-  type TestStatus = com.thetestpeople.trt.model.TestStatus
 
   implicit val uriQueryStringBinder: QueryStringBindable[URI] = new QueryStringBindable[URI] {
     override def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, URI]] =
@@ -81,6 +80,15 @@ object Binders {
         case None     ⇒ Left(s"Unable to parse '$value' as an ID")
       }
     override def unbind(key: String, id: Id[T]): String = id.toString
+  }
+
+  implicit val sortQueryStringBinder: QueryStringBindable[Sort] = new QueryStringBindable[Sort] {
+    override def bind(key: String, params: Map[String, Seq[String]]): Option[Either[String, Sort]] =
+      for {
+        values ← params.get(key)
+        value ← values.headOption
+      } yield Right(Sort(value).get)
+    override def unbind(key: String, sort: Sort): String = s"$key=$sort"
   }
 
 }

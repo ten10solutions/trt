@@ -370,5 +370,11 @@
       </column>
     </addColumn>
   </changeSet>
+
+  <changeSet author="matt" id="add-analysis-weather-index">
+    <createIndex indexName="idx_analysis_weather" tableName="analysis">
+      <column name="weather" />
+    </createIndex>
+  </changeSet>
   
 </databaseChangeLog>

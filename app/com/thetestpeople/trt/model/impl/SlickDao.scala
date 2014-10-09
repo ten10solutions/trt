@@ -156,7 +156,8 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
-    limitOpt: Option[Int] = None): Seq[TestAndAnalysis] = {
+    limitOpt: Option[Int] = None,
+    sortBy: SortBy.Test = SortBy.Test.Group()): Seq[TestAndAnalysis] = {
     var query = testsAndAnalyses
     query = query.filter(_._2.configuration === configuration)
     query = query.filterNot(_._1.deleted)
@@ -166,12 +167,21 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       query = query.filter(_._1.group.toLowerCase like globToSqlPattern(group))
     for (status ← testStatusOpt)
       query = query.filter(_._2.status === status)
-    query = query.sortBy(_._1.name).sortBy(_._1.group)
+    query = sortBy match {
+      case SortBy.Test.Weather(descending) ⇒
+        query.sortBy { case (test, analysis) ⇒ order(analysis.weather, descending) }
+      case SortBy.Test.Group(descending) ⇒
+        query.sortBy { case (test, analysis) ⇒ order(test.name, descending) }
+          .sortBy { case (test, analysis) ⇒ order(test.group, descending) }
+    }
     query = query.drop(startingFrom)
     for (limit ← limitOpt)
       query = query.take(limit)
     query.map { case (test, analysis) ⇒ (test, analysis.?) }.run.map { case (test, analysisOpt) ⇒ TestAndAnalysis(test, analysisOpt, commentOpt = None) }
   }
+
+  private def order[T](column: Column[T], descending: Boolean) =
+    if (descending) column.desc else column.asc
 
   def getTestsById(testIds: Seq[Id[Test]]): Seq[Test] = tests.filter(_.id inSet testIds).run
 

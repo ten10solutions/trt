@@ -3,6 +3,18 @@ package com.thetestpeople.trt.model
 import java.net.URI
 import com.thetestpeople.trt.model.jenkins._
 
+object SortBy {
+
+  sealed trait Test {
+    def descending: Boolean
+  }
+  object Test {
+    case class Weather(descending: Boolean = false) extends SortBy.Test
+    case class Group(descending: Boolean = false) extends SortBy.Test
+  }
+
+}
+
 trait Dao extends ExecutionDao with JenkinsDao {
 
   /**
@@ -45,7 +57,8 @@ trait Dao extends ExecutionDao with JenkinsDao {
     nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
-    limitOpt: Option[Int] = None): Seq[TestAndAnalysis]
+    limitOpt: Option[Int] = None,
+    sortBy: SortBy.Test = SortBy.Test.Group()): Seq[TestAndAnalysis]
 
   /**
    * Gets test counts for all configurations.

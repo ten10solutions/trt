@@ -222,33 +222,48 @@ class Application(service: Service, adminService: AdminService) extends Controll
     s"Deleted ${batchIds.size} $batchWord"
   }
 
-  def tests(configurationOpt: Option[Configuration], testStatusOpt: Option[TestStatus], nameOpt: Option[String], groupOpt: Option[String], pageOpt: Option[Int], pageSizeOpt: Option[Int]) =
-    Action { implicit request ⇒
-      Utils.time("Application.tests()") {
-        logger.debug(s"tests(configuration = $configurationOpt, status = $testStatusOpt, name = $nameOpt, group = $groupOpt, page = $pageOpt, pageSize = $pageSizeOpt)")
-        Pagination.validate(pageOpt, pageSizeOpt) match {
-          case Left(errorMessage) ⇒
-            BadRequest(errorMessage)
-          case Right(pagination) ⇒
-            val configuration = configurationOpt.getOrElse(Configuration.Default)
-            Ok(handleTests(testStatusOpt, configuration, nameOpt, groupOpt, pagination))
-        }
+  def tests(
+    configurationOpt: Option[Configuration],
+    testStatusOpt: Option[TestStatus],
+    nameOpt: Option[String],
+    groupOpt: Option[String],
+    pageOpt: Option[Int],
+    pageSizeOpt: Option[Int],
+    sortOpt: Option[Sort],
+    descendingOpt: Option[Boolean]) = Action { implicit request ⇒
+    Utils.time("Application.tests()") {
+      logger.debug(s"tests(configuration = $configurationOpt, status = $testStatusOpt, name = $nameOpt, group = $groupOpt, page = $pageOpt, pageSize = $pageSizeOpt, sort = $sortOpt, descending = $descendingOpt)")
+      Pagination.validate(pageOpt, pageSizeOpt) match {
+        case Left(errorMessage) ⇒
+          BadRequest(errorMessage)
+        case Right(pagination) ⇒
+          val configuration = configurationOpt.getOrElse(Configuration.Default)
+          Ok(handleTests(testStatusOpt, configuration, nameOpt, groupOpt, pagination, sortOpt, descendingOpt))
       }
     }
+  }
 
-  private def handleTests(testStatusOpt: Option[TestStatus], configuration: Configuration, nameOpt: Option[String], groupOpt: Option[String], pagination: Pagination)(implicit request: Request[_]) = {
+  private def getTestSortBy(sortOpt: Option[Sort], descendingOpt: Option[Boolean]): SortBy.Test = sortOpt match {
+    case Some(Sort.Weather) ⇒ SortBy.Test.Weather(descendingOpt getOrElse false)
+    case Some(Sort.Group)   ⇒ SortBy.Test.Group(descendingOpt getOrElse false)
+    case _                  ⇒ SortBy.Test.Group(descending = false)
+  }
+
+  private def handleTests(testStatusOpt: Option[TestStatus], configuration: Configuration, nameOpt: Option[String], groupOpt: Option[String], pagination: Pagination, sortOpt: Option[Sort], descendingOpt: Option[Boolean])(implicit request: Request[_]) = {
+    val sortBy = getTestSortBy(sortOpt, descendingOpt)
     val (testCounts, tests) = service.getTests(
       configuration = configuration,
       testStatusOpt = testStatusOpt,
       nameOpt = nameOpt,
       groupOpt = groupOpt,
       startingFrom = pagination.firstItem,
-      limit = pagination.pageSize)
+      limit = pagination.pageSize,
+      sortBy = sortBy)
 
     val testViews = tests.map(new TestView(_))
     val testsSummary = TestsSummaryView(configuration, testCounts)
     val paginationData = pagination.paginationData(testCounts.countFor(testStatusOpt))
-    views.html.tests(testsSummary, testViews.toList, configuration, testStatusOpt, nameOpt, groupOpt, service.canRerun, paginationData)
+    views.html.tests(testsSummary, testViews.toList, configuration, testStatusOpt, nameOpt, groupOpt, service.canRerun, paginationData, sortOpt, descendingOpt)
   }
 
   def admin() = Action { implicit request ⇒

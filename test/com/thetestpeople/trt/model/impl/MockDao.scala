@@ -63,7 +63,8 @@ class MockDao extends Dao {
     nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
-    limitOpt: Option[Int]): Seq[TestAndAnalysis] = {
+    limitOpt: Option[Int],
+    sortBy: SortBy.Test = SortBy.Test.Group()): Seq[TestAndAnalysis] = {
     val allResults =
       for {
         test ← tests
