@@ -81,7 +81,6 @@ class JenkinsScraper(
     val buildXml = getBuildXml(buildUrl)
     val buildSummary = parseBuild(buildUrl, buildXml)
     if (buildSummary.hasTestReport) {
-      scrapeTestResult(buildUrl)
       for {
         testResult ← scrapeTestResult(buildUrl)
         consoleTextOpt = if (fetchConsole) Some(getConsole(buildUrl)) else None
