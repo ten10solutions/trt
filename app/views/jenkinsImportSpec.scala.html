@@ -1,4 +1,10 @@
-@(spec: JenkinsImportSpec, jobImportInfo: JenkinsJobImportInfo, builds: Seq[JenkinsBuildImportInfo], name: String, progress: Int)(implicit flash: Flash, globalViewContext: GlobalViewContext)
+@(
+  spec: JenkinsImportSpec, 
+  jobImportInfo: JenkinsJobImportInfo, 
+  builds: Seq[JenkinsBuildImportInfo], 
+  name: String, 
+  progress: Int,
+  pagination: PaginationData)(implicit flash: Flash, globalViewContext: GlobalViewContext)
 
 @css = {
   <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jenkinsImportSpec.css")">
@@ -6,6 +12,14 @@
 
 @scripts = {
   <script src="@routes.Assets.at("javascripts/jenkinsImportSpec.js")"></script>
+}
+
+@buildsPaginationWidget = { 
+  @paginationWidget(pagination)((page, pageSize) => 
+    routes.JenkinsController.getJenkinsImportSpec(
+      id = spec.id, 
+      page = Some(page),
+      pageSize = Some(pageSize)))
 }
 
 @main("Jenkins Import Log", "JenkinsImportStatus", css = css, scripts = scripts) {
@@ -87,6 +101,8 @@
 
 <h3>Builds</h3>
 
+@buildsPaginationWidget
+
 <table style="margin-top: 15px" class="table table-striped table-bordered table-hover">
 <tr>
   <th class="build-number-col">Build number</th>
@@ -149,6 +165,8 @@
   </tr>
 }
 </table>
+
+@buildsPaginationWidget
 
 }
 }

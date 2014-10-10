@@ -68,18 +68,25 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
     }
   }
 
-  def getJenkinsImportSpec(id: Id[JenkinsImportSpec]) = Action { implicit request ⇒
-    logger.debug(s"getJenkinsImportSpec($id)")
-    service.getJenkinsImportSpec(id) match {
-      case None ⇒
-        NotFound(s"Could not find Jenkins import spec with id '$id'")
-      case Some(spec) ⇒
-        val allInfos = getBuildImportInfos(spec)
-        val jobName = service.getJenkinsJobs().find(_.url == spec.jobUrl).map(_.name)
-          .getOrElse(spec.jobUrl.toString) // Job name not known until first import completes
-        val jobImportInfo = getJobImportInfo(spec)
-        val progress = getJenkinsImportProgressPercent(allInfos)
-        Ok(html.jenkinsImportSpec(spec, jobImportInfo, allInfos, jobName, progress))
+  def getJenkinsImportSpec(id: Id[JenkinsImportSpec], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
+    logger.debug(s"getJenkinsImportSpec($id, page = $pageOpt, pageSize = $pageSizeOpt)")
+    Pagination.validate(pageOpt, pageSizeOpt) match {
+      case Left(errorMessage) ⇒
+        BadRequest(errorMessage)
+      case Right(pagination) ⇒
+        service.getJenkinsImportSpec(id) match {
+          case None ⇒
+            NotFound(s"Could not find Jenkins import spec with id '$id'")
+          case Some(spec) ⇒
+            val allInfos = getBuildImportInfos(spec)
+            val pageInfos = allInfos.drop(pagination.firstItem).take(pagination.pageSize)
+            val jobName = service.getJenkinsJobs().find(_.url == spec.jobUrl).map(_.name)
+              .getOrElse(spec.jobUrl.toString) // Job name not known until first import completes
+            val jobImportInfo = getJobImportInfo(spec)
+            val progress = getJenkinsImportProgressPercent(pageInfos)
+            val paginationData = pagination.paginationData(allInfos.size)
+            Ok(html.jenkinsImportSpec(spec, jobImportInfo, pageInfos, jobName, progress, paginationData))
+        }
     }
   }
 

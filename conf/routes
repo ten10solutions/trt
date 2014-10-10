@@ -58,7 +58,7 @@ GET     /jenkins/jobs               @controllers.JenkinsController.jenkinsImport
 GET     /jenkins/jobs/new           @controllers.JenkinsController.newJenkinsImportSpec()
 POST    /jenkins/jobs/new           @controllers.JenkinsController.createJenkinsImportSpec()
 
-GET     /jenkins/job/:id/log        @controllers.JenkinsController.getJenkinsImportSpec(id: Id[JenkinsImportSpec])
+GET     /jenkins/job/:id/log        @controllers.JenkinsController.getJenkinsImportSpec(id: Id[JenkinsImportSpec], page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 GET     /jenkins/job/:id/edit       @controllers.JenkinsController.editJenkinsImportSpec(id: Id[JenkinsImportSpec])
 POST    /jenkins/job/:id/edit       @controllers.JenkinsController.updateJenkinsImportSpec(id: Id[JenkinsImportSpec])
 POST    /jenkins/job/:id/delete     @controllers.JenkinsController.deleteJenkinsImportSpec(id: Id[JenkinsImportSpec])
