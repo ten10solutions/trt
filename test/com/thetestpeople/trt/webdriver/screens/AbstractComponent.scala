@@ -8,7 +8,7 @@ import org.joda.time.DateTime
 
 abstract class AbstractComponent(implicit automationContext: AutomationContext) {
 
-  protected def log(message: String) = println(s"[${new DateTime}] $message")
+  protected def log(message: String) = automationContext.log(message)
 
   protected def webDriver = automationContext.webDriver
 

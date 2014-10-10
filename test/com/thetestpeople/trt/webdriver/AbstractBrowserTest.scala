@@ -30,7 +30,7 @@ abstract class AbstractBrowserTest extends FlatSpec with Matchers {
         else
           new PhantomJSDriver
       try {
-        val automationContext = AutomationContext(webDriver)
+        val automationContext = AutomationContext(webDriver, message => info(message))
         val site = new Site(automationContext, siteUrl)
         site.restApi.deleteAll()
         testBlock(site)
