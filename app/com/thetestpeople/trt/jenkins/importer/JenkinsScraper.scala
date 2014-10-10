@@ -73,14 +73,14 @@ class JenkinsScraper(
     }
 
   /**
-   * @return None if build has no tests associated with it.
+   * @return None if build has no tests associated with it, or if it is still building
    */
   @throws[JenkinsScraperException]
   def scrapeBuild(buildUrl: URI, jobUrl: URI): Option[JenkinsBuild] = {
     logger.debug(s"scrapeBuild($buildUrl)")
     val buildXml = getBuildXml(buildUrl)
     val buildSummary = parseBuild(buildUrl, buildXml)
-    if (buildSummary.hasTestReport) {
+    if (buildSummary.hasTestReport && !buildSummary.isBuilding) { // Note: you can have a test report while building, e.g. a multimodule Maven project
       for {
         testResult ← scrapeTestResult(buildUrl)
         consoleTextOpt = if (fetchConsole) Some(getConsole(buildUrl)) else None

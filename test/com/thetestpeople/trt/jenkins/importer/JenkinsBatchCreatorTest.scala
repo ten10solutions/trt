@@ -47,14 +47,16 @@ class JenkinsBatchCreatorTest extends FlatSpec with Matchers {
     nameOpt: Option[String] = Some(DummyData.BatchName),
     timestampOpt: Option[DateTime] = Some(DummyData.ExecutionTime),
     result: String = "PASSED",
-    hasTestReport: Boolean = true) =
+    hasTestReport: Boolean = true,
+    isBuilding: Boolean = false) =
     BuildSummary(
       url = url,
       durationOpt = durationOpt,
       nameOpt = nameOpt,
       timestampOpt = timestampOpt,
       result = result,
-      hasTestReport = hasTestReport)
+      hasTestReport = hasTestReport,
+      isBuilding = isBuilding)
 
   private def makeSuite(
     name: String = DummyData.Group,

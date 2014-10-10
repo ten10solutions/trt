@@ -23,19 +23,21 @@ class JenkinsBuildXmlParserTest extends FlatSpec with Matchers {
     buildSummary.result should be("UNSTABLE")
     buildSummary.timestampOpt should be(Some(new DateTime(1392394912000L)))
     buildSummary.url should be(uri("http://ci.pentaho.com/job/pentaho-big-data-plugin/755/"))
+    buildSummary.isBuilding should be(false)
   }
 
   "Parsing a matrix build" should "work" in {
     val xml = TestUtils.loadXmlFromClasspath("/matrixBuild.xml")
-    
+
     val buildSummary = parse(xml)
-    
+
     buildSummary.durationOpt should be(Some(millis(2302595)))
     buildSummary.hasTestReport should be(true)
     buildSummary.nameOpt should be(Some("High Level Tests #886"))
     buildSummary.result should be("UNSTABLE")
     buildSummary.timestampOpt should be(Some(new DateTime(1392277044928L)))
     buildSummary.url should be(uri("http://asdf:8080/job/highlevel/886/"))
+    buildSummary.isBuilding should be(false)
   }
 
   private def parse(xml: Elem): BuildSummary = new JenkinsBuildXmlParser().parseBuild(xml)

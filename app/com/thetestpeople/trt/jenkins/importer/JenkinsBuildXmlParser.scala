@@ -18,13 +18,17 @@ class JenkinsBuildXmlParser {
     val result = getFieldOpt(elem, "result").getOrElse(
       throw new ParseException("Could not find a <result> element"))
     val hasTestReport = (elem \ "action" \ "urlName").exists(_.text == "testReport")
+    val isBuilding = getFieldOpt(elem, "building").getOrElse(
+      throw new ParseException("Could not find a <building> element")).toBoolean
+
     BuildSummary(
       url = new URI(url),
       durationOpt = durationOpt,
       nameOpt = nameOpt,
       timestampOpt = timestampOpt,
       result = result,
-      hasTestReport = hasTestReport)
+      hasTestReport = hasTestReport,
+      isBuilding = isBuilding)
   }
 
   private def getFieldOpt(node: Node, name: String): Option[String] =
