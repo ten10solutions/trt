@@ -8,28 +8,28 @@
 
   @helper.form(routes.Application.updateSystemConfiguration(), 'role -> "form") {
     
-    @helper.inputText(confForm("failureDurationThreshold"), 
+    @helper.inputText(confForm("brokenDurationThreshold"), 
       'class -> "form-control",
       'placeholder -> "Duration threshold",
-	    '_label -> "Duration threshold for Broken status",
-	    '_help -> "How long a test must have been failing before it is classified as Broken, rather than a Warning (e.g. 6 hours, 1 day, etc.)")
+      '_label -> "Duration threshold for Broken status",
+      '_help -> "How long a test must have been failing before it is classified as Broken, rather than a Warning (e.g. 6 hours, 1 day, etc.)")
     
-    @helper.inputText(confForm("failureCountThreshold"), 
+    @helper.inputText(confForm("brokenCountThreshold"), 
       'class -> "form-control",
       'placeholder -> "Count threshold",
-	    '_label -> "Count threshold for Broken status",
+      '_label -> "Count threshold for Broken status",
       '_help -> "Number of consecutive failures required before a test is classed as Broken, rather than a Warning")
         
-    @helper.inputText(confForm("passDurationThreshold"), 
+    @helper.inputText(confForm("healthyDurationThreshold"), 
       'class -> "form-control",
       'placeholder -> "Duration threshold",
-	    '_label -> "Duration threshold for Healthy status", 
+      '_label -> "Duration threshold for Healthy status", 
       '_help -> "How long a test must have been passing before it is classified as Healthy, rather than a Warning (e.g. 6 hours, 1 day, etc.)")
     
-    @helper.inputText(confForm("passCountThreshold"), 
+    @helper.inputText(confForm("healthyCountThreshold"), 
       'class -> "form-control",
       'placeholder -> "Count threshold",
-	    '_label -> "Count threshold for Healthy status", 
+      '_label -> "Count threshold for Healthy status", 
       '_help -> "Number of consecutive passes required before a test is classed as Healthy, rather than a Warning")
         
     <div class="form-actions">

@@ -8,10 +8,16 @@ import org.openqa.selenium.By
 object SystemConfigurationScreen {
 
   private object Locators {
-    val FailureDurationThreshold = id("failureDurationThreshold")
-    val FailureCountThreshold = id("failureCountThreshold")
-    val PassDurationThreshold = id("passDurationThreshold")
-    val PassCountThreshold = id("passCountThreshold")
+    val BrokenDurationThreshold = id("brokenDurationThreshold")
+    val BrokenCountThreshold = id("brokenCountThreshold")
+    val HealthyDurationThreshold = id("healthyDurationThreshold")
+    val HealthyCountThreshold = id("healthyCountThreshold")
+
+    val ErrorsForBrokenDurationThreshold = id("errors-brokenDurationThreshold")
+    val ErrorsForBrokenCountThreshold = id("errors-brokenCountThreshold")
+    val ErrorsForHealthyDurationThreshold = id("errors-healthyDurationThreshold")
+    val ErrorsForHealthyCountThreshold = id("errors-healthyCountThreshold")
+
   }
 
 }
@@ -20,19 +26,30 @@ class SystemConfigurationScreen(implicit automationContext: AutomationContext) e
 
   import SystemConfigurationScreen._
 
-  def failureDurationThreshold: String = getField(Locators.FailureDurationThreshold)
-  def failureCountThreshold: String = getField(Locators.FailureCountThreshold)
-  def passDurationThreshold: String = getField(Locators.PassDurationThreshold)
-  def passCountThreshold: String = getField(Locators.PassCountThreshold)
+  def brokenDurationThreshold: String = getField(Locators.BrokenDurationThreshold)
+  def brokenCountThreshold: String = getField(Locators.BrokenCountThreshold)
+  def healthyDurationThreshold: String = getField(Locators.HealthyDurationThreshold)
+  def healthyCountThreshold: String = getField(Locators.HealthyCountThreshold)
 
-  def failureDurationThreshold_=(text: String) =
-    setField("Failure duration threshold", Locators.FailureDurationThreshold, text)
-  def failureCountThreshold_=(text: String) =
-    setField("Failure count threshold", Locators.FailureCountThreshold, text)
-  def passDurationThreshold_=(text: String) =
-    setField("Pass duration threshold", Locators.PassDurationThreshold, text)
-  def passCountThreshold_=(text: String) =
-    setField("Pass count threshold", Locators.PassCountThreshold, text)
+  def brokenDurationThreshold_=(text: String) =
+    setField("Duration threshold for Broken status", Locators.BrokenDurationThreshold, text)
+  def brokenCountThreshold_=(text: String) =
+    setField("Count threshold for Broken status", Locators.BrokenCountThreshold, text)
+  def healthyDurationThreshold_=(text: String) =
+    setField("Duration threshold for Healthy status", Locators.HealthyDurationThreshold, text)
+  def healthyCountThreshold_=(text: String) =
+    setField("Count threshold for Healthy status", Locators.HealthyCountThreshold, text)
+
+  def waitForValidationError() {
+    webDriver.waitForDisplayedAndEnabled(By.className("alert-danger"))
+  }
+
+  def errorsForBrokenDurationThreshold = getOptionalText(Locators.ErrorsForBrokenDurationThreshold)
+  def errorsForBrokenCountThreshold = getOptionalText(Locators.ErrorsForBrokenCountThreshold)
+  def errorsForHealthyDurationThreshold = getOptionalText(Locators.ErrorsForHealthyDurationThreshold)
+  def errorsForHealthyCountThreshold = getOptionalText(Locators.ErrorsForHealthyCountThreshold)
+
+  private def getOptionalText(locator: By): Option[String] = webDriver.findImmediate(locator).map(_.getText)
 
   private def getField(locator: By): String =
     webDriver.waitForDisplayedAndEnabled(locator).getAttribute("value")

@@ -5,5 +5,5 @@
   @elements.input
   @if(elements.hasErrors){ <span class="glyphicon glyphicon-remove form-control-feedback"></span> }  
   <p class="help-block">@elements.infos.mkString(", ")</p>
-  @if(elements.hasErrors){ <div class="alert alert-danger">@elements.errors.mkString(", ")</div> }
+  @if(elements.hasErrors){ <div id="errors-@elements.id" class="alert alert-danger">@elements.errors.mkString(", ")</div> }
 </div>

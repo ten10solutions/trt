@@ -8,14 +8,15 @@ import com.thetestpeople.trt.utils.FormUtils._
 import play.api.data.Forms._
 import play.api.data.Forms
 import play.api.data.Form
+import controllers.SystemConfigurationFormConstraints._
 
 object SystemConfigurationForm {
 
   val form: Form[SystemConfiguration] =
     Form(mapping(
-      "failureDurationThreshold" -> duration,
-      "failureCountThreshold" -> number,
-      "passDurationThreshold" -> duration,
-      "passCountThreshold" -> number)(SystemConfiguration.apply)(SystemConfiguration.unapply))
+      "brokenDurationThreshold" -> duration.verifying(isNonNegativeDuration),
+      "brokenCountThreshold" -> number.verifying(isNonNegative),
+      "healthyDurationThreshold" -> duration.verifying(isNonNegativeDuration),
+      "healthyCountThreshold" -> number.verifying(isNonNegative))(SystemConfiguration.apply)(SystemConfiguration.unapply))
 
 }
