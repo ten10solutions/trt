@@ -36,7 +36,7 @@ onChartHover = (event, pos, item) ->
   if item
     eventDate = item.datapoint[0]
     seconds = item.datapoint[1]
-    tooltipText = "#{formatDuration(seconds)} &mdash; #{formatDate(eventDate)}"
+    tooltipText = "Duration: #{formatDuration(seconds)}<br/>Date: #{formatDate(eventDate)}"
     $("#chart-tooltip").html(tooltipText).css(
       top: item.pageY + 5
       left: item.pageX + 5

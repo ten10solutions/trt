@@ -32,14 +32,10 @@ chartOptions =
 onChartHover = (passes, fails) -> (event, pos, item) ->
   if item
     dataItem = undefined
-    if item.seriesIndex is 0
-      dataItem = fails[item.dataIndex]
-    else
-      dataItem = passes[item.dataIndex]
-    date = dataItem[0]
-    count = dataItem[1]
-
-    tooltipText = "#{count} #{item.series.label} on #{formatDate(date)}"
+    failCount = fails[item.dataIndex][1]
+    passCount = passes[item.dataIndex][1]
+    date = passes[item.dataIndex][0]
+    tooltipText = "Passed: #{passCount}<br/>Failed: #{failCount}<br/>Date: #{formatDate(date)}"
     $("#chart-tooltip").html(tooltipText).css(
       top: item.pageY + 5
       left: item.pageX + 5

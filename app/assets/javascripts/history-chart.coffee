@@ -27,13 +27,19 @@ chartOptions =
   legend:
     show: false
 
-onChartHover = (seriesData) -> (event, pos, item) ->
+onChartHover = (series, seriesData) -> (event, pos, item) ->
   if item
     dataItem = seriesData[item.seriesIndex][item.dataIndex]
     date = dataItem[0]
-    count = dataItem[1]
+    tooltipText = ""
+    i = 0
+    while i < series.length
+      label = series[i].label
+      count = seriesData[i][item.dataIndex][1]
+      tooltipText +="#{label}: #{count}</br>"
+      i++
+    tooltipText += "Date: #{formatDate(date)}</br>"
 
-    tooltipText = "#{count} #{item.series.label} on #{formatDate(date)}"
     $("#chart-tooltip").html(tooltipText).css(
       top: item.pageY + 5
       left: item.pageX + 5
@@ -75,6 +81,6 @@ window.createHistoryChart = (chartId, healthy, warnings, broken) ->
     minX: 10 * 60 * 1000
     minY: 10
   $("#" + chartId).unbind "plothover"
-  $("#" + chartId).bind "plothover", onChartHover(seriesData)
+  $("#" + chartId).bind "plothover", onChartHover(series, seriesData)
 
   initialiseTooltip()
