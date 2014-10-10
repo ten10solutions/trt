@@ -51,11 +51,6 @@
   }
 }
 
-@weatherSortLink = { @sortLink(Sort.Weather) }
-
-@groupSortLink = { @sortLink(Sort.Group) }
-
-
 @main(if(globalViewContext.multipleConfigurationMode) "Tests" + configuration else "Tests", "Tests", scripts = scripts, css = css) {
 
   <h2><img src="@routes.Assets.at("images/" + testsSummary.ballIcon)"/> Tests</h2>
@@ -209,13 +204,13 @@
         <tr>
           <th style="text-align: center"><input class="testCheckbox" id="selectAll" type="checkbox" title="Select all"/></th>
           <th class="pass-fail-col">Status</th>
-          <th class="pass-fail-col" style="white-space: nowrap">Weather @weatherSortLink</th>
-          <th class="group-col">Group @groupSortLink</th>
-          <th class="name-col">Name</th>
-          <th class="consecutive-failures-col">Consecutive failures</th>
-          <th class="failing-since-col">Started failing</th>
-          <th class="last-passfail-col">Last passed</th>
-          <th class="last-passfail-col">Last failed</th>
+          <th class="pass-fail-col" style="white-space: nowrap">Weather @sortLink(Sort.Weather)</th>
+          <th class="group-col">Group @sortLink(Sort.Group)</th>
+          <th class="name-col">Name @sortLink(Sort.Name)</th>
+          <th class="consecutive-failures-col">Consecutive failures @sortLink(Sort.ConsecutiveFailures)</th>
+          <th class="failing-since-col">Started failing @sortLink(Sort.StartedFailing)</th>
+          <th class="last-passfail-col">Last passed @sortLink(Sort.LastPassed)</th>
+          <th class="last-passfail-col">Last failed @sortLink(Sort.LastFailed)</th>
       </thead>
       <tbody>
         @for(test <- tests) {

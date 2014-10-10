@@ -244,9 +244,14 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   private def getTestSortBy(sortOpt: Option[Sort], descendingOpt: Option[Boolean]): SortBy.Test = sortOpt match {
-    case Some(Sort.Weather) ⇒ SortBy.Test.Weather(descendingOpt getOrElse false)
-    case Some(Sort.Group)   ⇒ SortBy.Test.Group(descendingOpt getOrElse false)
-    case _                  ⇒ SortBy.Test.Group(descending = false)
+    case Some(Sort.Weather)             ⇒ SortBy.Test.Weather(descendingOpt getOrElse false)
+    case Some(Sort.Group)               ⇒ SortBy.Test.Group(descendingOpt getOrElse false)
+    case Some(Sort.Name)                ⇒ SortBy.Test.Name(descendingOpt getOrElse false)
+    case Some(Sort.ConsecutiveFailures) ⇒ SortBy.Test.ConsecutiveFailures(descendingOpt getOrElse false)
+    case Some(Sort.StartedFailing)      ⇒ SortBy.Test.StartedFailing(descendingOpt getOrElse false)
+    case Some(Sort.LastPassed)          ⇒ SortBy.Test.LastPassed(descendingOpt getOrElse false)
+    case Some(Sort.LastFailed)          ⇒ SortBy.Test.LastFailed(descendingOpt getOrElse false)
+    case _                              ⇒ SortBy.Test.Group(descending = false)
   }
 
   private def handleTests(testStatusOpt: Option[TestStatus], configuration: Configuration, nameOpt: Option[String], groupOpt: Option[String], pagination: Pagination, sortOpt: Option[Sort], descendingOpt: Option[Boolean])(implicit request: Request[_]) = {

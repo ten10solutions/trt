@@ -173,6 +173,16 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       case SortBy.Test.Group(descending) ⇒
         query.sortBy { case (test, analysis) ⇒ order(test.name, descending) }
           .sortBy { case (test, analysis) ⇒ order(test.group, descending) }
+      case SortBy.Test.Name(descending) ⇒
+        query.sortBy { case (test, analysis) ⇒ order(test.name, descending) }
+      case SortBy.Test.ConsecutiveFailures(descending) ⇒
+        query.sortBy { case (test, analysis) ⇒ order(analysis.consecutiveFailures, descending) }
+      case SortBy.Test.StartedFailing(descending) ⇒
+        query.sortBy { case (test, analysis) ⇒ order(analysis.failingSince, descending) }
+      case SortBy.Test.LastPassed(descending) ⇒
+        query.sortBy { case (test, analysis) ⇒ order(analysis.lastPassedTime, descending) }
+      case SortBy.Test.LastFailed(descending) ⇒
+        query.sortBy { case (test, analysis) ⇒ order(analysis.lastFailedTime, descending) }
     }
     query = query.drop(startingFrom)
     for (limit ← limitOpt)

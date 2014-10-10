@@ -183,7 +183,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     dao.getAnalysedTests(startingFrom = 4, limitOpt = None).map(_.test.id) should contain theSameElementsAs (List(testId4, testId5))
   }
 
-  "Getting tests" should "return results ordered by group, then name" in transaction { dao ⇒
+  "Getting tests" should "by default return results ordered by group, then name" in transaction { dao ⇒
     def addTest(name: String, group: String) = {
       val testId = dao.ensureTestIsRecorded(F.test(name, Some(group)))
       dao.upsertAnalysis(F.analysis(testId))
@@ -196,8 +196,92 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     val testId_C0 = addTest(name = "0", group = "C")
     val testId_B1 = addTest(name = "1", group = "B")
 
-    dao.getAnalysedTests().map(_.test.id) should contain theSameElementsAs (List(
+    dao.getAnalysedTests().map(_.test.id) should equal(Seq(
       testId_A0, testId_A1, testId_B0, testId_B1, testId_C0, testId_C1))
+  }
+
+  "Getting tests" should "support ordering by weather" in transaction { dao ⇒
+    def addTest(weather: Double) = {
+      val testId = dao.ensureTestIsRecorded(F.test())
+      dao.upsertAnalysis(F.analysis(testId, weather = weather))
+      testId
+    }
+    val test1 = addTest(weather = 0.0)
+    val test3 = addTest(weather = 1.0)
+    val test2 = addTest(weather = 0.5)
+
+    dao.getAnalysedTests(sortBy = SortBy.Test.Weather()).map(_.test.id) should equal(Seq(test1, test2, test3))
+    dao.getAnalysedTests(sortBy = SortBy.Test.Weather(descending = true)).map(_.test.id) should equal(Seq(test3, test2, test1))
+  }
+
+  "Getting tests" should "support ordering by name" in transaction { dao ⇒
+    def addTest(name: String, group: String) = {
+      val testId = dao.ensureTestIsRecorded(F.test(name, Some(group)))
+      dao.upsertAnalysis(F.analysis(testId))
+      testId
+    }
+    val test1 = addTest(name = "Aardvark", group = "Zebra")
+    val test3 = addTest(name = "Cat", group = "Xenomorph")
+    val test2 = addTest(name = "Badger", group = "Yeti")
+
+    dao.getAnalysedTests(sortBy = SortBy.Test.Name()).map(_.test.id) should equal(Seq(test1, test2, test3))
+    dao.getAnalysedTests(sortBy = SortBy.Test.Name(descending = true)).map(_.test.id) should equal(Seq(test3, test2, test1))
+  }
+
+  "Getting tests" should "support ordering by consecutive failures" in transaction { dao ⇒
+    def addTest(consecutiveFailures: Int) = {
+      val testId = dao.ensureTestIsRecorded(F.test())
+      dao.upsertAnalysis(F.analysis(testId, consecutiveFailures = consecutiveFailures))
+      testId
+    }
+    val test1 = addTest(consecutiveFailures = 1)
+    val test3 = addTest(consecutiveFailures = 3)
+    val test2 = addTest(consecutiveFailures = 2)
+
+    dao.getAnalysedTests(sortBy = SortBy.Test.ConsecutiveFailures()).map(_.test.id) should equal(Seq(test1, test2, test3))
+    dao.getAnalysedTests(sortBy = SortBy.Test.ConsecutiveFailures(descending = true)).map(_.test.id) should equal(Seq(test3, test2, test1))
+  }
+
+  "Getting tests" should "support ordering by started failing" in transaction { dao ⇒
+    def addTest(failingSince: Option[DateTime]) = {
+      val testId = dao.ensureTestIsRecorded(F.test())
+      dao.upsertAnalysis(F.analysis(testId, failingSinceOpt = failingSince))
+      testId
+    }
+    val test1 = addTest(failingSince = None)
+    val test3 = addTest(failingSince = Some(2.days.ago))
+    val test2 = addTest(failingSince = Some(3.days.ago))
+
+    dao.getAnalysedTests(sortBy = SortBy.Test.StartedFailing()).map(_.test.id) should equal(Seq(test1, test2, test3))
+    dao.getAnalysedTests(sortBy = SortBy.Test.StartedFailing(descending = true)).map(_.test.id) should equal(Seq(test3, test2, test1))
+  }
+
+  "Getting tests" should "support ordering by last passed" in transaction { dao ⇒
+    def addTest(lastPassed: Option[DateTime]) = {
+      val testId = dao.ensureTestIsRecorded(F.test())
+      dao.upsertAnalysis(F.analysis(testId, lastPassedTimeOpt = lastPassed))
+      testId
+    }
+    val test1 = addTest(lastPassed = None)
+    val test3 = addTest(lastPassed = Some(2.days.ago))
+    val test2 = addTest(lastPassed = Some(3.days.ago))
+
+    dao.getAnalysedTests(sortBy = SortBy.Test.LastPassed()).map(_.test.id) should equal(Seq(test1, test2, test3))
+    dao.getAnalysedTests(sortBy = SortBy.Test.LastPassed(descending = true)).map(_.test.id) should equal(Seq(test3, test2, test1))
+  }
+
+  "Getting tests" should "support ordering by last failed" in transaction { dao ⇒
+    def addTest(lastFailed: Option[DateTime]) = {
+      val testId = dao.ensureTestIsRecorded(F.test())
+      dao.upsertAnalysis(F.analysis(testId, lastFailedTimeOpt = lastFailed))
+      testId
+    }
+    val test1 = addTest(lastFailed = None)
+    val test3 = addTest(lastFailed = Some(2.days.ago))
+    val test2 = addTest(lastFailed = Some(3.days.ago))
+
+    dao.getAnalysedTests(sortBy = SortBy.Test.LastFailed()).map(_.test.id) should equal(Seq(test1, test2, test3))
+    dao.getAnalysedTests(sortBy = SortBy.Test.LastFailed(descending = true)).map(_.test.id) should equal(Seq(test3, test2, test1))
   }
 
   "Getting tests by ID" should "work" in transaction { dao ⇒

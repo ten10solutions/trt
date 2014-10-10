@@ -51,7 +51,7 @@ class MockDao extends Dao {
   def getTestAndAnalysis(id: Id[Test], configuration: Configuration): Option[TestAndAnalysis] =
     for {
       test ← tests.find(_.id == id)
-      analysis <- analyses.find(a ⇒ a.testId == test.id && a.configuration == configuration)
+      analysis ← analyses.find(a ⇒ a.testId == test.id && a.configuration == configuration)
       commentOpt = testComments.find(_.testId == id).map(_.text)
     } yield TestAndAnalysis(test, Some(analysis), commentOpt)
 
@@ -74,7 +74,23 @@ class MockDao extends Dao {
         if testStatusOpt.forall(status ⇒ analysisOpt.exists(_.status == status))
         commentOpt = testComments.find(_.testId == test.id).map(_.text)
       } yield TestAndAnalysis(test, analysisOpt, commentOpt)
-    val sortedResults = allResults.sortBy(_.test.name).sortBy(_.test.groupOpt)
+    def order(x: Seq[TestAndAnalysis], descending: Boolean) = if (descending) x.reverse else x
+    val sortedResults = sortBy match {
+      case SortBy.Test.Weather(descending) ⇒
+        order(allResults.sortBy(_.analysisOpt.map(_.weather)), descending)
+      case SortBy.Test.Group(descending) ⇒
+        order(allResults.sortBy(_.test.name).sortBy(_.test.groupOpt), descending)
+      case SortBy.Test.Name(descending) ⇒
+        order(allResults.sortBy(_.name), descending)
+      case SortBy.Test.ConsecutiveFailures(descending) ⇒
+        order(allResults.sortBy(_.analysisOpt.map(_.consecutiveFailures)), descending)
+      case SortBy.Test.StartedFailing(descending) ⇒
+        order(allResults.sortBy(_.analysisOpt.flatMap(_.failingSinceOpt)), descending)
+      case SortBy.Test.LastPassed(descending) ⇒
+        order(allResults.sortBy(_.analysisOpt.flatMap(_.lastPassedTimeOpt)), descending)
+      case SortBy.Test.LastFailed(descending) ⇒
+        order(allResults.sortBy(_.analysisOpt.flatMap(_.lastFailedTimeOpt)), descending)
+    }
     limitOpt match {
       case Some(limit) ⇒ sortedResults.drop(startingFrom).take(limit)
       case None        ⇒ sortedResults.drop(startingFrom)
