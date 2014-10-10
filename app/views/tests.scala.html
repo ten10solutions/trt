@@ -51,7 +51,7 @@
   }
 }
 
-@main(if(globalViewContext.multipleConfigurationMode) "Tests" + configuration else "Tests", "Tests", scripts = scripts, css = css) {
+@main(if(globalViewContext.multipleConfigurationMode) "Tests: " + configuration else "Tests", "Tests", scripts = scripts, css = css) {
 
   <h2><img src="@routes.Assets.at("images/" + testsSummary.ballIcon)"/> Tests</h2>
   
