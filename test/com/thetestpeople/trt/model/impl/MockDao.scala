@@ -162,13 +162,14 @@ class MockDao extends Dao {
   def getExecutionsForTest(id: Id[Test]): Seq[Execution] =
     executions.filter(_.testId == id).sortBy(_.executionTime).reverse
 
-  def getEnrichedExecutionsForTest(testId: Id[Test], configurationOpt: Option[Configuration]): Seq[EnrichedExecution] = {
+  def getEnrichedExecutionsForTest(testId: Id[Test], configurationOpt: Option[Configuration], resultOpt: Option[Boolean] = None): Seq[EnrichedExecution] = {
     val executionsForTest =
       for {
         test ← tests.filter(_.id == testId)
         execution ← executions.filter(_.testId == testId)
         batch ← batches.find(_.id == execution.batchId)
         if configurationOpt.forall(_ == execution.configuration)
+        if resultOpt.forall(_ == execution.passed)
       } yield EnrichedExecution(execution, test.qualifiedName, batch.nameOpt, logOpt = None, commentOpt = None)
     executionsForTest.sortBy(_.execution.executionTime).reverse
   }

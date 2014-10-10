@@ -142,7 +142,7 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
   def getExecutionsForTest(id: Id[Test]): Seq[Execution] =
     getExecutionsForTestCompiled(id).run.toList
 
-  def getEnrichedExecutionsForTest(id: Id[Test], configurationOpt: Option[Configuration]): Seq[EnrichedExecution] = {
+  def getEnrichedExecutionsForTest(id: Id[Test], configurationOpt: Option[Configuration], resultOpt: Option[Boolean] = None): Seq[EnrichedExecution] = {
     var query =
       for {
         (execution, test, batch) ← executionTestBatchJoin
@@ -150,17 +150,18 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
       } yield (execution, test.name, test.group, batch.name)
     for (configuration ← configurationOpt)
       query = query.filter(_._1.configuration === configuration)
+    for (result ← resultOpt)
+      query = query.filter(_._1.passed === result)
     query = query.sortBy(_._1.executionTime.desc)
     query.run.toList.map((makeEnrichedExecution _).tupled)
   }
-  
-  def setExecutionComment(id: Id[Execution], text: String) = 
+
+  def setExecutionComment(id: Id[Execution], text: String) =
     if (executionComments.filter(_.executionId === id).firstOption.isDefined)
       executionComments.filter(_.executionId === id).map(_.text).update(text)
-    else 
+    else
       executionComments.insert(ExecutionComment(id, text))
-  
+
   def deleteExecutionComment(id: Id[Execution]) = executionComments.filter(_.executionId === id).delete
 
-  
 }

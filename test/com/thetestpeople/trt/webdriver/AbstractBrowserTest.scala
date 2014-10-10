@@ -24,13 +24,9 @@ abstract class AbstractBrowserTest extends FlatSpec with Matchers {
 
   protected def automate(testBlock: Site ⇒ Any) =
     Helpers.running(TestServer(port, FakeApplicationFactory.fakeApplication)) {
-      val webDriver: WebDriver =
-        if ("firefox".equalsIgnoreCase(System.getenv("TRT_BROWSER")))
-          new FirefoxDriver
-        else
-          new PhantomJSDriver
+      val webDriver: WebDriver = getWebDriver
       try {
-        val automationContext = AutomationContext(webDriver, message => info(message))
+        val automationContext = AutomationContext(webDriver, message ⇒ info(message))
         val site = new Site(automationContext, siteUrl)
         site.restApi.deleteAll()
         testBlock(site)
@@ -39,5 +35,11 @@ abstract class AbstractBrowserTest extends FlatSpec with Matchers {
           webDriver.quit()
       }
     }
+
+  private def getWebDriver: WebDriver =
+    if ("firefox".equalsIgnoreCase(System.getenv("TRT_BROWSER")))
+      new FirefoxDriver
+    else
+      new PhantomJSDriver
 
 }

@@ -263,6 +263,20 @@ trait ExecutionDaoTest { self: AbstractDaoTest ⇒
     executions.map(_.id) should equal(List(executionId1))
   }
 
+  it should "allow filtering by pass/fail" in transaction { dao ⇒
+    val testId = dao.ensureTestIsRecorded(F.test())
+    val batchId = dao.newBatch(F.batch())
+    def addExecution(passed: Boolean) = dao.newExecution(F.execution(batchId, testId, passed = passed))
+    val executionId1 = addExecution(passed = true)
+    val executionId2 = addExecution(passed = false)
+    val executionId3 = addExecution(passed = true)
+
+    val executions = dao.getEnrichedExecutionsForTest(testId, resultOpt = Some(true))
+
+    dao.getEnrichedExecutionsForTest(testId, resultOpt = Some(true)).map(_.id) should contain theSameElementsAs (List(executionId1, executionId3))
+    dao.getEnrichedExecutionsForTest(testId, resultOpt = Some(false)).map(_.id) should contain theSameElementsAs (List(executionId2))
+  }
+
   "Getting enriched executions" should "work for a list of IDs" in transaction { dao ⇒
     val testId = dao.ensureTestIsRecorded(F.test())
     val batchId = dao.newBatch(F.batch())

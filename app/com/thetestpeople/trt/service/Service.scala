@@ -31,7 +31,7 @@ trait Service extends JenkinsService {
 
   def deleteBatches(batchIds: List[Id[Batch]])
 
-  def getTestAndExecutions(id: Id[Test], configuration: Configuration = Configuration.Default): Option[TestAndExecutions]
+  def getTestAndExecutions(id: Id[Test], configuration: Configuration = Configuration.Default, resultOpt: Option[Boolean] = None): Option[TestAndExecutions]
 
   def getTests(
     configuration: Configuration = Configuration.Default,

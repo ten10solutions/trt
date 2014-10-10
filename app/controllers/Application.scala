@@ -67,27 +67,27 @@ class Application(service: Service, adminService: AdminService) extends Controll
     }
   }
 
-  def test(testId: Id[Test], configurationOpt: Option[Configuration], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
-    logger.debug(s"test($testId, configuration = $configurationOpt, page = $pageOpt, pageSize = $pageSizeOpt)")
+  def test(testId: Id[Test], configurationOpt: Option[Configuration], resultOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
+    logger.debug(s"test($testId, configuration = $configurationOpt, passed = $resultOpt, page = $pageOpt, pageSize = $pageSizeOpt)")
     Pagination.validate(pageOpt, pageSizeOpt) match {
       case Left(errorMessage) ⇒
         BadRequest(errorMessage)
       case Right(pagination) ⇒
         val configuration = configurationOpt.getOrElse(Configuration.Default)
-        handleTest(testId, configuration, pagination) match {
+        handleTest(testId, configuration, resultOpt, pagination) match {
           case None       ⇒ NotFound(s"Could not find test with id '$testId'")
           case Some(html) ⇒ Ok(html)
         }
     }
   }
 
-  private def handleTest(testId: Id[Test], configuration: Configuration, pagination: Pagination)(implicit request: Request[_]) =
-    service.getTestAndExecutions(testId, configuration) map {
+  private def handleTest(testId: Id[Test], configuration: Configuration, resultOpt: Option[Boolean], pagination: Pagination)(implicit request: Request[_]) =
+    service.getTestAndExecutions(testId, configuration, resultOpt) map {
       case TestAndExecutions(test, executions, otherConfigurations) ⇒
         val executionViews = executions.map(e ⇒ ExecutionView(e))
         val testView = new TestView(test)
         val paginationData = pagination.paginationData(executions.size)
-        views.html.test(testView, executionViews, Some(configuration), otherConfigurations, service.canRerun, paginationData)
+        views.html.test(testView, executionViews, Some(configuration), resultOpt, otherConfigurations, service.canRerun, paginationData)
     }
 
   def batch(batchId: Id[Batch], passedFilterOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒

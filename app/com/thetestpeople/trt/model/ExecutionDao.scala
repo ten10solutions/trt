@@ -48,7 +48,7 @@ trait ExecutionDao {
    * @param configurationOpt -- if defined, restrict executions to only those against the given configuration
    * @return executions of the given test, ordered most recent first. No execution logs will be provided.
    */
-  def getEnrichedExecutionsForTest(id: Id[Test], configurationOpt: Option[Configuration] = None): Seq[EnrichedExecution]
+  def getEnrichedExecutionsForTest(id: Id[Test], configurationOpt: Option[Configuration] = None, resultOpt: Option[Boolean] = None): Seq[EnrichedExecution]
 
   /**
    * @param passedFilterOpt -- if Some(true), return executions that passed. If Some(false), return only executions

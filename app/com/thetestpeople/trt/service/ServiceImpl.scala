@@ -37,9 +37,9 @@ class ServiceImpl(
       ExecutionsAndTotalCount(executions.toList, executionCount)
     }
 
-  def getTestAndExecutions(id: Id[Test], configuration: Configuration): Option[TestAndExecutions] = transaction {
+  def getTestAndExecutions(id: Id[Test], configuration: Configuration, resultOpt: Option[Boolean] = None): Option[TestAndExecutions] = transaction {
     dao.getTestAndAnalysis(id, configuration) map { test ⇒
-      val executions = dao.getEnrichedExecutionsForTest(id, Some(configuration))
+      val executions = dao.getEnrichedExecutionsForTest(id, Some(configuration), resultOpt)
       val otherConfigurations = dao.getConfigurations(id).filterNot(_ == configuration)
       TestAndExecutions(test, executions.toList, otherConfigurations)
     }
