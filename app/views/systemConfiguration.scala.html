@@ -7,29 +7,31 @@
   <h2>System Configuration</h2>
 
   @helper.form(routes.Application.updateSystemConfiguration(), 'role -> "form") {
-    
+
+    <h3><img src="@routes.Assets.at("images/balls/red.png")"/> Broken status</h3>    
     @helper.inputText(confForm("brokenDurationThreshold"), 
       'class -> "form-control",
       'placeholder -> "Duration threshold",
-      '_label -> "Duration threshold for Broken status",
+      '_label -> "Duration threshold",
       '_help -> "How long a test must have been failing before it is classified as Broken, rather than a Warning (e.g. 6 hours, 1 day, etc.)")
     
     @helper.inputText(confForm("brokenCountThreshold"), 
       'class -> "form-control",
       'placeholder -> "Count threshold",
-      '_label -> "Count threshold for Broken status",
+      '_label -> "Count threshold",
       '_help -> "Number of consecutive failures required before a test is classed as Broken, rather than a Warning")
         
+    <h3><img src="@routes.Assets.at("images/balls/green.png")"/> Healthy status</h3>    
     @helper.inputText(confForm("healthyDurationThreshold"), 
       'class -> "form-control",
       'placeholder -> "Duration threshold",
-      '_label -> "Duration threshold for Healthy status", 
+      '_label -> "Duration threshold", 
       '_help -> "How long a test must have been passing before it is classified as Healthy, rather than a Warning (e.g. 6 hours, 1 day, etc.)")
     
     @helper.inputText(confForm("healthyCountThreshold"), 
       'class -> "form-control",
       'placeholder -> "Count threshold",
-      '_label -> "Count threshold for Healthy status", 
+      '_label -> "Count threshold", 
       '_help -> "Number of consecutive passes required before a test is classed as Healthy, rather than a Warning")
         
     <div class="form-actions">
