@@ -22,6 +22,18 @@ class JenkinsScraper(
     parseJobXml(jobUrl, jobXml)
   }
 
+  private def getJobXml(jobUrl: URI): Elem = {
+    // We need to explicitly set the tree param to fetch the otherwise-hidden "allBuilds" list. Ordinarily the builds
+    // are capped at 100. See https://issues.jenkins-ci.org/browse/JENKINS-22977
+    val url = (jobUrl / "api/xml") ? "tree=name,url,allBuilds[number,url]"
+    try
+      http.get(url, basicAuthOpt = credentialsOpt).checkOK.bodyAsXml
+    catch {
+      case e: HttpException ⇒
+        throw new JenkinsScraperException(s"Problem getting Jenkins job information from $url: ${e.getMessage}", e)
+    }
+  }
+
   private def parseJobXml(jobUrl: URI, jobXml: Elem): JenkinsJob =
     try
       new JenkinsJobXmlParser().parse(jobXml)
@@ -76,11 +88,14 @@ class JenkinsScraper(
    * @return None if build has no tests associated with it, or if it is still building
    */
   @throws[JenkinsScraperException]
-  def scrapeBuild(buildUrl: URI, jobUrl: URI): Option[JenkinsBuild] = {
+  def getJenkinsBuild(buildUrl: URI, jobUrl: URI): Option[JenkinsBuild] = {
     logger.debug(s"scrapeBuild($buildUrl)")
     val buildXml = getBuildXml(buildUrl)
     val buildSummary = parseBuild(buildUrl, buildXml)
-    if (buildSummary.hasTestReport && !buildSummary.isBuilding) { // Note: you can have a test report while building, e.g. a multimodule Maven project
+    
+    // Note: it's not sufficient to check buildSummary.hasTestReport, as you can have a partial test report while building, 
+    // e.g. a multimodule Maven project.
+    if (buildSummary.hasTestReport && !buildSummary.isBuilding) {
       for {
         testResult ← scrapeTestResult(buildUrl)
         consoleTextOpt = if (fetchConsole) Some(getConsole(buildUrl)) else None
@@ -96,18 +111,6 @@ class JenkinsScraper(
       case e: ParseException ⇒
         throw new JenkinsScraperException(s"Problem parsing Jenkins build XML from $buildUrl: ${e.getMessage}", e)
     }
-
-  private def getJobXml(jobUrl: URI): Elem = {
-    // We need to explicitly set the tree param to fetch the otherwise-hidden "allBuilds" list. Ordinarily the builds
-    // are capped at 100. See https://issues.jenkins-ci.org/browse/JENKINS-22977
-    val url = (jobUrl / "api/xml") ? "tree=name,url,allBuilds[number,url]"
-    try
-      http.get(url, basicAuthOpt = credentialsOpt).checkOK.bodyAsXml
-    catch {
-      case e: HttpException ⇒
-        throw new JenkinsScraperException(s"Problem getting Jenkins job information from $url: ${e.getMessage}", e)
-    }
-  }
 
   private def getBuildXml(buildUrl: URI): Elem = {
     val url = buildUrl / "api/xml"

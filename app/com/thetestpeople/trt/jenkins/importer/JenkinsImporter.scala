@@ -44,7 +44,7 @@ class JenkinsImporter(
 
   private def doImportBuilds(spec: JenkinsImportSpec) {
     val alreadyImportedBuildUrls = transaction { dao.getJenkinsBuildUrls() }.toSet
-    def alreadyImported(link: JenkinsBuildLink) = alreadyImportedBuildUrls.contains(link.buildUrl)
+    def alreadyImported(link: JenkinsBuildLink) = alreadyImportedBuildUrls contains link.buildUrl
     val jenkinsScraper = getJenkinsScraper(spec.importConsoleLog)
 
     val job = jenkinsScraper.getJenkinsJob(spec.jobUrl)
@@ -84,7 +84,7 @@ class JenkinsImporter(
    */
   private def doImportBuild(buildLink: JenkinsBuildLink, job: JenkinsJob, importSpec: JenkinsImportSpec, jenkinsScraper: JenkinsScraper): Option[Id[Batch]] = {
     val buildUrl = buildLink.buildUrl
-    val build = jenkinsScraper.scrapeBuild(buildUrl, importSpec.jobUrl)
+    val build = jenkinsScraper.getJenkinsBuild(buildUrl, importSpec.jobUrl)
       .getOrElse(return None)
 
     val batch = new JenkinsBatchCreator(importSpec.configurationOpt).createBatch(build)

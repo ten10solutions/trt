@@ -11,5 +11,6 @@ case class GlobalViewContext(configurations: List[Configuration], hasExecutions:
   
   def singleConfigurationMode = configurations.size == 1
   
-  def multipleConfigurationMode = !singleConfigurationMode
+  def multipleConfigurationMode = configurations.size > 1
+  
 }
