@@ -74,7 +74,7 @@ excludeFilter in (Assets, LessKeys.less) := "_*.less"
 
 EclipseKeys.withSource := true
 
-EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Resource
+EclipseKeys.createSrc := EclipseCreateSrc.Default + EclipseCreateSrc.Resource + EclipseCreateSrc.Managed
 
 EclipseKeys.eclipseOutput := Some("bin")
 
@@ -112,3 +112,13 @@ linuxPackageMappings in Debian <+= (baseDirectory) map { bd =>
    (bd / "emptyDir") -> "/var/lib/trt"
   ) withUser "trt" withGroup "trt" withPerms "0755"
 }
+
+// == Build info ===============================================================================
+
+buildInfoSettings
+
+sourceGenerators in Compile <+= buildInfo
+
+buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion)
+
+buildInfoPackage := "com.thetestpeople.trt.buildKeys"
