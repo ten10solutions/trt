@@ -27,6 +27,15 @@ chartOptions =
   legend:
     show: false
 
+badge = (label) ->
+  if label == "Healthy"
+    return "badge-success"
+  else if label == "Warnings"
+    return "badge-warning"
+  else
+    return "badge-error"  
+        
+
 onChartHover = (series, seriesData) -> (event, pos, item) ->
   if item
     dataItem = seriesData[item.seriesIndex][item.dataIndex]
@@ -34,9 +43,11 @@ onChartHover = (series, seriesData) -> (event, pos, item) ->
     tooltipText = ""
     i = 0
     while i < series.length
-      label = series[i].label
       count = seriesData[i][item.dataIndex][1]
-      tooltipText +="#{label}: #{count}</br>"
+      if count > 0
+        label = series[i].label
+        badgeClass = badge(label)
+        tooltipText +="#{label}: <span class='badge #{badgeClass}'>#{count}</span></br>"
       i++
     tooltipText += "Date: #{formatDate(date)}</br>"
 
