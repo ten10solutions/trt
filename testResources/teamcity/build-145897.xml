@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<build id="145897" buildTypeId="NetCommunityProjects_Femah_Commit" number="0.1.78.209" status="SUCCESS" state="finished" href="/httpAuth/app/rest/builds/id:145897"
+  webUrl="https://teamcity.jetbrains.com/viewLog.html?buildId=145897&amp;buildTypeId=NetCommunityProjects_Femah_Commit">
+  <statusText>Tests passed: 56, ignored: 4</statusText>
+  <buildType id="NetCommunityProjects_Femah_Commit" name="Commit" description="Compile, test and generate Nuget package" projectName=".NET Community Projects (Sandbox) :: Femah"
+    projectId="NetCommunityProjects_Femah" href="/httpAuth/app/rest/buildTypes/id:NetCommunityProjects_Femah_Commit" webUrl="https://teamcity.jetbrains.com/viewType.html?buildTypeId=NetCommunityProjects_Femah_Commit" />
+  <tags />
+  <queuedDate>20140716T143553+0400</queuedDate>
+  <startDate>20140716T143554+0400</startDate>
+  <finishDate>20140716T143646+0400</finishDate>
+  <triggered type="vcs" details="jetbrains.git" date="20140716T143553+0400" />
+  <lastChanges count="1">
+    <change id="275907" version="97c29276cb3b1c14a771ce85f80f0e33d656cc38" username="matthew.hotstone" date="20140716T141909+0400" href="/httpAuth/app/rest/changes/id:275907"
+      webLink="https://teamcity.jetbrains.com/viewModification.html?modId=275907&amp;personal=false" />
+  </lastChanges>
+  <changes count="15" href="/httpAuth/app/rest/changes?locator=build:(id:145897)" />
+  <revisions>
+    <revision version="97c29276cb3b1c14a771ce85f80f0e33d656cc38">
+      <vcs-root-instance id="1718" vcs-root-id="NetCommunityProjects_Femah_LloydstoneFemah" name="lloydstone/femah"
+        href="/httpAuth/app/rest/vcs-root-instances/id:1718" />
+    </revision>
+  </revisions>
+  <agent name="win2008-v8-i-c7c6efec" typeId="160" />
+  <testOccurrences count="60" href="/httpAuth/app/rest/testOccurrences?locator=build:(id:145897)" passed="56" ignored="4" />
+  <artifacts href="/httpAuth/app/rest/builds/id:145897/artifacts/children" />
+  <relatedIssues href="/httpAuth/app/rest/builds/id:145897/relatedIssues" />
+  <properties count="2">
+    <property name="femah.githubApiKey" value="%secure:teamcity.password.femah.githubApiKey%" />
+    <property name="femah.nugetApiKey" value="%secure:teamcity.password.femah.nugetApiKey%" />
+  </properties>
+  <statistics href="/httpAuth/app/rest/builds/id:145897/statistics" />
+</build>
