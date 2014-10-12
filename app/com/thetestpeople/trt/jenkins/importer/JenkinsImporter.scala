@@ -67,7 +67,6 @@ class JenkinsImporter(
 
   private def importBuild(buildLink: JenkinsBuildLink, job: JenkinsJob, importSpec: JenkinsImportSpec, jenkinsScraper: JenkinsScraper) {
     val buildUrl = buildLink.buildUrl
-    logger.debug(s"Importing build $buildUrl")
     importStatusManager.buildStarted(importSpec.id, buildUrl)
     try {
       val batchIdOpt = doImportBuild(buildLink, job, importSpec, jenkinsScraper)

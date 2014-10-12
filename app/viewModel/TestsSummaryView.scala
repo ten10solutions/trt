@@ -22,4 +22,6 @@ case class TestsSummaryView(configuration: Configuration, testCounts: TestCounts
 
   def ballIcon: String = BallIcons.icon(overallStatus)
 
+  def ballDescription: String = TestStatus.identifier(overallStatus)
+
 }

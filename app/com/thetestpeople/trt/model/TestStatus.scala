@@ -38,4 +38,5 @@ object TestStatus {
     case Warning ⇒ "Warning"
     case Broken  ⇒ "Broken"
   }
+  
 }

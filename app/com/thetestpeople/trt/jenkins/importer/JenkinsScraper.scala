@@ -89,7 +89,6 @@ class JenkinsScraper(
    */
   @throws[JenkinsScraperException]
   def getJenkinsBuild(buildUrl: URI, jobUrl: URI): Option[JenkinsBuild] = {
-    logger.debug(s"scrapeBuild($buildUrl)")
     val buildXml = getBuildXml(buildUrl)
     val buildSummary = parseBuild(buildUrl, buildXml)
     
