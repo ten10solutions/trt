@@ -72,9 +72,16 @@ class ServiceImpl(
 
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts] = transaction { dao.getTestCountsByConfiguration() }
 
+  def getDeletedTests(): Seq[TestAndAnalysis] = transaction { dao.getDeletedTests().map(t ⇒ TestAndAnalysis(t)) }
+
   def markTestsAsDeleted(ids: Seq[Id[Test]], deleted: Boolean) = transaction {
-    logger.info("Marking tests as deleted: " + ids.mkString(", "))
+    if (deleted)
+      logger.info("Marking tests as deleted: " + ids.mkString(", "))
+    else
+      logger.info("Marking tests as no longer deleted: " + ids.mkString(", "))
     dao.markTestsAsDeleted(ids, deleted)
+    if (!deleted)
+      analysisService.scheduleAnalysis(ids)
   }
 
   def addBatch(incomingBatch: Incoming.Batch): Id[Batch] = transaction {
@@ -99,7 +106,7 @@ class ServiceImpl(
     }
     logger.info(s"Deleted batches ${batchIds.mkString(", ")}")
     logIndexer.deleteExecutions(executionIds)
-    analysisService.scheduleAnalysis(remainingTestIds.toList)
+    analysisService.scheduleAnalysis(remainingTestIds)
   }
 
   def getSystemConfiguration(): SystemConfiguration = transaction { dao.getSystemConfiguration() }
@@ -109,7 +116,7 @@ class ServiceImpl(
       dao.updateSystemConfiguration(newConfig)
       dao.getTestIds()
     }
-    analysisService.scheduleAnalysis(testIds.toList)
+    analysisService.scheduleAnalysis(testIds)
     analysisService.clearHistoricalTestCounts()
     logger.info(s"Updated system configuration to $newConfig")
   }

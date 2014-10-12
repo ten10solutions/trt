@@ -25,15 +25,15 @@
     
     @helper.inputText(confForm("credentials.username"), 
       'class -> "form-control",
-      'placeholder -> "Username",
-	    '_label -> "Username", 
-	    '_help -> "Jenkins username to use to access the API (or blank if not required)")
+      'placeholder -> "User ID",
+      '_label -> "User ID", 
+      '_help -> "Jenkins username to use to access the API (or blank if not required)")
 
     @helper.inputText(confForm("credentials.apiToken"), 
       'class -> "form-control",
       'placeholder -> "API token",
-	    '_label -> "API token", 
-	    '_help -> "API token (or blank if not required). Find on Jenkins via User -> Configure -> API Token -> Show API Token...")
+      '_label -> "API token", 
+     '_help -> "API token (or blank if not required). Find on Jenkins via User -> Configure -> API Token -> Show API Token...")
         
     <div class="form-actions" style="margin-bottom: 32px">
       <button id="submit" type="submit" class="btn btn-primary">Update</button>

@@ -150,6 +150,8 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
 
   private def globToSqlPattern(pattern: String) = pattern.replace("*", "%").toLowerCase
 
+  private type TestAnalysisQuery = Query[(TestMapping, AnalysisMapping), (Test, Analysis), Seq]
+
   def getAnalysedTests(
     configuration: Configuration,
     testStatusOpt: Option[TestStatus] = None,
@@ -158,7 +160,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     startingFrom: Int = 0,
     limitOpt: Option[Int] = None,
     sortBy: SortBy.Test = SortBy.Test.Group()): Seq[TestAndAnalysis] = {
-    var query = testsAndAnalyses
+    var query: TestAnalysisQuery = testsAndAnalyses
     query = query.filter(_._2.configuration === configuration)
     query = query.filterNot(_._1.deleted)
     for (name ← nameOpt)
@@ -167,7 +169,15 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       query = query.filter(_._1.group.toLowerCase like globToSqlPattern(group))
     for (status ← testStatusOpt)
       query = query.filter(_._2.status === status)
-    query = sortBy match {
+    query = sortQuery(query, sortBy)
+    query = query.drop(startingFrom)
+    for (limit ← limitOpt)
+      query = query.take(limit)
+    query.map { case (test, analysis) ⇒ (test, analysis.?) }.run.map { case (test, analysisOpt) ⇒ TestAndAnalysis(test, analysisOpt, commentOpt = None) }
+  }
+
+  private def sortQuery(query: TestAnalysisQuery, sortBy: SortBy.Test): TestAnalysisQuery =
+    sortBy match {
       case SortBy.Test.Weather(descending) ⇒
         query.sortBy { case (test, analysis) ⇒ order(analysis.weather, descending) }
       case SortBy.Test.Group(descending) ⇒
@@ -186,16 +196,13 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       case SortBy.Test.LastFailed(descending) ⇒
         query.sortBy { case (test, analysis) ⇒ order(analysis.lastFailedTime, descending) }
     }
-    query = query.drop(startingFrom)
-    for (limit ← limitOpt)
-      query = query.take(limit)
-    query.map { case (test, analysis) ⇒ (test, analysis.?) }.run.map { case (test, analysisOpt) ⇒ TestAndAnalysis(test, analysisOpt, commentOpt = None) }
-  }
 
   private def order[T](column: Column[T], descending: Boolean) =
     if (descending) column.desc else column.asc
 
   def getTestsById(testIds: Seq[Id[Test]]): Seq[Test] = tests.filter(_.id inSet testIds).run
+
+  def getDeletedTests(): Seq[Test] = tests.filter(_.deleted).sortBy(_.name).sortBy(_.group).run
 
   def getTestCounts(configuration: Configuration, nameOpt: Option[String] = None, groupOpt: Option[String] = None): TestCounts = {
     var query = testsAndAnalyses

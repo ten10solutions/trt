@@ -39,6 +39,11 @@ trait Dao extends ExecutionDao with JenkinsDao {
   def getTestIds(): Seq[Id[Test]]
 
   /**
+   * @return all tests marked as deleted
+   */
+  def getDeletedTests(): Seq[Test]
+  
+  /**
    * @return all test names matching the given pattern (case-insensitive, allows * wildcards)
    */
   def getTestNames(pattern: String): Seq[String]

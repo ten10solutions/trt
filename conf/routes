@@ -12,7 +12,9 @@ GET     /dashboard                  @controllers.Application.configurations()
 
 GET     /tests                      @controllers.Application.tests(configuration: Option[Configuration] ?= None, status: Option[TestStatus] ?= None, name: Option[String] ?= None, group: Option[String] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None, sort: Option[Sort] ?= None, descending: Option[Boolean] ?= None)
 GET     /tests/stale                @controllers.Application.staleTests(configuration: Option[Configuration] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
+GET     /tests/deleted              @controllers.Application.deletedTests(page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 POST    /tests/delete               @controllers.Application.deleteTests()
+POST    /tests/undelete             @controllers.Application.undeleteTests()
 
 GET     /test/:id                   @controllers.Application.test(id: Id[Test], configuration: Option[Configuration] ?= None, passed: Option[Boolean] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 POST    /test/:id/delete            @controllers.Application.deleteTest(id: Id[Test])

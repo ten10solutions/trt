@@ -73,10 +73,14 @@ class Application(service: Service, adminService: AdminService) extends Controll
       case Left(errorMessage) ⇒
         BadRequest(errorMessage)
       case Right(pagination) ⇒
-        val configuration = configurationOpt.getOrElse(Configuration.Default)
-        handleTest(testId, configuration, resultOpt, pagination) match {
-          case None       ⇒ NotFound(s"Could not find test with id '$testId'")
-          case Some(html) ⇒ Ok(html)
+        configurationOpt.orElse(getDefaultConfiguration) match {
+          case None ⇒
+            Redirect(routes.Application.index())
+          case Some(configuration) ⇒
+            handleTest(testId, configuration, resultOpt, pagination) match {
+              case None       ⇒ NotFound(s"Could not find test with id '$testId'")
+              case Some(html) ⇒ Ok(html)
+            }
         }
     }
   }
@@ -169,6 +173,20 @@ class Application(service: Service, adminService: AdminService) extends Controll
       id ← Id.parse[Batch](idString)
     } yield id
 
+  def deletedTests(pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
+    logger.debug(s"deletedTests(page = $pageOpt, pageSize = $pageSizeOpt))")
+
+    Pagination.validate(pageOpt, pageSizeOpt) match {
+      case Left(errorMessage) ⇒
+        BadRequest(errorMessage)
+      case Right(pagination) ⇒
+        val deletedTests = service.getDeletedTests()
+        val testViews = deletedTests.drop(pagination.firstItem).take(pagination.pageSize).map(TestView)
+        val paginationData = pagination.paginationData(deletedTests.size)
+        Ok(views.html.deletedTests(testViews, paginationData))
+    }
+  }
+
   def deleteTests() = Action { implicit request ⇒
     val selectedTestIds = ControllerHelper.getSelectedTestIds(request)
     logger.debug(s"deleteTests(${selectedTestIds.mkString(",")})")
@@ -177,6 +195,16 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
     val redirectTarget = previousUrlOpt.getOrElse(routes.Application.configurations())
     Redirect(redirectTarget).flashing("success" -> "Marked tests as deleted.")
+  }
+
+  def undeleteTests() = Action { implicit request ⇒
+    val selectedTestIds = ControllerHelper.getSelectedTestIds(request)
+    logger.debug(s"undeleteTests(${selectedTestIds.mkString(",")})")
+
+    service.markTestsAsDeleted(selectedTestIds, deleted = false)
+
+    val redirectTarget = previousUrlOpt.getOrElse(routes.Application.configurations())
+    Redirect(redirectTarget).flashing("success" -> "Marked tests as no longer deleted.")
   }
 
   def deleteTest(id: Id[Test]) = Action { implicit request ⇒
@@ -237,8 +265,12 @@ class Application(service: Service, adminService: AdminService) extends Controll
         case Left(errorMessage) ⇒
           BadRequest(errorMessage)
         case Right(pagination) ⇒
-          val configuration = configurationOpt.getOrElse(Configuration.Default)
-          Ok(handleTests(testStatusOpt, configuration, nameOpt, groupOpt, pagination, sortOpt, descendingOpt))
+          configurationOpt.orElse(getDefaultConfiguration) match {
+            case None ⇒
+              Redirect(routes.Application.index())
+            case Some(configuration) ⇒
+              Ok(handleTests(testStatusOpt, configuration, nameOpt, groupOpt, pagination, sortOpt, descendingOpt))
+          }
       }
     }
   }
@@ -266,7 +298,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
       limit = pagination.pageSize,
       sortBy = sortBy)
 
-    val testViews = tests.map(new TestView(_))
+    val testViews = tests.map(TestView)
     val testsSummary = TestsSummaryView(configuration, testCounts)
     val paginationData = pagination.paginationData(testCounts.countFor(testStatusOpt))
     views.html.tests(testsSummary, testViews.toList, configuration, testStatusOpt, nameOpt, groupOpt, service.canRerun, paginationData, sortOpt, descendingOpt)
@@ -340,7 +372,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   private def getDefaultConfiguration: Option[Configuration] = {
     val configurations = service.getConfigurations().sorted
-    if (configurations.contains(Configuration.Default))
+    if (configurations contains Configuration.Default)
       Some(Configuration.Default)
     else
       configurations.headOption

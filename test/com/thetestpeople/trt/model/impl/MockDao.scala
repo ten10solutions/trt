@@ -57,6 +57,15 @@ class MockDao extends Dao {
 
   def getTestIds(): Seq[Id[Test]] = tests.map(_.id)
 
+  /**
+   * @return all tests marked as deleted
+   */
+  def getDeletedTests(): Seq[Test] =
+    for {
+      test ← tests
+      if test.deleted
+    } yield test
+
   def getAnalysedTests(
     configuration: Configuration,
     testStatusOpt: Option[TestStatus] = None,

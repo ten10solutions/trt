@@ -35,15 +35,17 @@
         </tr>
       </table>
       <form id="filter-form" role="form" action="@routes.Application.batches()">
-        <div class="form-group">
-          <label for="job-select">Jenkins Job</label>
-          <select name="job" id="job-select" class="form-control">
-            <option value="">All</option>
-            @for(job <- jobs) {
-              <option value="@job.id" @if(Some(job.id) == jobIdOpt){selected}>@job.name</option>
-            }
-          </select>
-        </div>
+        @if(jobs.size > 1) {
+          <div class="form-group">
+            <label for="job-select">Jenkins Job</label>
+            <select name="job" id="job-select" class="form-control">
+              <option value="">All</option>
+              @for(job <- jobs) {
+                <option value="@job.id" @if(Some(job.id) == jobIdOpt){selected}>@job.name</option>
+              }
+            </select>
+          </div>
+        }
         @if(globalViewContext.multipleConfigurationMode) {
           <div class="form-group">
             <label for="configuration-select">Configuration</label>

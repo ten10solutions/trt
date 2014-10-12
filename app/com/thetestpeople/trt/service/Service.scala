@@ -44,6 +44,11 @@ trait Service extends JenkinsService {
 
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts]
 
+  /**
+   * @return tests that have been marked as deleted. No analysis or comment is retrieved.
+   */
+  def getDeletedTests(): Seq[TestAndAnalysis]
+
   def markTestsAsDeleted(ids: Seq[Id[Test]], deleted: Boolean = true)
 
   def getHistoricalTestCounts(): Map[Configuration, HistoricalTestCountsTimeline]
