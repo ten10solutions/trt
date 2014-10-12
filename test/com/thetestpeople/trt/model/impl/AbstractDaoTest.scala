@@ -733,4 +733,12 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     getComment() should equal(None)
   }
 
+  "Getting deleted tests" should "work" in transaction { dao ⇒
+    val testId = dao.ensureTestIsRecorded(F.test())
+    dao.markTestsAsDeleted(Seq(testId))
+    dao.getDeletedTests().map(_.id) should equal (Seq(testId))
+    dao.markTestsAsDeleted(Seq(testId), deleted = false)
+    dao.getDeletedTests().map(_.id) should equal (Seq())
+  }
+
 }

@@ -11,12 +11,18 @@ import scala.collection.JavaConverters._
 
 class ReportsMenu(implicit automationContext: AutomationContext) extends AbstractComponent {
 
-  def staleTests() = {
+  def staleTests(): StaleTestsScreen = {
     log("Click 'Stale Tests'")
     webDriver.waitForDisplayedAndEnabled(id("stale-tests-report")).click()
     new StaleTestsScreen
   }
 
+  def deletedTests(): DeletedTestsScreen = {
+    log("Click 'Deleted Tests'")
+    webDriver.waitForDisplayedAndEnabled(id("deleted-tests")).click()
+    new DeletedTestsScreen
+  }
+  
 }
 
 class TestsMenu(implicit automationContext: AutomationContext) extends AbstractComponent {
