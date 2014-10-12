@@ -29,18 +29,19 @@ chartOptions =
   axisLabels:
     show: true
 
-onChartHover = (passes, fails) -> (event, pos, item) ->
+onChartHover = (batchNames, passes, fails) -> (event, pos, item) ->
   if item
     dataItem = undefined
     failCount = fails[item.dataIndex][1]
     passCount = passes[item.dataIndex][1]
+    batchName = batchNames[item.dataIndex]
     date = passes[item.dataIndex][0]
-    tooltipText = ""
+    tooltipText = "#{batchName}<br/>"
     if passCount > 0
-      tooltipText +="Passed: <span class='badge badge-success'>#{passCount}</span></br>"
+      tooltipText +="Passed: <span class='badge badge-success'>#{passCount}</span><br/>"
     if failCount > 0
-      tooltipText +="Failed: <span class='badge badge-error'>#{failCount}</span></br>"
-    tooltipText += "Date: #{formatDate(date)}</br>"
+      tooltipText +="Failed: <span class='badge badge-error'>#{failCount}</span><br/>"
+    tooltipText += "Date: #{formatDate(date)}<br/>"
     $("#chart-tooltip").html(tooltipText).css(
       top: item.pageY + 5
       left: item.pageX + 5
@@ -71,8 +72,9 @@ createSeries = (fails, passes) ->
 
 chartData = {}
 
-window.saveChartData = (batchUrls, passes, fails) ->
+window.saveChartData = (batchNames, batchUrls, passes, fails) ->
   chartData =
+     batchNames: batchNames
      batchUrls: batchUrls
      passes: passes
      fails: fails
@@ -91,7 +93,7 @@ window.createPassFailChart = ->
     minY: 10
 
   $("#batch-chart").bind "plotclick", onChartClick(chartData.batchUrls)
-  $("#batch-chart").bind "plothover", onChartHover(chartData.passes, chartData.fails)
+  $("#batch-chart").bind "plothover", onChartHover(chartData.batchNames, chartData.passes, chartData.fails)
 
   initialiseTooltip()
 

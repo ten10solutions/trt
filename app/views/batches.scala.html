@@ -74,6 +74,7 @@
       </div>
 			  <script>
 			    $(document).ready(function(){
+			      var batchNames = [ @for(batch <- batches) { "@batch.nameOpt.getOrElse("")", } ];
 			      var batchUrls = [ @for(batch <- batches) { "@routes.Application.batch(batch.id)", } ];
 			      var passes = [
 			        @for(batch <- batches) {
@@ -85,7 +86,7 @@
 			          [ new Date(@batch.epochMillis), @batch.failCount ],
 			        }  
 			      ];
-			      saveChartData(batchUrls, passes, fails);
+			      saveChartData(batchNames, batchUrls, passes, fails);
                               @if(!hideChartInitially) {
                                 createPassFailChart();
                               }
@@ -107,9 +108,9 @@
 	        <th style="text-align: center"><input class="batchCheckbox" id="select-all" type="checkbox" title="Select all"/></th>
 	        <th class="pass-fail-col"></th>
 	        <th class="batch-name-col">Name</th>
-        @if(globalViewContext.multipleConfigurationMode) {
-                <th class="configuration-col">Configuration</th>
-        }
+                @if(globalViewContext.multipleConfigurationMode) {
+                  <th class="configuration-col">Configuration</th>
+                }
 	        <th class="time-col">Date</th>
 	        <th class="url-col">External Link</th>
 	        <th class="duration-col">Duration</th>
@@ -125,9 +126,9 @@
 	          <td style="text-align: center; width: 50px"><input class="batchCheckbox" type="checkbox" name="selectedBatch" value="@batch.id"/></td>
 	          <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.Application.batch(batch.id)"><img src="@routes.Assets.at("images/" + batch.passFailIcon)" alt="@batch.passFailText" title="@batch.passFailText"/></a></td>
 	          <td class="batch-name-cell">@for(name <- batch.nameOpt){ <a href="@routes.Application.batch(batch.id)">@name</a> }</td>
-        @if(globalViewContext.multipleConfigurationMode) {
-                  <td class="configuration-cell">@for(configuration <- batch.configurationOpt){<a href="@routes.Application.tests(configuration = Some(configuration))">@configuration</a>}</td>
-        }
+                  @if(globalViewContext.multipleConfigurationMode) {
+                    <td class="configuration-cell">@for(configuration <- batch.configurationOpt){<a href="@routes.Application.tests(configuration = Some(configuration))">@configuration</a>}</td>
+                  }
 	          <td class="time-cell"><span title="@batch.executionTime.absolute">@batch.executionTime.relative</span></td>
 	          <td class="url-cell">@for(url <- batch.urlOpt){<a href="@url">External Link <i class="fa fa-external-link"></i></a>}</td>
 	          <td class="duration-cell">@for(duration <- batch.durationOpt) { @duration }</td>
