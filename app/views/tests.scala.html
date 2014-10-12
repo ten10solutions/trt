@@ -207,6 +207,7 @@
           <th class="pass-fail-col" style="white-space: nowrap">Weather @sortLink(Sort.Weather)</th>
           <th class="group-col">Group @sortLink(Sort.Group)</th>
           <th class="name-col">Name @sortLink(Sort.Name)</th>
+          <th class="duration-col">Average duration @sortLink(Sort.Duration)</th>
           <th class="consecutive-failures-col">Consecutive failures @sortLink(Sort.ConsecutiveFailures)</th>
           <th class="failing-since-col">Started failing @sortLink(Sort.StartedFailing)</th>
           <th class="last-passfail-col">Last passed @sortLink(Sort.LastPassed)</th>
@@ -220,7 +221,8 @@
             <td class="pass-fail-cell">@for(weatherInfo <- test.weatherInfoOpt){<img title="@weatherInfo.passRate" src="@routes.Assets.at("images/" + weatherInfo.iconPath)"/>}</td>
             <td class="center-vert">@for(group <- test.groupOpt) {<a href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = Some(group.full), sort = sortOpt, descending = descendingOpt)"><span title="@group.full">@group.abbreviate(maxLength = 35)</span></a>}</td>
             <td class="center-vert"><a class="test-link" href="@routes.Application.test(test.id, configuration = Some(configuration))" title="@test.name.full">@test.name.abbreviate(maxLength = 40)</a></td>
-            <td class="consecutive-failures-cell">@for(consecutiveFailures <- test.consecutiveFailuresOpt){@consecutiveFailures}</td>
+            <td class="duration-cell">@for(duration <- test.medianDurationOpt){@duration}</td>
+            <td class="consecutive-failures-cell">@for(consecutiveFailures <- test.consecutiveFailuresOpt){@consecutiveFailures}</td>            
             <td class="failing-since-cell">@for(failingSince <- test.failingSinceOpt){<span title="@failingSince.absolute">@failingSince.relative</span>}</td>
             <td class="last-passfail-cell">@for((executionId, time) <- test.lastPassedExecutionOpt){<a class="last-passed-link" href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a>}</td>
             <td class="last-passfail-cell">@for((executionId, time) <- test.lastFailedExecutionOpt){<a href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a>}</td>

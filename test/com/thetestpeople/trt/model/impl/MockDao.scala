@@ -82,6 +82,8 @@ class MockDao extends Dao {
         order(allResults.sortBy(_.test.name).sortBy(_.test.groupOpt), descending)
       case SortBy.Test.Name(descending) ⇒
         order(allResults.sortBy(_.name), descending)
+      case SortBy.Test.Duration(descending) ⇒
+        order(allResults.sortBy(_.analysisOpt.flatMap(_.medianDurationOpt)), descending)
       case SortBy.Test.ConsecutiveFailures(descending) ⇒
         order(allResults.sortBy(_.analysisOpt.map(_.consecutiveFailures)), descending)
       case SortBy.Test.StartedFailing(descending) ⇒

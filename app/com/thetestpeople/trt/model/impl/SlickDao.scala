@@ -175,6 +175,8 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
           .sortBy { case (test, analysis) ⇒ order(test.group, descending) }
       case SortBy.Test.Name(descending) ⇒
         query.sortBy { case (test, analysis) ⇒ order(test.name, descending) }
+      case SortBy.Test.Duration(descending) ⇒
+        query.sortBy { case (test, analysis) ⇒ order(analysis.medianDuration, descending) }
       case SortBy.Test.ConsecutiveFailures(descending) ⇒
         query.sortBy { case (test, analysis) ⇒ order(analysis.consecutiveFailures, descending) }
       case SortBy.Test.StartedFailing(descending) ⇒

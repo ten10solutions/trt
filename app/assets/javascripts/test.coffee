@@ -1,7 +1,9 @@
 durationFormatter = (val, axis) -> formatDuration(val)
 
 formatDuration = (val) ->
-  if val < 1
+  if val < 0.010
+    (val * 1000).toFixed(1) + " ms"
+  else if val < 1
     (val * 1000).toFixed(0) + " ms"
   else if val < 10
     val.toFixed(1) + " s"
