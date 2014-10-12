@@ -14,6 +14,7 @@ object SystemConfigurationForm {
 
   val form: Form[SystemConfiguration] =
     Form(mapping(
+      "projectName" -> optional(text),
       "brokenDurationThreshold" -> duration.verifying(isNonNegativeDuration),
       "brokenCountThreshold" -> number.verifying(isNonNegative),
       "healthyDurationThreshold" -> duration.verifying(isNonNegativeDuration),

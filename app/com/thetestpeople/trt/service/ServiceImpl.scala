@@ -112,12 +112,16 @@ class ServiceImpl(
   def getSystemConfiguration(): SystemConfiguration = transaction { dao.getSystemConfiguration() }
 
   def updateSystemConfiguration(newConfig: SystemConfiguration) = {
+    val oldConfig = getSystemConfiguration()
+    val analysisUpdateRequired = oldConfig.copy(projectNameOpt = None) != newConfig.copy(projectNameOpt = None)
     val testIds = transaction {
       dao.updateSystemConfiguration(newConfig)
       dao.getTestIds()
     }
-    analysisService.scheduleAnalysis(testIds)
-    analysisService.clearHistoricalTestCounts()
+    if (analysisUpdateRequired) {
+      analysisService.scheduleAnalysis(testIds)
+      analysisService.clearHistoricalTestCounts()
+    }
     logger.info(s"Updated system configuration to $newConfig")
   }
 

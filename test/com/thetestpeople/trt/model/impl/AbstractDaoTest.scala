@@ -604,6 +604,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
 
   "Inserting and retrieving system configuration" should "persist all the data" in transaction { dao ⇒
     val systemConfiguration = SystemConfiguration(
+      projectNameOpt = Some(DummyData.ProjectName),
       failureDurationThreshold = 13.hours,
       failureCountThreshold = 7,
       passDurationThreshold = 9.hours,
@@ -736,9 +737,9 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
   "Getting deleted tests" should "work" in transaction { dao ⇒
     val testId = dao.ensureTestIsRecorded(F.test())
     dao.markTestsAsDeleted(Seq(testId))
-    dao.getDeletedTests().map(_.id) should equal (Seq(testId))
+    dao.getDeletedTests().map(_.id) should equal(Seq(testId))
     dao.markTestsAsDeleted(Seq(testId), deleted = false)
-    dao.getDeletedTests().map(_.id) should equal (Seq())
+    dao.getDeletedTests().map(_.id) should equal(Seq())
   }
 
 }

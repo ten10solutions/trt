@@ -376,5 +376,13 @@
       <column name="weather" />
     </createIndex>
   </changeSet>
+
+  <changeSet author="matt" id="add-system_configuration-project_name">
+    <addColumn tableName="system_configuration">
+      <column name="project_name" type="VARCHAR(10485760)" defaultValue="NULL">
+        <constraints nullable="true" />
+      </column>
+    </addColumn>
+  </changeSet>
   
 </databaseChangeLog>

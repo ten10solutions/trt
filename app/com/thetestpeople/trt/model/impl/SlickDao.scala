@@ -112,11 +112,10 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       tests.delete
       jenkinsConfiguration.delete
       systemConfiguration.delete
-      val DefaultSystemConfiguration = SystemConfiguration()
-      systemConfiguration.insert(DefaultSystemConfiguration)
+      systemConfiguration.insert(SystemConfiguration())
 
-      val DefaultJenkinsConfiguration = JenkinsConfiguration()
-      jenkinsConfiguration.insert(DefaultJenkinsConfiguration)
+      val defaultJenkinsConfiguration = JenkinsConfiguration()
+      jenkinsConfiguration.insert(JenkinsConfiguration())
     }
 
     logger.info("Deleted all data")

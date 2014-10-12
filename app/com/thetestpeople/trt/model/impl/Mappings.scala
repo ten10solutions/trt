@@ -192,12 +192,13 @@ trait Mappings { self: SlickDao ⇒
 
   class SystemConfigurationMapping(tag: Tag) extends Table[SystemConfiguration](tag, "system_configuration") {
 
+    val projectName = column[Option[String]]("project_name")
     val failureDurationThreshold = column[Duration]("failure_duration_threshold", O.NotNull)
     val failureCountThreshold = column[Int]("failure_count_threshold", O.NotNull)
     val passDurationThreshold = column[Duration]("pass_duration_threshold", O.NotNull)
     val passCountThreshold = column[Int]("pass_count_threshold", O.NotNull)
 
-    def * = (failureDurationThreshold, failureCountThreshold, passDurationThreshold, passCountThreshold) <>
+    def * = (projectName, failureDurationThreshold, failureCountThreshold, passDurationThreshold, passCountThreshold) <>
       (SystemConfiguration.tupled, SystemConfiguration.unapply)
 
   }

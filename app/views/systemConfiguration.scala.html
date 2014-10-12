@@ -8,7 +8,14 @@
 
   @helper.form(routes.Application.updateSystemConfiguration(), 'role -> "form") {
 
+    @helper.inputText(confForm("projectName"), 
+      'class -> "form-control",
+      'placeholder -> "Project name",
+      '_label -> "Project name",
+      '_help -> "Name of project being tested.")
+
     <h3><img src="@routes.Assets.at("images/balls/red.png")"/> Broken status</h3>    
+    
     @helper.inputText(confForm("brokenDurationThreshold"), 
       'class -> "form-control",
       'placeholder -> "Duration threshold",

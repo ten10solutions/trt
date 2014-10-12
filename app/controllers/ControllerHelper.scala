@@ -18,6 +18,10 @@ object ControllerHelper {
       id ← Id.parse[Test](idString)
     } yield id
 
-  def globalViewContext(service: Service): GlobalViewContext = GlobalViewContext(service.getConfigurations().toList, service.hasExecutions())
+  def globalViewContext(service: Service): GlobalViewContext = {
+    val configurations = service.getConfigurations()
+    val projectNameOpt = service.getSystemConfiguration().projectNameOpt
+    GlobalViewContext(projectNameOpt, configurations, service.hasExecutions())
+  }
 
 }

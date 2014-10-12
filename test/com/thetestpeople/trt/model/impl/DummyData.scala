@@ -12,6 +12,7 @@ import com.thetestpeople.trt.utils.http.Credentials
 
 object DummyData {
 
+  val ProjectName = "Project"
   val ExecutionTime = 1.day.ago
   val Duration: Duration = 3.seconds
   val Group = "Group"
