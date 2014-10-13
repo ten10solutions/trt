@@ -19,7 +19,7 @@ bin
 *.trace.db
 *.lock.db
 public/bower_components/
-luceneIndex*/
+test-dbs/
 *~
 *shim.sbt
 phantomjsdriver.log
