@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<builds count="11" href="/app/rest/builds/?locator=buildType:NetCommunityProjects_Femah_Commit">
+  <build id="145897" buildTypeId="NetCommunityProjects_Femah_Commit" number="0.1.78.209" status="SUCCESS" state="finished" href="/app/rest/builds/id:145897"
+    webUrl="https://teamcity.jetbrains.com/viewLog.html?buildId=145897&amp;buildTypeId=NetCommunityProjects_Femah_Commit" />
+  <build id="137748" buildTypeId="NetCommunityProjects_Femah_Commit" number="0.1.77.194" status="SUCCESS" state="finished" href="/app/rest/builds/id:137748"
+    webUrl="https://teamcity.jetbrains.com/viewLog.html?buildId=137748&amp;buildTypeId=NetCommunityProjects_Femah_Commit" />
+  <build id="129542" buildTypeId="NetCommunityProjects_Femah_Commit" number="0.1.70.160" status="SUCCESS" state="finished" pinned="true"
+    href="/app/rest/builds/id:129542" webUrl="https://teamcity.jetbrains.com/viewLog.html?buildId=129542&amp;buildTypeId=NetCommunityProjects_Femah_Commit" />
+</builds>

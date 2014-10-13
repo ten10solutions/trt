@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<testOccurrences count="100" href="https://teamcity.jetbrains.com/app/rest/testOccurrences?locator=count:100,start:100,build:(id:157593)"
+  nextHref="/httpAuth/app/rest/testOccurrences?locator=count:100,start:200,build:(id:157593)" prevHref="/httpAuth/app/rest/testOccurrences?locator=count:100,start:0,build:(id:157593)">
+  <testOccurrence id="id:537,build:(id:157593)" name="nunit.framework.tests.dll: NUnit: Framework: Assertions: AssertThatTests: AssertionPasses_Boolean"
+    status="SUCCESS" href="/httpAuth/app/rest/testOccurrences/id:537,build:(id:157593)" />
+  <testOccurrence id="id:541,build:(id:157593)" name="nunit.framework.tests.dll: NUnit: Framework: Assertions: AssertThatTests: AssertionPasses_BooleanWithMessage"
+    status="SUCCESS" href="/httpAuth/app/rest/testOccurrences/id:541,build:(id:157593)" />
+</testOccurrences>

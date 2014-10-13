@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<testOccurrence id="id:15361,build:(id:151953)" name="TestSuite: com.turn.ttorrent.common.TorrentTest.torrent_from_multiple_files" status="FAILURE"
+  duration="72" href="/httpAuth/app/rest/testOccurrences/id:15361,build:(id:151953)">
+  <details>java.lang.AssertionError</details>
+  <test id="-8149007222669147727" name="TestSuite: com.turn.ttorrent.common.TorrentTest.torrent_from_multiple_files" href="/httpAuth/app/rest/tests/id:-8149007222669147727" />
+  <build id="151953" buildTypeId="ttorrent_PaksvFork" number="100" status="FAILURE" state="finished" branchName="master" defaultBranch="true"
+    href="/httpAuth/app/rest/builds/id:151953" webUrl="https://teamcity.jetbrains.com/viewLog.html?buildId=151953&amp;buildTypeId=ttorrent_PaksvFork" />
+</testOccurrence>
