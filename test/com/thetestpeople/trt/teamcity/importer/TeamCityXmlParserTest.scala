@@ -23,8 +23,8 @@ class TeamCityXmlParserTest extends FlatSpec with Matchers {
   }
 
   "Parsing a TeamCity build XML" should "correctly capture build information" in {
-    val parser = new TeamCityBuildXmlParser()
-    val build = parser.parse(TestUtils.loadXmlFromClasspath("/teamcity/build-145897.xml"))
+    val parser = new TeamCityXmlParser
+    val build = parser.parseBuild(TestUtils.loadXmlFromClasspath("/teamcity/build-145897.xml"))
 
     build.startDate should equal(new DateTime(2014, 7, 16, 14, 35, 54, forOffsetHours(4)))
     build.finishDate should equal(new DateTime(2014, 7, 16, 14, 36, 46, forOffsetHours(4)))
