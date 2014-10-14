@@ -38,7 +38,8 @@ libraryDependencies ++= List(
   "org.apache.lucene" % "lucene-queryparser" % "4.9.0",
   "com.google.guava" % "guava" % "16.0.1",
   "org.liquibase" % "liquibase-core" % "3.1.1",
-  "oro" % "oro" % "2.0.8")
+  "oro" % "oro" % "2.0.8",
+  "org.apache.httpcomponents" % "httpclient" % "4.3.1")
 
 libraryDependencies ++= List(
   "org.scalatest" %% "scalatest" % "2.2.1" % "test",
@@ -122,3 +123,8 @@ sourceGenerators in Compile <+= buildInfo
 buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion)
 
 buildInfoPackage := "com.thetestpeople.trt.buildKeys"
+
+// == Misc =====================================================================================
+
+net.virtualvoid.sbt.graph.Plugin.graphSettings
+
