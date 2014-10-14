@@ -7,6 +7,8 @@ import org.scalatest.junit.JUnitRunner
 import com.thetestpeople.trt.utils.TestUtils
 import org.joda.time.DateTime
 import org.joda.time.DateTimeZone.forOffsetHours
+import com.thetestpeople.trt.utils.UriUtils._
+import org.joda.time.Duration
 
 @RunWith(classOf[JUnitRunner])
 class TeamCityXmlParserTest extends FlatSpec with Matchers {
@@ -25,7 +27,8 @@ class TeamCityXmlParserTest extends FlatSpec with Matchers {
   "Parsing a TeamCity build XML" should "correctly capture build information" in {
     val parser = new TeamCityXmlParser
     val build = parser.parseBuild(TestUtils.loadXmlFromClasspath("/teamcity/build-145897.xml"))
-
+    
+    build.url should equal(uri("https://teamcity.jetbrains.com/viewLog.html?buildId=145897&buildTypeId=NetCommunityProjects_Femah_Commit"))
     build.startDate should equal(new DateTime(2014, 7, 16, 14, 35, 54, forOffsetHours(4)))
     build.finishDate should equal(new DateTime(2014, 7, 16, 14, 36, 46, forOffsetHours(4)))
     build.number should equal("0.1.78.209")
@@ -49,7 +52,7 @@ class TeamCityXmlParserTest extends FlatSpec with Matchers {
       testName = "TestSuite: com.turn.ttorrent.common.TorrentTest.torrent_from_multiple_files",
       status = "FAILURE",
       detailOpt = Some("java.lang.AssertionError"),
-      duration = 72)
+      duration = Duration.millis(72))
   }
 
 }

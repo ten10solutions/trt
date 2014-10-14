@@ -1,3 +1,9 @@
 package com.thetestpeople.trt.teamcity.importer
 
-case class TeamCityTestOccurrence(testName: String, status: String, detailOpt: Option[String], duration: Int) 
+import org.joda.time.Duration
+
+case class TeamCityTestOccurrence(testName: String, status: String, detailOpt: Option[String], duration: Duration) {
+  
+  def passed = status == "SUCCESS"
+  
+} 

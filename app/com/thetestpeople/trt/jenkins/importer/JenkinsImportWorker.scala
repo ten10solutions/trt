@@ -1,18 +1,9 @@
 package com.thetestpeople.trt.jenkins.importer
 
-import com.thetestpeople.trt.model.Id
-import com.thetestpeople.trt.model
+import com.thetestpeople.trt.model._
+import com.thetestpeople.trt.model.jenkins._
 import com.thetestpeople.trt.utils.CoalescingBlockingQueue
 import com.thetestpeople.trt.utils.HasLogger
-import com.thetestpeople.trt.utils.http.Http
-import com.thetestpeople.trt.service.Clock
-import com.thetestpeople.trt.model.jenkins.JenkinsDao
-import com.thetestpeople.trt.model.jenkins.JenkinsImportSpec
-import play.core.BuildLink
-import com.thetestpeople.trt.model.Batch
-import com.thetestpeople.trt.model.Configuration
-import com.thetestpeople.trt.service.BatchRecorder
-import com.thetestpeople.trt.model.jenkins.JenkinsConfiguration
 
 trait JenkinsImportQueue {
 

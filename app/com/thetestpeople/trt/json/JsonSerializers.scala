@@ -50,7 +50,7 @@ object JsonSerializers {
     (__ \ "configuration").formatNullable[Configuration])(Incoming.Execution, unlift(Incoming.Execution.unapply))
 
   implicit val incomingBatchFormat: Format[Incoming.Batch] = (
-    (__ \ "executions").format[List[Incoming.Execution]] and
+    (__ \ "executions").format[Seq[Incoming.Execution]] and
     (__ \ "url").formatNullable[URI] and
     (__ \ "name").formatNullable[String] and
     (__ \ "log").formatNullable[String] and

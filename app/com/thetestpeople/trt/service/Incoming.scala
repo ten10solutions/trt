@@ -20,7 +20,7 @@ object Incoming {
   }
 
   case class Batch(
-    executions: List[Execution],
+    executions: Seq[Execution],
     urlOpt: Option[URI],
     nameOpt: Option[String],
     logOpt: Option[String],
@@ -41,7 +41,7 @@ object Incoming {
 
   }
 
-  case class Test(name: String, groupOpt: Option[String]) {
+  case class Test(name: String, groupOpt: Option[String] = None) {
     def qualifiedName = QualifiedName(name, groupOpt)
   }
 

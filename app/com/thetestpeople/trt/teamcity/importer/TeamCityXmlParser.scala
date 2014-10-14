@@ -4,18 +4,22 @@ import scala.xml.Elem
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.DateTime
 import scala.xml.Node
+import com.thetestpeople.trt.utils.UriUtils._
+import org.joda.time.Duration
 
 class TeamCityXmlParser {
 
   private val dateParser = DateTimeFormat.forPattern("yyyyMMdd'T'HHmmssZ").withOffsetParsed
 
   def parseBuild(elem: Elem): TeamCityBuild = {
+    val url = uri(getField(elem, "@webUrl"))
     val startDate = parseDate(getField(elem, "startDate"))
     val finishDate = parseDate(getField(elem, "finishDate"))
     val hasTests = (elem \ "testOccurrences").nonEmpty
     val testOccurrencesPathOpt = (elem \ "testOccurrences" \ "@href").headOption.map(_.text)
     val number = getField(elem, "@number")
     TeamCityBuild(
+      url = url,
       startDate = startDate,
       finishDate = finishDate,
       number = number,
@@ -38,7 +42,7 @@ class TeamCityXmlParser {
       testName = (elem \ "test" \ "@name").head.text,
       status = getField(elem, "@status"),
       detailOpt = getFieldOpt(elem, "details"),
-      duration = getField(elem, "@duration").toInt)
+      duration = Duration.millis(getField(elem, "@duration").toInt))
 
   private def parseDate(s: String): DateTime =
     try

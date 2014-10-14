@@ -20,7 +20,7 @@ class BatchRecorder(dao: Dao, clock: Clock, analysisService: AnalysisService, lo
     batch
   }
 
-  private def indexExecutions(executionIds: List[Id[Execution]]) {
+  private def indexExecutions(executionIds: Seq[Id[Execution]]) {
     val executions = dao.transaction {
       for {
         executionId ← executionIds
