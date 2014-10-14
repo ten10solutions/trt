@@ -49,9 +49,9 @@ class Factory(configuration: Configuration) {
 
   lazy val http: Http =
     if (useCachingHttp)
-      new PathCachingHttp(new WsHttp(urlFetchTimeout))
+      new PathCachingHttp(new WsHttp(timeout = urlFetchTimeout))
     else
-      new WsHttp(urlFetchTimeout)
+      new WsHttp(timeout = urlFetchTimeout)
 
   lazy val analysisService = new AnalysisService(dao, clock, async = true)
 

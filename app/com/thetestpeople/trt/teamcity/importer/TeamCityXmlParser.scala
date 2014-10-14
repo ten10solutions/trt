@@ -35,14 +35,20 @@ class TeamCityXmlParser {
       buildPath = getField(node, "@href"),
       finished = getField(node, "@state") == "finished")
 
-  def parseTestOccurrences(elem: Elem): Seq[String] = (elem \ "testOccurrence").flatMap(_ \ "@href" map (_.text))
+  def parseTestOccurrences(elem: Elem): TeamCityTestOccurrences = {
+    val nextLinkOpt = getFieldOpt(elem, "@nextHref")
+    val occurrencePaths = (elem \ "testOccurrence").flatMap(_ \ "@href" map (_.text))
+    TeamCityTestOccurrences(nextLinkOpt, occurrencePaths)
+  }
 
-  def parseTestOccurrence(elem: Elem): TeamCityTestOccurrence =
+  def parseTestOccurrence(elem: Elem): TeamCityTestOccurrence = {
+    val durationOpt = getFieldOpt(elem, "@duration").map(d ⇒ Duration.millis(d.toInt))
     TeamCityTestOccurrence(
       testName = (elem \ "test" \ "@name").head.text,
       status = getField(elem, "@status"),
       detailOpt = getFieldOpt(elem, "details"),
-      duration = Duration.millis(getField(elem, "@duration").toInt))
+      durationOpt = durationOpt)
+  }
 
   private def parseDate(s: String): DateTime =
     try

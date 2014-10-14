@@ -12,11 +12,11 @@ import play.api.libs.ws._
 import play.api.Play.current
 import com.thetestpeople.trt.utils.HasLogger
 
-class WsHttp(timeout: Duration = 60.seconds) extends Http with HasLogger {
+class WsHttp(client: WSClient = WS.client, timeout: Duration = 60.seconds) extends Http with HasLogger {
 
   def get(url: URI, basicAuthOpt: Option[Credentials] = None): HttpResponse =
     try {
-      val future = WS.url(url.toString).withBasicAuth(basicAuthOpt).get()
+      val future = client.url(url.toString).withBasicAuth(basicAuthOpt).get()
       logger.debug(curlGet(url, basicAuthOpt))
       val response = await(future)
       response
@@ -27,7 +27,7 @@ class WsHttp(timeout: Duration = 60.seconds) extends Http with HasLogger {
 
   def post(url: URI, basicAuthOpt: Option[Credentials] = None, bodyParams: Map[String, Seq[String]]): HttpResponse =
     try {
-      val future = WS.url(url.toString).withBasicAuth(basicAuthOpt).post(bodyParams)
+      val future = client.url(url.toString).withBasicAuth(basicAuthOpt).post(bodyParams)
       logger.debug(curlPost(url, basicAuthOpt, bodyParams))
       val response = await(future)
       response

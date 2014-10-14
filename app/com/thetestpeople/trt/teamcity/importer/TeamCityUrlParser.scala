@@ -6,8 +6,6 @@ import org.apache.http.client.utils.URIBuilder
 import org.apache.http.NameValuePair
 import java.{ util ⇒ ju }
 
-case class TeamCityConfiguration(serverUrl: URI, buildTypeId: String)
-
 object TeamCityUrlParser {
 
   def parse(url: URI): Either[String, TeamCityConfiguration] = {

@@ -25,19 +25,10 @@ class TeamCityBatchCreator(configurationOpt: Option[Configuration]) {
       summaryOpt = None,
       logOpt = occurrence.detailOpt,
       executionTimeOpt = None,
-      durationOpt = Some(occurrence.duration),
+      durationOpt = occurrence.durationOpt,
       configurationOpt = configurationOpt)
 
-  private object StripTestSuitePrefix {
-
-    private val prefix = "TestSuite: "
-
-    def unapply(s: String): Option[String] =
-      if (s startsWith prefix)
-        Some(s drop prefix.length)
-      else
-        None
-  }
+  private def stripSuitePrefix(s: String) = s.drop(s.indexOf(":") + 1)
 
   private object QualifiedTestName {
 
@@ -48,11 +39,11 @@ class TeamCityBatchCreator(configurationOpt: Option[Configuration]) {
   }
 
   private def createTest(testName: String): Incoming.Test =
-    testName match {
-      case StripTestSuitePrefix(QualifiedTestName(group, name)) ⇒
+    stripSuitePrefix(testName) match {
+      case QualifiedTestName(group, name) ⇒
         Incoming.Test(name = name, groupOpt = Some(group))
-      case _ ⇒
-        Incoming.Test(name = testName)
+      case name ⇒
+        Incoming.Test(name = name)
     }
 
 }

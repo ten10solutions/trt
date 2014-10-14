@@ -27,7 +27,7 @@ class TeamCityXmlParserTest extends FlatSpec with Matchers {
   "Parsing a TeamCity build XML" should "correctly capture build information" in {
     val parser = new TeamCityXmlParser
     val build = parser.parseBuild(TestUtils.loadXmlFromClasspath("/teamcity/build-145897.xml"))
-    
+
     build.url should equal(uri("https://teamcity.jetbrains.com/viewLog.html?buildId=145897&buildTypeId=NetCommunityProjects_Femah_Commit"))
     build.startDate should equal(new DateTime(2014, 7, 16, 14, 35, 54, forOffsetHours(4)))
     build.finishDate should equal(new DateTime(2014, 7, 16, 14, 36, 46, forOffsetHours(4)))
@@ -43,7 +43,7 @@ class TeamCityXmlParserTest extends FlatSpec with Matchers {
       "/httpAuth/app/rest/testOccurrences/id:537,build:(id:157593)",
       "/httpAuth/app/rest/testOccurrences/id:541,build:(id:157593)"))
   }
-  
+
   "Parsing TeamCity test occurrence XML" should "correctly capture the test occurrence details" in {
     val parser = new TeamCityXmlParser
     val testOccurrence = parser.parseTestOccurrence(TestUtils.loadXmlFromClasspath("/teamcity/testOccurrence.xml"))
@@ -52,7 +52,7 @@ class TeamCityXmlParserTest extends FlatSpec with Matchers {
       testName = "TestSuite: com.turn.ttorrent.common.TorrentTest.torrent_from_multiple_files",
       status = "FAILURE",
       detailOpt = Some("java.lang.AssertionError"),
-      duration = Duration.millis(72))
+      durationOpt = Some(Duration.millis(72)))
   }
 
 }
