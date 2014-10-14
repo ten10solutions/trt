@@ -9,6 +9,6 @@ case class BuildSummary(
   durationOpt: Option[Duration],
   nameOpt: Option[String],
   timestampOpt: Option[DateTime],
-  result: String,
+  resultOpt: Option[String],
   hasTestReport: Boolean,
   isBuilding: Boolean)

@@ -46,7 +46,7 @@ class JenkinsBatchCreatorTest extends FlatSpec with Matchers {
     durationOpt: Option[Duration] = Some(DummyData.Duration),
     nameOpt: Option[String] = Some(DummyData.BatchName),
     timestampOpt: Option[DateTime] = Some(DummyData.ExecutionTime),
-    result: String = "PASSED",
+    resultOpt: Option[String] = Some("PASSED"),
     hasTestReport: Boolean = true,
     isBuilding: Boolean = false) =
     BuildSummary(
@@ -54,7 +54,7 @@ class JenkinsBatchCreatorTest extends FlatSpec with Matchers {
       durationOpt = durationOpt,
       nameOpt = nameOpt,
       timestampOpt = timestampOpt,
-      result = result,
+      resultOpt = resultOpt,
       hasTestReport = hasTestReport,
       isBuilding = isBuilding)
 

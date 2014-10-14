@@ -15,8 +15,7 @@ class JenkinsBuildXmlParser {
     val durationOpt = getFieldOpt(elem, "duration").map(parseLong).map(Duration.millis)
     val nameOpt = getFieldOpt(elem, "fullDisplayName")
     val timestampOpt = getFieldOpt(elem, "timestamp").map(parseLong).map(new DateTime(_))
-    val result = getFieldOpt(elem, "result").getOrElse(
-      throw new ParseException("Could not find a <result> element"))
+    val resultOpt = getFieldOpt(elem, "result")
     val hasTestReport = (elem \ "action" \ "urlName").exists(_.text == "testReport")
     val isBuilding = getFieldOpt(elem, "building").getOrElse(
       throw new ParseException("Could not find a <building> element")).toBoolean
@@ -26,7 +25,7 @@ class JenkinsBuildXmlParser {
       durationOpt = durationOpt,
       nameOpt = nameOpt,
       timestampOpt = timestampOpt,
-      result = result,
+      resultOpt = resultOpt,
       hasTestReport = hasTestReport,
       isBuilding = isBuilding)
   }
