@@ -5,7 +5,7 @@ import com.thetestpeople.trt.model.ExecutionLite
 /**
  * Group of executions sharing the same configuration and testId
  */
-case class ExecutionGroup(executions: List[ExecutionLite]) {
+case class ExecutionGroup(executions: Seq[ExecutionLite]) {
 
   def configuration = executions(0).configuration
 
@@ -22,7 +22,7 @@ class ExecutionGroupIterator(executions: Iterator[ExecutionLite]) extends Iterat
     val first = remaining.next()
     val (same, rest) = executions.span(e ⇒ e.configuration == first.configuration && e.testId == first.testId)
     remaining = rest
-    ExecutionGroup(first :: same.toList)
+    ExecutionGroup(first +: same.toSeq)
   }
 
   def hasNext = remaining.hasNext

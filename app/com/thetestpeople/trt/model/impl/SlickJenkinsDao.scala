@@ -82,7 +82,7 @@ trait SlickJenkinsDao { this: SlickDao ⇒
     val config = jenkinsConfiguration.firstOption.getOrElse(
       throw new IllegalStateException("No Jenkins configuration present"))
     val params = jenkinsJobParams.run
-    FullJenkinsConfiguration(config, params.toList)
+    FullJenkinsConfiguration(config, params)
   }
 
   def updateJenkinsConfiguration(config: FullJenkinsConfiguration): Unit = synchronized {

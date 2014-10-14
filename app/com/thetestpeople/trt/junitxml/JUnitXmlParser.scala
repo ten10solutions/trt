@@ -39,7 +39,7 @@ class JUnitXmlParser {
     val sysoutOpt = (suiteNode \ "system-out").headOption.map(_.text)
     val syserrOpt = (suiteNode \ "system-err").headOption.map(_.text)
     val properties = getProperties(suiteNode)
-    val testCases = (suiteNode \ "testcase").toList.map(parseCase)
+    val testCases = (suiteNode \ "testcase").map(parseCase)
     TestSuite(
       name = name,
       testCases = testCases,
@@ -132,7 +132,7 @@ class JUnitXmlParser {
 
 case class TestSuite(
   name: String,
-  testCases: List[TestCase],
+  testCases: Seq[TestCase],
   errorsOpt: Option[Int],
   failuresOpt: Option[Int],
   testsOpt: Option[Int],

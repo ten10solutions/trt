@@ -20,7 +20,7 @@ case class EditableJenkinsConfiguration(
     credentialsOpt: Option[Credentials],
     rerunJobUrlOpt: Option[URI],
     authenticationTokenOpt: Option[String],
-    params: List[JenkinsJobParam]) {
+    params: Seq[JenkinsJobParam]) {
 
   def usernameOpt: Option[String] = credentialsOpt.map(_.username)
 
@@ -35,6 +35,6 @@ case class EditableJenkinsConfiguration(
         authenticationTokenOpt = authenticationTokenOpt),
       params = params)
 
-  def duplicateParamNames = params.groupBy(_.param).filter(_._2.size > 1).map(_._1).toList.sorted
+  def duplicateParamNames: Seq[String] = params.groupBy(_.param).filter(_._2.size > 1).map(_._1).toSeq.sorted
 
 }

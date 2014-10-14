@@ -31,14 +31,14 @@ class JenkinsTestResultXmlParser {
       throw new ParseException(s"Unknown root element <${root.label}>")
   }
 
-  private def getChildReportUrls(root: Elem): List[URI] =
-    (root \ "childReport" \ "child" \ "url").map(_.text).map(new URI(_)).toList
+  private def getChildReportUrls(root: Elem): Seq[URI] =
+    (root \ "childReport" \ "child" \ "url").map(_.text).map(new URI(_))
 
   def parseOrdinaryTestResult(root: Elem): OrdinaryTestResult = {
     val durationString = getFieldOpt(root, "duration").getOrElse(
       throw new ParseException(s"No <duration> element within <${root.label}>"))
     val duration = asDuration(parseDecimal(durationString))
-    val suites = (root \ "suite").toList.map(parseSuite)
+    val suites = (root \ "suite").map(parseSuite)
     OrdinaryTestResult(duration = duration, suites = suites)
   }
 
@@ -46,7 +46,7 @@ class JenkinsTestResultXmlParser {
     val durationString = getFieldOpt(node, "duration").getOrElse(
       throw new ParseException("No <duration> element within <suite>"))
     val duration = asDuration(parseDecimal(durationString))
-    val cases = (node \ "case").toList.map(parseCase)
+    val cases = (node \ "case").map(parseCase)
     val name = getFieldOpt(node, "name").getOrElse(
       throw new ParseException("No <name> element within <suite>"))
     Suite(name = name, duration = duration, cases = cases)

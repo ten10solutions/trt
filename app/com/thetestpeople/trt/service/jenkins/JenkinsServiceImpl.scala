@@ -19,7 +19,7 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
 
   import dao.transaction
 
-  def getJenkinsImportSpecs: List[JenkinsImportSpec] = transaction { dao.getJenkinsImportSpecs.toList }
+  def getJenkinsImportSpecs: Seq[JenkinsImportSpec] = transaction { dao.getJenkinsImportSpecs }
 
   def newJenkinsImportSpec(spec: JenkinsImportSpec) =
     transaction {
@@ -69,7 +69,7 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
     logger.info(s"Updated Jenkins configuration to $config")
   }
 
-  def rerunTests(testIds: List[Id[Test]]) = transaction {
+  def rerunTests(testIds: Seq[Id[Test]]) = transaction {
     new JenkinsTestRunner(dao, http).rerunTests(testIds)
   }
 
@@ -77,7 +77,7 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
     dao.getJenkinsConfiguration.config.rerunJobUrlOpt.isDefined
   }
 
-  def getJenkinsJobs(): List[JenkinsJob] = transaction { dao.getJenkinsJobs().toList }
+  def getJenkinsJobs(): Seq[JenkinsJob] = transaction { dao.getJenkinsJobs() }
 
   def getJenkinsBuilds(jobUrl: URI): Seq[JenkinsBuild] = transaction { dao.getJenkinsBuilds(jobUrl) }
 

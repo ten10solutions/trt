@@ -88,7 +88,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
   private def handleTest(testId: Id[Test], configuration: Configuration, resultOpt: Option[Boolean], pagination: Pagination)(implicit request: Request[_]) =
     service.getTestAndExecutions(testId, configuration, resultOpt) map {
       case TestAndExecutions(test, executions, otherConfigurations) ⇒
-        val executionViews = executions.map(e ⇒ ExecutionView(e))
+        val executionViews = executions.map(e ⇒ ExecutionView(e)).toList
         val testView = new TestView(test)
         val paginationData = pagination.paginationData(executions.size)
         views.html.test(testView, executionViews, Some(configuration), resultOpt, otherConfigurations, service.canRerun, paginationData)
@@ -110,7 +110,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
   private def handleBatch(batchId: Id[Batch], passedFilterOpt: Option[Boolean], pagination: Pagination)(implicit request: Request[_]) =
     service.getBatchAndExecutions(batchId, passedFilterOpt) map {
       case BatchAndExecutions(batch, executions, logOpt, importSpecIdOpt, commentOpt) ⇒
-        val batchView = new BatchView(batch, executions, logOpt, importSpecIdOpt, commentOpt)
+        val batchView = new BatchView(batch, executions.toList, logOpt, importSpecIdOpt, commentOpt)
         val paginationData = pagination.paginationData(executions.size)
         val canRerun = service.canRerun
         views.html.batch(batchView, passedFilterOpt, canRerun, paginationData)
@@ -142,7 +142,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   private def handleBatches(jobIdOpt: Option[Id[JenkinsJob]], configurationOpt: Option[Configuration], pagination: Pagination)(implicit request: Request[_]) = {
     val batches = service.getBatches(jobIdOpt, configurationOpt).map(new BatchView(_))
-    val jobs = service.getJenkinsJobs()
+    val jobs = service.getJenkinsJobs().toList
     val paginationData = pagination.paginationData(batches.size)
     val hideChartInitially = batches.size >= HideBatchChartThreshold
     views.html.batches(batches.toList, jobIdOpt, configurationOpt, jobs, paginationData, hideChartInitially)
@@ -161,7 +161,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
       service.getExecutions(configurationOpt, resultOpt, startingFrom = pagination.firstItem, limit = pagination.pageSize)
     val executionVolume = service.getExecutionVolume(configurationOpt)
     val paginationData = pagination.paginationData(totalExecutionCount)
-    val executionViews = executions.map(new ExecutionView(_))
+    val executionViews = executions.map(new ExecutionView(_)).toList
     views.html.executions(executionViews, totalExecutionCount, configurationOpt, resultOpt, paginationData, executionVolume)
   }
 

@@ -59,7 +59,7 @@ class WsHttp(timeout: Duration = 60.seconds) extends Http with HasLogger {
     val userClause = basicAuthOpt.map(curlUserClause).getOrElse("")
     val paramClauses =
       for {
-        (paramName, paramValues) ← bodyParams.toList
+        (paramName, paramValues) ← bodyParams.toSeq
         paramValue ← paramValues
       } yield s"--data-urlencode '${paramName}=${paramValue}'"
     s"curl -v --globoff -X POST '$url' $userClause ${paramClauses.mkString(" ")}"

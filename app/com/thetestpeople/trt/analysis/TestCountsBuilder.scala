@@ -8,7 +8,7 @@ import com.github.nscala_time.time.Imports._
 /**
  * Mutable store of test counts by configuration, then time.
  */
-class TestCountsBuilder(sampleTimesByConfig: Map[Configuration, List[DateTime]]) {
+class TestCountsBuilder(sampleTimesByConfig: Map[Configuration, Seq[DateTime]]) {
 
   private var countsMap: Map[Configuration, Map[DateTime, MutableTestCounts]] = Map()
 

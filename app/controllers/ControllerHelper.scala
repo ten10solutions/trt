@@ -10,10 +10,10 @@ import com.thetestpeople.trt.utils.Utils
 
 object ControllerHelper {
 
-  def getSelectedTestIds(request: Request[AnyContent]): List[Id[Test]] =
+  def getSelectedTestIds(request: Request[AnyContent]): Seq[Id[Test]] =
     for {
-      requestMap ← request.body.asFormUrlEncoded.toList
-      selectedIds ← requestMap.get("selectedTest").toList
+      requestMap ← request.body.asFormUrlEncoded.toSeq
+      selectedIds ← requestMap.get("selectedTest").toSeq
       idString ← selectedIds
       id ← Id.parse[Test](idString)
     } yield id

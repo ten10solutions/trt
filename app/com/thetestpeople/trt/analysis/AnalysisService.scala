@@ -60,7 +60,7 @@ class AnalysisService(dao: Dao, clock: Clock, async: Boolean = true) extends Has
     val executions = dao.getExecutionsForTest(testId)
     for {
       (configuration, executionsForConfig) ← executions.groupBy(_.configuration)
-      analysis ← testAnalyser.analyse(executionsForConfig.toList)
+      analysis ← testAnalyser.analyse(executionsForConfig)
     } updateAnalysis(testId, configuration, analysis)
   }
 

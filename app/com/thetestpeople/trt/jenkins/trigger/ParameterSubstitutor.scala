@@ -6,12 +6,12 @@ import com.thetestpeople.trt.model.Test
 
 object ParameterSubstitutor {
 
-  def constructParameters(params: List[JenkinsJobParam], tests: List[Test]): List[BuildParameter] = {
+  def constructParameters(params: Seq[JenkinsJobParam], tests: Seq[Test]): Seq[BuildParameter] = {
     val names = tests.map(_.qualifiedName)
     params.map(p ⇒ BuildParameter(p.param, substitute(p.value, names)))
   }
 
-  private def substitute(template: String, names: List[QualifiedName]): String =
+  private def substitute(template: String, names: Seq[QualifiedName]): String =
     template
       .replace("$" + MavenParamHelper.VariableName, MavenParamHelper.mavenTestNames(names))
       .replace("$" + SSTParamHelper.VariableName, SSTParamHelper.sstRegexes(names))

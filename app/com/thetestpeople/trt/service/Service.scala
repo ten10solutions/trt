@@ -10,11 +10,11 @@ import com.thetestpeople.trt.analysis.HistoricalTestCountsTimeline
 import com.thetestpeople.trt.analysis.ExecutionVolume
 import com.thetestpeople.trt.analysis.ExecutionTimeMAD
 
-case class TestAndExecutions(test: TestAndAnalysis, executions: List[EnrichedExecution], otherConfigurations: Seq[Configuration])
+case class TestAndExecutions(test: TestAndAnalysis, executions: Seq[EnrichedExecution], otherConfigurations: Seq[Configuration])
 
-case class BatchAndExecutions(batch: Batch, executions: List[EnrichedExecution], logOpt: Option[String], importSpecIdOpt: Option[Id[JenkinsImportSpec]], commentOpt: Option[String])
+case class BatchAndExecutions(batch: Batch, executions: Seq[EnrichedExecution], logOpt: Option[String], importSpecIdOpt: Option[Id[JenkinsImportSpec]], commentOpt: Option[String])
 
-case class ExecutionsAndTotalCount(executions: List[EnrichedExecution], total: Int)
+case class ExecutionsAndTotalCount(executions: Seq[EnrichedExecution], total: Int)
 
 case class ExecutionAndFragment(execution: EnrichedExecution, fragment: String)
 

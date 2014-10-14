@@ -31,7 +31,7 @@ class TestAnalyser(clock: Clock, config: AnalysisConfiguration) {
 
   import config._
 
-  def analyse(executions: List[Execution]): Option[TestAnalysis] = {
+  def analyse(executions: Seq[Execution]): Option[TestAnalysis] = {
     val sortedExecutions = executions.sortBy(_.executionTime).reverse
     sortedExecutions.headOption map { mostRecentExecution ⇒
       val lastPassedExecutionOpt = sortedExecutions.find(_.passed)
@@ -55,20 +55,20 @@ class TestAnalyser(clock: Clock, config: AnalysisConfiguration) {
     }
   }
 
-  private def medianDuration(executions: List[Execution]): Option[Duration] = {
+  private def medianDuration(executions: Seq[Execution]): Option[Duration] = {
     val durations = executions.flatMap(_.durationOpt).map(_.getMillis.toDouble)
     StatsUtils.median(durations).map(m => Duration.millis(m.longValue))
   }
   
-  private def calculateWeather(sortedExecutions: List[Execution]): Double = {
+  private def calculateWeather(sortedExecutions: Seq[Execution]): Double = {
     val recentExecutions = sortedExecutions.take(10)
     recentExecutions.count(_.passed).toDouble / recentExecutions.size
   }
 
-  private def duration(recentPasses: List[Execution]): Duration =
+  private def duration(recentPasses: Seq[Execution]): Duration =
     (recentPasses.last.executionTime to recentPasses.head.executionTime).duration
 
-  private def calculateTestStatus(recentFailures: List[Execution], recentPasses: List[Execution]): TestStatus =
+  private def calculateTestStatus(recentFailures: Seq[Execution], recentPasses: Seq[Execution]): TestStatus =
     TestAnalyser.calculateTestStatus(config,
       if (recentFailures.isEmpty)
         PassFailBlock(recentPasses.size, true, duration(recentPasses))

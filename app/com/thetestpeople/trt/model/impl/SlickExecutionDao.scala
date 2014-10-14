@@ -140,7 +140,7 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
   }
 
   def getExecutionsForTest(id: Id[Test]): Seq[Execution] =
-    getExecutionsForTestCompiled(id).run.toList
+    getExecutionsForTestCompiled(id).run
 
   def getEnrichedExecutionsForTest(id: Id[Test], configurationOpt: Option[Configuration], resultOpt: Option[Boolean] = None): Seq[EnrichedExecution] = {
     var query =
@@ -153,7 +153,7 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
     for (result ← resultOpt)
       query = query.filter(_._1.passed === result)
     query = query.sortBy(_._1.executionTime.desc)
-    query.run.toList.map((makeEnrichedExecution _).tupled)
+    query.run.map((makeEnrichedExecution _).tupled)
   }
 
   def setExecutionComment(id: Id[Execution], text: String) =

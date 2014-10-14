@@ -31,7 +31,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
 
   def jenkinsImportSpecs() = Action { implicit request ⇒
     logger.debug(s"jenkinsImportSpecs()")
-    val specs = service.getJenkinsImportSpecs.map(makeView).sortBy(_.jobUrl)
+    val specs = service.getJenkinsImportSpecs.map(makeView).sortBy(_.jobUrl).toList
     Ok(html.jenkinsImportSpecs(specs))
   }
 
@@ -262,12 +262,12 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
     } yield new Call("GET", previousUrl)
 
   def rerunSelectedTests() = Action { implicit request ⇒
-    val selectedTestIds: List[Id[Test]] = ControllerHelper.getSelectedTestIds(request)
+    val selectedTestIds: Seq[Id[Test]] = ControllerHelper.getSelectedTestIds(request)
     logger.debug(s"rerunSelectedTests(${selectedTestIds.mkString(",")})")
     rerunTests(selectedTestIds)
   }
 
-  private def rerunTests(testIds: List[Id[Test]])(implicit request: Request[AnyContent]) = {
+  private def rerunTests(testIds: Seq[Id[Test]])(implicit request: Request[AnyContent]) = {
     val triggerResult = service.rerunTests(testIds)
 
     val redirectTarget = previousUrlOpt.getOrElse(routes.Application.tests())

@@ -52,13 +52,13 @@ object DateUtils {
    * @return points in time evenly spaced across the given interval, including the start and end times. Fewer than 
    *  the requested number of samples will be returned if there are not enough distinct times in the interval.
    */
-  def sampleTimesBetween(interval: Interval, samples: Int): List[DateTime] =
+  def sampleTimesBetween(interval: Interval, samples: Int): Seq[DateTime] =
     sampleTimesBetween(interval.start, interval.end, samples)
 
-  def sampleTimesBetween(start: DateTime, end: DateTime, samples: Int): List[DateTime] = {
+  def sampleTimesBetween(start: DateTime, end: DateTime, samples: Int): Seq[DateTime] = {
     require(samples >= 2)
     val gapMillis = (end.getMillis - start.getMillis) / (samples - 1)
-    val milliOffsets: List[Long] = (0 until (samples - 1)).map(_ * gapMillis).toList
+    val milliOffsets: Seq[Long] = (0 until (samples - 1)).map(_ * gapMillis)
     (milliOffsets.map(start + _) :+ end).distinct
   }
 

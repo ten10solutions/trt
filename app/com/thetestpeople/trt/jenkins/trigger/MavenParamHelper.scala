@@ -15,7 +15,7 @@ object MavenParamHelper {
 
   def mavenTestNames(names: Seq[QualifiedName]): String = {
     val clauses =
-      for ((groupOpt, namesInGroup) ← names.groupBy(_.groupOpt).toList.sortBy(_._1))
+      for ((groupOpt, namesInGroup) ← names.groupBy(_.groupOpt).toSeq.sortBy(_._1))
         yield mavenTestNameClause(groupOpt, namesInGroup.sorted.map(_.name))
     clauses.mkString(",")
   }

@@ -23,7 +23,7 @@ class JenkinsBuildInvoker(
   credentialsOpt: Option[Credentials] = None)
     extends HasLogger {
 
-  def triggerBuild(buildParameters: List[BuildParameter] = Nil, crumbOpt: Option[Crumb] = None): TriggerResult =
+  def triggerBuild(buildParameters: Seq[BuildParameter] = Nil, crumbOpt: Option[Crumb] = None): TriggerResult =
     try {
       val postUrl = jobUrl / "build"
       val postBody = constructPostBody(buildParameters, crumbOpt)
@@ -55,17 +55,17 @@ class JenkinsBuildInvoker(
 
   private def jenkinsUrl: URI = JenkinsUrlHelper.getServerUrl(jobUrl)
 
-  private def constructPostBody(buildParameters: List[BuildParameter], crumbOpt: Option[Crumb]): Map[String, Seq[String]] =
+  private def constructPostBody(buildParameters: Seq[BuildParameter], crumbOpt: Option[Crumb]): Map[String, Seq[String]] =
     jsonParam(buildParameters) ++ causeParam ++ crumbParam(crumbOpt) ++ authenticationTokenParam
 
-  private def jsonParam(buildParameters: List[BuildParameter]) = Map("json" -> Seq(jsonBuildRequest(buildParameters)))
+  private def jsonParam(buildParameters: Seq[BuildParameter]) = Map("json" -> Seq(jsonBuildRequest(buildParameters)))
 
   /**
    * Construct a JSON build request of the form Jenkins is expecting. Something like:
    *
    * {"parameter": [{"name": "someParameterName", "value": "com.example.Test#testMethod1"}]}
    */
-  private def jsonBuildRequest(buildParameters: List[BuildParameter]): String = {
+  private def jsonBuildRequest(buildParameters: Seq[BuildParameter]): String = {
     val json = Json.obj("parameter" -> buildParameters.map(_.asJson))
     Json.stringify(json)
   }

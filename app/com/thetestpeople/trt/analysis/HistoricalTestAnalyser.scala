@@ -21,14 +21,14 @@ class HistoricalTestAnalyser(
 
   import HistoricalTestAnalyser._
 
-  private val sampleTimesByConfig: Map[Configuration, List[DateTime]] = getSampleTimesByConfiguration(executionIntervalsByConfig)
+  private val sampleTimesByConfig: Map[Configuration, Seq[DateTime]] = getSampleTimesByConfiguration(executionIntervalsByConfig)
   private val testCountsBuilder = new TestCountsBuilder(sampleTimesByConfig)
 
   /**
    * Analyse the executions and produce test statuses over a series of points in time.
    */
   def executionGroup(executionGroup: ExecutionGroup) {
-    val sampleTimes: List[DateTime] = sampleTimesByConfig(executionGroup.configuration)
+    val sampleTimes: Seq[DateTime] = sampleTimesByConfig(executionGroup.configuration)
     analyseExecutionGroup(executionGroup, testCountsBuilder, sampleTimes)
   }
 
@@ -41,7 +41,7 @@ class HistoricalTestAnalyser(
    * @return for each configuration, a series of sample times across the execution interval for that configuration.
    *   The sample times are ordered most recent -> least recent.
    */
-  private def getSampleTimesByConfiguration(executionIntervalsByConfig: Map[Configuration, Interval]): Map[Configuration, List[DateTime]] =
+  private def getSampleTimesByConfiguration(executionIntervalsByConfig: Map[Configuration, Interval]): Map[Configuration, Seq[DateTime]] =
     for {
       (configuration, executionInterval) ← executionIntervalsByConfig
       sampleTimes = DateUtils.sampleTimesBetween(executionInterval, samples = sampleSize)
@@ -50,7 +50,7 @@ class HistoricalTestAnalyser(
   /**
    * Compute all the test results for the given execution group and record them into the TestCountsBuilder.
    */
-  private def analyseExecutionGroup(executionGroup: ExecutionGroup, testCountsBuilder: TestCountsBuilder, sampleTimes: List[DateTime]) {
+  private def analyseExecutionGroup(executionGroup: ExecutionGroup, testCountsBuilder: TestCountsBuilder, sampleTimes: Seq[DateTime]) {
     val quickTestAnalyser = new QuickTestAnalyser(executionGroup.executions.reverse.toArray)
     for (sampleTime ← sampleTimes) {
       quickTestAnalyser.ignoreExecutionsAfter(sampleTime)

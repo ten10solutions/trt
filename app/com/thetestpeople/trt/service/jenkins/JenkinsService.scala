@@ -20,7 +20,7 @@ trait JenkinsService {
 
   def getJenkinsImportSpec(id: Id[JenkinsImportSpec]): Option[JenkinsImportSpec]
 
-  def getJenkinsImportSpecs: List[JenkinsImportSpec]
+  def getJenkinsImportSpecs: Seq[JenkinsImportSpec]
 
   /**
    * @return true if the import spec was deleted, false if there was no import spec with the given ID
@@ -41,14 +41,14 @@ trait JenkinsService {
 
   def updateJenkinsConfiguration(config: FullJenkinsConfiguration)
 
-  def rerunTests(testIds: List[Id[Test]]): TriggerResult
+  def rerunTests(testIds: Seq[Id[Test]]): TriggerResult
 
   /**
    * Whether or not there is configuration to rerun tests through Jenkins
    */
   def canRerun: Boolean
 
-  def getJenkinsJobs(): List[JenkinsJob]
+  def getJenkinsJobs(): Seq[JenkinsJob]
 
   def getJenkinsBuilds(jobUrl: URI): Seq[JenkinsBuild]
 

@@ -13,7 +13,7 @@ object PathCachingHttp {
     val url = new URL(urlString)
     val host = url.getHost
     val path = url.getPath
-    val chunks = host +: path.split("/").toList :+ DigestUtils.md5Hex(urlString)
+    val chunks = host +: path.split("/").toSeq :+ DigestUtils.md5Hex(urlString)
     chunks.mkString("/")
   }
 

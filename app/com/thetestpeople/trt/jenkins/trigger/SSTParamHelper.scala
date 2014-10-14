@@ -6,7 +6,7 @@ object SSTParamHelper {
 
   val VariableName = "SST_REGEXES"
 
-  def sstRegexes(names: List[QualifiedName]): String =
+  def sstRegexes(names: Seq[QualifiedName]): String =
     names.map(sstRegex).mkString(" ")
 
   private def sstRegex(fullName: QualifiedName): String = {

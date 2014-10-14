@@ -24,7 +24,7 @@ object JenkinsConfigurationForm {
       "credentials" -> optional(credentialsMapping),
       "rerunJobUrl" -> optional(url.verifying(isJenkinsJob)),
       "authenticationToken" -> optional(text),
-      "params" -> list(paramMapping))(EditableJenkinsConfiguration.apply)(EditableJenkinsConfiguration.unapply)
+      "params" -> seq(paramMapping))(EditableJenkinsConfiguration.apply)(EditableJenkinsConfiguration.unapply)
     Form(formMapping.verifying(parametersAreAllDistinct))
   }
 
