@@ -16,8 +16,8 @@ import scala.concurrent.duration._
 
 object ScrapeTeamCity extends App {
 
-  //  val Right(configuration) = TeamCityUrlParser.parse(uri("http://localhost:8111/viewType.html?buildTypeId=TestReportyThing_Build"))
-  val Right(configuration) = TeamCityUrlParser.parse(uri("https://teamcity.jetbrains.com/viewType.html?buildTypeId=NetCommunityProjects_Femah_Commit"))
+    val Right(configuration) = TeamCityUrlParser.parse(uri("http://localhost:8111/viewType.html?buildTypeId=TestReportyThing_Build"))
+//  val Right(configuration) = TeamCityUrlParser.parse(uri("https://teamcity.jetbrains.com/viewType.html?buildTypeId=NetCommunityProjects_Femah_Commit"))
 
   val wsClient = new NingWSClient(new AsyncHttpClientConfig.Builder().build())
   val http = new WsHttp(wsClient)

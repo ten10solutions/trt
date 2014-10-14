@@ -37,8 +37,9 @@ class TeamCityXmlParserTest extends FlatSpec with Matchers {
 
   "Parsing a TeamCity list of test occurrences XML" should "correctly capture the paths to the test occurrences" in {
     val parser = new TeamCityXmlParser
-    val paths = parser.parseTestOccurrences(TestUtils.loadXmlFromClasspath("/teamcity/testOccurrences.xml"))
+    val TeamCityTestOccurrences(Some(nextPagePath), paths) = parser.parseTestOccurrences(TestUtils.loadXmlFromClasspath("/teamcity/testOccurrences.xml"))
 
+    nextPagePath should equal("/httpAuth/app/rest/testOccurrences?locator=count:100,start:200,build:(id:157593)")
     paths should equal(Seq(
       "/httpAuth/app/rest/testOccurrences/id:537,build:(id:157593)",
       "/httpAuth/app/rest/testOccurrences/id:541,build:(id:157593)"))
