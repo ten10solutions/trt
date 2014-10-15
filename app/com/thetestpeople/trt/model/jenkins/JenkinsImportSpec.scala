@@ -8,7 +8,7 @@ import java.net.URI
 
 case class CiImportSpec(
     id: Id[CiImportSpec] = Id.dummy,
-    ciType: CIType,
+    ciType: CiType,
     jobUrl: URI,
     pollingInterval: Duration,
     importConsoleLog: Boolean,

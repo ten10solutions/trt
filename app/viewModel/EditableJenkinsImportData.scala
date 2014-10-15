@@ -5,7 +5,7 @@ import controllers.jenkins.CiImportSpecForm
 import org.joda.time.Duration
 import java.net.URI
 import com.thetestpeople.trt.model.Configuration
-import com.thetestpeople.trt.model.CIType
+import com.thetestpeople.trt.model.CiType
 
 object EditableJenkinsImportData {
 
@@ -33,7 +33,7 @@ case class EditableJenkinsImportData(
   def newSpec(): CiImportSpec =
     CiImportSpec(
       jobUrl = jobUrl,
-      ciType = CIType.Jenkins,
+      ciType = CiType.Jenkins,
       pollingInterval = pollingInterval,
       importConsoleLog = importConsoleLog,
       configurationOpt = configurationOpt)

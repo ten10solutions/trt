@@ -180,7 +180,7 @@ trait Mappings { self: SlickDao ⇒
   class CiImportSpecMapping(tag: Tag) extends Table[CiImportSpec](tag, "jenkins_import_specs") {
 
     def id = column[Id[CiImportSpec]]("id", O.PrimaryKey, O.NotNull, O.AutoInc)
-    def ciType = column[CIType]("ci_type", O.NotNull)
+    def ciType = column[CiType]("ci_type", O.NotNull)
     def jobUrl = column[URI]("job_url", O.NotNull)
     def pollingInterval = column[Duration]("polling_interval", O.NotNull)
     def importConsoleLog = column[Boolean]("import_console_log", O.NotNull)

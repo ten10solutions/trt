@@ -86,7 +86,7 @@ object TestDataFactory {
 
   def ciImportSpec(
     jobUrl: URI = DummyData.JobUrl,
-    ciType: CIType = CIType.Jenkins,
+    ciType: CiType = CiType.Jenkins,
     pollingInterval: Duration = DummyData.PollingInterval,
     importConsoleLog: Boolean = true,
     lastCheckedOpt: Option[DateTime] = None,

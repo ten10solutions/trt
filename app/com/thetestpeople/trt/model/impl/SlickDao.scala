@@ -62,7 +62,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
 
     implicit def configurationMapper = MappedColumnType.base[Configuration, String](_.configuration, Configuration.apply)
 
-    implicit def ciTypeMapper = MappedColumnType.base[CIType, String](_.name, CIType.apply)
+    implicit def ciTypeMapper = MappedColumnType.base[CiType, String](_.name, CiType.apply)
 
     implicit def uriMapper = MappedColumnType.base[URI, String](_.toString, new URI(_))
 
