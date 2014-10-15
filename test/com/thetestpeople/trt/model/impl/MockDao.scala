@@ -279,14 +279,14 @@ class MockDao extends Dao {
 
   def getExecutionLog(id: Id[Execution]) = executionLogs.find(_.executionId == id).map(_.log)
 
-  def newJenkinsBuild(ciBuild: CiBuild) {
+  def newCiBuild(ciBuild: CiBuild) {
     ciBuilds +:= ciBuild
   }
 
-  def getJenkinsBuild(buildUrl: URI): Option[CiBuild] =
+  def getCiBuild(buildUrl: URI): Option[CiBuild] =
     ciBuilds.find(_.buildUrl == buildUrl)
 
-  def getJenkinsBuildUrls(): Seq[URI] = ciBuilds.map(_.buildUrl)
+  def getCiBuildUrls(): Seq[URI] = ciBuilds.map(_.buildUrl)
 
   def getJenkinsJobs(): Seq[JenkinsJob] = jenkinsJobs
 

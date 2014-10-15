@@ -443,7 +443,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
   "Getting batches" should "let you filter by Jenkins job" in transaction { dao ⇒
     def addBatchAssociatedWithJob(jobId: Id[JenkinsJob], buildUrl: URI) = {
       val batchId = dao.newBatch(F.batch())
-      dao.newJenkinsBuild(F.jenkinsBuild(batchId, jobId, buildUrl = buildUrl))
+      dao.newCiBuild(F.jenkinsBuild(batchId, jobId, buildUrl = buildUrl))
       batchId
     }
     val jobId1 = dao.ensureJenkinsJob(F.jenkinsJob(url = DummyData.JobUrl))
@@ -553,14 +553,14 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     val testId = dao.ensureTestIsRecorded(F.test())
     val executionId = dao.newExecution(F.execution(batchId, testId), logOpt = Some(DummyData.Log))
     val jobId = dao.ensureJenkinsJob(F.jenkinsJob())
-    dao.newJenkinsBuild(F.jenkinsBuild(batchId, jobId = jobId, buildUrl = DummyData.BuildUrl))
+    dao.newCiBuild(F.jenkinsBuild(batchId, jobId = jobId, buildUrl = DummyData.BuildUrl))
     dao.upsertAnalysis(F.analysis(testId, lastPassedExecutionIdOpt = Some(executionId)))
 
     dao.deleteBatches(List(batchId))
 
     dao.getBatch(batchId) should equal(None)
     dao.getEnrichedExecutionsInBatch(batchId) should equal(List())
-    dao.getJenkinsBuild(DummyData.BuildUrl) should equal(None)
+    dao.getCiBuild(DummyData.BuildUrl) should equal(None)
   }
 
   "Deleting a batch" should "delete tests if they no longer have associated executions" in transaction { dao ⇒

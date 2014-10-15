@@ -44,7 +44,7 @@ class JenkinsImporter(
   }
 
   private def doImportBuilds(spec: CiImportSpec) {
-    val alreadyImportedBuildUrls = transaction { dao.getJenkinsBuildUrls() }.toSet
+    val alreadyImportedBuildUrls = transaction { dao.getCiBuildUrls() }.toSet
     def alreadyImported(link: JenkinsBuildLink) = alreadyImportedBuildUrls contains link.buildUrl
     val jenkinsScraper = getJenkinsScraper(spec.importConsoleLog)
 
@@ -93,7 +93,7 @@ class JenkinsImporter(
     val modelJob = model.jenkins.JenkinsJob(url = importSpec.jobUrl, name = job.name)
     val jobId = transaction { dao.ensureJenkinsJob(modelJob) }
     val ciBuild = CiBuild(batchId, clock.now, buildUrl, buildLink.buildNumber, jobId, Some(importSpec.id))
-    transaction { dao.newJenkinsBuild(ciBuild) }
+    transaction { dao.newCiBuild(ciBuild) }
     Some(batchId)
   }
 

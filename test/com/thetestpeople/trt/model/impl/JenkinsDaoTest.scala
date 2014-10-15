@@ -81,9 +81,9 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
       importTime = DummyData.ImportTime,
       buildUrl = DummyData.BuildUrl,
       importSpecIdOpt = Some(specId))
-    dao.newJenkinsBuild(build)
+    dao.newCiBuild(build)
 
-    val Some(buildAgain) = dao.getJenkinsBuild(DummyData.BuildUrl)
+    val Some(buildAgain) = dao.getCiBuild(DummyData.BuildUrl)
     buildAgain should equal(build)
   }
 
@@ -94,8 +94,8 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
     val specId = dao.newCiImportSpec(F.ciImportSpec())
     val build1 = F.jenkinsBuild(jobId = jobId, batchId = batchId1, buildUrl = DummyData.BuildUrl, importSpecIdOpt = Some(specId))
     val build2 = F.jenkinsBuild(jobId = jobId, batchId = batchId2, buildUrl = DummyData.BuildUrl2,importSpecIdOpt = Some(specId))
-    dao.newJenkinsBuild(build1)
-    dao.newJenkinsBuild(build2)
+    dao.newCiBuild(build1)
+    dao.newCiBuild(build2)
 
     val builds = dao.getCiBuilds(specId)
 
@@ -106,7 +106,7 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
     def addBuild(buildUrl: URI) {
       val batchId = dao.newBatch(F.batch())
       val jobId = dao.ensureJenkinsJob(F.jenkinsJob())
-      dao.newJenkinsBuild(F.jenkinsBuild(batchId, jobId = jobId, buildUrl = buildUrl))
+      dao.newCiBuild(F.jenkinsBuild(batchId, jobId = jobId, buildUrl = buildUrl))
     }
     val buildUrls = List(
       "http://www.example.com/1",
@@ -114,7 +114,7 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
       "http://www.example.com/3").map(uri)
     buildUrls.foreach(addBuild)
 
-    dao.getJenkinsBuildUrls should contain theSameElementsAs (buildUrls)
+    dao.getCiBuildUrls should contain theSameElementsAs (buildUrls)
   }
 
   "Adding a new Jenkins job" should "persist all job data" in transaction { dao ⇒

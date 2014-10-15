@@ -16,21 +16,21 @@ trait SlickJenkinsDao { this: SlickDao ⇒
 
   private lazy val ciBuildInserter = ciBuilds.insertInvoker
 
-  def newJenkinsBuild(build: CiBuild) {
+  def newCiBuild(build: CiBuild) {
     ciBuildInserter.insert(build)
   }
 
-  private lazy val getJenkinsBuildCompiled = {
-    def getJenkinsBuild(buildUrl: Column[URI]) =
+  private lazy val getCiBuildCompiled = {
+    def getCiBuild(buildUrl: Column[URI]) =
       ciBuilds.filter(_.buildUrl === buildUrl)
-    Compiled(getJenkinsBuild _)
+    Compiled(getCiBuild _)
   }
 
-  def getJenkinsBuild(buildUrl: URI): Option[CiBuild] = {
-    getJenkinsBuildCompiled(buildUrl).firstOption
+  def getCiBuild(buildUrl: URI): Option[CiBuild] = {
+    getCiBuildCompiled(buildUrl).firstOption
   }
 
-  def getJenkinsBuildUrls(): Seq[URI] = ciBuilds.map(_.buildUrl).run
+  def getCiBuildUrls(): Seq[URI] = ciBuilds.map(_.buildUrl).run
 
   def getCiBuilds(specId: Id[CiImportSpec]): Seq[CiBuild] = {
     val query =
