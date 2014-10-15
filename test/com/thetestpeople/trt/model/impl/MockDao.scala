@@ -33,7 +33,7 @@ class MockDao extends Dao {
   private var batchLogs: Seq[BatchLogRow] = List()
   private var batchComments: Seq[BatchComment] = List()
   private var jenkinsJobs: Seq[JenkinsJob] = List()
-  private var jenkinsBuilds: Seq[JenkinsBuild] = List()
+  private var jenkinsBuilds: Seq[CiBuild] = List()
   private var ciImportSpecs: Seq[CiImportSpec] = List()
   private var systemConfiguration = SystemConfiguration()
   private var jenkinsConfiguration = JenkinsConfiguration()
@@ -279,18 +279,18 @@ class MockDao extends Dao {
 
   def getExecutionLog(id: Id[Execution]) = executionLogs.find(_.executionId == id).map(_.log)
 
-  def newJenkinsBuild(jenkinsBuild: JenkinsBuild) {
+  def newJenkinsBuild(jenkinsBuild: CiBuild) {
     jenkinsBuilds +:= jenkinsBuild
   }
 
-  def getJenkinsBuild(buildUrl: URI): Option[JenkinsBuild] =
+  def getJenkinsBuild(buildUrl: URI): Option[CiBuild] =
     jenkinsBuilds.find(_.buildUrl == buildUrl)
 
   def getJenkinsBuildUrls(): Seq[URI] = jenkinsBuilds.map(_.buildUrl)
 
   def getJenkinsJobs(): Seq[JenkinsJob] = jenkinsJobs
 
-  def getJenkinsBuilds(jobUrl: URI): Seq[JenkinsBuild] =
+  def getJenkinsBuilds(jobUrl: URI): Seq[CiBuild] =
     for {
       job ← jenkinsJobs
       build ← jenkinsBuilds

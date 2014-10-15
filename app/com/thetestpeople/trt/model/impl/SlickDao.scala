@@ -45,7 +45,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     val systemConfiguration = TableQuery[SystemConfigurationMapping]
 
     val jenkinsJobs = TableQuery[JenkinsJobMapping]
-    val jenkinsBuilds = TableQuery[JenkinsBuildMapping]
+    val jenkinsBuilds = TableQuery[CiBuildMapping]
     val ciImportSpecs = TableQuery[CiImportSpecMapping]
     val jenkinsConfiguration = TableQuery[JenkinsConfigurationMapping]
     val jenkinsJobParams = TableQuery[JenkinsJobParamMapping]

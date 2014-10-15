@@ -50,7 +50,7 @@ trait JenkinsService {
 
   def getJenkinsJobs(): Seq[JenkinsJob]
 
-  def getJenkinsBuilds(jobUrl: URI): Seq[JenkinsBuild]
+  def getJenkinsBuilds(jobUrl: URI): Seq[CiBuild]
 
   def getBuildImportStatuses(specId: Id[CiImportSpec]): Seq[JenkinsBuildImportStatus]
 

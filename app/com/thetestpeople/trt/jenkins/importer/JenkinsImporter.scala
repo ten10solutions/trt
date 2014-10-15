@@ -10,6 +10,7 @@ import com.thetestpeople.trt.model.jenkins.JenkinsDao
 import com.thetestpeople.trt.model.Id
 import com.thetestpeople.trt.model
 import com.thetestpeople.trt.model.jenkins.CiImportSpec
+import com.thetestpeople.trt.model.jenkins.CiBuild
 import com.thetestpeople.trt.model.Batch
 import com.thetestpeople.trt.model.Configuration
 import com.thetestpeople.trt.model.jenkins.JenkinsConfiguration
@@ -91,8 +92,8 @@ class JenkinsImporter(
 
     val modelJob = model.jenkins.JenkinsJob(url = importSpec.jobUrl, name = job.name)
     val jobId = transaction { dao.ensureJenkinsJob(modelJob) }
-    val modelBuild = model.jenkins.JenkinsBuild(batchId, clock.now, buildUrl, buildLink.buildNumber, jobId, Some(importSpec.id))
-    transaction { dao.newJenkinsBuild(modelBuild) }
+    val ciBuild = CiBuild(batchId, clock.now, buildUrl, buildLink.buildNumber, jobId, Some(importSpec.id))
+    transaction { dao.newJenkinsBuild(ciBuild) }
     Some(batchId)
   }
 

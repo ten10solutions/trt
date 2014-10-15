@@ -74,7 +74,7 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
     val batchId = dao.newBatch(F.batch())
     val jobId = dao.ensureJenkinsJob(F.jenkinsJob())
     val specId = dao.newCiImportSpec(F.ciImportSpec())
-    val build = JenkinsBuild(
+    val build = CiBuild(
       jobId = jobId,
       batchId = batchId,
       buildNumber = DummyData.BuildNumber,

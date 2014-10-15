@@ -16,8 +16,8 @@ trait SlickJenkinsDao { this: SlickDao ⇒
 
   private lazy val jenkinsBuildInserter = jenkinsBuilds.insertInvoker
 
-  def newJenkinsBuild(jenkinsBuild: JenkinsBuild) {
-    jenkinsBuildInserter.insert(jenkinsBuild)
+  def newJenkinsBuild(build: CiBuild) {
+    jenkinsBuildInserter.insert(build)
   }
 
   private lazy val getJenkinsBuildCompiled = {
@@ -26,13 +26,13 @@ trait SlickJenkinsDao { this: SlickDao ⇒
     Compiled(getJenkinsBuild _)
   }
 
-  def getJenkinsBuild(buildUrl: URI): Option[JenkinsBuild] = {
+  def getJenkinsBuild(buildUrl: URI): Option[CiBuild] = {
     getJenkinsBuildCompiled(buildUrl).firstOption
   }
 
   def getJenkinsBuildUrls(): Seq[URI] = jenkinsBuilds.map(_.buildUrl).run
 
-  def getJenkinsBuilds(jobUrl: URI): Seq[JenkinsBuild] = {
+  def getJenkinsBuilds(jobUrl: URI): Seq[CiBuild] = {
     val query =
       for {
         job ← jenkinsJobs

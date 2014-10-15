@@ -133,7 +133,7 @@ trait Mappings { self: SlickDao ⇒
 
   }
 
-  class JenkinsBuildMapping(tag: Tag) extends Table[JenkinsBuild](tag, "jenkins_builds") {
+  class CiBuildMapping(tag: Tag) extends Table[CiBuild](tag, "jenkins_builds") {
 
     def batchId = column[Id[Batch]]("batch_id", O.PrimaryKey, O.NotNull)
     def importTime = column[DateTime]("import_time", O.NotNull)
@@ -142,7 +142,7 @@ trait Mappings { self: SlickDao ⇒
     def jobId = column[Id[JenkinsJob]]("job_id", O.NotNull)
     def importSpecIdOpt = column[Option[Id[CiImportSpec]]]("import_spec_id")
     
-    def * = (batchId, importTime, buildUrl, buildNumber, jobId, importSpecIdOpt) <> (JenkinsBuild.tupled, JenkinsBuild.unapply)
+    def * = (batchId, importTime, buildUrl, buildNumber, jobId, importSpecIdOpt) <> (CiBuild.tupled, CiBuild.unapply)
 
     def buildUrlIndex = index("idx_jenkins_build_url", buildUrl, unique = true)
     def jobIdIndex = index("idx_jenkins_job_id", jobId)
@@ -154,7 +154,7 @@ trait Mappings { self: SlickDao ⇒
      */
     def ? = (batchId.?, importTime.?, buildUrl.?, buildNumber.?, jobId.?, importSpecIdOpt).shaped <> ({ r ⇒
         import r._; _1.map(_ ⇒
-          JenkinsBuild.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6)))
+          CiBuild.tupled((_1.get, _2.get, _3.get, _4.get, _5.get, _6)))
       }, (_: Any) ⇒ throw new Exception("Inserting into ? projection not supported."))
 
   }

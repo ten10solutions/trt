@@ -16,9 +16,9 @@ trait JenkinsDao {
 
   def ensureJenkinsJob(job: JenkinsJob): Id[JenkinsJob]
 
-  def newJenkinsBuild(jenkinsBuild: JenkinsBuild)
+  def newJenkinsBuild(build: CiBuild)
 
-  def getJenkinsBuild(buildUrl: URI): Option[JenkinsBuild]
+  def getJenkinsBuild(buildUrl: URI): Option[CiBuild]
 
   /**
    * @return all the URLs of builds imported from Jenkins
@@ -27,7 +27,7 @@ trait JenkinsDao {
 
   def getJenkinsJobs(): Seq[JenkinsJob]
   
-  def getJenkinsBuilds(jobUrl: URI): Seq[JenkinsBuild]
+  def getJenkinsBuilds(jobUrl: URI): Seq[CiBuild]
 
   def newCiImportSpec(spec: CiImportSpec): Id[CiImportSpec]
 

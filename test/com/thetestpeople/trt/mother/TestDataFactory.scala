@@ -113,6 +113,6 @@ object TestDataFactory {
     buildUrl: URI = DummyData.BuildUrl,
     buildNumber: Int = DummyData.BuildNumber,
     importSpecIdOpt: Option[Id[CiImportSpec]] = None) =
-    JenkinsBuild(batchId, importTime, buildUrl, buildNumber, jobId, importSpecIdOpt)
+    CiBuild(batchId, importTime, buildUrl, buildNumber, jobId, importSpecIdOpt)
 
 }

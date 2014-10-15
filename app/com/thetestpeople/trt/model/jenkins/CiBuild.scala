@@ -4,7 +4,7 @@ import com.thetestpeople.trt.model._
 import org.joda.time.DateTime
 import java.net.URI
 
-case class JenkinsBuild(
+case class CiBuild(
   batchId: Id[Batch],
   importTime: DateTime,
   buildUrl: URI,

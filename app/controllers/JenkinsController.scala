@@ -165,7 +165,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
     val inMemoryInfos = inMemoryStatuses.map(makeBuildImportInfoFromImportStatus)
     val inMemoryUrls = inMemoryStatuses.map(_.buildUrl).toSet
 
-    def inMemory(build: JenkinsBuild) = inMemoryUrls contains build.buildUrl
+    def inMemory(build: CiBuild) = inMemoryUrls contains build.buildUrl
     val dbBuilds = service.getJenkinsBuilds(spec.jobUrl).filterNot(inMemory)
     val dbInfos = dbBuilds.map(makeBuildImportInfo)
 
@@ -198,7 +198,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
       detailsOpt = detailsOpt)
   }
 
-  private def makeBuildImportInfo(build: JenkinsBuild) =
+  private def makeBuildImportInfo(build: CiBuild) =
     JenkinsBuildImportInfo(
       buildUrl = build.buildUrl,
       buildNumber = build.buildNumber,
