@@ -1,19 +1,50 @@
 package com.thetestpeople.trt.teamcity.importer
 
-import com.thetestpeople.trt.utils.http._
 import java.net.URI
-import org.apache.http.client.utils.URIBuilder
-import com.thetestpeople.trt.utils.HasLogger
-import com.thetestpeople.trt.utils.UriUtils._
+
 import scala.collection.mutable.ListBuffer
-import scala.annotation.tailrec
+import scala.xml._
+
+import org.apache.http.client.utils.URIBuilder
+
+import com.thetestpeople.trt.utils.HasLogger
+import com.thetestpeople.trt.utils.http._
+
+class TeamCityDownloadException(message: String, cause: Throwable = null) extends RuntimeException(message, cause)
 
 /**
  * Downloads information about TeamCity builds using its REST API
  */
-class TeamCityBuildDownloader(http: Http, configuration: TeamCityConfiguration) extends HasLogger {
+class TeamCityBuildDownloader(http: Http, configuration: TeamCityConfiguration, credentialsOpt: Option[Credentials] = None) extends HasLogger {
 
-  private val authRoute = "guestAuth"
+  private val authRoute = if (credentialsOpt.isDefined) "basicAuth" else "guestAuth"
+
+  private val parser = new TeamCityXmlParser
+
+  /**
+   * Get the list of builds that are available to download
+   */
+  @throws[TeamCityDownloadException]
+  def getBuildLinks(): Seq[TeamCityBuildLink] = {
+    val url = buildsUrl
+    val xml = fetchXml(url)
+    parseBuildListXml(url, xml)
+  }
+
+  /**
+   * Download all the test results for the given build
+   */
+  @throws[TeamCityDownloadException]
+  def getBuild(buildLink: TeamCityBuildLink): TeamCityBuild = {
+    val url = configuration.relativePath(buildLink.buildPath)
+    val xml = fetchXml(url)
+    var build = parseBuildXml(url, xml)
+    for (testOccurrencesPath ← build.testOccurrencesPathOpt) {
+      val occurrences = fetchAllTestOccurrences(testOccurrencesPath)
+      build = build.copy(occurrences = occurrences)
+    }
+    build
+  }
 
   private def buildsUrl: URI = {
     val builder = new URIBuilder(configuration.serverUrl)
@@ -22,55 +53,73 @@ class TeamCityBuildDownloader(http: Http, configuration: TeamCityConfiguration) 
     builder.build
   }
 
-  def getBuildLinks(): Seq[TeamCityBuildLink] = {
-    println("getBuildLinks()")
-    val response = http.get(buildsUrl)
-    val buildsXml = response.bodyAsXml
-    val parser = new TeamCityXmlParser
-    parser.parseBuildLinks(buildsXml)
+  private def fetchXml(url: URI): Elem =
+    try
+      http.get(url, basicAuthOpt = credentialsOpt).checkOK.bodyAsXml
+    catch {
+      case e: HttpException ⇒
+        throw new TeamCityDownloadException(s"Problem getting XML from $url: ${e.getMessage}", e)
+    }
+
+  private def parseBuildListXml(url: URI, xml: Elem) =
+    try
+      parser.parseBuildLinks(xml)
+    catch {
+      case e: TeamCityXmlParseException ⇒
+        throw new TeamCityDownloadException(s"Problem parsing TeamCity build list XML from $url", e)
+    }
+
+  private def parseBuildXml(url: URI, xml: Elem) =
+    try
+      parser.parseBuild(xml)
+    catch {
+      case e: TeamCityXmlParseException ⇒
+        throw new TeamCityDownloadException(s"Problem parsing TeamCity build XML from $url", e)
+    }
+
+  private def parseTestOccurrenceXml(url: URI, xml: Elem) =
+    try
+      parser.parseTestOccurrence(xml)
+    catch {
+      case e: TeamCityXmlParseException ⇒
+        throw new TeamCityDownloadException(s"Problem parsing TeamCity test occurrence XML from $url", e)
+    }
+
+  private def parseTestOccurrencesXml(url: URI, xml: Elem) =
+    try
+      parser.parseTestOccurrences(xml)
+    catch {
+      case e: TeamCityXmlParseException ⇒
+        throw new TeamCityDownloadException(s"Problem parsing TeamCity test occurrences XML from $url", e)
+    }
+
+  /**
+   * Fetch all test occurrences from the given path -- and if the results are paged, recursively fetch
+   *   the subsequent pages too.
+   */
+  private def fetchAllTestOccurrences(testOccurrencesPath: String): Seq[TeamCityTestOccurrence] = {
+    val allOccurrencePaths = ListBuffer[String]()
+    fetchAllTestOccurrences(testOccurrencesPath, allOccurrencePaths)
+    allOccurrencePaths.map(getTestOccurrence)
   }
 
-  private def getAllTestOccurrences(testOccurrencesPath: String, allOccurrencePaths: ListBuffer[String]) {
+  private def fetchAllTestOccurrences(testOccurrencesPath: String, allOccurrencePaths: ListBuffer[String]) {
     val TeamCityTestOccurrences(nextLinkOpt, occurrencePaths) = getTestOccurrencePaths(testOccurrencesPath)
     allOccurrencePaths ++= occurrencePaths
     for (nextLink ← nextLinkOpt)
-      getAllTestOccurrences(nextLink, allOccurrencePaths)
-  }
-
-  def getBuild(buildLink: TeamCityBuildLink): TeamCityBuild = {
-    println(s"getBuild($buildLink)")
-    val buildUrl = concat(configuration.serverUrl, buildLink.buildPath)
-    val response = http.get(buildUrl)
-    val buildXml = response.bodyAsXml
-    val parser = new TeamCityXmlParser
-    var build = parser.parseBuild(buildXml)
-    for (testOccurrencesPath ← build.testOccurrencesPathOpt) {
-      val allOccurrencePaths = ListBuffer[String]()
-      getAllTestOccurrences(testOccurrencesPath, allOccurrencePaths)
-      val occurrences = allOccurrencePaths.toSeq.map(getTestOccurrence)
-      build = build.copy(occurrences = occurrences)
-    }
-    build
+      fetchAllTestOccurrences(nextLink, allOccurrencePaths)
   }
 
   private def getTestOccurrence(occurrencePath: String): TeamCityTestOccurrence = {
-    println(s"getTestOccurrence($occurrencePath)")
-    val parser = new TeamCityXmlParser
-    val occurrenceUrl = concat(configuration.serverUrl, occurrencePath)
-    val response = http.get(occurrenceUrl)
-    val occurrenceXml = response.bodyAsXml
-    parser.parseTestOccurrence(occurrenceXml)
+    val url = configuration.relativePath(occurrencePath)
+    val xml = fetchXml(url)
+    parseTestOccurrenceXml(url, xml)
   }
 
   private def getTestOccurrencePaths(occurrencesPath: String): TeamCityTestOccurrences = {
-    println(s"getTestOccurrencePaths($occurrencesPath)")
-    val parser = new TeamCityXmlParser
-    val occurrencesUrl = concat(configuration.serverUrl, occurrencesPath)
-    val response = http.get(occurrencesUrl)
-    val occurrencesXml = response.bodyAsXml
-    parser.parseTestOccurrences(occurrencesXml)
+    val url = configuration.relativePath(occurrencesPath)
+    val xml = fetchXml(url)
+    parseTestOccurrencesXml(url, xml)
   }
-
-  private def concat(url: URI, pathAndQuery: String): URI = uri(url.toString + pathAndQuery)
 
 }
