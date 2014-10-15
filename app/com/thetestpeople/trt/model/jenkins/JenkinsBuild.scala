@@ -10,4 +10,4 @@ case class JenkinsBuild(
   buildUrl: URI,
   buildNumber: Int,
   jobId: Id[JenkinsJob],
-  importSpecIdOpt: Option[Id[JenkinsImportSpec]])
+  importSpecIdOpt: Option[Id[CiImportSpec]])

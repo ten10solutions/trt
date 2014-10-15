@@ -15,13 +15,13 @@ import java.net.URI
 trait JenkinsDaoTest { self: AbstractDaoTest ⇒
 
   "Inserting and retrieving a new Jenkins import spec" should "persist all the data" in transaction { dao ⇒
-    val specId = dao.newJenkinsImportSpec(F.jenkinsImportSpec(
+    val specId = dao.newCiImportSpec(F.ciImportSpec(
       jobUrl = DummyData.JobUrl,
       pollingInterval = DummyData.PollingInterval,
       importConsoleLog = true,
       lastCheckedOpt = Some(DummyData.LastChecked)))
 
-    val Some(spec) = dao.getJenkinsImportSpec(specId)
+    val Some(spec) = dao.getCiImportSpec(specId)
     spec.jobUrl should equal(DummyData.JobUrl)
     spec.pollingInterval should equal(DummyData.PollingInterval)
     spec.importConsoleLog should equal(true)
@@ -29,42 +29,42 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
   }
 
   "Deleting a Jenkins import spec" should "delete it if present" in transaction { dao ⇒
-    val specId = dao.newJenkinsImportSpec(F.jenkinsImportSpec())
+    val specId = dao.newCiImportSpec(F.ciImportSpec())
 
-    val success = dao.deleteJenkinsImportSpec(specId)
+    val success = dao.deleteCiImportSpec(specId)
 
     success should be(true)
-    dao.getJenkinsImportSpec(specId) should be(None)
-    dao.deleteJenkinsImportSpec(specId) should be(false)
+    dao.getCiImportSpec(specId) should be(None)
+    dao.deleteCiImportSpec(specId) should be(false)
   }
 
   "Deleting a Jenkins import spec" should "indicate if it wasnt present to start with" in transaction { dao ⇒
-    dao.deleteJenkinsImportSpec(Id.dummy) should be(false)
+    dao.deleteCiImportSpec(Id.dummy) should be(false)
   }
 
   "Updating last checked date of an import spec" should "persist the change" in transaction { dao ⇒
-    val specId = dao.newJenkinsImportSpec(F.jenkinsImportSpec(lastCheckedOpt = None))
+    val specId = dao.newCiImportSpec(F.ciImportSpec(lastCheckedOpt = None))
 
-    val success = dao.updateJenkinsImportSpec(specId, lastCheckedOpt = Some(DummyData.LastChecked))
+    val success = dao.updateCiImportSpec(specId, lastCheckedOpt = Some(DummyData.LastChecked))
 
     success should be(true)
-    val Some(updatedSpec) = dao.getJenkinsImportSpec(specId)
+    val Some(updatedSpec) = dao.getCiImportSpec(specId)
     updatedSpec.lastCheckedOpt should be(Some(DummyData.LastChecked))
   }
 
   "Updating various fields of an import spec" should "persist the changes" in transaction { dao ⇒
-    val specId = dao.newJenkinsImportSpec(F.jenkinsImportSpec(
+    val specId = dao.newCiImportSpec(F.ciImportSpec(
       jobUrl = uri("http://www.example.com"),
       pollingInterval = 5.minutes,
       importConsoleLog = true))
 
-    val success = dao.updateJenkinsImportSpec(F.jenkinsImportSpec(
+    val success = dao.updateCiImportSpec(F.ciImportSpec(
       jobUrl = uri("http://www.elsewhere.com"),
       pollingInterval = 10.minutes,
       importConsoleLog = false).copy(id = specId))
 
     success should be(true)
-    val Some(updatedSpec) = dao.getJenkinsImportSpec(specId)
+    val Some(updatedSpec) = dao.getCiImportSpec(specId)
     updatedSpec.jobUrl should be(uri("http://www.elsewhere.com"))
     updatedSpec.pollingInterval should be(10.minutes: Duration)
     updatedSpec.importConsoleLog should be(false)
@@ -73,7 +73,7 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
   "Adding a Jenkins build" should "persist all the data" in transaction { dao ⇒
     val batchId = dao.newBatch(F.batch())
     val jobId = dao.ensureJenkinsJob(F.jenkinsJob())
-    val specId = dao.newJenkinsImportSpec(F.jenkinsImportSpec())
+    val specId = dao.newCiImportSpec(F.ciImportSpec())
     val build = JenkinsBuild(
       jobId = jobId,
       batchId = batchId,

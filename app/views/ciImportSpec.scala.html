@@ -1,5 +1,5 @@
 @(
-  spec: JenkinsImportSpec, 
+  spec: CiImportSpec, 
   jobImportInfo: JenkinsJobImportInfo, 
   builds: Seq[JenkinsBuildImportInfo], 
   name: String, 
@@ -7,16 +7,16 @@
   pagination: PaginationData)(implicit flash: Flash, globalViewContext: GlobalViewContext)
 
 @css = {
-  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jenkinsImportSpec.css")">
+  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/ciImportSpec.css")">
 }
 
 @scripts = {
-  <script src="@routes.Assets.at("javascripts/jenkinsImportSpec.js")"></script>
+  <script src="@routes.Assets.at("javascripts/ciImportSpec.js")"></script>
 }
 
 @buildsPaginationWidget = { 
   @paginationWidget(pagination)((page, pageSize) => 
-    routes.JenkinsController.getJenkinsImportSpec(
+    routes.JenkinsController.getCiImportSpec(
       id = spec.id, 
       page = Some(page),
       pageSize = Some(pageSize)))
@@ -25,7 +25,7 @@
 @main("Jenkins Import Log", "JenkinsImportStatus", css = css, scripts = scripts) {
 
 <ol class="breadcrumb">
-  <li><a href="@routes.JenkinsController.jenkinsImportSpecs()">Jenkins Jobs</a></li>
+  <li><a href="@routes.JenkinsController.ciImportSpecs()">Jenkins Jobs</a></li>
   <li class="active">@name</li>
 </ol>
 
@@ -93,7 +93,7 @@
   </tr>
   <tr>
     <td>Configure</td>
-    <td><a href="@routes.JenkinsController.editJenkinsImportSpec(spec.id)">Configure how this job is imported</a></td>
+    <td><a href="@routes.JenkinsController.editCiImportSpec(spec.id)">Configure how this job is imported</a></td>
   </tr>
 </table>
 

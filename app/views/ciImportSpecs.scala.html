@@ -1,7 +1,7 @@
-@(specs: List[JenkinsImportSpecView])(implicit flash: Flash, globalViewContext: GlobalViewContext)
+@(specs: List[CiImportSpecView])(implicit flash: Flash, globalViewContext: GlobalViewContext)
 
 @css = {
-  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/jenkinsImportSpecs.css")">
+  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/ciImportSpecs.css")">
 }
 
 @main("Jenkins Imports", "Jenkins Imports", css = css) {
@@ -15,7 +15,7 @@
     <div class="panel panel-info">
       <div class="panel-heading">No jenkins jobs set up</div>
       <div class="panel-body">
-        There are no Jenkins jobs set up for import yet. <a href="@routes.JenkinsController.newJenkinsImportSpec()">Configure a new Jenkins job to import from</a>.
+        There are no Jenkins jobs set up for import yet. <a href="@routes.JenkinsController.newCiImportSpec()">Configure a new Jenkins job to import from</a>.
       </div>
     </div>
 
@@ -37,7 +37,7 @@
       @for(spec <- specs) {
         <tr>
           <td class=""><a href="@spec.jobUrl">@spec.jobName <i class="fa fa-external-link"></i></a></td>
-          <td class="view-log-cell"><a href="@routes.JenkinsController.getJenkinsImportSpec(spec.id)">Log</a></td>
+          <td class="view-log-cell"><a href="@routes.JenkinsController.getCiImportSpec(spec.id)">Log</a></td>
           <td class="last-checked-cell">
           @if(spec.inProgress) {
             <div class="progress">
@@ -50,14 +50,14 @@
           <td class="polling-interval-cell">@spec.pollingInterval</td>
           <td class="import-console-cell">@if(spec.importConsoleLog) { <i class="glyphicon glyphicon-ok"></i> }</td>
           <td class="configuration-cell">@spec.configuration</td>
-          <td class="configure-cell"><a href="@routes.JenkinsController.editJenkinsImportSpec(spec.id)">Configure</a></td>
+          <td class="configure-cell"><a href="@routes.JenkinsController.editCiImportSpec(spec.id)">Configure</a></td>
           <td class="sync-cell">
             <form action="@routes.JenkinsController.syncJenkins(spec.id)" method="post">
               <button class="btn btn-default" title="Check for new builds now"><i class="glyphicon glyphicon-refresh"></i> Sync</button>
             </form>
           </td>
           <td class="delete-cell">
-            <form action="@routes.JenkinsController.deleteJenkinsImportSpec(spec.id)" method="post">
+            <form action="@routes.JenkinsController.deleteCiImportSpec(spec.id)" method="post">
               <button class="btn btn-default" title="Permanently delete this Jenkins import"><i class="glyphicon glyphicon-trash"></i> Delete</button>
             </form>
           </td>
@@ -65,7 +65,7 @@
       }
       <tr>
         <td colspan="9" style="text-align: center">
-           <a href="@routes.JenkinsController.newJenkinsImportSpec"><i class="glyphicon glyphicon-plus"></i> Add new</a>
+           <a href="@routes.JenkinsController.newCiImportSpec"><i class="glyphicon glyphicon-plus"></i> Add new</a>
         </td>
       </tr>
     </tbody>

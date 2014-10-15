@@ -10,7 +10,7 @@ trait JenkinsImportQueue {
   /**
    * Enqueue the given import spec to be imported
    */
-  def add(importSpecId: Id[JenkinsImportSpec])
+  def add(importSpecId: Id[CiImportSpec])
 
 }
 
@@ -23,11 +23,11 @@ class JenkinsImportWorker(
 
   import dao.transaction
 
-  private val importSpecQueue: CoalescingBlockingQueue[Id[JenkinsImportSpec]] = new CoalescingBlockingQueue
+  private val importSpecQueue: CoalescingBlockingQueue[Id[CiImportSpec]] = new CoalescingBlockingQueue
 
   private var continue = true
 
-  def add(importSpecId: Id[JenkinsImportSpec]) {
+  def add(importSpecId: Id[CiImportSpec]) {
     logger.debug(s"Queued import for $importSpecId")
     importSpecQueue.offer(importSpecId)
   }

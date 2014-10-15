@@ -6,8 +6,8 @@ import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
 import java.net.URI
 
-case class JenkinsImportSpec(
-    id: Id[JenkinsImportSpec] = Id.dummy,
+case class CiImportSpec(
+    id: Id[CiImportSpec] = Id.dummy,
     ciType: CIType,
     jobUrl: URI,
     pollingInterval: Duration,

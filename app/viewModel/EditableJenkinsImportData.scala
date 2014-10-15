@@ -1,7 +1,7 @@
 package viewModel
 
 import com.thetestpeople.trt.model.jenkins._
-import controllers.jenkins.JenkinsImportSpecForm
+import controllers.jenkins.CiImportSpecForm
 import org.joda.time.Duration
 import java.net.URI
 import com.thetestpeople.trt.model.Configuration
@@ -9,7 +9,7 @@ import com.thetestpeople.trt.model.CIType
 
 object EditableJenkinsImportData {
 
-  def fromSpec(spec: JenkinsImportSpec): EditableJenkinsImportData =
+  def fromSpec(spec: CiImportSpec): EditableJenkinsImportData =
     EditableJenkinsImportData(
       jobUrl = spec.jobUrl,
       pollingInterval = spec.pollingInterval,
@@ -24,14 +24,14 @@ case class EditableJenkinsImportData(
     importConsoleLog: Boolean,
     configurationOpt: Option[Configuration]) {
 
-  def updatedSpec(spec: JenkinsImportSpec): JenkinsImportSpec =
+  def updatedSpec(spec: CiImportSpec): CiImportSpec =
     spec.copy(jobUrl = jobUrl,
       pollingInterval = pollingInterval,
       importConsoleLog = importConsoleLog,
       configurationOpt = configurationOpt)
 
-  def newSpec(): JenkinsImportSpec =
-    JenkinsImportSpec(
+  def newSpec(): CiImportSpec =
+    CiImportSpec(
       jobUrl = jobUrl,
       ciType = CIType.Jenkins,
       pollingInterval = pollingInterval,

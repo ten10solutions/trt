@@ -14,23 +14,23 @@ trait JenkinsService {
    *
    * @param spec -- any value set for id or lastCheckedOpt will be ignored.
    */
-  def newJenkinsImportSpec(spec: JenkinsImportSpec): Id[JenkinsImportSpec]
+  def newCiImportSpec(spec: CiImportSpec): Id[CiImportSpec]
 
-  def updateJenkinsImportSpec(spec: JenkinsImportSpec): Boolean
+  def updateCiImportSpec(spec: CiImportSpec): Boolean
 
-  def getJenkinsImportSpec(id: Id[JenkinsImportSpec]): Option[JenkinsImportSpec]
+  def getCiImportSpec(id: Id[CiImportSpec]): Option[CiImportSpec]
 
-  def getJenkinsImportSpecs: Seq[JenkinsImportSpec]
+  def getCiImportSpecs: Seq[CiImportSpec]
 
   /**
    * @return true if the import spec was deleted, false if there was no import spec with the given ID
    */
-  def deleteJenkinsImportSpec(id: Id[JenkinsImportSpec]): Boolean
+  def deleteCiImportSpec(id: Id[CiImportSpec]): Boolean
 
   /**
    * Schedule the given Jenkins job to be scanned for builds to import
    */
-  def syncJenkins(id: Id[JenkinsImportSpec])
+  def syncJenkins(id: Id[CiImportSpec])
 
   /**
    * Schedule all the Jenkins jobs to be scanned for builds to import
@@ -52,7 +52,7 @@ trait JenkinsService {
 
   def getJenkinsBuilds(jobUrl: URI): Seq[JenkinsBuild]
 
-  def getBuildImportStatuses(specId: Id[JenkinsImportSpec]): Seq[JenkinsBuildImportStatus]
+  def getBuildImportStatuses(specId: Id[CiImportSpec]): Seq[JenkinsBuildImportStatus]
 
-  def getJobImportStatus(specId: Id[JenkinsImportSpec]): Option[JenkinsJobImportStatus]
+  def getJobImportStatus(specId: Id[CiImportSpec]): Option[JenkinsJobImportStatus]
 }

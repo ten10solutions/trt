@@ -17,46 +17,46 @@ class JenkinsImportStatusManager(clock: Clock) {
 
   private val lock: Lock = new ReentrantLock
 
-  private var specStatuses: Map[Id[JenkinsImportSpec], MutableJenkinsSpecImportStatus] = Map()
+  private var specStatuses: Map[Id[CiImportSpec], MutableJenkinsSpecImportStatus] = Map()
 
-  def importStarted(id: Id[JenkinsImportSpec], jobUrl: URI) = lock.withLock {
+  def importStarted(id: Id[CiImportSpec], jobUrl: URI) = lock.withLock {
     specStatuses += id -> new MutableJenkinsSpecImportStatus(id, jobUrl)
     specStatuses(id).started()
   }
 
-  def importComplete(id: Id[JenkinsImportSpec]) = lock.withLock {
+  def importComplete(id: Id[CiImportSpec]) = lock.withLock {
     specStatuses(id).complete()
   }
 
-  def importErrored(id: Id[JenkinsImportSpec], t: Throwable) = lock.withLock {
+  def importErrored(id: Id[CiImportSpec], t: Throwable) = lock.withLock {
     specStatuses(id).errored(t)
   }
 
-  def getBuildImportStatuses(id: Id[JenkinsImportSpec]): Seq[JenkinsBuildImportStatus] = lock.withLock {
+  def getBuildImportStatuses(id: Id[CiImportSpec]): Seq[JenkinsBuildImportStatus] = lock.withLock {
     specStatuses.get(id).toSeq.flatMap(importStatus ⇒ importStatus.getBuildStatuses.map(_.snapshot))
   }
 
-  def getJobImportStatus(id: Id[JenkinsImportSpec]): Option[JenkinsJobImportStatus] = lock.withLock {
+  def getJobImportStatus(id: Id[CiImportSpec]): Option[JenkinsJobImportStatus] = lock.withLock {
     specStatuses.get(id).map(_.snapshot)
   }
 
-  def buildExists(id: Id[JenkinsImportSpec], buildUrl: URI, buildNumber: Int) = lock.withLock {
+  def buildExists(id: Id[CiImportSpec], buildUrl: URI, buildNumber: Int) = lock.withLock {
     specStatuses(id).buildExists(buildUrl, buildNumber)
   }
 
-  def buildStarted(id: Id[JenkinsImportSpec], buildUrl: URI) = lock.withLock {
+  def buildStarted(id: Id[CiImportSpec], buildUrl: URI) = lock.withLock {
     specStatuses(id).buildStarted(buildUrl)
   }
 
-  def buildComplete(id: Id[JenkinsImportSpec], buildUrl: URI, batchIdOpt: Option[Id[Batch]]) = lock.withLock {
+  def buildComplete(id: Id[CiImportSpec], buildUrl: URI, batchIdOpt: Option[Id[Batch]]) = lock.withLock {
     specStatuses(id).buildComplete(buildUrl, batchIdOpt)
   }
 
-  def buildErrored(id: Id[JenkinsImportSpec], buildUrl: URI, t: Throwable) = lock.withLock {
+  def buildErrored(id: Id[CiImportSpec], buildUrl: URI, t: Throwable) = lock.withLock {
     specStatuses(id).buildErrored(buildUrl, t)
   }
 
-  private class MutableJenkinsSpecImportStatus(specId: Id[JenkinsImportSpec], jobUrl: URI) {
+  private class MutableJenkinsSpecImportStatus(specId: Id[CiImportSpec], jobUrl: URI) {
 
     private var updatedAt: DateTime = clock.now
 
@@ -130,7 +130,7 @@ class JenkinsImportStatusManager(clock: Clock) {
 
 case class JenkinsBuildImportStatus(buildUrl: URI, buildNumber: Int, updatedAt: DateTime, state: BuildImportState)
 
-case class JenkinsJobImportStatus(specId: Id[JenkinsImportSpec], updatedAt: DateTime, state: JobImportState)
+case class JenkinsJobImportStatus(specId: Id[CiImportSpec], updatedAt: DateTime, state: JobImportState)
 
 sealed trait BuildImportState
 

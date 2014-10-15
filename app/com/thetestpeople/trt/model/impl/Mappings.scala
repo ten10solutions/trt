@@ -140,7 +140,7 @@ trait Mappings { self: SlickDao ⇒
     def buildUrl = column[URI]("build_url", O.NotNull)
     def buildNumber = column[Int]("build_number", O.NotNull)
     def jobId = column[Id[JenkinsJob]]("job_id", O.NotNull)
-    def importSpecIdOpt = column[Option[Id[JenkinsImportSpec]]]("import_spec_id")
+    def importSpecIdOpt = column[Option[Id[CiImportSpec]]]("import_spec_id")
     
     def * = (batchId, importTime, buildUrl, buildNumber, jobId, importSpecIdOpt) <> (JenkinsBuild.tupled, JenkinsBuild.unapply)
 
@@ -177,9 +177,9 @@ trait Mappings { self: SlickDao ⇒
 
   }
   
-  class JenkinsImportSpecMapping(tag: Tag) extends Table[JenkinsImportSpec](tag, "jenkins_import_specs") {
+  class CiImportSpecMapping(tag: Tag) extends Table[CiImportSpec](tag, "jenkins_import_specs") {
 
-    def id = column[Id[JenkinsImportSpec]]("id", O.PrimaryKey, O.NotNull, O.AutoInc)
+    def id = column[Id[CiImportSpec]]("id", O.PrimaryKey, O.NotNull, O.AutoInc)
     def ciType = column[CIType]("ci_type", O.NotNull)
     def jobUrl = column[URI]("job_url", O.NotNull)
     def pollingInterval = column[Duration]("polling_interval", O.NotNull)
@@ -187,7 +187,7 @@ trait Mappings { self: SlickDao ⇒
     def lastChecked = column[Option[DateTime]]("last_checked")
     def configuration = column[Option[Configuration]]("configuration")
 
-    def * = (id, ciType, jobUrl, pollingInterval, importConsoleLog, lastChecked, configuration) <> (JenkinsImportSpec.tupled, JenkinsImportSpec.unapply)
+    def * = (id, ciType, jobUrl, pollingInterval, importConsoleLog, lastChecked, configuration) <> (CiImportSpec.tupled, CiImportSpec.unapply)
 
   }
 

@@ -21,9 +21,9 @@ class JenkinsServiceTest extends FlatSpec with ShouldMatchers {
 
   "Creating a Jenkins import spec" should "not persist lastCheckedOpt" in {
     val service = setup().service
-    val spec = F.jenkinsImportSpec(lastCheckedOpt = Some(5.minutes.ago))
-    val specId = service.newJenkinsImportSpec(spec)
-    val Some(specAgain) = service.getJenkinsImportSpec(specId)
+    val spec = F.ciImportSpec(lastCheckedOpt = Some(5.minutes.ago))
+    val specId = service.newCiImportSpec(spec)
+    val Some(specAgain) = service.getCiImportSpec(specId)
     specAgain.lastCheckedOpt should equal(None)
 
     // Everything should be persisted, except lastCheckedOpt (and Id)

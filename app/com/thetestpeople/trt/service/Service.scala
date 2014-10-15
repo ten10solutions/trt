@@ -12,7 +12,7 @@ import com.thetestpeople.trt.analysis.ExecutionTimeMAD
 
 case class TestAndExecutions(test: TestAndAnalysis, executions: Seq[EnrichedExecution], otherConfigurations: Seq[Configuration])
 
-case class BatchAndExecutions(batch: Batch, executions: Seq[EnrichedExecution], logOpt: Option[String], importSpecIdOpt: Option[Id[JenkinsImportSpec]], commentOpt: Option[String])
+case class BatchAndExecutions(batch: Batch, executions: Seq[EnrichedExecution], logOpt: Option[String], importSpecIdOpt: Option[Id[CiImportSpec]], commentOpt: Option[String])
 
 case class ExecutionsAndTotalCount(executions: Seq[EnrichedExecution], total: Int)
 

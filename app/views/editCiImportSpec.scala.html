@@ -1,19 +1,19 @@
-@(jenkinsImportForm: Form[EditableJenkinsImportData], specOpt: Option[Id[JenkinsImportSpec]])(implicit flash: Flash, globalViewContext: GlobalViewContext)
+@(jenkinsImportForm: Form[EditableJenkinsImportData], specOpt: Option[Id[CiImportSpec]])(implicit flash: Flash, globalViewContext: GlobalViewContext)
 
 @import BootstrapHelpers._
  
 @main("Jenkins Job", "Jenkins Job") {
 
   <ol class="breadcrumb">
-    <li><a href="@routes.JenkinsController.jenkinsImportSpecs()">Jenkins Jobs</a></li>
+    <li><a href="@routes.JenkinsController.ciImportSpecs()">Jenkins Jobs</a></li>
     <li class="active">@if(specOpt.isEmpty) { New } else { Edit }</li>
   </ol>
 
   <h2>Jenkins Job</h2>  
 
   @helper.form(action = specOpt match { 
-    case None       => routes.JenkinsController.createJenkinsImportSpec
-    case Some(id) => routes.JenkinsController.updateJenkinsImportSpec(id)
+    case None       => routes.JenkinsController.createCiImportSpec
+    case Some(id) => routes.JenkinsController.updateCiImportSpec(id)
    }, 'role -> "form") {
     
     @helper.inputText(jenkinsImportForm("jobUrl"), 
@@ -43,7 +43,7 @@
       <button type="submit" class="btn btn-primary">
          @if(specOpt.isDefined){ Update } else { Create }
        </button>
-      <a href="@routes.JenkinsController.jenkinsImportSpecs()" class="btn btn-default" role="button">Cancel</a>
+      <a href="@routes.JenkinsController.ciImportSpecs()" class="btn btn-default" role="button">Cancel</a>
     </div>
 	
   }

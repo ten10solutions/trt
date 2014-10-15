@@ -29,26 +29,26 @@ trait JenkinsDao {
   
   def getJenkinsBuilds(jobUrl: URI): Seq[JenkinsBuild]
 
-  def newJenkinsImportSpec(spec: JenkinsImportSpec): Id[JenkinsImportSpec]
+  def newCiImportSpec(spec: CiImportSpec): Id[CiImportSpec]
 
-  def getJenkinsImportSpecs(): Seq[JenkinsImportSpec]
+  def getCiImportSpecs(): Seq[CiImportSpec]
 
-  def getJenkinsImportSpec(id: Id[JenkinsImportSpec]): Option[JenkinsImportSpec]
+  def getCiImportSpec(id: Id[CiImportSpec]): Option[CiImportSpec]
 
   /**
    * @return true if the import spec was deleted, false if there was no import spec with the given ID
    */
-  def deleteJenkinsImportSpec(id: Id[JenkinsImportSpec]): Boolean
+  def deleteCiImportSpec(id: Id[CiImportSpec]): Boolean
 
   /**
    * @return true if the import spec was updated, false if there was no import spec with the given ID
    */
-  def updateJenkinsImportSpec(spec: JenkinsImportSpec): Boolean
+  def updateCiImportSpec(spec: CiImportSpec): Boolean
 
   /**
    * @return true if the import spec was updated, false if there was no import spec with the given ID
    */
-  def updateJenkinsImportSpec(id: Id[JenkinsImportSpec], lastCheckedOpt: Option[DateTime]): Boolean
+  def updateCiImportSpec(id: Id[CiImportSpec], lastCheckedOpt: Option[DateTime]): Boolean
 
   def getJenkinsConfiguration(): FullJenkinsConfiguration
 

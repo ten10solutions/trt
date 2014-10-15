@@ -1,7 +1,7 @@
 package viewModel
 
 import com.thetestpeople.trt.model.Id
-import com.thetestpeople.trt.model.jenkins.JenkinsImportSpec
+import com.thetestpeople.trt.model.jenkins.CiImportSpec
 import java.net.URI
 import org.joda.time.DateTime
 import com.thetestpeople.trt.model.Batch

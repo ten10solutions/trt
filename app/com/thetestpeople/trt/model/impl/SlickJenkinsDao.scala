@@ -45,33 +45,33 @@ trait SlickJenkinsDao { this: SlickDao ⇒
 
   def getJenkinsJobs(): Seq[JenkinsJob] = jenkinsJobs.run
 
-  def newJenkinsImportSpec(spec: JenkinsImportSpec): Id[JenkinsImportSpec] =
-    (jenkinsImportSpecs returning jenkinsImportSpecs.map(_.id)).insert(spec)
+  def newCiImportSpec(spec: CiImportSpec): Id[CiImportSpec] =
+    (ciImportSpecs returning ciImportSpecs.map(_.id)).insert(spec)
 
-  def getJenkinsImportSpecs(): Seq[JenkinsImportSpec] =
-    jenkinsImportSpecs.run
+  def getCiImportSpecs(): Seq[CiImportSpec] =
+    ciImportSpecs.run
 
-  def deleteJenkinsImportSpec(id: Id[JenkinsImportSpec]): Boolean = {
-    val query = jenkinsImportSpecs.filter(_.id === id)
+  def deleteCiImportSpec(id: Id[CiImportSpec]): Boolean = {
+    val query = ciImportSpecs.filter(_.id === id)
     val deletedCount = query.delete
     deletedCount > 0
   }
 
-  def getJenkinsImportSpec(id: Id[JenkinsImportSpec]): Option[JenkinsImportSpec] =
-    jenkinsImportSpecs.filter(_.id === id).firstOption
+  def getCiImportSpec(id: Id[CiImportSpec]): Option[CiImportSpec] =
+    ciImportSpecs.filter(_.id === id).firstOption
 
-  def updateJenkinsImportSpec(updatedSpec: JenkinsImportSpec) = {
-    val query = for { spec ← jenkinsImportSpecs if spec.id === updatedSpec.id } yield spec
+  def updateCiImportSpec(updatedSpec: CiImportSpec) = {
+    val query = for { spec ← ciImportSpecs if spec.id === updatedSpec.id } yield spec
     query.update(updatedSpec) > 0
   }
 
   /**
    * @return true if the import spec was updated, false if there was no import spec with the given ID
    */
-  def updateJenkinsImportSpec(id: Id[JenkinsImportSpec], lastCheckedOpt: Option[DateTime]): Boolean = {
+  def updateCiImportSpec(id: Id[CiImportSpec], lastCheckedOpt: Option[DateTime]): Boolean = {
     val query =
       for {
-        spec ← jenkinsImportSpecs
+        spec ← ciImportSpecs
         if spec.id === id
       } yield spec.lastChecked
 

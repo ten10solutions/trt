@@ -29,52 +29,52 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
   import routes.JenkinsController
   import views.html
 
-  def jenkinsImportSpecs() = Action { implicit request ⇒
-    logger.debug(s"jenkinsImportSpecs()")
-    val specs = service.getJenkinsImportSpecs.map(makeView).sortBy(_.jobUrl).toList
-    Ok(html.jenkinsImportSpecs(specs))
+  def ciImportSpecs() = Action { implicit request ⇒
+    logger.debug(s"ciImportSpecs()")
+    val specs = service.getCiImportSpecs.map(makeView).sortBy(_.jobUrl).toList
+    Ok(html.ciImportSpecs(specs))
   }
 
-  private def makeView(spec: JenkinsImportSpec): JenkinsImportSpecView = {
+  private def makeView(spec: CiImportSpec): CiImportSpecView = {
     val inProgress = PartialFunction.cond(service.getJobImportStatus(spec.id)) {
       case Some(JenkinsJobImportStatus(_, _, JobImportState.InProgress)) ⇒ true
     }
-    JenkinsImportSpecView(spec, inProgress)
+    CiImportSpecView(spec, inProgress)
   }
 
-  def newJenkinsImportSpec() = Action { implicit request ⇒
-    logger.debug(s"newJenkinsImportSpec()")
-    Ok(html.editJenkinsImportSpec(JenkinsImportSpecForm.initial, specOpt = None))
+  def newCiImportSpec() = Action { implicit request ⇒
+    logger.debug(s"newCiImportSpec()")
+    Ok(html.editCiImportSpec(CiImportSpecForm.initial, specOpt = None))
   }
 
-  def deleteJenkinsImportSpec(id: Id[JenkinsImportSpec]) = Action { implicit request ⇒
-    logger.debug(s"deleteJenkinsImportSpec($id)")
-    val success = service.deleteJenkinsImportSpec(id)
+  def deleteCiImportSpec(id: Id[CiImportSpec]) = Action { implicit request ⇒
+    logger.debug(s"deleteCiImportSpec($id)")
+    val success = service.deleteCiImportSpec(id)
     if (success)
-      Redirect(JenkinsController.jenkinsImportSpecs).flashing("success" -> "Deleted import specification")
+      Redirect(JenkinsController.ciImportSpecs).flashing("success" -> "Deleted import specification")
     else
       NotFound(s"Could not find Jenkins import spec with id '$id'")
   }
 
-  def editJenkinsImportSpec(id: Id[JenkinsImportSpec]) = Action { implicit request ⇒
-    logger.debug(s"editJenkinsImportSpec($id)")
-    service.getJenkinsImportSpec(id) match {
+  def editCiImportSpec(id: Id[CiImportSpec]) = Action { implicit request ⇒
+    logger.debug(s"editCiImportSpec($id)")
+    service.getCiImportSpec(id) match {
       case None ⇒
         NotFound(s"Could not find Jenkins import spec with id '$id'")
       case Some(spec) ⇒
         val jenkinsImportData = EditableJenkinsImportData.fromSpec(spec)
-        val populatedForm = JenkinsImportSpecForm.form.fill(jenkinsImportData)
-        Ok(html.editJenkinsImportSpec(populatedForm, Some(id)))
+        val populatedForm = CiImportSpecForm.form.fill(jenkinsImportData)
+        Ok(html.editCiImportSpec(populatedForm, Some(id)))
     }
   }
 
-  def getJenkinsImportSpec(id: Id[JenkinsImportSpec], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
-    logger.debug(s"getJenkinsImportSpec($id, page = $pageOpt, pageSize = $pageSizeOpt)")
+  def getCiImportSpec(id: Id[CiImportSpec], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
+    logger.debug(s"getCiImportSpec($id, page = $pageOpt, pageSize = $pageSizeOpt)")
     Pagination.validate(pageOpt, pageSizeOpt) match {
       case Left(errorMessage) ⇒
         BadRequest(errorMessage)
       case Right(pagination) ⇒
-        service.getJenkinsImportSpec(id) match {
+        service.getCiImportSpec(id) match {
           case None ⇒
             NotFound(s"Could not find Jenkins import spec with id '$id'")
           case Some(spec) ⇒
@@ -85,34 +85,34 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
             val jobImportInfo = getJobImportInfo(spec)
             val progress = getJenkinsImportProgressPercent(allInfos)
             val paginationData = pagination.paginationData(allInfos.size)
-            Ok(html.jenkinsImportSpec(spec, jobImportInfo, pageInfos, jobName, progress, paginationData))
+            Ok(html.ciImportSpec(spec, jobImportInfo, pageInfos, jobName, progress, paginationData))
         }
     }
   }
 
-  def createJenkinsImportSpec() = Action { implicit request ⇒
-    logger.debug(s"createJenkinsImportSpec()")
-    JenkinsImportSpecForm.form.bindFromRequest().fold(
+  def createCiImportSpec() = Action { implicit request ⇒
+    logger.debug(s"createCiImportSpec()")
+    CiImportSpecForm.form.bindFromRequest().fold(
       formWithErrors ⇒
-        BadRequest(html.editJenkinsImportSpec(formWithErrors, None)),
+        BadRequest(html.editCiImportSpec(formWithErrors, None)),
       jenkinsImport ⇒ {
-        val specId = service.newJenkinsImportSpec(jenkinsImport.newSpec)
-        Redirect(JenkinsController.getJenkinsImportSpec(specId)).flashing("success" -> "Created new import specification")
+        val specId = service.newCiImportSpec(jenkinsImport.newSpec)
+        Redirect(JenkinsController.getCiImportSpec(specId)).flashing("success" -> "Created new import specification")
       })
   }
 
-  def updateJenkinsImportSpec(id: Id[JenkinsImportSpec]) = Action { implicit request ⇒
-    logger.debug(s"updateJenkinsImportSpec($id)")
-    service.getJenkinsImportSpec(id) match {
+  def updateCiImportSpec(id: Id[CiImportSpec]) = Action { implicit request ⇒
+    logger.debug(s"updateCiImportSpec($id)")
+    service.getCiImportSpec(id) match {
       case None ⇒
         NotFound(s"Could not find Jenkins import spec with id '$id'")
       case Some(spec) ⇒
-        JenkinsImportSpecForm.form.bindFromRequest.fold(
+        CiImportSpecForm.form.bindFromRequest.fold(
           formWithErrors ⇒
-            BadRequest(html.editJenkinsImportSpec(formWithErrors, Some(id))),
+            BadRequest(html.editCiImportSpec(formWithErrors, Some(id))),
           jenkinsImport ⇒ {
-            service.updateJenkinsImportSpec(jenkinsImport.updatedSpec(spec))
-            Redirect(JenkinsController.jenkinsImportSpecs).flashing("success" -> "Updated import specification")
+            service.updateCiImportSpec(jenkinsImport.updatedSpec(spec))
+            Redirect(JenkinsController.ciImportSpecs).flashing("success" -> "Updated import specification")
           })
     }
   }
@@ -127,7 +127,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
       percent.toInt
     }
 
-  private def getJobImportInfo(spec: JenkinsImportSpec): JenkinsJobImportInfo = {
+  private def getJobImportInfo(spec: CiImportSpec): JenkinsJobImportInfo = {
     service.getJobImportStatus(spec.id).map { status ⇒
       val importState = status.state match {
         case JobImportState.Complete   ⇒ viewModel.ImportState.Complete
@@ -160,7 +160,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
     stringWriter.toString
   }
 
-  private def getBuildImportInfos(spec: JenkinsImportSpec): Seq[JenkinsBuildImportInfo] = {
+  private def getBuildImportInfos(spec: CiImportSpec): Seq[JenkinsBuildImportInfo] = {
     val inMemoryStatuses = service.getBuildImportStatuses(spec.id)
     val inMemoryInfos = inMemoryStatuses.map(makeBuildImportInfoFromImportStatus)
     val inMemoryUrls = inMemoryStatuses.map(_.buildUrl).toSet
@@ -206,11 +206,11 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
       updatedAtTime = build.importTime,
       batchIdOpt = Some(build.batchId))
 
-  def syncJenkins(id: Id[JenkinsImportSpec]) = Action { implicit request ⇒
+  def syncJenkins(id: Id[CiImportSpec]) = Action { implicit request ⇒
     logger.debug(s"syncJenkins($id)")
-    if (service.getJenkinsImportSpec(id).isDefined) {
+    if (service.getCiImportSpec(id).isDefined) {
       service.syncJenkins(id)
-      Redirect(JenkinsController.getJenkinsImportSpec(id)).flashing("success" -> "Sync has been triggered")
+      Redirect(JenkinsController.getCiImportSpec(id)).flashing("success" -> "Sync has been triggered")
     } else
       NotFound(s"Could not find Jenkins import spec with id '$id'")
   }

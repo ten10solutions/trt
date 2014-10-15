@@ -30,7 +30,7 @@ class JenkinsImportTest extends FlatSpec with ShouldMatchers {
     val service = serviceBundle.service
     val jenkinsImporter = serviceBundle.jenkinsImporter
 
-    val specId = service.newJenkinsImportSpec(F.jenkinsImportSpec(
+    val specId = service.newCiImportSpec(F.ciImportSpec(
       jobUrl = new URI("http://ci.pentaho.com/job/pentaho-big-data-plugin/"),
       pollingInterval = 2.minutes,
       importConsoleLog = false))

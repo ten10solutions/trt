@@ -19,44 +19,44 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
 
   import dao.transaction
 
-  def getJenkinsImportSpecs: Seq[JenkinsImportSpec] = transaction { dao.getJenkinsImportSpecs }
+  def getCiImportSpecs: Seq[CiImportSpec] = transaction { dao.getCiImportSpecs }
 
-  def newJenkinsImportSpec(spec: JenkinsImportSpec) =
+  def newCiImportSpec(spec: CiImportSpec) =
     transaction {
-      val specId = dao.newJenkinsImportSpec(spec.copy(lastCheckedOpt = None))
+      val specId = dao.newCiImportSpec(spec.copy(lastCheckedOpt = None))
       logger.info(s"Added new import spec for ${spec.jobUrl}, id = ${spec.id}")
       jenkinsImportQueue.add(specId)
       specId
     }
 
-  def deleteJenkinsImportSpec(id: Id[JenkinsImportSpec]) = transaction {
-    val success = dao.deleteJenkinsImportSpec(id)
+  def deleteCiImportSpec(id: Id[CiImportSpec]) = transaction {
+    val success = dao.deleteCiImportSpec(id)
     if (success)
       logger.info(s"Deleted Jenkins import spec $id")
     success
   }
 
-  def getJenkinsImportSpec(id: Id[JenkinsImportSpec]): Option[JenkinsImportSpec] = transaction {
-    dao.getJenkinsImportSpec(id)
+  def getCiImportSpec(id: Id[CiImportSpec]): Option[CiImportSpec] = transaction {
+    dao.getCiImportSpec(id)
   }
 
-  def updateJenkinsImportSpec(spec: JenkinsImportSpec): Boolean =
+  def updateCiImportSpec(spec: CiImportSpec): Boolean =
     transaction {
-      val success = dao.updateJenkinsImportSpec(spec)
+      val success = dao.updateCiImportSpec(spec)
       if (success)
         logger.info(s"Updated Jenkins import spec $spec.id")
       success
     }
 
-  def syncJenkins(specId: Id[JenkinsImportSpec]) = {
+  def syncJenkins(specId: Id[CiImportSpec]) = {
     jenkinsImportQueue.add(specId)
   }
 
   def syncAllJenkins() {
     logger.debug("syncAllJenkins()")
-    val specs = transaction { dao.getJenkinsImportSpecs() }
+    val specs = transaction { dao.getCiImportSpecs() }
     val now = clock.now
-    def isOverdue(spec: JenkinsImportSpec) = spec.nextCheckDueOpt.forall(_ <= now)
+    def isOverdue(spec: CiImportSpec) = spec.nextCheckDueOpt.forall(_ <= now)
     for (spec ← specs if isOverdue(spec))
       syncJenkins(spec.id)
 
@@ -81,11 +81,11 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
 
   def getJenkinsBuilds(jobUrl: URI): Seq[JenkinsBuild] = transaction { dao.getJenkinsBuilds(jobUrl) }
 
-  def getBuildImportStatuses(specId: Id[JenkinsImportSpec]): Seq[JenkinsBuildImportStatus] = {
+  def getBuildImportStatuses(specId: Id[CiImportSpec]): Seq[JenkinsBuildImportStatus] = {
     jenkinsImportStatusManager.getBuildImportStatuses(specId)
   }
   
-  def getJobImportStatus(specId: Id[JenkinsImportSpec]): Option[JenkinsJobImportStatus] = {
+  def getJobImportStatus(specId: Id[CiImportSpec]): Option[JenkinsJobImportStatus] = {
     jenkinsImportStatusManager.getJobImportStatus(specId)
   }
 

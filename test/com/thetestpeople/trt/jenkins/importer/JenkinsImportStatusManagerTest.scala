@@ -9,7 +9,7 @@ import com.thetestpeople.trt.utils.UriUtils._
 import java.net.URI
 import com.thetestpeople.trt.service.FakeClock
 import com.thetestpeople.trt.model._
-import com.thetestpeople.trt.model.jenkins.JenkinsImportSpec
+import com.thetestpeople.trt.model.jenkins.CiImportSpec
 import com.thetestpeople.trt.model.impl.DummyData
 import com.github.nscala_time.time.Imports._
 
@@ -20,7 +20,7 @@ class JenkinsImportStatusManagerTest extends FlatSpec with Matchers {
     val clock = FakeClock()
     val statusManager = new JenkinsImportStatusManager(clock)
 
-    val specId = Id[JenkinsImportSpec](1)
+    val specId = Id[CiImportSpec](1)
     statusManager.importStarted(specId, DummyData.JobUrl)
 
     val Some(jobStatus1) = statusManager.getJobImportStatus(specId)
@@ -38,7 +38,7 @@ class JenkinsImportStatusManagerTest extends FlatSpec with Matchers {
   it should "record job import errors" in {
     val clock = FakeClock()
     val statusManager = new JenkinsImportStatusManager(clock)
-    val specId = Id[JenkinsImportSpec](1)
+    val specId = Id[CiImportSpec](1)
     statusManager.importStarted(specId, DummyData.JobUrl)
     clock += 5.minutes
 
@@ -54,7 +54,7 @@ class JenkinsImportStatusManagerTest extends FlatSpec with Matchers {
   it should "record build imports" in {
     val clock = FakeClock()
     val statusManager = new JenkinsImportStatusManager(clock)
-    val specId = Id[JenkinsImportSpec](1)
+    val specId = Id[CiImportSpec](1)
     statusManager.importStarted(specId, DummyData.JobUrl)
 
     statusManager.buildExists(specId, DummyData.BuildUrl, DummyData.BuildNumber)

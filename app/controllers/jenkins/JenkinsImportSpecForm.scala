@@ -7,7 +7,7 @@ import viewModel._
 import controllers.jenkins.JenkinsFormConstraints._
 import com.thetestpeople.trt.model.Configuration
 
-object JenkinsImportSpecForm {
+object CiImportSpecForm {
 
   lazy val form: Form[EditableJenkinsImportData] =
     Form(Forms.mapping(

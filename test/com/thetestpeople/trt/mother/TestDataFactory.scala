@@ -84,14 +84,14 @@ object TestDataFactory {
       whenAnalysed = whenAnalysed,
       medianDurationOpt = medianDurationOpt)
 
-  def jenkinsImportSpec(
+  def ciImportSpec(
     jobUrl: URI = DummyData.JobUrl,
     ciType: CIType = CIType.Jenkins,
     pollingInterval: Duration = DummyData.PollingInterval,
     importConsoleLog: Boolean = true,
     lastCheckedOpt: Option[DateTime] = None,
-    configurationOpt: Option[Configuration] = None): JenkinsImportSpec =
-    JenkinsImportSpec(
+    configurationOpt: Option[Configuration] = None): CiImportSpec =
+    CiImportSpec(
       ciType = ciType,
       jobUrl = jobUrl,
       pollingInterval = pollingInterval,
@@ -112,7 +112,7 @@ object TestDataFactory {
     importTime: DateTime = DummyData.ImportTime,
     buildUrl: URI = DummyData.BuildUrl,
     buildNumber: Int = DummyData.BuildNumber,
-    importSpecIdOpt: Option[Id[JenkinsImportSpec]] = None) =
+    importSpecIdOpt: Option[Id[CiImportSpec]] = None) =
     JenkinsBuild(batchId, importTime, buildUrl, buildNumber, jobId, importSpecIdOpt)
 
 }

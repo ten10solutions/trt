@@ -1,10 +1,10 @@
 package viewModel
 
-import com.thetestpeople.trt.model.jenkins.JenkinsImportSpec
+import com.thetestpeople.trt.model.jenkins.CiImportSpec
 import com.thetestpeople.trt.model.jenkins._
 import com.thetestpeople.trt.utils.DateUtils
 
-case class JenkinsImportSpecView(spec: JenkinsImportSpec, inProgress: Boolean) {
+case class CiImportSpecView(spec: CiImportSpec, inProgress: Boolean) {
 
   def id = spec.id
 

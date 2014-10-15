@@ -28,7 +28,7 @@
           <tr><td>URL</td><td><a href="@url" id="batch-url">@url <i class="fa fa-external-link"></i></a></td></tr>
         }  
         @for(specId <- batch.importSpecIdOpt) {
-          <tr><td>Imported by</td><td><a href="@routes.JenkinsController.getJenkinsImportSpec(specId)">Jenkins importer</a></td></tr>
+          <tr><td>Imported by</td><td><a href="@routes.JenkinsController.getCiImportSpec(specId)">Jenkins importer</a></td></tr>
         }  
         @for(configuration <- batch.configurationOpt) {
           <tr>

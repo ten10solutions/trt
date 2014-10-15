@@ -9,7 +9,7 @@ import com.thetestpeople.trt.service.BatchRecorder
 import com.thetestpeople.trt.model.jenkins.JenkinsDao
 import com.thetestpeople.trt.model.Id
 import com.thetestpeople.trt.model
-import com.thetestpeople.trt.model.jenkins.JenkinsImportSpec
+import com.thetestpeople.trt.model.jenkins.CiImportSpec
 import com.thetestpeople.trt.model.Batch
 import com.thetestpeople.trt.model.Configuration
 import com.thetestpeople.trt.model.jenkins.JenkinsConfiguration
@@ -24,8 +24,8 @@ class JenkinsImporter(
 
   import dao.transaction
 
-  def importBuilds(specId: Id[JenkinsImportSpec]) {
-    val specOpt = transaction(dao.getJenkinsImportSpec(specId))
+  def importBuilds(specId: Id[CiImportSpec]) {
+    val specOpt = transaction(dao.getCiImportSpec(specId))
     val spec = specOpt.getOrElse {
       logger.warn(s"No import spec found $specId, skipping")
       return
@@ -42,7 +42,7 @@ class JenkinsImporter(
     }
   }
 
-  private def doImportBuilds(spec: JenkinsImportSpec) {
+  private def doImportBuilds(spec: CiImportSpec) {
     val alreadyImportedBuildUrls = transaction { dao.getJenkinsBuildUrls() }.toSet
     def alreadyImported(link: JenkinsBuildLink) = alreadyImportedBuildUrls contains link.buildUrl
     val jenkinsScraper = getJenkinsScraper(spec.importConsoleLog)
@@ -56,7 +56,7 @@ class JenkinsImporter(
     for (link ← buildLinks)
       importBuild(link, job, spec, jenkinsScraper)
 
-    transaction { dao.updateJenkinsImportSpec(spec.id, Some(clock.now)) }
+    transaction { dao.updateCiImportSpec(spec.id, Some(clock.now)) }
   }
 
   private def getJenkinsScraper(importConsoleLog: Boolean): JenkinsScraper = {
@@ -65,7 +65,7 @@ class JenkinsImporter(
     new JenkinsScraper(http, credentialsOpt, importConsoleLog)
   }
 
-  private def importBuild(buildLink: JenkinsBuildLink, job: JenkinsJob, importSpec: JenkinsImportSpec, jenkinsScraper: JenkinsScraper) {
+  private def importBuild(buildLink: JenkinsBuildLink, job: JenkinsJob, importSpec: CiImportSpec, jenkinsScraper: JenkinsScraper) {
     val buildUrl = buildLink.buildUrl
     importStatusManager.buildStarted(importSpec.id, buildUrl)
     try {
@@ -81,7 +81,7 @@ class JenkinsImporter(
   /**
    * @return None if build had no associated test executions. 
    */
-  private def doImportBuild(buildLink: JenkinsBuildLink, job: JenkinsJob, importSpec: JenkinsImportSpec, jenkinsScraper: JenkinsScraper): Option[Id[Batch]] = {
+  private def doImportBuild(buildLink: JenkinsBuildLink, job: JenkinsJob, importSpec: CiImportSpec, jenkinsScraper: JenkinsScraper): Option[Id[Batch]] = {
     val buildUrl = buildLink.buildUrl
     val build = jenkinsScraper.getJenkinsBuild(buildUrl, importSpec.jobUrl)
       .getOrElse(return None)
