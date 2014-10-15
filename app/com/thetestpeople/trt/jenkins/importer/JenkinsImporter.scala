@@ -15,6 +15,8 @@ import com.thetestpeople.trt.model.Batch
 import com.thetestpeople.trt.model.Configuration
 import com.thetestpeople.trt.model.jenkins.JenkinsConfiguration
 import java.net.URI
+import com.thetestpeople.trt.model.CiType._
+import com.thetestpeople.trt.model.CiType
 
 class JenkinsImporter(
     clock: Clock,
@@ -34,7 +36,11 @@ class JenkinsImporter(
     logger.debug(s"Examining ${spec.jobUrl} for new builds")
     importStatusManager.importStarted(spec.id, spec.jobUrl)
     try {
-      doImportBuilds(spec)
+      spec.ciType match {
+        case CiType.Jenkins ⇒ importJenkinsBuilds(spec)
+        //        case CiType.TeamCity ⇒ doImportBuilds(spec)
+        case t              ⇒ logger.warn(s"Unknown CI type $t for spec $specId, skipping")
+      }
       importStatusManager.importComplete(spec.id)
     } catch {
       case e: Exception ⇒
@@ -43,7 +49,7 @@ class JenkinsImporter(
     }
   }
 
-  private def doImportBuilds(spec: CiImportSpec) {
+  private def importJenkinsBuilds(spec: CiImportSpec) {
     val alreadyImportedBuildUrls = transaction { dao.getCiBuildUrls() }.toSet
     def alreadyImported(link: JenkinsBuildLink) = alreadyImportedBuildUrls contains link.buildUrl
     val jenkinsScraper = getJenkinsScraper(spec.importConsoleLog)
@@ -80,7 +86,7 @@ class JenkinsImporter(
   }
 
   /**
-   * @return None if build had no associated test executions. 
+   * @return None if build had no associated test executions.
    */
   private def doImportBuild(buildLink: JenkinsBuildLink, job: JenkinsJob, importSpec: CiImportSpec, jenkinsScraper: JenkinsScraper): Option[Id[Batch]] = {
     val buildUrl = buildLink.buildUrl
