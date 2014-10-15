@@ -176,17 +176,18 @@ trait Mappings { self: SlickDao ⇒
     def * = (paramName, value) <> (JenkinsJobParam.tupled, JenkinsJobParam.unapply)
 
   }
-
+  
   class JenkinsImportSpecMapping(tag: Tag) extends Table[JenkinsImportSpec](tag, "jenkins_import_specs") {
 
     def id = column[Id[JenkinsImportSpec]]("id", O.PrimaryKey, O.NotNull, O.AutoInc)
+    def ciType = column[CIType]("ci_type", O.NotNull)
     def jobUrl = column[URI]("job_url", O.NotNull)
     def pollingInterval = column[Duration]("polling_interval", O.NotNull)
     def importConsoleLog = column[Boolean]("import_console_log", O.NotNull)
     def lastChecked = column[Option[DateTime]]("last_checked")
     def configuration = column[Option[Configuration]]("configuration")
 
-    def * = (id, jobUrl, pollingInterval, importConsoleLog, lastChecked, configuration) <> (JenkinsImportSpec.tupled, JenkinsImportSpec.unapply)
+    def * = (id, ciType, jobUrl, pollingInterval, importConsoleLog, lastChecked, configuration) <> (JenkinsImportSpec.tupled, JenkinsImportSpec.unapply)
 
   }
 

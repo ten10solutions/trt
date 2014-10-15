@@ -384,5 +384,13 @@
       </column>
     </addColumn>
   </changeSet>
+
+  <changeSet author="matt" id="add-jenkins_import_specs-ci_type">
+    <addColumn tableName="jenkins_import_specs">
+      <column name="ci_type" type="VARCHAR(10485760)" defaultValue="Jenkins">
+        <constraints nullable="false" />
+      </column>
+    </addColumn>
+  </changeSet>
   
 </databaseChangeLog>

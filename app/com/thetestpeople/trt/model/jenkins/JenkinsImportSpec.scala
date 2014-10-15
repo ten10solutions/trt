@@ -8,6 +8,7 @@ import java.net.URI
 
 case class JenkinsImportSpec(
     id: Id[JenkinsImportSpec] = Id.dummy,
+    ciType: CIType,
     jobUrl: URI,
     pollingInterval: Duration,
     importConsoleLog: Boolean,

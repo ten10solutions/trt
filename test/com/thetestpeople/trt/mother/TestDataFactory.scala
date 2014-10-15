@@ -86,11 +86,13 @@ object TestDataFactory {
 
   def jenkinsImportSpec(
     jobUrl: URI = DummyData.JobUrl,
+    ciType: CIType = CIType.Jenkins,
     pollingInterval: Duration = DummyData.PollingInterval,
     importConsoleLog: Boolean = true,
     lastCheckedOpt: Option[DateTime] = None,
     configurationOpt: Option[Configuration] = None): JenkinsImportSpec =
     JenkinsImportSpec(
+      ciType = ciType,
       jobUrl = jobUrl,
       pollingInterval = pollingInterval,
       importConsoleLog = importConsoleLog,
