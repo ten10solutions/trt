@@ -14,7 +14,7 @@ case class CiImportSpecView(spec: CiImportSpec, inProgress: Boolean) {
     if (lastJobIndex == -1)
       jobUrl.toString
     else
-      path.drop(lastJobIndex + 5)
+      path.drop(lastJobIndex + "/job".length)
   }
 
   def jobUrl = spec.jobUrl
