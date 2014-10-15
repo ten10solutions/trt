@@ -33,7 +33,7 @@ class MockDao extends Dao {
   private var batchLogs: Seq[BatchLogRow] = List()
   private var batchComments: Seq[BatchComment] = List()
   private var jenkinsJobs: Seq[JenkinsJob] = List()
-  private var jenkinsBuilds: Seq[CiBuild] = List()
+  private var ciBuilds: Seq[CiBuild] = List()
   private var importSpecs: Seq[CiImportSpec] = List()
   private var systemConfiguration = SystemConfiguration()
   private var jenkinsConfiguration = JenkinsConfiguration()
@@ -127,7 +127,7 @@ class MockDao extends Dao {
 
   def getBatch(id: Id[Batch]): Option[BatchAndLog] = batches.find(_.id == id).map { batch ⇒
     val logOpt = batchLogs.find(_.batchId == id).map(_.log)
-    val importSpecIdOpt = jenkinsBuilds.find(_.batchId == id).flatMap(_.importSpecIdOpt)
+    val importSpecIdOpt = ciBuilds.find(_.batchId == id).flatMap(_.importSpecIdOpt)
     val commentOpt = batchComments.find(_.batchId == id).map(_.text)
     BatchAndLog(batch, logOpt, importSpecIdOpt, commentOpt)
   }
@@ -142,7 +142,7 @@ class MockDao extends Dao {
 
   private def areAssociated(batch: Batch, jobId: Id[JenkinsJob]): Boolean = {
     for {
-      build ← jenkinsBuilds
+      build ← ciBuilds
       job ← jenkinsJobs
       if job.id == jobId
       if build.jobId == job.id
@@ -234,7 +234,7 @@ class MockDao extends Dao {
 
   def deleteBatches(batchIds: Seq[Id[Batch]]) = {
     val (executionIds, testIds) = executions.filter(batchIds contains _.batchId).map(e ⇒ (e.id, e.testId)).toList.unzip
-    jenkinsBuilds = jenkinsBuilds.filterNot(batchIds contains _.batchId)
+    ciBuilds = ciBuilds.filterNot(batchIds contains _.batchId)
     analyses = analyses.filterNot(testIds contains _.testId)
     executionLogs = executionLogs.filterNot(executionIds contains _.executionId)
     executions = executions.filterNot(executionIds contains _.id)
@@ -279,20 +279,20 @@ class MockDao extends Dao {
 
   def getExecutionLog(id: Id[Execution]) = executionLogs.find(_.executionId == id).map(_.log)
 
-  def newJenkinsBuild(jenkinsBuild: CiBuild) {
-    jenkinsBuilds +:= jenkinsBuild
+  def newJenkinsBuild(ciBuild: CiBuild) {
+    ciBuilds +:= ciBuild
   }
 
   def getJenkinsBuild(buildUrl: URI): Option[CiBuild] =
-    jenkinsBuilds.find(_.buildUrl == buildUrl)
+    ciBuilds.find(_.buildUrl == buildUrl)
 
-  def getJenkinsBuildUrls(): Seq[URI] = jenkinsBuilds.map(_.buildUrl)
+  def getJenkinsBuildUrls(): Seq[URI] = ciBuilds.map(_.buildUrl)
 
   def getJenkinsJobs(): Seq[JenkinsJob] = jenkinsJobs
 
-  def getJenkinsBuilds(specId: Id[CiImportSpec]): Seq[CiBuild] =
+  def getCiBuilds(specId: Id[CiImportSpec]): Seq[CiBuild] =
     for {
-      build ← jenkinsBuilds
+      build ← ciBuilds
       if build.importSpecIdOpt == Some(specId)
     } yield build
 

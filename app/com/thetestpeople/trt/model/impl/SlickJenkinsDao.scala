@@ -14,15 +14,15 @@ trait SlickJenkinsDao { this: SlickDao ⇒
   import Mappers._
   import Tables._
 
-  private lazy val jenkinsBuildInserter = jenkinsBuilds.insertInvoker
+  private lazy val ciBuildInserter = ciBuilds.insertInvoker
 
   def newJenkinsBuild(build: CiBuild) {
-    jenkinsBuildInserter.insert(build)
+    ciBuildInserter.insert(build)
   }
 
   private lazy val getJenkinsBuildCompiled = {
     def getJenkinsBuild(buildUrl: Column[URI]) =
-      jenkinsBuilds.filter(_.buildUrl === buildUrl)
+      ciBuilds.filter(_.buildUrl === buildUrl)
     Compiled(getJenkinsBuild _)
   }
 
@@ -30,12 +30,12 @@ trait SlickJenkinsDao { this: SlickDao ⇒
     getJenkinsBuildCompiled(buildUrl).firstOption
   }
 
-  def getJenkinsBuildUrls(): Seq[URI] = jenkinsBuilds.map(_.buildUrl).run
+  def getJenkinsBuildUrls(): Seq[URI] = ciBuilds.map(_.buildUrl).run
 
-  def getJenkinsBuilds(specId: Id[CiImportSpec]): Seq[CiBuild] = {
+  def getCiBuilds(specId: Id[CiImportSpec]): Seq[CiBuild] = {
     val query =
       for {
-        build ← jenkinsBuilds
+        build ← ciBuilds
         if build.importSpecId === specId
       } yield build
     query.run

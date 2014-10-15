@@ -27,7 +27,7 @@ trait JenkinsDao {
 
   def getJenkinsJobs(): Seq[JenkinsJob]
   
-  def getJenkinsBuilds(specId: Id[CiImportSpec]): Seq[CiBuild]
+  def getCiBuilds(specId: Id[CiImportSpec]): Seq[CiBuild]
 
   def newCiImportSpec(spec: CiImportSpec): Id[CiImportSpec]
 

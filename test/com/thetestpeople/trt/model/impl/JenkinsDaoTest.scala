@@ -97,7 +97,7 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
     dao.newJenkinsBuild(build1)
     dao.newJenkinsBuild(build2)
 
-    val builds = dao.getJenkinsBuilds(specId)
+    val builds = dao.getCiBuilds(specId)
 
     builds should contain theSameElementsAs (Seq(build1, build2))
   }

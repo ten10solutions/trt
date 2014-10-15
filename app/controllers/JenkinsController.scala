@@ -166,7 +166,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
     val inMemoryUrls = inMemoryStatuses.map(_.buildUrl).toSet
 
     def inMemory(build: CiBuild) = inMemoryUrls contains build.buildUrl
-    val dbBuilds = service.getJenkinsBuilds(spec.id).filterNot(inMemory)
+    val dbBuilds = service.getCiBuilds(spec.id).filterNot(inMemory)
     val dbInfos = dbBuilds.map(makeBuildImportInfo)
 
     (dbInfos ++ inMemoryInfos).sortBy(_.buildNumber).reverse
