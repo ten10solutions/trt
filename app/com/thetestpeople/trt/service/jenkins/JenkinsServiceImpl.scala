@@ -79,7 +79,7 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
 
   def getJenkinsJobs(): Seq[JenkinsJob] = transaction { dao.getJenkinsJobs() }
 
-  def getJenkinsBuilds(jobUrl: URI): Seq[CiBuild] = transaction { dao.getJenkinsBuilds(jobUrl) }
+  def getJenkinsBuilds(specId: Id[CiImportSpec]): Seq[CiBuild] = transaction { dao.getJenkinsBuilds(specId) }
 
   def getBuildImportStatuses(specId: Id[CiImportSpec]): Seq[JenkinsBuildImportStatus] = {
     jenkinsImportStatusManager.getBuildImportStatuses(specId)

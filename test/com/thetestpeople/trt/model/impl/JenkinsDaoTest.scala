@@ -91,12 +91,13 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
     val batchId1 = dao.newBatch(F.batch())
     val batchId2 = dao.newBatch(F.batch())
     val jobId = dao.ensureJenkinsJob(F.jenkinsJob(url = DummyData.JobUrl))
-    val build1 = F.jenkinsBuild(jobId = jobId, batchId = batchId1, buildUrl = DummyData.BuildUrl)
-    val build2 = F.jenkinsBuild(jobId = jobId, batchId = batchId2, buildUrl = DummyData.BuildUrl2)
+    val specId = dao.newCiImportSpec(F.ciImportSpec())
+    val build1 = F.jenkinsBuild(jobId = jobId, batchId = batchId1, buildUrl = DummyData.BuildUrl, importSpecIdOpt = Some(specId))
+    val build2 = F.jenkinsBuild(jobId = jobId, batchId = batchId2, buildUrl = DummyData.BuildUrl2,importSpecIdOpt = Some(specId))
     dao.newJenkinsBuild(build1)
     dao.newJenkinsBuild(build2)
 
-    val builds = dao.getJenkinsBuilds(DummyData.JobUrl)
+    val builds = dao.getJenkinsBuilds(specId)
 
     builds should contain theSameElementsAs (Seq(build1, build2))
   }

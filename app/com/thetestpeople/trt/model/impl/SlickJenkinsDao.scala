@@ -32,13 +32,11 @@ trait SlickJenkinsDao { this: SlickDao ⇒
 
   def getJenkinsBuildUrls(): Seq[URI] = jenkinsBuilds.map(_.buildUrl).run
 
-  def getJenkinsBuilds(jobUrl: URI): Seq[CiBuild] = {
+  def getJenkinsBuilds(specId: Id[CiImportSpec]): Seq[CiBuild] = {
     val query =
       for {
-        job ← jenkinsJobs
         build ← jenkinsBuilds
-        if build.jobId === job.id
-        if job.url === jobUrl
+        if build.importSpecId === specId
       } yield build
     query.run
   }

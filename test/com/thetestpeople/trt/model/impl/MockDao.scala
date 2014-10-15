@@ -34,7 +34,7 @@ class MockDao extends Dao {
   private var batchComments: Seq[BatchComment] = List()
   private var jenkinsJobs: Seq[JenkinsJob] = List()
   private var jenkinsBuilds: Seq[CiBuild] = List()
-  private var ciImportSpecs: Seq[CiImportSpec] = List()
+  private var importSpecs: Seq[CiImportSpec] = List()
   private var systemConfiguration = SystemConfiguration()
   private var jenkinsConfiguration = JenkinsConfiguration()
   private var jenkinsConfigParams: Seq[JenkinsJobParam] = List()
@@ -290,44 +290,42 @@ class MockDao extends Dao {
 
   def getJenkinsJobs(): Seq[JenkinsJob] = jenkinsJobs
 
-  def getJenkinsBuilds(jobUrl: URI): Seq[CiBuild] =
+  def getJenkinsBuilds(specId: Id[CiImportSpec]): Seq[CiBuild] =
     for {
-      job ← jenkinsJobs
       build ← jenkinsBuilds
-      if job.id == build.jobId
-      if job.url == jobUrl
+      if build.importSpecIdOpt == Some(specId)
     } yield build
 
   def newCiImportSpec(spec: CiImportSpec): Id[CiImportSpec] = {
-    val newId = nextId(ciImportSpecs.map(_.id))
-    ciImportSpecs +:= spec.copy(id = newId)
+    val newId = nextId(importSpecs.map(_.id))
+    importSpecs +:= spec.copy(id = newId)
     newId
   }
 
-  def getCiImportSpecs: Seq[CiImportSpec] = ciImportSpecs
+  def getCiImportSpecs: Seq[CiImportSpec] = importSpecs
 
   def deleteCiImportSpec(id: Id[CiImportSpec]): Boolean = {
-    val found = ciImportSpecs.exists(_.id == id)
-    ciImportSpecs = ciImportSpecs.filterNot(_.id == id)
+    val found = importSpecs.exists(_.id == id)
+    importSpecs = importSpecs.filterNot(_.id == id)
     found
   }
 
-  def getCiImportSpec(id: Id[CiImportSpec]): Option[CiImportSpec] = ciImportSpecs.find(_.id == id)
+  def getCiImportSpec(id: Id[CiImportSpec]): Option[CiImportSpec] = importSpecs.find(_.id == id)
 
   def updateCiImportSpec(updatedSpec: CiImportSpec): Boolean =
-    ciImportSpecs.find(_.id == updatedSpec.id) match {
+    importSpecs.find(_.id == updatedSpec.id) match {
       case Some(spec) ⇒
-        ciImportSpecs = updatedSpec +: ciImportSpecs.filterNot(_.id == updatedSpec.id)
+        importSpecs = updatedSpec +: importSpecs.filterNot(_.id == updatedSpec.id)
         true
       case None ⇒
         false
     }
 
   def updateCiImportSpec(id: Id[CiImportSpec], lastCheckedOpt: Option[DateTime]): Boolean =
-    ciImportSpecs.find(_.id == id) match {
+    importSpecs.find(_.id == id) match {
       case Some(spec) ⇒
         val updatedSpec = spec.copy(lastCheckedOpt = lastCheckedOpt)
-        ciImportSpecs = updatedSpec +: ciImportSpecs.filterNot(_.id == id)
+        importSpecs = updatedSpec +: importSpecs.filterNot(_.id == id)
         true
       case None ⇒
         false
