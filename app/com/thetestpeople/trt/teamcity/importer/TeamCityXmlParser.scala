@@ -33,7 +33,8 @@ class TeamCityXmlParser {
       id = getField(node, "@id").toInt,
       number = getField(node, "@number"),
       buildPath = getField(node, "@href"),
-      finished = getField(node, "@state") == "finished")
+      finished = getField(node, "@state") == "finished",
+      webUrl = uri(getField(node, "@webUrl")))
 
   def parseTestOccurrences(elem: Elem): TeamCityTestOccurrences = {
     val nextLinkOpt = getFieldOpt(elem, "@nextHref")

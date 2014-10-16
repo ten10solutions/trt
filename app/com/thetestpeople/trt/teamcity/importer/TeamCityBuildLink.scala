@@ -1,3 +1,5 @@
 package com.thetestpeople.trt.teamcity.importer
 
-case class TeamCityBuildLink(id: Int, number: String, finished: Boolean, buildPath: String)
+import java.net.URI
+
+case class TeamCityBuildLink(id: Int, number: String, finished: Boolean, buildPath: String, webUrl: URI)

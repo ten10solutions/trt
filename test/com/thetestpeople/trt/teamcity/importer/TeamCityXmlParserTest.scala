@@ -19,9 +19,12 @@ class TeamCityXmlParserTest extends FlatSpec with Matchers {
 
     builds should equal(
       Seq(
-        TeamCityBuildLink(id = 145897, number = "0.1.78.209", buildPath = "/app/rest/builds/id:145897", finished = true),
-        TeamCityBuildLink(id = 137748, number = "0.1.77.194", buildPath = "/app/rest/builds/id:137748", finished = true),
-        TeamCityBuildLink(id = 129542, number = "0.1.70.160", buildPath = "/app/rest/builds/id:129542", finished = true)))
+        TeamCityBuildLink(id = 145897, number = "0.1.78.209", buildPath = "/app/rest/builds/id:145897", finished = true,
+          webUrl = uri("https://teamcity.jetbrains.com/viewLog.html?buildId=145897&buildTypeId=NetCommunityProjects_Femah_Commit")),
+        TeamCityBuildLink(id = 137748, number = "0.1.77.194", buildPath = "/app/rest/builds/id:137748", finished = true,
+          webUrl = uri("https://teamcity.jetbrains.com/viewLog.html?buildId=137748&buildTypeId=NetCommunityProjects_Femah_Commit")),
+        TeamCityBuildLink(id = 129542, number = "0.1.70.160", buildPath = "/app/rest/builds/id:129542", finished = true,
+          webUrl = uri("https://teamcity.jetbrains.com/viewLog.html?buildId=129542&buildTypeId=NetCommunityProjects_Femah_Commit"))))
   }
 
   "Parsing a TeamCity build XML" should "correctly capture build information" in {
