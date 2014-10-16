@@ -24,3 +24,4 @@ test-dbs/
 *shim.sbt
 phantomjsdriver.log
 webcache/
+luceneIndex/

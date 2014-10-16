@@ -102,13 +102,13 @@ object TestDataFactory {
   def jenkinsJob(
     url: URI = DummyData.JobUrl,
     name: String = DummyData.JobName) =
-    JenkinsJob(
+    CiJob(
       url = url,
       name = name)
 
   def jenkinsBuild(
     batchId: Id[Batch],
-    jobId: Id[JenkinsJob],
+    jobId: Id[CiJob],
     importTime: DateTime = DummyData.ImportTime,
     buildUrl: URI = DummyData.BuildUrl,
     buildNumber: Int = DummyData.BuildNumber,

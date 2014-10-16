@@ -5,7 +5,7 @@ import com.thetestpeople.trt.model.jenkins._
 
 object Aliases {
 
-  type JenkinsJobId = Id[JenkinsJob]
+  type CiJobId = Id[CiJob]
   
   type TestStatus = com.thetestpeople.trt.model.TestStatus
 

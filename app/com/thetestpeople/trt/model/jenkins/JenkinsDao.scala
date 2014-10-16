@@ -14,7 +14,7 @@ trait JenkinsDao {
    */
   def transaction[T](block: ⇒ T): T
 
-  def ensureJenkinsJob(job: JenkinsJob): Id[JenkinsJob]
+  def ensureJenkinsJob(job: CiJob): Id[CiJob]
 
   def newCiBuild(build: CiBuild)
 
@@ -25,7 +25,7 @@ trait JenkinsDao {
    */
   def getCiBuildUrls(): Seq[URI]
 
-  def getJenkinsJobs(): Seq[JenkinsJob]
+  def getJenkinsJobs(): Seq[CiJob]
   
   def getCiBuilds(specId: Id[CiImportSpec]): Seq[CiBuild]
 

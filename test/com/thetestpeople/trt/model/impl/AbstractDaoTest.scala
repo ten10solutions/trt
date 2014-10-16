@@ -441,7 +441,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
   }
 
   "Getting batches" should "let you filter by Jenkins job" in transaction { dao ⇒
-    def addBatchAssociatedWithJob(jobId: Id[JenkinsJob], buildUrl: URI) = {
+    def addBatchAssociatedWithJob(jobId: Id[CiJob], buildUrl: URI) = {
       val batchId = dao.newBatch(F.batch())
       dao.newCiBuild(F.jenkinsBuild(batchId, jobId, buildUrl = buildUrl))
       batchId

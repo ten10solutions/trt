@@ -121,13 +121,13 @@ trait Mappings { self: SlickDao ⇒
 
   }
 
-  class JenkinsJobMapping(tag: Tag) extends Table[JenkinsJob](tag, "jenkins_jobs") {
+  class JenkinsJobMapping(tag: Tag) extends Table[CiJob](tag, "jenkins_jobs") {
 
-    def id = column[Id[JenkinsJob]]("ID", O.PrimaryKey, O.NotNull, O.AutoInc)
+    def id = column[Id[CiJob]]("ID", O.PrimaryKey, O.NotNull, O.AutoInc)
     def url = column[URI]("url", O.NotNull)
     def name = column[String]("name", O.NotNull)
 
-    def * = (id, url, name) <> (JenkinsJob.tupled, JenkinsJob.unapply)
+    def * = (id, url, name) <> (CiJob.tupled, CiJob.unapply)
 
     def urlIndex = index("idx_jenkins_job_url", url)
 
@@ -139,7 +139,7 @@ trait Mappings { self: SlickDao ⇒
     def importTime = column[DateTime]("import_time", O.NotNull)
     def buildUrl = column[URI]("build_url", O.NotNull)
     def buildNumber = column[Int]("build_number", O.NotNull)
-    def jobId = column[Id[JenkinsJob]]("job_id", O.NotNull)
+    def jobId = column[Id[CiJob]]("job_id", O.NotNull)
     def importSpecId = column[Option[Id[CiImportSpec]]]("import_spec_id")
     
     def * = (batchId, importTime, buildUrl, buildNumber, jobId, importSpecId) <> (CiBuild.tupled, CiBuild.unapply)

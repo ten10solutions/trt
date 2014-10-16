@@ -77,7 +77,7 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
     dao.getJenkinsConfiguration.config.rerunJobUrlOpt.isDefined
   }
 
-  def getJenkinsJobs(): Seq[JenkinsJob] = transaction { dao.getJenkinsJobs() }
+  def getJenkinsJobs(): Seq[CiJob] = transaction { dao.getJenkinsJobs() }
 
   def getCiBuilds(specId: Id[CiImportSpec]): Seq[CiBuild] = transaction { dao.getCiBuilds(specId) }
 

@@ -48,7 +48,7 @@ trait JenkinsService {
    */
   def canRerun: Boolean
 
-  def getJenkinsJobs(): Seq[JenkinsJob]
+  def getJenkinsJobs(): Seq[CiJob]
 
   def getCiBuilds(specId: Id[CiImportSpec]): Seq[CiBuild]
 

@@ -116,7 +116,7 @@ trait Dao extends ExecutionDao with JenkinsDao {
    * @param configurationOpt -- if Some(configuration), then only return batches that are associated with the given configuration
    * Otherwise, return all batches.
    */
-  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch]
+  def getBatches(jobOpt: Option[Id[CiJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch]
 
   /**
    * Add a record for a new batch (the existing ID is ignored)

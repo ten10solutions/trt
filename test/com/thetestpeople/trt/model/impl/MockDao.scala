@@ -32,7 +32,7 @@ class MockDao extends Dao {
   private var executionComments: Seq[ExecutionComment] = List()
   private var batchLogs: Seq[BatchLogRow] = List()
   private var batchComments: Seq[BatchComment] = List()
-  private var jenkinsJobs: Seq[JenkinsJob] = List()
+  private var jenkinsJobs: Seq[CiJob] = List()
   private var ciBuilds: Seq[CiBuild] = List()
   private var importSpecs: Seq[CiImportSpec] = List()
   private var systemConfiguration = SystemConfiguration()
@@ -132,7 +132,7 @@ class MockDao extends Dao {
     BatchAndLog(batch, logOpt, importSpecIdOpt, commentOpt)
   }
 
-  def getBatches(jobIdOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch] = {
+  def getBatches(jobIdOpt: Option[Id[CiJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch] = {
     batches
       .filter(batch ⇒ jobIdOpt.forall(jobId ⇒ areAssociated(batch, jobId)))
       .filter(batch ⇒ configurationOpt.forall(configuration ⇒ batch.configurationOpt == Some(configuration)))
@@ -140,7 +140,7 @@ class MockDao extends Dao {
       .reverse
   }
 
-  private def areAssociated(batch: Batch, jobId: Id[JenkinsJob]): Boolean = {
+  private def areAssociated(batch: Batch, jobId: Id[CiJob]): Boolean = {
     for {
       build ← ciBuilds
       job ← jenkinsJobs
@@ -288,7 +288,7 @@ class MockDao extends Dao {
 
   def getCiBuildUrls(): Seq[URI] = ciBuilds.map(_.buildUrl)
 
-  def getJenkinsJobs(): Seq[JenkinsJob] = jenkinsJobs
+  def getJenkinsJobs(): Seq[CiJob] = jenkinsJobs
 
   def getCiBuilds(specId: Id[CiImportSpec]): Seq[CiBuild] =
     for {
@@ -342,7 +342,7 @@ class MockDao extends Dao {
     jenkinsConfigParams = config.params
   }
 
-  def ensureJenkinsJob(job: JenkinsJob): Id[JenkinsJob] = {
+  def ensureJenkinsJob(job: CiJob): Id[CiJob] = {
     jenkinsJobs.find(_.url == job.url) match {
       case Some(jobAgain) ⇒
         jobAgain.id

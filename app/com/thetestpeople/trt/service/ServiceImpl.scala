@@ -97,7 +97,7 @@ class ServiceImpl(
       }
     }
 
-  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch] =
+  def getBatches(jobOpt: Option[Id[CiJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch] =
     transaction { dao.getBatches(jobOpt, configurationOpt) }
 
   def deleteBatches(batchIds: List[Id[Batch]]) = {

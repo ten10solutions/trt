@@ -132,7 +132,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
     }
   }
 
-  def batches(jobIdOpt: Option[Id[JenkinsJob]], configurationOpt: Option[Configuration], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
+  def batches(jobIdOpt: Option[Id[CiJob]], configurationOpt: Option[Configuration], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
     logger.debug(s"batches(jobId = $jobIdOpt, configuration = $configurationOpt, page = $pageOpt, pageSize = $pageSizeOpt)")
     Pagination.validate(pageOpt, pageSizeOpt) match {
       case Left(errorMessage) ⇒ BadRequest(errorMessage)
@@ -140,7 +140,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
     }
   }
 
-  private def handleBatches(jobIdOpt: Option[Id[JenkinsJob]], configurationOpt: Option[Configuration], pagination: Pagination)(implicit request: Request[_]) = {
+  private def handleBatches(jobIdOpt: Option[Id[CiJob]], configurationOpt: Option[Configuration], pagination: Pagination)(implicit request: Request[_]) = {
     val batches = service.getBatches(jobIdOpt, configurationOpt).map(new BatchView(_))
     val jobs = service.getJenkinsJobs().toList
     val paginationData = pagination.paginationData(batches.size)

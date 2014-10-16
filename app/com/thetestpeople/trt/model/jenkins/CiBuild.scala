@@ -9,5 +9,5 @@ case class CiBuild(
   importTime: DateTime,
   buildUrl: URI,
   buildNumber: Int,
-  jobId: Id[JenkinsJob],
+  jobId: Id[CiJob],
   importSpecIdOpt: Option[Id[CiImportSpec]])

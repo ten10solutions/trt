@@ -11,6 +11,7 @@ import com.thetestpeople.trt.model.Id
 import com.thetestpeople.trt.model
 import com.thetestpeople.trt.model.jenkins.CiImportSpec
 import com.thetestpeople.trt.model.jenkins.CiBuild
+import com.thetestpeople.trt.model.jenkins.CiJob
 import com.thetestpeople.trt.model.Batch
 import com.thetestpeople.trt.model.Configuration
 import com.thetestpeople.trt.model.jenkins.JenkinsConfiguration
@@ -96,7 +97,7 @@ class JenkinsImporter(
     val batch = new JenkinsBatchCreator(importSpec.configurationOpt).createBatch(build)
     val batchId = batchRecorder.recordBatch(batch).id
 
-    val modelJob = model.jenkins.JenkinsJob(url = importSpec.jobUrl, name = job.name)
+    val modelJob = CiJob(url = importSpec.jobUrl, name = job.name)
     val jobId = transaction { dao.ensureJenkinsJob(modelJob) }
     val ciBuild = CiBuild(batchId, clock.now, buildUrl, buildLink.buildNumber, jobId, Some(importSpec.id))
     transaction { dao.newCiBuild(ciBuild) }

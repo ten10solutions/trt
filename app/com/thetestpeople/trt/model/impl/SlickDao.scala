@@ -284,7 +284,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     query.firstOption.map { case (batch, logRowOpt, jenkinsBuildOpt, commentOpt) ⇒ BatchAndLog(batch, logRowOpt.map(_.log), jenkinsBuildOpt.flatMap(_.importSpecIdOpt), commentOpt = commentOpt.map(_.text)) }
   }
 
-  def getBatches(jobOpt: Option[Id[JenkinsJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch] = {
+  def getBatches(jobOpt: Option[Id[CiJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch] = {
     var baseQuery =
       jobOpt match {
         case Some(jobId) ⇒
