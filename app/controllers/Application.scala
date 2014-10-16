@@ -142,7 +142,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   private def handleBatches(jobIdOpt: Option[Id[CiJob]], configurationOpt: Option[Configuration], pagination: Pagination)(implicit request: Request[_]) = {
     val batches = service.getBatches(jobIdOpt, configurationOpt).map(new BatchView(_))
-    val jobs = service.getJenkinsJobs().toList
+    val jobs = service.getCiJobs().toList
     val paginationData = pagination.paginationData(batches.size)
     val hideChartInitially = batches.size >= HideBatchChartThreshold
     views.html.batches(batches.toList, jobIdOpt, configurationOpt, jobs, paginationData, hideChartInitially)

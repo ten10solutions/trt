@@ -6,7 +6,7 @@ import com.thetestpeople.trt.model._
 import com.thetestpeople.trt.model.jenkins._
 import com.thetestpeople.trt.utils.KeyedLocks
 import com.thetestpeople.trt.jenkins.importer
-import com.thetestpeople.trt.jenkins.importer.JenkinsScraper
+import com.thetestpeople.trt.jenkins.importer.JenkinsBuildDownloader
 import com.thetestpeople.trt.jenkins.importer.JenkinsBuildImportStatus
 import com.thetestpeople.trt.jenkins.importer.JenkinsJobImportStatus
 import com.thetestpeople.trt.jenkins.importer.JenkinsBatchCreator
@@ -77,7 +77,7 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
     dao.getJenkinsConfiguration.config.rerunJobUrlOpt.isDefined
   }
 
-  def getJenkinsJobs(): Seq[CiJob] = transaction { dao.getJenkinsJobs() }
+  def getCiJobs(): Seq[CiJob] = transaction { dao.getCiJobs() }
 
   def getCiBuilds(specId: Id[CiImportSpec]): Seq[CiBuild] = transaction { dao.getCiBuilds(specId) }
 

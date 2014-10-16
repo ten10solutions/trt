@@ -9,14 +9,14 @@ import com.thetestpeople.trt.utils.UriUtils._
 import com.thetestpeople.trt.utils.http.Credentials
 import com.thetestpeople.trt.utils.http._
 
-class JenkinsScraperException(message: String, cause: Throwable = null) extends RuntimeException(message, cause)
+class JenkinsBuildDownloaderException(message: String, cause: Throwable = null) extends RuntimeException(message, cause)
 
-class JenkinsScraper(
+class JenkinsBuildDownloader(
     http: Http,
     credentialsOpt: Option[Credentials],
     fetchConsole: Boolean) extends HasLogger {
 
-  @throws[JenkinsScraperException]
+  @throws[JenkinsBuildDownloaderException]
   def getJenkinsJob(jobUrl: URI): JenkinsJob = {
     val jobXml = getJobXml(jobUrl)
     parseJobXml(jobUrl, jobXml)
@@ -30,7 +30,7 @@ class JenkinsScraper(
       http.get(url, basicAuthOpt = credentialsOpt).checkOK.bodyAsXml
     catch {
       case e: HttpException ⇒
-        throw new JenkinsScraperException(s"Problem getting Jenkins job information from $url: ${e.getMessage}", e)
+        throw new JenkinsBuildDownloaderException(s"Problem getting Jenkins job information from $url: ${e.getMessage}", e)
     }
   }
 
@@ -39,7 +39,7 @@ class JenkinsScraper(
       new JenkinsJobXmlParser().parse(jobXml)
     catch {
       case e: ParseException ⇒
-        throw new JenkinsScraperException(s"Problem parsing Jenkins job XML from $jobUrl", e)
+        throw new JenkinsBuildDownloaderException(s"Problem parsing Jenkins job XML from $jobUrl", e)
     }
 
   private def scrapeTestResult(buildUrl: URI): Option[OrdinaryTestResult] = {
@@ -57,7 +57,7 @@ class JenkinsScraper(
       new JenkinsTestResultXmlParser().parseTestResult(testXml)
     catch {
       case e: ParseException ⇒
-        throw new JenkinsScraperException(s"Problem parsing test result XML from $testUrl: ${e.getMessage}", e)
+        throw new JenkinsBuildDownloaderException(s"Problem parsing test result XML from $testUrl: ${e.getMessage}", e)
     }
 
   private def processAggregatedTestResult(testResult: AggregatedTestResult): Option[OrdinaryTestResult] = {
@@ -81,13 +81,13 @@ class JenkinsScraper(
       new JenkinsTestResultXmlParser().parseOrdinaryTestResult(testResultXml)
     catch {
       case e: ParseException ⇒
-        throw new JenkinsScraperException(s"Problem parsing test result: ${e.getMessage}", e)
+        throw new JenkinsBuildDownloaderException(s"Problem parsing test result: ${e.getMessage}", e)
     }
 
   /**
    * @return None if build has no tests associated with it, or if it is still building
    */
-  @throws[JenkinsScraperException]
+  @throws[JenkinsBuildDownloaderException]
   def getJenkinsBuild(buildUrl: URI, jobUrl: URI): Option[JenkinsBuild] = {
     val buildXml = getBuildXml(buildUrl)
     val buildSummary = parseBuild(buildUrl, buildXml)
@@ -108,7 +108,7 @@ class JenkinsScraper(
       new JenkinsBuildXmlParser().parseBuild(buildXml)
     catch {
       case e: ParseException ⇒
-        throw new JenkinsScraperException(s"Problem parsing Jenkins build XML from $buildUrl: ${e.getMessage}", e)
+        throw new JenkinsBuildDownloaderException(s"Problem parsing Jenkins build XML from $buildUrl: ${e.getMessage}", e)
     }
 
   private def getBuildXml(buildUrl: URI): Elem = {
@@ -117,7 +117,7 @@ class JenkinsScraper(
       http.get(url, basicAuthOpt = credentialsOpt).checkOK.bodyAsXml
     catch {
       case e: HttpException ⇒
-        throw new JenkinsScraperException(s"Problem getting Jenkins build information from $url: ${e.getMessage}", e)
+        throw new JenkinsBuildDownloaderException(s"Problem getting Jenkins build information from $url: ${e.getMessage}", e)
     }
   }
 
@@ -128,7 +128,7 @@ class JenkinsScraper(
       http.get(testResultsUrl(buildUrl), basicAuthOpt = credentialsOpt).checkOK.bodyAsXml
     catch {
       case e: HttpException ⇒
-        throw new JenkinsScraperException(s"Problem getting Jenkins test results for build $buildUrl: ${e.getMessage}", e)
+        throw new JenkinsBuildDownloaderException(s"Problem getting Jenkins test results for build $buildUrl: ${e.getMessage}", e)
     }
 
   private def getConsole(buildUrl: URI): String =
@@ -136,7 +136,7 @@ class JenkinsScraper(
       http.get(buildUrl / "consoleText", basicAuthOpt = credentialsOpt).checkOK.body
     catch {
       case e: HttpException ⇒
-        throw new JenkinsScraperException(s"Problem getting console log for $buildUrl: ${e.getMessage}", e)
+        throw new JenkinsBuildDownloaderException(s"Problem getting console log for $buildUrl: ${e.getMessage}", e)
     }
 
 }

@@ -72,7 +72,7 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
 
   "Adding a Jenkins build" should "persist all the data" in transaction { dao ⇒
     val batchId = dao.newBatch(F.batch())
-    val jobId = dao.ensureJenkinsJob(F.jenkinsJob())
+    val jobId = dao.ensureCiJob(F.ciJob())
     val specId = dao.newCiImportSpec(F.ciImportSpec())
     val build = CiBuild(
       jobId = jobId,
@@ -90,7 +90,7 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
   "Fetching jenkins builds associated with a job URL" should "return the builds" in transaction { dao ⇒
     val batchId1 = dao.newBatch(F.batch())
     val batchId2 = dao.newBatch(F.batch())
-    val jobId = dao.ensureJenkinsJob(F.jenkinsJob(url = DummyData.JobUrl))
+    val jobId = dao.ensureCiJob(F.ciJob(url = DummyData.JobUrl))
     val specId = dao.newCiImportSpec(F.ciImportSpec())
     val build1 = F.jenkinsBuild(jobId = jobId, batchId = batchId1, buildUrl = DummyData.BuildUrl, importSpecIdOpt = Some(specId))
     val build2 = F.jenkinsBuild(jobId = jobId, batchId = batchId2, buildUrl = DummyData.BuildUrl2,importSpecIdOpt = Some(specId))
@@ -105,7 +105,7 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
   "The DAO" should "return all the Jenkins build URLs" in transaction { dao ⇒
     def addBuild(buildUrl: URI) {
       val batchId = dao.newBatch(F.batch())
-      val jobId = dao.ensureJenkinsJob(F.jenkinsJob())
+      val jobId = dao.ensureCiJob(F.ciJob())
       dao.newCiBuild(F.jenkinsBuild(batchId, jobId = jobId, buildUrl = buildUrl))
     }
     val buildUrls = List(
@@ -118,21 +118,21 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
   }
 
   "Adding a new Jenkins job" should "persist all job data" in transaction { dao ⇒
-    val jobId = dao.ensureJenkinsJob(F.jenkinsJob(
+    val jobId = dao.ensureCiJob(F.ciJob(
       url = DummyData.JobUrl,
       name = DummyData.JobName))
 
-    val Seq(job) = dao.getJenkinsJobs()
+    val Seq(job) = dao.getCiJobs()
     job.id should equal(jobId)
     job.url should equal(DummyData.JobUrl)
     job.name should equal(DummyData.JobName)
   }
 
   "Ensuring a new Jenkins job exists" should "have no effect if it already exists" in transaction { dao ⇒
-    val jobId = dao.ensureJenkinsJob(F.jenkinsJob(url = DummyData.JobUrl))
-    val jobIdAgain = dao.ensureJenkinsJob(F.jenkinsJob(url = DummyData.JobUrl))
+    val jobId = dao.ensureCiJob(F.ciJob(url = DummyData.JobUrl))
+    val jobIdAgain = dao.ensureCiJob(F.ciJob(url = DummyData.JobUrl))
     jobIdAgain should equal(jobId)
-    val Seq(job) = dao.getJenkinsJobs()
+    val Seq(job) = dao.getCiJobs()
     job.id should equal(jobId)
   }
 

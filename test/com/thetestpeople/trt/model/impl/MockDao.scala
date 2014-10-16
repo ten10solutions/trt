@@ -32,7 +32,7 @@ class MockDao extends Dao {
   private var executionComments: Seq[ExecutionComment] = List()
   private var batchLogs: Seq[BatchLogRow] = List()
   private var batchComments: Seq[BatchComment] = List()
-  private var jenkinsJobs: Seq[CiJob] = List()
+  private var ciJobs: Seq[CiJob] = List()
   private var ciBuilds: Seq[CiBuild] = List()
   private var importSpecs: Seq[CiImportSpec] = List()
   private var systemConfiguration = SystemConfiguration()
@@ -143,7 +143,7 @@ class MockDao extends Dao {
   private def areAssociated(batch: Batch, jobId: Id[CiJob]): Boolean = {
     for {
       build ← ciBuilds
-      job ← jenkinsJobs
+      job ← ciJobs
       if job.id == jobId
       if build.jobId == job.id
       if build.batchId == batch.id
@@ -288,7 +288,7 @@ class MockDao extends Dao {
 
   def getCiBuildUrls(): Seq[URI] = ciBuilds.map(_.buildUrl)
 
-  def getJenkinsJobs(): Seq[CiJob] = jenkinsJobs
+  def getCiJobs(): Seq[CiJob] = ciJobs
 
   def getCiBuilds(specId: Id[CiImportSpec]): Seq[CiBuild] =
     for {
@@ -342,13 +342,13 @@ class MockDao extends Dao {
     jenkinsConfigParams = config.params
   }
 
-  def ensureJenkinsJob(job: CiJob): Id[CiJob] = {
-    jenkinsJobs.find(_.url == job.url) match {
+  def ensureCiJob(job: CiJob): Id[CiJob] = {
+    ciJobs.find(_.url == job.url) match {
       case Some(jobAgain) ⇒
         jobAgain.id
       case None ⇒
-        val newId = nextId(jenkinsJobs.map(_.id))
-        jenkinsJobs +:= job.copy(id = newId)
+        val newId = nextId(ciJobs.map(_.id))
+        ciJobs +:= job.copy(id = newId)
         newId
     }
   }

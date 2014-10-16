@@ -53,31 +53,31 @@ class JenkinsImporter(
   private def importJenkinsBuilds(spec: CiImportSpec) {
     val alreadyImportedBuildUrls = transaction { dao.getCiBuildUrls() }.toSet
     def alreadyImported(link: JenkinsBuildLink) = alreadyImportedBuildUrls contains link.buildUrl
-    val jenkinsScraper = getJenkinsScraper(spec.importConsoleLog)
+    val jenkinsBuildDownloader = getJenkinsBuildDownloader(spec.importConsoleLog)
 
-    val job = jenkinsScraper.getJenkinsJob(spec.jobUrl)
+    val job = jenkinsBuildDownloader.getJenkinsJob(spec.jobUrl)
 
     val buildLinks = job.buildLinks.filterNot(alreadyImported).sortBy(_.buildNumber).reverse
 
     for (link ← buildLinks)
       importStatusManager.buildExists(spec.id, link.buildUrl, link.buildNumber)
     for (link ← buildLinks)
-      importBuild(link, job, spec, jenkinsScraper)
+      importBuild(link, job, spec, jenkinsBuildDownloader)
 
     transaction { dao.updateCiImportSpec(spec.id, Some(clock.now)) }
   }
 
-  private def getJenkinsScraper(importConsoleLog: Boolean): JenkinsScraper = {
+  private def getJenkinsBuildDownloader(importConsoleLog: Boolean): JenkinsBuildDownloader = {
     val jenkinsConfiguration = transaction { dao.getJenkinsConfiguration() }
     val credentialsOpt = jenkinsConfiguration.config.credentialsOpt
-    new JenkinsScraper(http, credentialsOpt, importConsoleLog)
+    new JenkinsBuildDownloader(http, credentialsOpt, importConsoleLog)
   }
 
-  private def importBuild(buildLink: JenkinsBuildLink, job: JenkinsJob, importSpec: CiImportSpec, jenkinsScraper: JenkinsScraper) {
+  private def importBuild(buildLink: JenkinsBuildLink, job: JenkinsJob, importSpec: CiImportSpec, jenkinsBuildDownloader: JenkinsBuildDownloader) {
     val buildUrl = buildLink.buildUrl
     importStatusManager.buildStarted(importSpec.id, buildUrl)
     try {
-      val batchIdOpt = doImportBuild(buildLink, job, importSpec, jenkinsScraper)
+      val batchIdOpt = doImportBuild(buildLink, job, importSpec, jenkinsBuildDownloader)
       importStatusManager.buildComplete(importSpec.id, buildUrl, batchIdOpt)
     } catch {
       case e: Exception ⇒
@@ -89,16 +89,16 @@ class JenkinsImporter(
   /**
    * @return None if build had no associated test executions.
    */
-  private def doImportBuild(buildLink: JenkinsBuildLink, job: JenkinsJob, importSpec: CiImportSpec, jenkinsScraper: JenkinsScraper): Option[Id[Batch]] = {
+  private def doImportBuild(buildLink: JenkinsBuildLink, job: JenkinsJob, importSpec: CiImportSpec, jenkinsBuildDownloader: JenkinsBuildDownloader): Option[Id[Batch]] = {
     val buildUrl = buildLink.buildUrl
-    val build = jenkinsScraper.getJenkinsBuild(buildUrl, importSpec.jobUrl)
+    val build = jenkinsBuildDownloader.getJenkinsBuild(buildUrl, importSpec.jobUrl)
       .getOrElse(return None)
 
     val batch = new JenkinsBatchCreator(importSpec.configurationOpt).createBatch(build)
     val batchId = batchRecorder.recordBatch(batch).id
 
     val modelJob = CiJob(url = importSpec.jobUrl, name = job.name)
-    val jobId = transaction { dao.ensureJenkinsJob(modelJob) }
+    val jobId = transaction { dao.ensureCiJob(modelJob) }
     val ciBuild = CiBuild(batchId, clock.now, buildUrl, buildLink.buildNumber, jobId, Some(importSpec.id))
     transaction { dao.newCiBuild(ciBuild) }
     Some(batchId)

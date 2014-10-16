@@ -99,7 +99,7 @@ object TestDataFactory {
       lastCheckedOpt = lastCheckedOpt,
       configurationOpt = configurationOpt)
 
-  def jenkinsJob(
+  def ciJob(
     url: URI = DummyData.JobUrl,
     name: String = DummyData.JobName) =
     CiJob(

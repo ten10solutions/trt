@@ -41,7 +41,7 @@ trait SlickJenkinsDao { this: SlickDao ⇒
     query.run
   }
 
-  def getJenkinsJobs(): Seq[CiJob] = jenkinsJobs.run
+  def getCiJobs(): Seq[CiJob] = ciJobs.run
 
   def newCiImportSpec(spec: CiImportSpec): Id[CiImportSpec] =
     (ciImportSpecs returning ciImportSpecs.map(_.id)).insert(spec)
@@ -89,12 +89,12 @@ trait SlickJenkinsDao { this: SlickDao ⇒
     jenkinsJobParams.insertAll(config.params: _*)
   }
 
-  def ensureJenkinsJob(job: CiJob): Id[CiJob] = synchronized {
-    jenkinsJobs.filter(_.url === job.url).firstOption match {
+  def ensureCiJob(job: CiJob): Id[CiJob] = synchronized {
+    ciJobs.filter(_.url === job.url).firstOption match {
       case Some(job) ⇒
         job.id
       case None ⇒
-        (jenkinsJobs returning jenkinsJobs.map(_.id)).insert(job)
+        (ciJobs returning ciJobs.map(_.id)).insert(job)
     }
   }
 

@@ -80,7 +80,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
           case Some(spec) ⇒
             val allInfos = getBuildImportInfos(spec)
             val pageInfos = allInfos.drop(pagination.firstItem).take(pagination.pageSize)
-            val jobName = service.getJenkinsJobs().find(_.url == spec.jobUrl).map(_.name)
+            val jobName = service.getCiJobs().find(_.url == spec.jobUrl).map(_.name)
               .getOrElse(spec.jobUrl.toString) // Job name not known until first import completes
             val jobImportInfo = getJobImportInfo(spec)
             val progress = getJenkinsImportProgressPercent(allInfos)

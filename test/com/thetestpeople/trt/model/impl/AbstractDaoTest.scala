@@ -446,8 +446,8 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
       dao.newCiBuild(F.jenkinsBuild(batchId, jobId, buildUrl = buildUrl))
       batchId
     }
-    val jobId1 = dao.ensureJenkinsJob(F.jenkinsJob(url = DummyData.JobUrl))
-    val jobId2 = dao.ensureJenkinsJob(F.jenkinsJob(url = DummyData.JobUrl2))
+    val jobId1 = dao.ensureCiJob(F.ciJob(url = DummyData.JobUrl))
+    val jobId2 = dao.ensureCiJob(F.ciJob(url = DummyData.JobUrl2))
     val batchId1 = addBatchAssociatedWithJob(jobId1, DummyData.BuildUrl)
     val batchId2 = addBatchAssociatedWithJob(jobId2, DummyData.BuildUrl2)
 
@@ -552,7 +552,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     val batchId = dao.newBatch(F.batch(), logOpt = Some(DummyData.Log))
     val testId = dao.ensureTestIsRecorded(F.test())
     val executionId = dao.newExecution(F.execution(batchId, testId), logOpt = Some(DummyData.Log))
-    val jobId = dao.ensureJenkinsJob(F.jenkinsJob())
+    val jobId = dao.ensureCiJob(F.ciJob())
     dao.newCiBuild(F.jenkinsBuild(batchId, jobId = jobId, buildUrl = DummyData.BuildUrl))
     dao.upsertAnalysis(F.analysis(testId, lastPassedExecutionIdOpt = Some(executionId)))
 
