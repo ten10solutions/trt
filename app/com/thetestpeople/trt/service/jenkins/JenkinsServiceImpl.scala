@@ -25,7 +25,7 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
     transaction {
       val specId = dao.newCiImportSpec(spec.copy(lastCheckedOpt = None))
       logger.info(s"Added new import spec for ${spec.jobUrl}, id = ${spec.id}")
-      jenkinsImportQueue.add(specId)
+      ciImportQueue.add(specId)
       specId
     }
 
@@ -49,7 +49,7 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
     }
 
   def syncJenkins(specId: Id[CiImportSpec]) = {
-    jenkinsImportQueue.add(specId)
+    ciImportQueue.add(specId)
   }
 
   def syncAllJenkins() {

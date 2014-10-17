@@ -5,7 +5,7 @@ import com.thetestpeople.trt.model.jenkins._
 import com.thetestpeople.trt.utils.CoalescingBlockingQueue
 import com.thetestpeople.trt.utils.HasLogger
 
-trait JenkinsImportQueue {
+trait CiImportQueue {
 
   /**
    * Enqueue the given import spec to be imported
@@ -17,9 +17,9 @@ trait JenkinsImportQueue {
 /**
  * Examine Jenkins jobs to examine for any new builds to import.
  */
-class JenkinsImportWorker(
+class CiImportWorker(
     dao: JenkinsDao,
-    jenkinsImporter: JenkinsImporter) extends JenkinsImportQueue with HasLogger {
+    ciImporter: CiImporter) extends CiImportQueue with HasLogger {
 
   import dao.transaction
 
@@ -38,7 +38,7 @@ class JenkinsImportWorker(
       val specId = importSpecQueue.take()
       logger.info(s"Checking if there is anything to import from import spec $specId")
       try
-        jenkinsImporter.importBuilds(specId)
+        ciImporter.importBuilds(specId)
       catch {
         case e: Exception ⇒ logger.error(s"Problem importing from import spec $specId", e)
       }

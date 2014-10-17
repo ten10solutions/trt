@@ -19,7 +19,7 @@ import java.net.URI
 import com.thetestpeople.trt.model.CiType._
 import com.thetestpeople.trt.model.CiType
 
-class JenkinsImporter(
+class CiImporter(
     clock: Clock,
     http: Http,
     dao: JenkinsDao,

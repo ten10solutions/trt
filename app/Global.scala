@@ -14,14 +14,14 @@ object Global extends GlobalSettings with HasLogger {
   override def onStart(app: Application) {
     factory.dbMigrator.migrate()
 
-    initialiseJenkinsImportWorker(app)
+    initialiseCiImportWorker(app)
     initialiseJenkinsPoller(app)
     initialiseAnalyseExecutionsPoller(app)
   }
 
-  private def initialiseJenkinsImportWorker(app: Application) {
+  private def initialiseCiImportWorker(app: Application) {
     Future {
-      factory.jenkinsImportWorker.run()
+      factory.ciImportWorker.run()
     }
   }
 
@@ -56,7 +56,7 @@ object Global extends GlobalSettings with HasLogger {
   }
 
   override def onStop(app: Application) {
-    factory.jenkinsImportWorker.stop()
+    factory.ciImportWorker.stop()
   }
 
   override def getControllerInstance[A](clazz: Class[A]): A = factory.getControllerInstance(clazz)

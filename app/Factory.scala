@@ -55,7 +55,7 @@ class Factory(configuration: Configuration) {
 
   lazy val analysisService = new AnalysisService(dao, clock, async = true)
 
-  lazy val service: Service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, jenkinsImportWorker, logIndexer)
+  lazy val service: Service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, ciImportWorker, logIndexer)
 
   lazy val adminService = new AdminServiceImpl(dao, dao, logIndexer, analysisService)
 
@@ -69,9 +69,9 @@ class Factory(configuration: Configuration) {
 
   lazy val batchRecorder = new BatchRecorder(dao, clock, analysisService, logIndexer)
 
-  lazy val jenkinsImporter = new JenkinsImporter(clock, http, dao, jenkinsImportStatusManager, batchRecorder)
+  lazy val ciImporter = new CiImporter(clock, http, dao, jenkinsImportStatusManager, batchRecorder)
 
-  lazy val jenkinsImportWorker = new JenkinsImportWorker(dao, jenkinsImporter)
+  lazy val ciImportWorker = new CiImportWorker(dao, ciImporter)
 
   lazy val luceneInMemory: Boolean =
     configuration.getBoolean(Lucene.InMemory).getOrElse(false)

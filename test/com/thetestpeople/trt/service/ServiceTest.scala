@@ -12,7 +12,7 @@ import com.thetestpeople.trt.model.impl.DummyData
 import com.thetestpeople.trt.model._
 import com.thetestpeople.trt.analysis.AnalysisService
 import com.thetestpeople.trt.jenkins.importer.JenkinsImportStatusManager
-import com.thetestpeople.trt.jenkins.importer.FakeJenkinsImportQueue
+import com.thetestpeople.trt.jenkins.importer.FakeCiImportQueue
 import com.thetestpeople.trt.service.indexing.LuceneLogIndexer
 
 @RunWith(classOf[JUnitRunner])

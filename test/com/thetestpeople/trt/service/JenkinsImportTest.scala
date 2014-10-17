@@ -14,8 +14,8 @@ import com.thetestpeople.trt.utils.http.Http
 import com.thetestpeople.trt.utils.http.AlwaysFailingHttp
 import com.thetestpeople.trt.utils.http.ClasspathCachingHttp
 import com.thetestpeople.trt.jenkins.importer.JenkinsImportStatusManager
-import com.thetestpeople.trt.jenkins.importer.FakeJenkinsImportQueue
-import com.thetestpeople.trt.jenkins.importer.JenkinsImporter
+import com.thetestpeople.trt.jenkins.importer.FakeCiImportQueue
+import com.thetestpeople.trt.jenkins.importer.CiImporter
 import com.thetestpeople.trt.service.indexing.LuceneLogIndexer
 
 @RunWith(classOf[JUnitRunner])
@@ -28,7 +28,7 @@ class JenkinsImportTest extends FlatSpec with ShouldMatchers {
     val http = new ClasspathCachingHttp("")
     val serviceBundle = setup(http, clock)
     val service = serviceBundle.service
-    val jenkinsImporter = serviceBundle.jenkinsImporter
+    val ciImporter = serviceBundle.ciImporter
 
     val specId = service.newCiImportSpec(F.ciImportSpec(
       jobUrl = new URI("http://ci.pentaho.com/job/pentaho-big-data-plugin/"),
@@ -38,7 +38,7 @@ class JenkinsImportTest extends FlatSpec with ShouldMatchers {
     http.prefix = "webcache-pentaho-1214-1216"
 
     service.syncAllJenkins()
-    jenkinsImporter.importBuilds(specId)
+    ciImporter.importBuilds(specId)
 
     service.getBatches().flatMap(_.nameOpt) should equal(List(
       "pentaho-big-data-plugin #1216",
@@ -50,7 +50,7 @@ class JenkinsImportTest extends FlatSpec with ShouldMatchers {
     clock += 10.minutes
 
     service.syncAllJenkins()
-    jenkinsImporter.importBuilds(specId)
+    ciImporter.importBuilds(specId)
 
     service.getBatches().flatMap(_.nameOpt) should equal(List(
       "pentaho-big-data-plugin #1219",

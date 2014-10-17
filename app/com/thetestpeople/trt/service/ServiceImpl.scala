@@ -8,7 +8,7 @@ import com.thetestpeople.trt.analysis._
 import java.net.URI
 import com.thetestpeople.trt.utils.http.Http
 import com.thetestpeople.trt.jenkins.importer.JenkinsImportStatusManager
-import com.thetestpeople.trt.jenkins.importer.JenkinsImportQueue
+import com.thetestpeople.trt.jenkins.importer.CiImportQueue
 import com.thetestpeople.trt.service.indexing.LogIndexer
 import com.thetestpeople.trt.service.indexing.ExecutionHit
 import com.thetestpeople.trt.service.indexing.SearchResult
@@ -22,7 +22,7 @@ class ServiceImpl(
   protected val analysisService: AnalysisService,
   protected val jenkinsImportStatusManager: JenkinsImportStatusManager,
   protected val batchRecorder: BatchRecorder,
-  protected val jenkinsImportQueue: JenkinsImportQueue,
+  protected val ciImportQueue: CiImportQueue,
   protected val logIndexer: LogIndexer)
     extends Service with HasLogger with JenkinsServiceImpl {
 
