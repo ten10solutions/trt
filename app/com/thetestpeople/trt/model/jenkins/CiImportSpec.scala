@@ -6,6 +6,9 @@ import org.joda.time.DateTime
 import com.github.nscala_time.time.Imports._
 import java.net.URI
 
+/**
+ * Configuration for importing test results from a job on a continuous integration server.
+ */
 case class CiImportSpec(
     id: Id[CiImportSpec] = Id.dummy,
     ciType: CiType,

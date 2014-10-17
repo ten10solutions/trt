@@ -6,7 +6,7 @@ import com.thetestpeople.trt.utils.http.Http
 import com.thetestpeople.trt.utils.http.Credentials
 import com.thetestpeople.trt.service.Clock
 import com.thetestpeople.trt.service.BatchRecorder
-import com.thetestpeople.trt.model.jenkins.JenkinsDao
+import com.thetestpeople.trt.model.jenkins.CiDao
 import com.thetestpeople.trt.model.Id
 import com.thetestpeople.trt.model
 import com.thetestpeople.trt.model.jenkins.CiImportSpec
@@ -22,7 +22,7 @@ import com.thetestpeople.trt.model.CiType
 class CiImporter(
     clock: Clock,
     http: Http,
-    dao: JenkinsDao,
+    dao: CiDao,
     importStatusManager: CiImportStatusManager,
     batchRecorder: BatchRecorder) extends HasLogger {
 

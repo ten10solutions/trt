@@ -14,7 +14,7 @@ import scala.slick.util.CloseableIterator
 import scala.slick.driver.H2Driver
 
 class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extends Dao
-    with DaoAdmin with HasLogger with SlickJenkinsDao with SlickExecutionDao with Mappings {
+    with DaoAdmin with HasLogger with SlickCiDao with SlickExecutionDao with Mappings {
 
   protected val driver = DriverLookup(jdbcUrl)
 
@@ -44,7 +44,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     val testComments = TableQuery[TestCommentMapping]
     val systemConfiguration = TableQuery[SystemConfigurationMapping]
 
-    val ciJobs = TableQuery[JenkinsJobMapping]
+    val ciJobs = TableQuery[CiJobMapping]
     val ciBuilds = TableQuery[CiBuildMapping]
     val ciImportSpecs = TableQuery[CiImportSpecMapping]
     val jenkinsConfiguration = TableQuery[JenkinsConfigurationMapping]
@@ -278,10 +278,10 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   def getBatch(id: Id[Batch]): Option[BatchAndLog] = {
     val query =
       for {
-        (((batch, log), jenkinsBuild), comment) ← batches leftJoin batchLogs on (_.id === _.batchId) leftJoin ciBuilds on (_._1.id === _.batchId) leftJoin batchComments on (_._1._1.id === _.batchId)
+        (((batch, log), ciBuild), comment) ← batches leftJoin batchLogs on (_.id === _.batchId) leftJoin ciBuilds on (_._1.id === _.batchId) leftJoin batchComments on (_._1._1.id === _.batchId)
         if batch.id === id
-      } yield (batch, log.?, jenkinsBuild.?, comment.?)
-    query.firstOption.map { case (batch, logRowOpt, jenkinsBuildOpt, commentOpt) ⇒ BatchAndLog(batch, logRowOpt.map(_.log), jenkinsBuildOpt.flatMap(_.importSpecIdOpt), commentOpt = commentOpt.map(_.text)) }
+      } yield (batch, log.?, ciBuild.?, comment.?)
+    query.firstOption.map { case (batch, logRowOpt, ciBuildOpt, commentOpt) ⇒ BatchAndLog(batch, logRowOpt.map(_.log), ciBuildOpt.flatMap(_.importSpecIdOpt), commentOpt = commentOpt.map(_.text)) }
   }
 
   def getBatches(jobOpt: Option[Id[CiJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch] = {
@@ -290,9 +290,9 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
         case Some(jobId) ⇒
           for {
             batch ← batches
-            jenkinsBuild ← ciBuilds
-            if jenkinsBuild.batchId === batch.id
-            if jenkinsBuild.jobId === jobId
+            ciBuild ← ciBuilds
+            if ciBuild.batchId === batch.id
+            if ciBuild.jobId === jobId
           } yield batch
         case None ⇒
           batches

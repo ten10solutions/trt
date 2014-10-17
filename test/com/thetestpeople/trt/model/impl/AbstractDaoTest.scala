@@ -12,7 +12,7 @@ import org.joda.time.DateTime
 import org.joda.time.Duration
 import java.net.URI
 
-abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoTest with JenkinsDaoTest {
+abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoTest with CiDaoTest {
 
   protected def createDao: Dao
 

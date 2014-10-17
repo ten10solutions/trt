@@ -21,7 +21,7 @@ object SortBy {
 
 }
 
-trait Dao extends ExecutionDao with JenkinsDao {
+trait Dao extends ExecutionDao with CiDao {
 
   /**
    * Run the given block within a transaction

@@ -12,23 +12,25 @@ import org.joda.time.DateTime
 import org.joda.time.Duration
 import java.net.URI
 
-trait JenkinsDaoTest { self: AbstractDaoTest ⇒
+trait CiDaoTest { self: AbstractDaoTest ⇒
 
-  "Inserting and retrieving a new Jenkins import spec" should "persist all the data" in transaction { dao ⇒
+  "Inserting and retrieving a new import spec" should "persist all the data" in transaction { dao ⇒
     val specId = dao.newCiImportSpec(F.ciImportSpec(
+      ciType = CiType.TeamCity,
       jobUrl = DummyData.JobUrl,
       pollingInterval = DummyData.PollingInterval,
       importConsoleLog = true,
       lastCheckedOpt = Some(DummyData.LastChecked)))
 
     val Some(spec) = dao.getCiImportSpec(specId)
+    spec.ciType should equal(CiType.TeamCity)
     spec.jobUrl should equal(DummyData.JobUrl)
     spec.pollingInterval should equal(DummyData.PollingInterval)
     spec.importConsoleLog should equal(true)
     spec.lastCheckedOpt should equal(Some(DummyData.LastChecked))
   }
 
-  "Deleting a Jenkins import spec" should "delete it if present" in transaction { dao ⇒
+  "Deleting animport spec" should "delete it if present" in transaction { dao ⇒
     val specId = dao.newCiImportSpec(F.ciImportSpec())
 
     val success = dao.deleteCiImportSpec(specId)
@@ -38,7 +40,7 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
     dao.deleteCiImportSpec(specId) should be(false)
   }
 
-  "Deleting a Jenkins import spec" should "indicate if it wasnt present to start with" in transaction { dao ⇒
+  "Deleting an import spec" should "indicate if it wasnt present to start with" in transaction { dao ⇒
     dao.deleteCiImportSpec(Id.dummy) should be(false)
   }
 
@@ -70,7 +72,7 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
     updatedSpec.importConsoleLog should be(false)
   }
 
-  "Adding a Jenkins build" should "persist all the data" in transaction { dao ⇒
+  "Adding a CI build" should "persist all the data" in transaction { dao ⇒
     val batchId = dao.newBatch(F.batch())
     val jobId = dao.ensureCiJob(F.ciJob())
     val specId = dao.newCiImportSpec(F.ciImportSpec())
@@ -87,13 +89,13 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
     buildAgain should equal(build)
   }
 
-  "Fetching jenkins builds associated with a job URL" should "return the builds" in transaction { dao ⇒
+  "Fetching builds associated with a job URL" should "return the builds" in transaction { dao ⇒
     val batchId1 = dao.newBatch(F.batch())
     val batchId2 = dao.newBatch(F.batch())
     val jobId = dao.ensureCiJob(F.ciJob(url = DummyData.JobUrl))
     val specId = dao.newCiImportSpec(F.ciImportSpec())
     val build1 = F.jenkinsBuild(jobId = jobId, batchId = batchId1, buildUrl = DummyData.BuildUrl, importSpecIdOpt = Some(specId))
-    val build2 = F.jenkinsBuild(jobId = jobId, batchId = batchId2, buildUrl = DummyData.BuildUrl2,importSpecIdOpt = Some(specId))
+    val build2 = F.jenkinsBuild(jobId = jobId, batchId = batchId2, buildUrl = DummyData.BuildUrl2, importSpecIdOpt = Some(specId))
     dao.newCiBuild(build1)
     dao.newCiBuild(build2)
 
@@ -102,7 +104,7 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
     builds should contain theSameElementsAs (Seq(build1, build2))
   }
 
-  "The DAO" should "return all the Jenkins build URLs" in transaction { dao ⇒
+  "The DAO" should "return all the build URLs" in transaction { dao ⇒
     def addBuild(buildUrl: URI) {
       val batchId = dao.newBatch(F.batch())
       val jobId = dao.ensureCiJob(F.ciJob())
@@ -128,7 +130,7 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
     job.name should equal(DummyData.JobName)
   }
 
-  "Ensuring a new Jenkins job exists" should "have no effect if it already exists" in transaction { dao ⇒
+  "Ensuring a new job exists" should "have no effect if it already exists" in transaction { dao ⇒
     val jobId = dao.ensureCiJob(F.ciJob(url = DummyData.JobUrl))
     val jobIdAgain = dao.ensureCiJob(F.ciJob(url = DummyData.JobUrl))
     jobIdAgain should equal(jobId)
@@ -136,7 +138,7 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
     job.id should equal(jobId)
   }
 
-  "Inserting and retrieving Jenkins configuration" should "persist all the data" in transaction { dao ⇒
+  "Inserting and retrieving configuration" should "persist all the data" in transaction { dao ⇒
     val params: List[JenkinsJobParam] = List(JenkinsJobParam(
       param = DummyData.ParamName,
       value = DummyData.ParamValue))
@@ -152,5 +154,5 @@ trait JenkinsDaoTest { self: AbstractDaoTest ⇒
     val fullConfigAgain = dao.getJenkinsConfiguration
     fullConfigAgain should equal(fullConfig)
   }
-  
+
 }

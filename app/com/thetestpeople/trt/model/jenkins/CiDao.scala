@@ -5,9 +5,9 @@ import org.joda.time._
 import java.net.URI
 
 /**
- * DAO for storing Jenkins related data
+ * DAO for storing data related to CI (continuous integration) jobs & builds
  */
-trait JenkinsDao {
+trait CiDao {
 
   /**
    * Run the given block within a transaction

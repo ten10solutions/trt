@@ -18,7 +18,7 @@ trait CiImportQueue {
  * Examine Jenkins jobs to examine for any new builds to import.
  */
 class CiImportWorker(
-    dao: JenkinsDao,
+    dao: CiDao,
     ciImporter: CiImporter) extends CiImportQueue with HasLogger {
 
   import dao.transaction

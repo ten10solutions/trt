@@ -6,7 +6,7 @@ import com.thetestpeople.trt.model.jenkins._
 import play.Logger
 import java.net.URI
 
-trait SlickJenkinsDao { this: SlickDao ⇒
+trait SlickCiDao { this: SlickDao ⇒
 
   import driver.simple._
   import Database.dynamicSession

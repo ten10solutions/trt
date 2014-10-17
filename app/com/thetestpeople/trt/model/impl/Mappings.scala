@@ -121,7 +121,7 @@ trait Mappings { self: SlickDao ⇒
 
   }
 
-  class JenkinsJobMapping(tag: Tag) extends Table[CiJob](tag, "jenkins_jobs") {
+  class CiJobMapping(tag: Tag) extends Table[CiJob](tag, "jenkins_jobs") {
 
     def id = column[Id[CiJob]]("ID", O.PrimaryKey, O.NotNull, O.AutoInc)
     def url = column[URI]("url", O.NotNull)
