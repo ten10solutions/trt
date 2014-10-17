@@ -12,12 +12,12 @@ import play.Logger
 import play.api.mvc._
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.data.Form
-import com.thetestpeople.trt.jenkins.importer.JenkinsImportStatusManager
+import com.thetestpeople.trt.jenkins.importer.CiImportStatusManager
 import com.thetestpeople.trt.jenkins.importer.JobImportState
-import com.thetestpeople.trt.jenkins.importer.JenkinsBuildImportStatus
+import com.thetestpeople.trt.jenkins.importer.CiBuildImportStatus
 import com.thetestpeople.trt.jenkins.importer.BuildImportState
 import com.thetestpeople.trt.jenkins.importer.JobImportState
-import com.thetestpeople.trt.jenkins.importer.JenkinsJobImportStatus
+import com.thetestpeople.trt.jenkins.importer.CiJobImportStatus
 
 /**
  * Handle HTTP requests specific to Jenkins functionality
@@ -37,7 +37,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
 
   private def makeView(spec: CiImportSpec): CiImportSpecView = {
     val inProgress = PartialFunction.cond(service.getJobImportStatus(spec.id)) {
-      case Some(JenkinsJobImportStatus(_, _, JobImportState.InProgress)) ⇒ true
+      case Some(CiJobImportStatus(_, _, JobImportState.InProgress)) ⇒ true
     }
     CiImportSpecView(spec, inProgress)
   }
@@ -172,7 +172,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
     (dbInfos ++ inMemoryInfos).sortBy(_.buildNumber).reverse
   }
 
-  private def makeBuildImportInfoFromImportStatus(status: JenkinsBuildImportStatus) = {
+  private def makeBuildImportInfoFromImportStatus(status: CiBuildImportStatus) = {
     val batchIdOpt = PartialFunction.condOpt(status.state) {
       case BuildImportState.Complete(Some(batchId)) ⇒ batchId
     }

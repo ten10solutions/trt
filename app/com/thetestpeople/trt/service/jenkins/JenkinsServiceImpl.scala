@@ -7,8 +7,8 @@ import com.thetestpeople.trt.model.jenkins._
 import com.thetestpeople.trt.utils.KeyedLocks
 import com.thetestpeople.trt.jenkins.importer
 import com.thetestpeople.trt.jenkins.importer.JenkinsBuildDownloader
-import com.thetestpeople.trt.jenkins.importer.JenkinsBuildImportStatus
-import com.thetestpeople.trt.jenkins.importer.JenkinsJobImportStatus
+import com.thetestpeople.trt.jenkins.importer.CiBuildImportStatus
+import com.thetestpeople.trt.jenkins.importer.CiJobImportStatus
 import com.thetestpeople.trt.jenkins.importer.JenkinsBatchCreator
 import com.thetestpeople.trt.service.jenkins._
 import com.thetestpeople.trt.service._
@@ -81,12 +81,12 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
 
   def getCiBuilds(specId: Id[CiImportSpec]): Seq[CiBuild] = transaction { dao.getCiBuilds(specId) }
 
-  def getBuildImportStatuses(specId: Id[CiImportSpec]): Seq[JenkinsBuildImportStatus] = {
-    jenkinsImportStatusManager.getBuildImportStatuses(specId)
+  def getBuildImportStatuses(specId: Id[CiImportSpec]): Seq[CiBuildImportStatus] = {
+    ciImportStatusManager.getBuildImportStatuses(specId)
   }
   
-  def getJobImportStatus(specId: Id[CiImportSpec]): Option[JenkinsJobImportStatus] = {
-    jenkinsImportStatusManager.getJobImportStatus(specId)
+  def getJobImportStatus(specId: Id[CiImportSpec]): Option[CiJobImportStatus] = {
+    ciImportStatusManager.getJobImportStatus(specId)
   }
 
 }

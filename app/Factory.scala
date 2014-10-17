@@ -55,7 +55,7 @@ class Factory(configuration: Configuration) {
 
   lazy val analysisService = new AnalysisService(dao, clock, async = true)
 
-  lazy val service: Service = new ServiceImpl(dao, clock, http, analysisService, jenkinsImportStatusManager, batchRecorder, ciImportWorker, logIndexer)
+  lazy val service: Service = new ServiceImpl(dao, clock, http, analysisService, ciImportStatusManager, batchRecorder, ciImportWorker, logIndexer)
 
   lazy val adminService = new AdminServiceImpl(dao, dao, logIndexer, analysisService)
 
@@ -63,13 +63,13 @@ class Factory(configuration: Configuration) {
 
   lazy val jenkinsController = new JenkinsController(service)
 
-  lazy val jenkinsImportStatusManager: JenkinsImportStatusManager = new JenkinsImportStatusManager(clock)
+  lazy val ciImportStatusManager: CiImportStatusManager = new CiImportStatusManager(clock)
 
   lazy val jsonController = new JsonController(service, adminService)
 
   lazy val batchRecorder = new BatchRecorder(dao, clock, analysisService, logIndexer)
 
-  lazy val ciImporter = new CiImporter(clock, http, dao, jenkinsImportStatusManager, batchRecorder)
+  lazy val ciImporter = new CiImporter(clock, http, dao, ciImportStatusManager, batchRecorder)
 
   lazy val ciImportWorker = new CiImportWorker(dao, ciImporter)
 

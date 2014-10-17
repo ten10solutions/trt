@@ -7,7 +7,7 @@ import com.thetestpeople.trt.service.jenkins.JenkinsServiceImpl
 import com.thetestpeople.trt.analysis._
 import java.net.URI
 import com.thetestpeople.trt.utils.http.Http
-import com.thetestpeople.trt.jenkins.importer.JenkinsImportStatusManager
+import com.thetestpeople.trt.jenkins.importer.CiImportStatusManager
 import com.thetestpeople.trt.jenkins.importer.CiImportQueue
 import com.thetestpeople.trt.service.indexing.LogIndexer
 import com.thetestpeople.trt.service.indexing.ExecutionHit
@@ -20,7 +20,7 @@ class ServiceImpl(
   protected val clock: Clock,
   protected val http: Http,
   protected val analysisService: AnalysisService,
-  protected val jenkinsImportStatusManager: JenkinsImportStatusManager,
+  protected val ciImportStatusManager: CiImportStatusManager,
   protected val batchRecorder: BatchRecorder,
   protected val ciImportQueue: CiImportQueue,
   protected val logIndexer: LogIndexer)

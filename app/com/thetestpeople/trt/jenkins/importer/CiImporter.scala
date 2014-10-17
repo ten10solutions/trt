@@ -23,7 +23,7 @@ class CiImporter(
     clock: Clock,
     http: Http,
     dao: JenkinsDao,
-    importStatusManager: JenkinsImportStatusManager,
+    importStatusManager: CiImportStatusManager,
     batchRecorder: BatchRecorder) extends HasLogger {
 
   import dao.transaction

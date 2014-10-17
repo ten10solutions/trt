@@ -4,8 +4,8 @@ import com.thetestpeople.trt.model._
 import com.thetestpeople.trt.model.jenkins._
 import com.thetestpeople.trt.jenkins.trigger.TriggerResult
 import java.net.URI
-import com.thetestpeople.trt.jenkins.importer.JenkinsBuildImportStatus
-import com.thetestpeople.trt.jenkins.importer.JenkinsJobImportStatus
+import com.thetestpeople.trt.jenkins.importer.CiBuildImportStatus
+import com.thetestpeople.trt.jenkins.importer.CiJobImportStatus
 
 trait JenkinsService {
 
@@ -52,7 +52,7 @@ trait JenkinsService {
 
   def getCiBuilds(specId: Id[CiImportSpec]): Seq[CiBuild]
 
-  def getBuildImportStatuses(specId: Id[CiImportSpec]): Seq[JenkinsBuildImportStatus]
+  def getBuildImportStatuses(specId: Id[CiImportSpec]): Seq[CiBuildImportStatus]
 
-  def getJobImportStatus(specId: Id[CiImportSpec]): Option[JenkinsJobImportStatus]
+  def getJobImportStatus(specId: Id[CiImportSpec]): Option[CiJobImportStatus]
 }

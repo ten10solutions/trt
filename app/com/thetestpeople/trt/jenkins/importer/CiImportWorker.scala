@@ -33,7 +33,7 @@ class CiImportWorker(
   }
 
   def run() {
-    logger.debug("Jenkins import worker started")
+    logger.debug("CI import worker started")
     while (continue) {
       val specId = importSpecQueue.take()
       logger.info(s"Checking if there is anything to import from import spec $specId")
@@ -43,11 +43,11 @@ class CiImportWorker(
         case e: Exception ⇒ logger.error(s"Problem importing from import spec $specId", e)
       }
     }
-    logger.debug("Jenkins import worker finished")
+    logger.debug("CI import worker finished")
   }
 
   def stop() {
-    logger.debug("Stopping Jenkins import worker")
+    logger.debug("CI Jenkins import worker")
     continue = false
   }
 

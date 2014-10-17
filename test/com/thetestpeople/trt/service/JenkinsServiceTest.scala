@@ -12,7 +12,7 @@ import com.thetestpeople.trt.model.impl.MockDao
 import java.net.URI
 import com.thetestpeople.trt.utils.http.AlwaysFailingHttp
 import com.thetestpeople.trt.utils.http.Http
-import com.thetestpeople.trt.jenkins.importer.JenkinsImportStatusManager
+import com.thetestpeople.trt.jenkins.importer.CiImportStatusManager
 import com.thetestpeople.trt.jenkins.importer.FakeCiImportQueue
 import com.thetestpeople.trt.service.indexing.LuceneLogIndexer
 

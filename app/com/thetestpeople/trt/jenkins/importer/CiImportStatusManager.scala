@@ -13,14 +13,14 @@ import org.joda.time.DateTime
 /**
  * Stores information about the state of ongoing Jenkins imports.
  */
-class JenkinsImportStatusManager(clock: Clock) {
+class CiImportStatusManager(clock: Clock) {
 
   private val lock: Lock = new ReentrantLock
 
-  private var specStatuses: Map[Id[CiImportSpec], MutableJenkinsSpecImportStatus] = Map()
+  private var specStatuses: Map[Id[CiImportSpec], MutableCiSpecImportStatus] = Map()
 
   def importStarted(id: Id[CiImportSpec], jobUrl: URI) = lock.withLock {
-    specStatuses += id -> new MutableJenkinsSpecImportStatus(id, jobUrl)
+    specStatuses += id -> new MutableCiSpecImportStatus(id, jobUrl)
     specStatuses(id).started()
   }
 
@@ -32,11 +32,11 @@ class JenkinsImportStatusManager(clock: Clock) {
     specStatuses(id).errored(t)
   }
 
-  def getBuildImportStatuses(id: Id[CiImportSpec]): Seq[JenkinsBuildImportStatus] = lock.withLock {
+  def getBuildImportStatuses(id: Id[CiImportSpec]): Seq[CiBuildImportStatus] = lock.withLock {
     specStatuses.get(id).toSeq.flatMap(importStatus ⇒ importStatus.getBuildStatuses.map(_.snapshot))
   }
 
-  def getJobImportStatus(id: Id[CiImportSpec]): Option[JenkinsJobImportStatus] = lock.withLock {
+  def getJobImportStatus(id: Id[CiImportSpec]): Option[CiJobImportStatus] = lock.withLock {
     specStatuses.get(id).map(_.snapshot)
   }
 
@@ -56,13 +56,13 @@ class JenkinsImportStatusManager(clock: Clock) {
     specStatuses(id).buildErrored(buildUrl, t)
   }
 
-  private class MutableJenkinsSpecImportStatus(specId: Id[CiImportSpec], jobUrl: URI) {
+  private class MutableCiSpecImportStatus(specId: Id[CiImportSpec], jobUrl: URI) {
 
     private var updatedAt: DateTime = clock.now
 
     private var state: JobImportState = JobImportState.NotStarted
 
-    private var buildStatuses: Map[URI, MutableJenkinsBuildImportStatus] = Map()
+    private var buildStatuses: Map[URI, MutableCiBuildImportStatus] = Map()
 
     def started() = {
       updatedAt = clock.now
@@ -82,7 +82,7 @@ class JenkinsImportStatusManager(clock: Clock) {
     def getBuildStatuses = buildStatuses.values.toSeq
 
     def buildExists(buildUrl: URI, buildNumber: Int) = {
-      buildStatuses += buildUrl -> new MutableJenkinsBuildImportStatus(buildUrl, buildNumber)
+      buildStatuses += buildUrl -> new MutableCiBuildImportStatus(buildUrl, buildNumber)
     }
 
     def buildStarted(buildUrl: URI) = {
@@ -97,11 +97,11 @@ class JenkinsImportStatusManager(clock: Clock) {
       buildStatuses(buildUrl).buildErrored(t)
     }
 
-    def snapshot = JenkinsJobImportStatus(specId, updatedAt, state)
+    def snapshot = CiJobImportStatus(specId, updatedAt, state)
 
   }
 
-  private class MutableJenkinsBuildImportStatus(val buildUrl: URI, val buildNumber: Int) {
+  private class MutableCiBuildImportStatus(val buildUrl: URI, val buildNumber: Int) {
 
     private var updatedAt: DateTime = clock.now
 
@@ -122,15 +122,15 @@ class JenkinsImportStatusManager(clock: Clock) {
       state = BuildImportState.Errored(t)
     }
 
-    def snapshot = JenkinsBuildImportStatus(buildUrl, buildNumber, updatedAt, state)
+    def snapshot = CiBuildImportStatus(buildUrl, buildNumber, updatedAt, state)
 
   }
 
 }
 
-case class JenkinsBuildImportStatus(buildUrl: URI, buildNumber: Int, updatedAt: DateTime, state: BuildImportState)
+case class CiBuildImportStatus(buildUrl: URI, buildNumber: Int, updatedAt: DateTime, state: BuildImportState)
 
-case class JenkinsJobImportStatus(specId: Id[CiImportSpec], updatedAt: DateTime, state: JobImportState)
+case class CiJobImportStatus(specId: Id[CiImportSpec], updatedAt: DateTime, state: JobImportState)
 
 sealed trait BuildImportState
 
