@@ -16,7 +16,7 @@ class TeamCityUrlParserTest extends FlatSpec with Matchers {
   "TeamCity URL parser" should "find the build configuration and server URL" in {
     val teamCityUrl = uri("https://teamcity.jetbrains.com/viewType.html?buildTypeId=NetCommunityProjects_Femah_Commit")
 
-    val Right(TeamCityConfiguration(serverUrl, buildTypeId)) = TeamCityUrlParser.parse(teamCityUrl)
+    val Right(TeamCityJobLink(serverUrl, buildTypeId)) = TeamCityUrlParser.parse(teamCityUrl)
 
     serverUrl should equal(uri("https://teamcity.jetbrains.com"))
     buildTypeId should equal("NetCommunityProjects_Femah_Commit")

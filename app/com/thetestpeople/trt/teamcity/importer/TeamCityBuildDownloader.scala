@@ -15,7 +15,7 @@ class TeamCityDownloadException(message: String, cause: Throwable = null) extend
 /**
  * Downloads information about TeamCity builds using its REST API
  */
-class TeamCityBuildDownloader(http: Http, configuration: TeamCityConfiguration, credentialsOpt: Option[Credentials] = None) extends HasLogger {
+class TeamCityBuildDownloader(http: Http, jobLink: TeamCityJobLink, credentialsOpt: Option[Credentials] = None) extends HasLogger {
 
   private val authRoute = if (credentialsOpt.isDefined) "basicAuth" else "guestAuth"
 
@@ -36,7 +36,7 @@ class TeamCityBuildDownloader(http: Http, configuration: TeamCityConfiguration, 
    */
   @throws[TeamCityDownloadException]
   def getBuild(buildLink: TeamCityBuildLink): TeamCityBuild = {
-    val url = configuration.relativePath(buildLink.buildPath)
+    val url = jobLink.relativePath(buildLink.buildPath)
     val xml = fetchXml(url)
     var build = parseBuildXml(url, xml)
     for (testOccurrencesPath ← build.testOccurrencesPathOpt) {
@@ -47,9 +47,9 @@ class TeamCityBuildDownloader(http: Http, configuration: TeamCityConfiguration, 
   }
 
   private def buildsUrl: URI = {
-    val builder = new URIBuilder(configuration.serverUrl)
+    val builder = new URIBuilder(jobLink.serverUrl)
     builder.setPath(s"/$authRoute/app/rest/builds/")
-    builder.addParameter("locator", s"buildType:${configuration.buildTypeId}")
+    builder.addParameter("locator", s"buildType:${jobLink.buildTypeId}")
     builder.build
   }
 
@@ -111,13 +111,13 @@ class TeamCityBuildDownloader(http: Http, configuration: TeamCityConfiguration, 
   }
 
   private def getTestOccurrence(occurrencePath: String): TeamCityTestOccurrence = {
-    val url = configuration.relativePath(occurrencePath)
+    val url = jobLink.relativePath(occurrencePath)
     val xml = fetchXml(url)
     parseTestOccurrenceXml(url, xml)
   }
 
   private def getTestOccurrencePaths(occurrencesPath: String): TeamCityTestOccurrences = {
-    val url = configuration.relativePath(occurrencesPath)
+    val url = jobLink.relativePath(occurrencesPath)
     val xml = fetchXml(url)
     parseTestOccurrencesXml(url, xml)
   }

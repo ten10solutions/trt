@@ -8,12 +8,12 @@ import java.{ util ⇒ ju }
 
 object TeamCityUrlParser {
 
-  def parse(url: URI): Either[String, TeamCityConfiguration] = {
+  def parse(url: URI): Either[String, TeamCityJobLink] = {
     val builder = new URIBuilder(url)
     val queryParams = getQueryParams(builder)
     getQueryParams(builder).get("buildTypeId") match {
       case None              ⇒ Left("No 'buildTypeId' query parameter found")
-      case Some(buildTypeId) ⇒ Right(TeamCityConfiguration(getServerUrl(builder), buildTypeId))
+      case Some(buildTypeId) ⇒ Right(TeamCityJobLink(getServerUrl(builder), buildTypeId))
     }
   }
 
