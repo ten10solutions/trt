@@ -9,13 +9,22 @@ import org.joda.time.DateTime
 import org.joda.time.DateTimeZone.forOffsetHours
 import com.thetestpeople.trt.utils.UriUtils._
 import org.joda.time.Duration
+import scala.xml.Elem
 
 @RunWith(classOf[JUnitRunner])
 class TeamCityXmlParserTest extends FlatSpec with Matchers {
 
+  val parser = new TeamCityXmlParser
+
+  "Parsing TeamCity build type XML" should "correctly capture the information" in {
+    val buildType = parser.parseBuildType(getXml("buildType.xml"))
+    buildType.name should equal("Build")
+    buildType.projectName should equal("Test Reporty Thing")
+    buildType.buildsPathOpt should equal(Some("/guestAuth/app/rest/buildTypes/id:TestReportyThing_Build/builds/"))
+  }
+
   "Parsing a TeamCity list of builds XML" should "correctly capture the builds" in {
-    val parser = new TeamCityXmlParser
-    val builds = parser.parseBuildLinks(TestUtils.loadXmlFromClasspath("/teamcity/builds.xml"))
+    val builds = parser.parseBuildLinks(getXml("builds.xml"))
 
     builds should equal(
       Seq(
@@ -28,8 +37,7 @@ class TeamCityXmlParserTest extends FlatSpec with Matchers {
   }
 
   "Parsing a TeamCity build XML" should "correctly capture build information" in {
-    val parser = new TeamCityXmlParser
-    val build = parser.parseBuild(TestUtils.loadXmlFromClasspath("/teamcity/build-145897.xml"))
+    val build = parser.parseBuild(getXml("build-145897.xml"))
 
     build.url should equal(uri("https://teamcity.jetbrains.com/viewLog.html?buildId=145897&buildTypeId=NetCommunityProjects_Femah_Commit"))
     build.startDate should equal(new DateTime(2014, 7, 16, 14, 35, 54, forOffsetHours(4)))
@@ -39,8 +47,7 @@ class TeamCityXmlParserTest extends FlatSpec with Matchers {
   }
 
   "Parsing a TeamCity list of test occurrences XML" should "correctly capture the paths to the test occurrences" in {
-    val parser = new TeamCityXmlParser
-    val TeamCityTestOccurrences(Some(nextPagePath), paths) = parser.parseTestOccurrences(TestUtils.loadXmlFromClasspath("/teamcity/testOccurrences.xml"))
+    val TeamCityTestOccurrences(Some(nextPagePath), paths) = parser.parseTestOccurrences(getXml("testOccurrences.xml"))
 
     nextPagePath should equal("/httpAuth/app/rest/testOccurrences?locator=count:100,start:200,build:(id:157593)")
     paths should equal(Seq(
@@ -49,8 +56,7 @@ class TeamCityXmlParserTest extends FlatSpec with Matchers {
   }
 
   "Parsing TeamCity test occurrence XML" should "correctly capture the test occurrence details" in {
-    val parser = new TeamCityXmlParser
-    val testOccurrence = parser.parseTestOccurrence(TestUtils.loadXmlFromClasspath("/teamcity/testOccurrence.xml"))
+    val testOccurrence = parser.parseTestOccurrence(getXml("testOccurrence.xml"))
 
     TeamCityTestOccurrence(
       testName = "TestSuite: com.turn.ttorrent.common.TorrentTest.torrent_from_multiple_files",
@@ -59,4 +65,6 @@ class TeamCityXmlParserTest extends FlatSpec with Matchers {
       durationOpt = Some(Duration.millis(72)))
   }
 
+  private def getXml(filename: String): Elem = TestUtils.loadXmlFromClasspath("/teamcity/" + filename)
+  
 }

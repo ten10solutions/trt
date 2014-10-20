@@ -22,13 +22,20 @@ class TeamCityBuildDownloader(http: Http, jobLink: TeamCityJobLink, credentialsO
   private val parser = new TeamCityXmlParser
 
   /**
-   * Get the list of builds that are available to download
+   * Get information about a build type (configuration), and list of builds that are available to download
    */
   @throws[TeamCityDownloadException]
-  def getBuildLinks(): Seq[TeamCityBuildLink] = {
-    val url = buildsUrl
+  def getBuildType(): (TeamCityBuildType, Seq[TeamCityBuildLink]) = {
+    val url = buildTypeUrl
     val xml = fetchXml(url)
-    parseBuildListXml(url, xml)
+    val buildType = parseBuildTypeXml(url, xml)
+    val buildLinks =
+      buildType.buildsPathOpt.toSeq.flatMap { buildsPath ⇒
+        val url = jobLink.relativePath(buildsPath)
+        val xml = fetchXml(url)
+        parseBuildListXml(url, xml)
+      }
+    (buildType, buildLinks)
   }
 
   /**
@@ -46,10 +53,9 @@ class TeamCityBuildDownloader(http: Http, jobLink: TeamCityJobLink, credentialsO
     build
   }
 
-  private def buildsUrl: URI = {
+  private def buildTypeUrl: URI = {
     val builder = new URIBuilder(jobLink.serverUrl)
-    builder.setPath(s"/$authRoute/app/rest/builds/")
-    builder.addParameter("locator", s"buildType:${jobLink.buildTypeId}")
+    builder.setPath(s"/$authRoute/app/rest/buildTypes/id:${jobLink.buildTypeId}")
     builder.build
   }
 
@@ -67,6 +73,14 @@ class TeamCityBuildDownloader(http: Http, jobLink: TeamCityJobLink, credentialsO
     catch {
       case e: TeamCityXmlParseException ⇒
         throw new TeamCityDownloadException(s"Problem parsing TeamCity build list XML from $url", e)
+    }
+
+  private def parseBuildTypeXml(url: URI, xml: Elem) =
+    try
+      parser.parseBuildType(xml)
+    catch {
+      case e: TeamCityXmlParseException ⇒
+        throw new TeamCityDownloadException(s"Problem parsing TeamCity build type XML from $url", e)
     }
 
   private def parseBuildXml(url: URI, xml: Elem) =

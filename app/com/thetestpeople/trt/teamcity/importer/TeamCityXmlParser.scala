@@ -11,6 +11,13 @@ class TeamCityXmlParser {
 
   private val dateParser = DateTimeFormat.forPattern("yyyyMMdd'T'HHmmssZ").withOffsetParsed
 
+  def parseBuildType(elem: Elem) =
+    TeamCityBuildType(
+      name = getField(elem, "@name"),
+      projectName = getField(elem, "@projectName"),
+      buildsPathOpt = (elem \ "builds").headOption.map(_ \ "@href").map(_.text),
+      webUrl = uri(getField(elem, "@webUrl")))
+
   def parseBuild(elem: Elem): TeamCityBuild = {
     val url = uri(getField(elem, "@webUrl"))
     val startDate = parseDate(getField(elem, "startDate"))

@@ -15,6 +15,7 @@ import com.thetestpeople.trt.teamcity.importer.TeamCityDownloadException
 import com.thetestpeople.trt.teamcity.importer.TeamCityUrlParser
 import com.thetestpeople.trt.utils.HasLogger
 import com.thetestpeople.trt.utils.http.Http
+import com.thetestpeople.trt.teamcity.importer.TeamCityBuildType
 
 class TeamCityImporter(clock: Clock,
     http: Http,
@@ -30,21 +31,22 @@ class TeamCityImporter(clock: Clock,
     val teamCityConfiguration = TeamCityUrlParser.parse(spec.jobUrl).right.get
     val buildDownloader = new TeamCityBuildDownloader(http, teamCityConfiguration)
 
-    val buildLinks = buildDownloader.getBuildLinks().filterNot(alreadyImported)
+    val (buildType, allBuildLinks) = buildDownloader.getBuildType()
+    val buildLinks = allBuildLinks.filterNot(alreadyImported)
 
     for (link ← buildLinks)
       importStatusManager.buildExists(spec.id, link.webUrl, 1)
     for (link ← buildLinks)
-      importBuild(link, spec, buildDownloader)
+      importBuild(link, spec, buildDownloader, buildType)
 
     transaction { dao.updateCiImportSpec(spec.id, Some(clock.now)) }
   }
 
-  private def importBuild(buildLink: TeamCityBuildLink, importSpec: CiImportSpec, buildDownloader: TeamCityBuildDownloader) {
+  private def importBuild(buildLink: TeamCityBuildLink, importSpec: CiImportSpec, buildDownloader: TeamCityBuildDownloader, buildType: TeamCityBuildType) {
     val buildUrl = buildLink.webUrl
     importStatusManager.buildStarted(importSpec.id, buildUrl)
     try {
-      val batchIdOpt = doImportBuild(buildLink, importSpec, buildDownloader)
+      val batchIdOpt = doImportBuild(buildLink, importSpec, buildDownloader, buildType)
       importStatusManager.buildComplete(importSpec.id, buildUrl, batchIdOpt)
     } catch {
       case e: Exception ⇒
@@ -56,14 +58,15 @@ class TeamCityImporter(clock: Clock,
   /**
    * @return None if build had no associated test executions.
    */
-  private def doImportBuild(buildLink: TeamCityBuildLink, importSpec: CiImportSpec, buildDownloader: TeamCityBuildDownloader): Option[Id[Batch]] = {
+  private def doImportBuild(buildLink: TeamCityBuildLink, importSpec: CiImportSpec, buildDownloader: TeamCityBuildDownloader, buildType: TeamCityBuildType): Option[Id[Batch]] = {
     val buildUrl = buildLink.webUrl
     val build = buildDownloader.getBuild(buildLink)
 
     val batch = new TeamCityBatchCreator(importSpec.configurationOpt).createBatch(build)
     val batchId = batchRecorder.recordBatch(batch).id
 
-    val ciJob = CiJob(url = importSpec.jobUrl, name = "TeamCity job")
+    val jobName = s"${buildType.projectName}/${buildType.name}"
+    val ciJob = CiJob(url = buildType.webUrl, name = jobName )
     val jobId = transaction { dao.ensureCiJob(ciJob) }
     val ciBuild = CiBuild(batchId, clock.now, buildUrl, 17, jobId, Some(importSpec.id))
     transaction { dao.newCiBuild(ciBuild) }

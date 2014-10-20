@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<buildType id="TestReportyThing_Build" name="Build" projectName="Test Reporty Thing" projectId="TestReportyThing"
+  href="/guestAuth/app/rest/buildTypes/id:TestReportyThing_Build" webUrl="http://localhost:8111/viewType.html?buildTypeId=TestReportyThing_Build">
+  <project id="TestReportyThing" name="Test Reporty Thing" parentProjectId="_Root" href="/guestAuth/app/rest/projects/id:TestReportyThing" webUrl="http://localhost:8111/project.html?projectId=TestReportyThing" />
+  <vcs-root-entries>
+    <vcs-root-entry id="TestReportyThing_GitGithubComThetestpeopleTrtGitRefsHeadsMaster">
+      <vcs-root id="TestReportyThing_GitGithubComThetestpeopleTrtGitRefsHeadsMaster" name="git@github.com:thetestpeople/trt.git#refs/heads/master"
+        href="/guestAuth/app/rest/vcs-roots/id:TestReportyThing_GitGithubComThetestpeopleTrtGitRefsHeadsMaster" />
+      <checkout-rules></checkout-rules>
+    </vcs-root-entry>
+  </vcs-root-entries>
+  <settings count="16">
+    <property name="allowExternalStatus" value="false" />
+    <property name="artifactRules" value="" />
+    <property name="buildNumberCounter" value="12" />
+    <property name="buildNumberPattern" value="%build.counter%" />
+    <property name="checkoutDirectory" />
+    <property name="checkoutMode" value="ON_SERVER" />
+    <property name="cleanBuild" value="false" />
+    <property name="enableHangingBuildsDetection" value="true" />
+    <property name="executionTimeoutMin" value="0" />
+    <property name="maximumNumberOfBuilds" value="0" />
+    <property name="shouldFailBuildIfTestsFailed" value="true" />
+    <property name="shouldFailBuildOnAnyErrorMessage" value="false" />
+    <property name="shouldFailBuildOnBadExitCode" value="true" />
+    <property name="shouldFailBuildOnOOMEOrCrash" value="true" />
+    <property name="showDependenciesChanges" value="false" />
+    <property name="vcsLabelingBranchFilter" value="+:&lt;default&gt;" />
+  </settings>
+  <parameters count="0" href="/app/rest/buildTypes/id:TestReportyThing_Build/parameters" />
+  <steps count="2">
+    <step id="RUNNER_1" name="Bower install" type="simpleRunner">
+      <properties>
+        <property name="script.content" value="bower --config.interactive=false install -f" />
+        <property name="teamcity.step.mode" value="default" />
+        <property name="use.custom.script" value="true" />
+      </properties>
+    </step>
+    <step id="RUNNER_2" name="sbt test dist" type="simpleRunner">
+      <properties>
+        <property name="script.content" value="sbt -Dsbt.log.noformat=true test dist debian:package-bin" />
+        <property name="teamcity.step.mode" value="default" />
+        <property name="use.custom.script" value="true" />
+      </properties>
+    </step>
+  </steps>
+  <features count="1">
+    <feature id="BUILD_EXT_1" type="xml-report-plugin">
+      <properties>
+        <property name="xmlReportParsing.reportDirs" value="**/target/test-reports/*.xml" />
+        <property name="xmlReportParsing.reportType" value="surefire" />
+      </properties>
+    </feature>
+  </features>
+  <triggers count="1">
+    <trigger id="vcsTrigger" type="vcsTrigger">
+      <properties>
+        <property name="quietPeriodMode" value="DO_NOT_USE" />
+      </properties>
+    </trigger>
+  </triggers>
+  <snapshot-dependencies />
+  <artifact-dependencies />
+  <agent-requirements />
+  <builds href="/guestAuth/app/rest/buildTypes/id:TestReportyThing_Build/builds/" />
+</buildType>

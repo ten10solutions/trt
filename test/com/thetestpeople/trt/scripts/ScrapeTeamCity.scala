@@ -23,8 +23,8 @@ object ScrapeTeamCity extends App {
   val http = new WsHttp(wsClient)
   val downloader = new TeamCityBuildDownloader(http, jobLink)
 
-  val links = downloader.getBuildLinks()
-  for (link ← links) {
+  val (buildType, buildLinks) = downloader.getBuildType()
+  for (link ← buildLinks) {
     val build = downloader.getBuild(link)
 
     val batchCreator = new TeamCityBatchCreator(Some(Configuration.Default))
