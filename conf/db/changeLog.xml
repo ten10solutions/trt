@@ -396,5 +396,11 @@
   <changeSet author="matt" id="drop-null-constraint-jenkins_builds-build_number">
     <dropNotNullConstraint tableName="jenkins_builds" columnName="build_number" columnDataType="INT" />  
   </changeSet>
+
+  <changeSet author="matt" id="rename-jenkins-tables">
+    <renameTable oldTableName="jenkins_builds" newTableName="ci_builds"/>
+    <renameTable oldTableName="jenkins_jobs" newTableName="ci_jobs"/>
+    <renameTable oldTableName="jenkins_import_specs" newTableName="ci_import_specs"/>
+  </changeSet>
   
 </databaseChangeLog>

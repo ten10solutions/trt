@@ -121,7 +121,7 @@ trait Mappings { self: SlickDao ⇒
 
   }
 
-  class CiJobMapping(tag: Tag) extends Table[CiJob](tag, "jenkins_jobs") {
+  class CiJobMapping(tag: Tag) extends Table[CiJob](tag, "ci_jobs") {
 
     def id = column[Id[CiJob]]("ID", O.PrimaryKey, O.NotNull, O.AutoInc)
     def url = column[URI]("url", O.NotNull)
@@ -133,7 +133,7 @@ trait Mappings { self: SlickDao ⇒
 
   }
 
-  class CiBuildMapping(tag: Tag) extends Table[CiBuild](tag, "jenkins_builds") {
+  class CiBuildMapping(tag: Tag) extends Table[CiBuild](tag, "ci_builds") {
 
     def batchId = column[Id[Batch]]("batch_id", O.PrimaryKey, O.NotNull)
     def importTime = column[DateTime]("import_time", O.NotNull)
@@ -177,7 +177,7 @@ trait Mappings { self: SlickDao ⇒
 
   }
   
-  class CiImportSpecMapping(tag: Tag) extends Table[CiImportSpec](tag, "jenkins_import_specs") {
+  class CiImportSpecMapping(tag: Tag) extends Table[CiImportSpec](tag, "ci_import_specs") {
 
     def id = column[Id[CiImportSpec]]("id", O.PrimaryKey, O.NotNull, O.AutoInc)
     def ciType = column[CiType]("ci_type", O.NotNull)

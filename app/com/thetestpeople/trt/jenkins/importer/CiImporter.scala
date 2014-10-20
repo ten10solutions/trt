@@ -27,11 +27,7 @@ class CiImporter(
     logger.debug(s"Examining ${spec.jobUrl} for new builds")
     importStatusManager.importStarted(spec.id, spec.jobUrl)
     try {
-      spec.ciType match {
-        case CiType.Jenkins  ⇒ jenkinsImporter.importBuilds(spec)
-        case CiType.TeamCity ⇒ teamCityImporter.importBuilds(spec)
-        case t               ⇒ logger.warn(s"Unknown CI type $t for spec $specId, skipping")
-      }
+      doImportBuilds(spec)
       importStatusManager.importComplete(spec.id)
     } catch {
       case e: Exception ⇒
@@ -39,6 +35,13 @@ class CiImporter(
         importStatusManager.importErrored(spec.id, e)
     }
   }
+
+  private def doImportBuilds(spec: CiImportSpec) =
+    spec.ciType match {
+      case CiType.Jenkins  ⇒ jenkinsImporter.importBuilds(spec)
+      case CiType.TeamCity ⇒ teamCityImporter.importBuilds(spec)
+      case t               ⇒ logger.warn(s"Unknown CI type $t for spec ${spec.id}, skipping")
+    }
 
   private def jenkinsImporter = new JenkinsImporter(clock, http, dao, importStatusManager, batchRecorder)
   private def teamCityImporter = new TeamCityImporter(clock, http, dao, importStatusManager, batchRecorder)

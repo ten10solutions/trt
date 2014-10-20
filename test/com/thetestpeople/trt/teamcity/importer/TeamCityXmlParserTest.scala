@@ -40,6 +40,7 @@ class TeamCityXmlParserTest extends FlatSpec with Matchers {
     val build = parser.parseBuild(getXml("build-145897.xml"))
 
     build.url should equal(uri("https://teamcity.jetbrains.com/viewLog.html?buildId=145897&buildTypeId=NetCommunityProjects_Femah_Commit"))
+    build.state should equal("finished")
     build.startDate should equal(new DateTime(2014, 7, 16, 14, 35, 54, forOffsetHours(4)))
     build.finishDate should equal(new DateTime(2014, 7, 16, 14, 36, 46, forOffsetHours(4)))
     build.number should equal("0.1.78.209")

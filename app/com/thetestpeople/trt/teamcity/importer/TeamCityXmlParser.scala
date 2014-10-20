@@ -20,6 +20,7 @@ class TeamCityXmlParser {
 
   def parseBuild(elem: Elem): TeamCityBuild = {
     val url = uri(getField(elem, "@webUrl"))
+    val state = getField(elem, "@state")
     val startDate = parseDate(getField(elem, "startDate"))
     val finishDate = parseDate(getField(elem, "finishDate"))
     val hasTests = (elem \ "testOccurrences").nonEmpty
@@ -27,6 +28,7 @@ class TeamCityXmlParser {
     val number = getField(elem, "@number")
     TeamCityBuild(
       url = url,
+      state = state,
       startDate = startDate,
       finishDate = finishDate,
       number = number,
