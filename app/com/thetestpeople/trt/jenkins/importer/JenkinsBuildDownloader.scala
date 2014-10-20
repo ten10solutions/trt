@@ -103,7 +103,7 @@ class JenkinsBuildDownloader(
       None
   }
 
-  private def parseBuild(buildUrl: URI, buildXml: Elem): BuildSummary =
+  private def parseBuild(buildUrl: URI, buildXml: Elem): JenkinsBuildSummary =
     try
       new JenkinsBuildXmlParser().parseBuild(buildXml)
     catch {

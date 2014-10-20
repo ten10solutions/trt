@@ -4,7 +4,7 @@ import org.joda.time.Duration
 import org.joda.time.DateTime
 import java.net.URI
 
-case class BuildSummary(
+case class JenkinsBuildSummary(
   url: URI,
   durationOpt: Option[Duration],
   nameOpt: Option[String],

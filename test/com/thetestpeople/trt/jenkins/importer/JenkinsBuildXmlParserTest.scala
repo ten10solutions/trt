@@ -40,7 +40,7 @@ class JenkinsBuildXmlParserTest extends FlatSpec with Matchers {
     buildSummary.isBuilding should be(false)
   }
 
-  private def parse(xml: Elem): BuildSummary = new JenkinsBuildXmlParser().parseBuild(xml)
+  private def parse(xml: Elem): JenkinsBuildSummary = new JenkinsBuildXmlParser().parseBuild(xml)
 
   private def millis(n: Int): Duration = n.millis
 

@@ -49,7 +49,7 @@ class JenkinsBatchCreatorTest extends FlatSpec with Matchers {
     resultOpt: Option[String] = Some("PASSED"),
     hasTestReport: Boolean = true,
     isBuilding: Boolean = false) =
-    BuildSummary(
+    JenkinsBuildSummary(
       url = url,
       durationOpt = durationOpt,
       nameOpt = nameOpt,

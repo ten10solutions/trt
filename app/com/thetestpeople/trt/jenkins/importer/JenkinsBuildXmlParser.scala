@@ -9,7 +9,7 @@ import java.net.URI
 class JenkinsBuildXmlParser {
 
   @throws[ParseException]
-  def parseBuild(elem: Elem): BuildSummary = {
+  def parseBuild(elem: Elem): JenkinsBuildSummary = {
     val url = getFieldOpt(elem, "url").getOrElse(
       throw new ParseException("Could not find a <url> element"))
     val durationOpt = getFieldOpt(elem, "duration").map(parseLong).map(Duration.millis)
@@ -20,7 +20,7 @@ class JenkinsBuildXmlParser {
     val isBuilding = getFieldOpt(elem, "building").getOrElse(
       throw new ParseException("Could not find a <building> element")).toBoolean
 
-    BuildSummary(
+    JenkinsBuildSummary(
       url = new URI(url),
       durationOpt = durationOpt,
       nameOpt = nameOpt,
