@@ -40,8 +40,8 @@ class CiImportStatusManager(clock: Clock) {
     specStatuses.get(id).map(_.snapshot)
   }
 
-  def buildExists(id: Id[CiImportSpec], buildUrl: URI, buildNumber: Int) = lock.withLock {
-    specStatuses(id).buildExists(buildUrl, buildNumber)
+  def buildExists(id: Id[CiImportSpec], buildUrl: URI, buildNumberOpt: Option[Int]) = lock.withLock {
+    specStatuses(id).buildExists(buildUrl, buildNumberOpt)
   }
 
   def buildStarted(id: Id[CiImportSpec], buildUrl: URI) = lock.withLock {
@@ -81,8 +81,8 @@ class CiImportStatusManager(clock: Clock) {
 
     def getBuildStatuses = buildStatuses.values.toSeq
 
-    def buildExists(buildUrl: URI, buildNumber: Int) = {
-      buildStatuses += buildUrl -> new MutableCiBuildImportStatus(buildUrl, buildNumber)
+    def buildExists(buildUrl: URI, buildNumberOpt: Option[Int]) = {
+      buildStatuses += buildUrl -> new MutableCiBuildImportStatus(buildUrl, buildNumberOpt)
     }
 
     def buildStarted(buildUrl: URI) = {
@@ -101,7 +101,7 @@ class CiImportStatusManager(clock: Clock) {
 
   }
 
-  private class MutableCiBuildImportStatus(val buildUrl: URI, val buildNumber: Int) {
+  private class MutableCiBuildImportStatus(val buildUrl: URI, val buildNumberOpt: Option[Int]) {
 
     private var updatedAt: DateTime = clock.now
 
@@ -122,13 +122,13 @@ class CiImportStatusManager(clock: Clock) {
       state = BuildImportState.Errored(t)
     }
 
-    def snapshot = CiBuildImportStatus(buildUrl, buildNumber, updatedAt, state)
+    def snapshot = CiBuildImportStatus(buildUrl, buildNumberOpt, updatedAt, state)
 
   }
 
 }
 
-case class CiBuildImportStatus(buildUrl: URI, buildNumber: Int, updatedAt: DateTime, state: BuildImportState)
+case class CiBuildImportStatus(buildUrl: URI, buildNumberOpt: Option[Int], updatedAt: DateTime, state: BuildImportState)
 
 case class CiJobImportStatus(specId: Id[CiImportSpec], updatedAt: DateTime, state: JobImportState)
 

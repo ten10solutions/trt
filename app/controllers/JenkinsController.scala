@@ -169,7 +169,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
     val dbBuilds = service.getCiBuilds(spec.id).filterNot(inMemory)
     val dbInfos = dbBuilds.map(makeBuildImportInfo)
 
-    (dbInfos ++ inMemoryInfos).sortBy(_.buildNumber).reverse
+    (dbInfos ++ inMemoryInfos).sortBy(_.buildNumberOpt).reverse
   }
 
   private def makeBuildImportInfoFromImportStatus(status: CiBuildImportStatus) = {
@@ -190,7 +190,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
     }
     JenkinsBuildImportInfo(
       buildUrl = status.buildUrl,
-      buildNumber = status.buildNumber,
+      buildNumberOpt = status.buildNumberOpt,
       importState = importState,
       updatedAtTime = status.updatedAt,
       batchIdOpt = batchIdOpt,
@@ -201,7 +201,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
   private def makeBuildImportInfo(build: CiBuild) =
     JenkinsBuildImportInfo(
       buildUrl = build.buildUrl,
-      buildNumber = build.buildNumber,
+      buildNumberOpt = build.buildNumberOpt,
       importState = viewModel.ImportState.Complete,
       updatedAtTime = build.importTime,
       batchIdOpt = Some(build.batchId))

@@ -35,7 +35,7 @@ class TeamCityImporter(clock: Clock,
     val buildLinks = allBuildLinks.filterNot(alreadyImported)
 
     for (link ← buildLinks)
-      importStatusManager.buildExists(spec.id, link.webUrl, 1)
+      importStatusManager.buildExists(spec.id, link.webUrl, buildNumberOpt = None)
     for (link ← buildLinks)
       importBuild(link, spec, buildDownloader, buildType)
 
@@ -65,10 +65,10 @@ class TeamCityImporter(clock: Clock,
     val batch = new TeamCityBatchCreator(importSpec.configurationOpt).createBatch(build)
     val batchId = batchRecorder.recordBatch(batch).id
 
-    val jobName = s"${buildType.projectName}/${buildType.name}"
+    val jobName = s"${buildType.projectName} > ${buildType.name}"
     val ciJob = CiJob(url = buildType.webUrl, name = jobName )
     val jobId = transaction { dao.ensureCiJob(ciJob) }
-    val ciBuild = CiBuild(batchId, clock.now, buildUrl, 17, jobId, Some(importSpec.id))
+    val ciBuild = CiBuild(batchId, clock.now, buildUrl, None, jobId, Some(importSpec.id))
     transaction { dao.newCiBuild(ciBuild) }
     Some(batchId)
   }

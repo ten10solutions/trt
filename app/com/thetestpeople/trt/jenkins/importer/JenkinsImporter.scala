@@ -29,7 +29,7 @@ class JenkinsImporter(clock: Clock,
     val buildLinks = job.buildLinks.filterNot(alreadyImported).sortBy(_.buildNumber).reverse
 
     for (link ← buildLinks)
-      importStatusManager.buildExists(spec.id, link.buildUrl, link.buildNumber)
+      importStatusManager.buildExists(spec.id, link.buildUrl, Some(link.buildNumber))
     for (link ← buildLinks)
       importBuild(link, job, spec, buildDownloader)
 
@@ -68,7 +68,7 @@ class JenkinsImporter(clock: Clock,
 
     val ciJob = CiJob(url = importSpec.jobUrl, name = job.name)
     val jobId = transaction { dao.ensureCiJob(ciJob) }
-    val ciBuild = CiBuild(batchId, clock.now, buildUrl, buildLink.buildNumber, jobId, Some(importSpec.id))
+    val ciBuild = CiBuild(batchId, clock.now, buildUrl, Some(buildLink.buildNumber), jobId, Some(importSpec.id))
     transaction { dao.newCiBuild(ciBuild) }
     Some(batchId)
   }

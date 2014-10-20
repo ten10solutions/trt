@@ -79,7 +79,7 @@ trait CiDaoTest { self: AbstractDaoTest ⇒
     val build = CiBuild(
       jobId = jobId,
       batchId = batchId,
-      buildNumber = DummyData.BuildNumber,
+      buildNumberOpt = Some(DummyData.BuildNumber),
       importTime = DummyData.ImportTime,
       buildUrl = DummyData.BuildUrl,
       importSpecIdOpt = Some(specId))

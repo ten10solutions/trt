@@ -392,5 +392,9 @@
       </column>
     </addColumn>
   </changeSet>
+
+  <changeSet author="matt" id="drop-null-constraint-jenkins_builds-build_number">
+    <dropNotNullConstraint tableName="jenkins_builds" columnName="build_number" columnDataType="INT" />  
+  </changeSet>
   
 </databaseChangeLog>

@@ -112,9 +112,9 @@
   <th class="batch-col">Batch</th>
 </tr>
 
-@for(build <- builds) {
+@for((build, buildIndex) <- builds.zipWithIndex) {
   <tr>
-    <td class="build-number-cell"><a href="@build.buildUrl">#@build.buildNumber <i class="fa fa-external-link"></i></a></td>
+    <td class="build-number-cell">@for(buildNumber <- build.buildNumberOpt){<a href="@build.buildUrl">#@buildNumber <i class="fa fa-external-link"></i></a>}</td>
     <td class="status-cell">@build.importState.description 
       @if(build.importState == ImportState.NotStarted) {
         @*
@@ -146,12 +146,12 @@
     <td class="summary-cell">@for(summary <- build.summaryOpt) { @summary }
       @for(details <- build.detailsOpt) {
         <br/>
-        <button id="show-build-details-button-@{build.buildNumber}" class="btn btn-default" title="Show details"><i class="glyphicon glyphicon-plus"></i> Show details</button>
-        <button id="hide-build-details-button-@{build.buildNumber}" class="btn btn-default" title="Hide details" style="display: none"><i class="glyphicon glyphicon-minus"> </i> Hide details</button>
-        <pre id="build-details-@{build.buildNumber}" style="width: 800px; display: none">@details</pre>
+        <button id="show-build-details-button-@{buildIndex}" class="btn btn-default" title="Show details"><i class="glyphicon glyphicon-plus"></i> Show details</button>
+        <button id="hide-build-details-button-@{buildIndex}" class="btn btn-default" title="Hide details" style="display: none"><i class="glyphicon glyphicon-minus"> </i> Hide details</button>
+        <pre id="build-details-@{buildIndex}" style="width: 800px; display: none">@details</pre>
         <script>
           $(document).ready(function() {
-            setUpDetailsToggleButton('build-details-@{build.buildNumber}', 'show-build-details-button-@{build.buildNumber}', 'hide-build-details-button-@{build.buildNumber}')
+            setUpDetailsToggleButton('build-details-@{buildIndex}', 'show-build-details-button-@{buildIndex}', 'hide-build-details-button-@{buildIndex}')
           });
         </script>
       }

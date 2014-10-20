@@ -11,6 +11,6 @@ case class CiBuild(
   batchId: Id[Batch],
   importTime: DateTime,
   buildUrl: URI,
-  buildNumber: Int,
+  buildNumberOpt: Option[Int],
   jobId: Id[CiJob],
   importSpecIdOpt: Option[Id[CiImportSpec]])

@@ -57,10 +57,10 @@ class CiImportStatusManagerTest extends FlatSpec with Matchers {
     val specId = Id[CiImportSpec](1)
     statusManager.importStarted(specId, DummyData.JobUrl)
 
-    statusManager.buildExists(specId, DummyData.BuildUrl, DummyData.BuildNumber)
+    statusManager.buildExists(specId, DummyData.BuildUrl, Some(DummyData.BuildNumber))
 
     val Seq(buildStatus1) = statusManager.getBuildImportStatuses(specId)
-    buildStatus1.buildNumber should equal(DummyData.BuildNumber)
+    buildStatus1.buildNumberOpt should equal(Some(DummyData.BuildNumber))
     buildStatus1.buildUrl should equal(DummyData.BuildUrl)
     buildStatus1.updatedAt should equal(clock.now)
     buildStatus1.state should equal(BuildImportState.NotStarted)

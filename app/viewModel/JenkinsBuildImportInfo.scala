@@ -8,7 +8,7 @@ import com.thetestpeople.trt.model.Batch
 
 case class JenkinsBuildImportInfo(
     buildUrl: URI,
-    buildNumber: Int,
+    buildNumberOpt: Option[Int],
     importState: ImportState,
     updatedAtTime: DateTime,
     batchIdOpt: Option[Id[Batch]] = None,
