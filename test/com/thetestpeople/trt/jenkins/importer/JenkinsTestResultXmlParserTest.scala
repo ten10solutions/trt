@@ -6,6 +6,11 @@ import org.junit.runner.RunWith
 import org.scalatest._
 import org.scalatest.junit.JUnitRunner
 import java.net.URI
+import com.thetestpeople.trt.importer.jenkins.JenkinsTestResultXmlParser
+import com.thetestpeople.trt.importer.jenkins.TestResult
+import com.thetestpeople.trt.importer.jenkins.Suite
+import com.thetestpeople.trt.importer.jenkins.OrdinaryTestResult
+import com.thetestpeople.trt.importer.jenkins.MatrixTestResult
 
 @RunWith(classOf[JUnitRunner])
 class JenkinsTestResultXmlParserTest extends FlatSpec with Matchers {

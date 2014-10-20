@@ -12,6 +12,7 @@ import com.thetestpeople.trt.model._
 import com.thetestpeople.trt.model.jenkins.CiImportSpec
 import com.thetestpeople.trt.model.impl.DummyData
 import com.github.nscala_time.time.Imports._
+import com.thetestpeople.trt.importer._
 
 @RunWith(classOf[JUnitRunner])
 class CiImportStatusManagerTest extends FlatSpec with Matchers {

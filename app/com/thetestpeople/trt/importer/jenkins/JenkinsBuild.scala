@@ -1,7 +1,5 @@
-package com.thetestpeople.trt.jenkins.importer
+package com.thetestpeople.trt.importer.jenkins
 
-import com.thetestpeople.trt.service.Incoming
-import org.joda.time.DateTime
 import java.net.URI
 
 case class JenkinsBuild(

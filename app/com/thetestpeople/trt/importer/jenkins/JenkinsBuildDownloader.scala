@@ -1,9 +1,7 @@
-package com.thetestpeople.trt.jenkins.importer
+package com.thetestpeople.trt.importer.jenkins
 
 import java.net.URI
-
 import scala.xml._
-
 import com.thetestpeople.trt.utils.HasLogger
 import com.thetestpeople.trt.utils.UriUtils._
 import com.thetestpeople.trt.utils.http.Credentials

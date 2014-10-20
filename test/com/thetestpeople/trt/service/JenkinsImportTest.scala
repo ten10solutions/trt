@@ -13,9 +13,8 @@ import java.net.URI
 import com.thetestpeople.trt.utils.http.Http
 import com.thetestpeople.trt.utils.http.AlwaysFailingHttp
 import com.thetestpeople.trt.utils.http.ClasspathCachingHttp
-import com.thetestpeople.trt.jenkins.importer.CiImportStatusManager
-import com.thetestpeople.trt.jenkins.importer.FakeCiImportQueue
-import com.thetestpeople.trt.jenkins.importer.CiImporter
+import com.thetestpeople.trt.importer._
+import com.thetestpeople.trt.importer.CiImporter
 import com.thetestpeople.trt.service.indexing.LuceneLogIndexer
 
 @RunWith(classOf[JUnitRunner])

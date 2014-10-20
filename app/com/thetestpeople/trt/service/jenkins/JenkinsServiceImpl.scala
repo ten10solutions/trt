@@ -5,11 +5,8 @@ import com.github.nscala_time.time.Imports._
 import com.thetestpeople.trt.model._
 import com.thetestpeople.trt.model.jenkins._
 import com.thetestpeople.trt.utils.KeyedLocks
-import com.thetestpeople.trt.jenkins.importer
-import com.thetestpeople.trt.jenkins.importer.JenkinsBuildDownloader
-import com.thetestpeople.trt.jenkins.importer.CiBuildImportStatus
-import com.thetestpeople.trt.jenkins.importer.CiJobImportStatus
-import com.thetestpeople.trt.jenkins.importer.JenkinsBatchCreator
+import com.thetestpeople.trt.importer.jenkins._
+import com.thetestpeople.trt.importer._
 import com.thetestpeople.trt.service.jenkins._
 import com.thetestpeople.trt.service._
 import com.thetestpeople.trt.jenkins.trigger.JenkinsTestRunner

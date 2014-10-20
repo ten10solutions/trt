@@ -1,7 +1,6 @@
-package com.thetestpeople.trt.jenkins.importer
+package com.thetestpeople.trt.importer.jenkins
 
 import scala.xml.Elem
-import java.net.URI
 import com.thetestpeople.trt.utils.UriUtils._
 import scala.xml.Node
 

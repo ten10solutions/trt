@@ -1,4 +1,4 @@
-package com.thetestpeople.trt.jenkins.importer
+package com.thetestpeople.trt.importer
 
 import com.thetestpeople.trt.model._
 import com.thetestpeople.trt.model.jenkins._

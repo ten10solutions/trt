@@ -9,6 +9,8 @@ import com.github.nscala_time.time.Imports._
 import com.thetestpeople.trt.utils.TestUtils
 import java.net.URI
 import com.thetestpeople.trt.utils.UriUtils._
+import com.thetestpeople.trt.importer.jenkins.JenkinsBuildSummary
+import com.thetestpeople.trt.importer.jenkins.JenkinsBuildXmlParser
 
 @RunWith(classOf[JUnitRunner])
 class JenkinsBuildXmlParserTest extends FlatSpec with Matchers {

@@ -1,4 +1,4 @@
-package com.thetestpeople.trt.jenkins.importer
+package com.thetestpeople.trt.importer.jenkins
 
 import java.net.URI
 

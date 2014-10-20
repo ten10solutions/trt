@@ -9,6 +9,8 @@ import scala.xml.XML
 import com.thetestpeople.trt.utils.TestUtils
 import com.thetestpeople.trt.utils.UriUtils._
 import java.net.URI
+import com.thetestpeople.trt.importer.jenkins.JenkinsJob
+import com.thetestpeople.trt.importer.jenkins.JenkinsJobXmlParser
 
 @RunWith(classOf[JUnitRunner])
 class JenkinsJobXmlParserTest extends FlatSpec with Matchers {

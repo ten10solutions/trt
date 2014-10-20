@@ -7,8 +7,8 @@ import com.thetestpeople.trt.service.jenkins.JenkinsServiceImpl
 import com.thetestpeople.trt.analysis._
 import java.net.URI
 import com.thetestpeople.trt.utils.http.Http
-import com.thetestpeople.trt.jenkins.importer.CiImportStatusManager
-import com.thetestpeople.trt.jenkins.importer.CiImportQueue
+import com.thetestpeople.trt.importer._
+import com.thetestpeople.trt.importer.CiImportQueue
 import com.thetestpeople.trt.service.indexing.LogIndexer
 import com.thetestpeople.trt.service.indexing.ExecutionHit
 import com.thetestpeople.trt.service.indexing.SearchResult

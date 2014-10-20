@@ -9,7 +9,6 @@ import com.thetestpeople.trt.utils.RichConfiguration._
 import com.thetestpeople.trt.utils.http.Http
 import com.thetestpeople.trt.utils.http.PathCachingHttp
 import com.thetestpeople.trt.utils.http.WsHttp
-import com.thetestpeople.trt.jenkins.importer._
 import com.thetestpeople.trt.service.indexing.LuceneLogIndexer
 import controllers._
 import play.api.Configuration
@@ -18,6 +17,7 @@ import play.api.db._
 import play.api.mvc.Controller
 import java.io.File
 import com.thetestpeople.trt.service.indexing.LogIndexer
+import com.thetestpeople.trt.importer._
 
 /**
  * Lightweight dependency injection: constructs the objects used by the application

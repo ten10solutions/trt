@@ -1,4 +1,4 @@
-package com.thetestpeople.trt.jenkins.importer
+package com.thetestpeople.trt.importer
 
 import com.thetestpeople.trt.model.CiType
 import com.thetestpeople.trt.model.Id
@@ -8,6 +8,9 @@ import com.thetestpeople.trt.service.BatchRecorder
 import com.thetestpeople.trt.service.Clock
 import com.thetestpeople.trt.utils.HasLogger
 import com.thetestpeople.trt.utils.http.Http
+import com.thetestpeople.trt.importer._
+import com.thetestpeople.trt.importer.jenkins.JenkinsImporter
+import com.thetestpeople.trt.importer.teamcity.TeamCityImporter
 
 class CiImporter(
     clock: Clock,

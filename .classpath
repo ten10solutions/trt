@@ -10,7 +10,6 @@
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
   <classpathentry kind="src" path="target/scala-2.11/src_managed/main"/>
   <classpathentry kind="output" path="bin"/>
-  <classpathentry kind="lib" path="target/scala-2.11/classes"/>
   <classpathentry sourcepath="/home/matt/.ivy2/cache/com.typesafe.play/twirl-api_2.11/srcs/twirl-api_2.11-1.0.2-sources.jar" kind="lib" path="/home/matt/.ivy2/cache/com.typesafe.play/twirl-api_2.11/jars/twirl-api_2.11-1.0.2.jar"/>
   <classpathentry sourcepath="/home/matt/.ivy2/cache/org.apache.commons/commons-lang3/srcs/commons-lang3-3.1-sources.jar" kind="lib" path="/home/matt/.ivy2/cache/org.apache.commons/commons-lang3/jars/commons-lang3-3.1.jar"/>
   <classpathentry sourcepath="/home/matt/.ivy2/cache/com.typesafe.play/play_2.11/srcs/play_2.11-2.3.4-sources.jar" kind="lib" path="/home/matt/.ivy2/cache/com.typesafe.play/play_2.11/jars/play_2.11-2.3.4.jar"/>

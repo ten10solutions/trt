@@ -1,4 +1,4 @@
-package com.thetestpeople.trt.jenkins.importer
+package com.thetestpeople.trt.importer.jenkins
 
 import org.joda.time.DateTime
 import com.thetestpeople.trt.service.Incoming

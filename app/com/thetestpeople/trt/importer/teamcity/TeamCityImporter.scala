@@ -1,4 +1,4 @@
-package com.thetestpeople.trt.jenkins.importer
+package com.thetestpeople.trt.importer.teamcity
 
 import com.thetestpeople.trt.model.Batch
 import com.thetestpeople.trt.model.Id
@@ -8,14 +8,11 @@ import com.thetestpeople.trt.model.jenkins.CiImportSpec
 import com.thetestpeople.trt.model.jenkins.CiJob
 import com.thetestpeople.trt.service.BatchRecorder
 import com.thetestpeople.trt.service.Clock
-import com.thetestpeople.trt.teamcity.importer.TeamCityBatchCreator
-import com.thetestpeople.trt.teamcity.importer.TeamCityBuildDownloader
-import com.thetestpeople.trt.teamcity.importer.TeamCityBuildLink
-import com.thetestpeople.trt.teamcity.importer.TeamCityDownloadException
-import com.thetestpeople.trt.teamcity.importer.TeamCityUrlParser
 import com.thetestpeople.trt.utils.HasLogger
 import com.thetestpeople.trt.utils.http.Http
-import com.thetestpeople.trt.teamcity.importer.TeamCityBuildType
+import com.thetestpeople.trt.teamcity.importer._
+import com.thetestpeople.trt.importer._
+
 
 class TeamCityImporter(clock: Clock,
     http: Http,

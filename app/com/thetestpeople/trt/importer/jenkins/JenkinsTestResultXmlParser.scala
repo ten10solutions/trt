@@ -1,9 +1,10 @@
-package com.thetestpeople.trt.jenkins.importer
+package com.thetestpeople.trt.importer.jenkins
 
 import org.joda.time.Duration
 import scala.xml._
-import scala.BigDecimal.RoundingMode
 import java.net.URI
+import scala.BigDecimal
+import scala.math.BigDecimal._
 
 class JenkinsTestResultXmlParser {
 

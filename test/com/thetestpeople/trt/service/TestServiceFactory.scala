@@ -5,9 +5,9 @@ import com.thetestpeople.trt.utils.http.AlwaysFailingHttp
 import com.thetestpeople.trt.model.impl.MockDao
 import com.thetestpeople.trt.analysis.AnalysisService
 import com.thetestpeople.trt.service.indexing.LuceneLogIndexer
-import com.thetestpeople.trt.jenkins.importer.CiImportStatusManager
+import com.thetestpeople.trt.importer._
 import com.thetestpeople.trt.utils.http.Http
-import com.thetestpeople.trt.jenkins.importer.CiImporter
+import com.thetestpeople.trt.importer.CiImporter
 import com.thetestpeople.trt.model.Dao
 
 object TestServiceFactory {

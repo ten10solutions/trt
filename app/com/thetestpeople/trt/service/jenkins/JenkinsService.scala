@@ -4,8 +4,7 @@ import com.thetestpeople.trt.model._
 import com.thetestpeople.trt.model.jenkins._
 import com.thetestpeople.trt.jenkins.trigger.TriggerResult
 import java.net.URI
-import com.thetestpeople.trt.jenkins.importer.CiBuildImportStatus
-import com.thetestpeople.trt.jenkins.importer.CiJobImportStatus
+import com.thetestpeople.trt.importer._
 
 trait JenkinsService {
 

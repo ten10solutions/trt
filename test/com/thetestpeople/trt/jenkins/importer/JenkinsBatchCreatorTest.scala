@@ -6,6 +6,12 @@ import org.scalatest.junit.JUnitRunner
 import com.thetestpeople.trt.model.impl.DummyData
 import com.github.nscala_time.time.Imports._
 import java.net.URI
+import com.thetestpeople.trt.importer.jenkins.JenkinsBatchCreator
+import com.thetestpeople.trt.importer.jenkins.JenkinsBuild
+import com.thetestpeople.trt.importer.jenkins.JenkinsBuildSummary
+import com.thetestpeople.trt.importer.jenkins.Suite
+import com.thetestpeople.trt.importer.jenkins.OrdinaryTestResult
+import com.thetestpeople.trt.importer.jenkins.Case
 
 @RunWith(classOf[JUnitRunner])
 class JenkinsBatchCreatorTest extends FlatSpec with Matchers {
