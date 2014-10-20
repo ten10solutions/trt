@@ -1,4 +1,4 @@
-package com.thetestpeople.trt.teamcity.importer
+package com.thetestpeople.trt.importer.teamcity
 
 import com.thetestpeople.trt.utils.UriUtils._
 import java.net.URI

@@ -1,4 +1,4 @@
-package com.thetestpeople.trt.teamcity.importer
+package com.thetestpeople.trt.importer.teamcity
 
 import org.junit.runner.RunWith
 import org.scalatest.FlatSpec

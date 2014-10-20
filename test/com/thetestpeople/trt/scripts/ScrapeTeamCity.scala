@@ -1,12 +1,12 @@
 package com.thetestpeople.trt.scripts
 
-import com.thetestpeople.trt.teamcity.importer.TeamCityUrlParser
+import com.thetestpeople.trt.importer.teamcity.TeamCityUrlParser
 import com.thetestpeople.trt.utils.UriUtils._
-import com.thetestpeople.trt.teamcity.importer.TeamCityBuildDownloader
+import com.thetestpeople.trt.importer.teamcity.TeamCityBuildDownloader
 import play.api.libs.ws.ning.NingWSClient
 import com.ning.http.client.AsyncHttpClientConfig
 import com.thetestpeople.trt.utils.http.WsHttp
-import com.thetestpeople.trt.teamcity.importer.TeamCityBatchCreator
+import com.thetestpeople.trt.importer.teamcity.TeamCityBatchCreator
 import com.thetestpeople.trt.model.Configuration
 import play.api.libs.json._
 import com.thetestpeople.trt.json.JsonSerializers._

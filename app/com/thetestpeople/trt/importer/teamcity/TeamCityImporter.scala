@@ -10,7 +10,7 @@ import com.thetestpeople.trt.service.BatchRecorder
 import com.thetestpeople.trt.service.Clock
 import com.thetestpeople.trt.utils.HasLogger
 import com.thetestpeople.trt.utils.http.Http
-import com.thetestpeople.trt.teamcity.importer._
+import com.thetestpeople.trt.importer.teamcity._
 import com.thetestpeople.trt.importer._
 
 

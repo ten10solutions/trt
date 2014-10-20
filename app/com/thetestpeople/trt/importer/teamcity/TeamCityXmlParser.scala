@@ -1,4 +1,4 @@
-package com.thetestpeople.trt.teamcity.importer
+package com.thetestpeople.trt.importer.teamcity
 
 import scala.xml.Elem
 import org.joda.time.format.DateTimeFormat
