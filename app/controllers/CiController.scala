@@ -18,11 +18,11 @@ import com.thetestpeople.trt.importer._
 /**
  * Handle HTTP requests specific to Jenkins functionality
  */
-class JenkinsController(service: Service) extends Controller with HasLogger {
+class CiController(service: Service) extends Controller with HasLogger {
 
   private implicit def globalViewContext: GlobalViewContext = ControllerHelper.globalViewContext(service)
 
-  import routes.JenkinsController
+  import routes.CiController
   import views.html
 
   def ciImportSpecs() = Action { implicit request ⇒
@@ -47,7 +47,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
     logger.debug(s"deleteCiImportSpec($id)")
     val success = service.deleteCiImportSpec(id)
     if (success)
-      Redirect(JenkinsController.ciImportSpecs).flashing("success" -> "Deleted import specification")
+      Redirect(CiController.ciImportSpecs).flashing("success" -> "Deleted import specification")
     else
       NotFound(s"Could not find Jenkins import spec with id '$id'")
   }
@@ -93,7 +93,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
         BadRequest(html.editCiImportSpec(formWithErrors, None)),
       editableSpec ⇒ {
         val specId = service.newCiImportSpec(editableSpec.newSpec)
-        Redirect(JenkinsController.getCiImportSpec(specId)).flashing("success" -> "Created new import specification")
+        Redirect(CiController.getCiImportSpec(specId)).flashing("success" -> "Created new import specification")
       })
   }
 
@@ -108,7 +108,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
             BadRequest(html.editCiImportSpec(formWithErrors, Some(id))),
           editableSpec ⇒ {
             service.updateCiImportSpec(editableSpec.applyEdits(spec))
-            Redirect(JenkinsController.ciImportSpecs).flashing("success" -> "Updated import specification")
+            Redirect(CiController.ciImportSpecs).flashing("success" -> "Updated import specification")
           })
     }
   }
@@ -208,7 +208,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
     logger.debug(s"syncJenkins($id)")
     if (service.getCiImportSpec(id).isDefined) {
       service.syncJenkins(id)
-      Redirect(JenkinsController.getCiImportSpec(id)).flashing("success" -> "Sync has been triggered")
+      Redirect(CiController.getCiImportSpec(id)).flashing("success" -> "Sync has been triggered")
     } else
       NotFound(s"Could not find Jenkins import spec with id '$id'")
   }
@@ -242,7 +242,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
       },
       jenkinsConfiguration ⇒ {
         service.updateJenkinsConfiguration(jenkinsConfiguration.asJenkinsConfiguration)
-        Redirect(JenkinsController.auth).flashing("success" -> "Updated configuration")
+        Redirect(CiController.auth).flashing("success" -> "Updated configuration")
       })
   }
 
@@ -253,7 +253,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
         BadRequest(html.jenkinsReruns(formWithErrors)),
       jenkinsConfiguration ⇒ {
         service.updateJenkinsConfiguration(jenkinsConfiguration.asJenkinsConfiguration)
-        Redirect(JenkinsController.reruns).flashing("success" -> "Updated configuration")
+        Redirect(CiController.reruns).flashing("success" -> "Updated configuration")
       })
   }
 
@@ -273,7 +273,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
         val newConfig = configuration.asTeamCityConfiguration
         service.updateTeamCityConfiguration(newConfig)
         logger.debug(s"New TeamCity config: $newConfig")
-        Redirect(JenkinsController.teamCityConfig).flashing("success" -> "Updated configuration")
+        Redirect(CiController.teamCityConfig).flashing("success" -> "Updated configuration")
       })
   }
 
@@ -303,11 +303,11 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
       case TriggerResult.AuthenticationProblem(message) ⇒
         Redirect(redirectTarget).flashing(
           "error" -> s"Could not trigger Jenkins build because of an authentication problem: $message. Check your Jenkins configuration:",
-          "link" -> routes.JenkinsController.auth.url)
+          "link" -> routes.CiController.auth.url)
       case TriggerResult.ParameterProblem(param) ⇒
         Redirect(redirectTarget).flashing(
           "error" -> s"Could not trigger Jenkins build because of a problem with parameter '$param'. Check your Jenkins configuration:",
-          "link" -> routes.JenkinsController.reruns.url)
+          "link" -> routes.CiController.reruns.url)
       case TriggerResult.OtherProblem(message, _) ⇒
         Redirect(redirectTarget).flashing(
           "error" -> s"There was a problem triggering Jenkins build: $message")

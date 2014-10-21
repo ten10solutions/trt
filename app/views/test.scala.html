@@ -107,7 +107,7 @@
       <td>@for(comment <- test.commentOpt){<span id="comment-text" style="white-space: pre-wrap">@comment</span> }<a id="edit-comment-link" data-toggle="modal" data-target="#comment-dialog"><i class="glyphicon glyphicon-pencil"></i> edit</a></td>
     </tr>
   </table>
-  <form id="rerun-test-form" action="@routes.JenkinsController.rerunTest(test.id)" role="form" method="post">
+  <form id="rerun-test-form" action="@routes.CiController.rerunTest(test.id)" role="form" method="post">
     <input type="hidden" name="previousURL" value="@request.uri"/>
   </form>
   <form id="undelete-test-form" action="@routes.Application.undeleteTest(test.id)" role="form" method="post">

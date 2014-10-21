@@ -14,7 +14,7 @@
    
   <p style="margin-top: 20px"/>
 
-  @helper.form(routes.JenkinsController.updateAuth(), 'role -> "form") {
+  @helper.form(routes.CiController.updateAuth(), 'role -> "form") {
     
     <input type="hidden" name="@confForm("rerunJobUrl").name" value="@confForm("rerunJobUrl").value"/>
     <input type="hidden" name="@confForm("authenticationToken").name" value="@confForm("authenticationToken").value"/>

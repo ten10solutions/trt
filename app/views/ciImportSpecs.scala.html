@@ -13,7 +13,7 @@
     <div class="panel panel-info">
       <div class="panel-heading">No CI imports set up</div>
       <div class="panel-body">
-        There are no CI servers yet set up to import results from. <a href="@routes.JenkinsController.newCiImportSpec()">Configure a new CI import</a>.
+        There are no CI servers yet set up to import results from. <a href="@routes.CiController.newCiImportSpec()">Configure a new CI import</a>.
       </div>
     </div>
 
@@ -35,7 +35,7 @@
       @for(spec <- specs) {
         <tr>
           <td class=""><a href="@spec.jobUrl">@spec.jobName <i class="fa fa-external-link"></i></a></td>
-          <td class="view-log-cell"><a href="@routes.JenkinsController.getCiImportSpec(spec.id)">Log</a></td>
+          <td class="view-log-cell"><a href="@routes.CiController.getCiImportSpec(spec.id)">Log</a></td>
           <td class="last-checked-cell">
           @if(spec.inProgress) {
             <div class="progress">
@@ -48,14 +48,14 @@
           <td class="polling-interval-cell">@spec.pollingInterval</td>
           <td class="import-console-cell">@if(spec.importConsoleLog) { <i class="glyphicon glyphicon-ok"></i> }</td>
           <td class="configuration-cell">@spec.configuration</td>
-          <td class="configure-cell"><a href="@routes.JenkinsController.editCiImportSpec(spec.id)">Configure</a></td>
+          <td class="configure-cell"><a href="@routes.CiController.editCiImportSpec(spec.id)">Configure</a></td>
           <td class="sync-cell">
-            <form action="@routes.JenkinsController.syncJenkins(spec.id)" method="post">
+            <form action="@routes.CiController.syncJenkins(spec.id)" method="post">
               <button class="btn btn-default" title="Check for new builds now"><i class="glyphicon glyphicon-refresh"></i> Sync</button>
             </form>
           </td>
           <td class="delete-cell">
-            <form action="@routes.JenkinsController.deleteCiImportSpec(spec.id)" method="post">
+            <form action="@routes.CiController.deleteCiImportSpec(spec.id)" method="post">
               <button class="btn btn-default" title="Permanently delete this Jenkins import"><i class="glyphicon glyphicon-trash"></i> Delete</button>
             </form>
           </td>
@@ -63,7 +63,7 @@
       }
       <tr>
         <td colspan="9" style="text-align: center">
-           <a href="@routes.JenkinsController.newCiImportSpec"><i class="glyphicon glyphicon-plus"></i> Add new</a>
+           <a href="@routes.CiController.newCiImportSpec"><i class="glyphicon glyphicon-plus"></i> Add new</a>
         </td>
       </tr>
     </tbody>

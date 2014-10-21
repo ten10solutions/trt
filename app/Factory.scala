@@ -61,7 +61,7 @@ class Factory(configuration: Configuration) {
 
   lazy val controller = new Application(service, adminService)
 
-  lazy val jenkinsController = new JenkinsController(service)
+  lazy val ciController = new CiController(service)
 
   lazy val ciImportStatusManager: CiImportStatusManager = new CiImportStatusManager(clock)
 
@@ -89,6 +89,6 @@ class Factory(configuration: Configuration) {
 
   lazy val controllerMap: Map[Class[_], Controller] = Map(
     classOf[Application] -> controller,
-    classOf[JenkinsController] -> jenkinsController,
+    classOf[CiController] -> ciController,
     classOf[JsonController] -> jsonController)
 }
