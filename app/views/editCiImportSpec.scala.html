@@ -16,35 +16,35 @@
     case Some(id) => routes.CiController.updateCiImportSpec(id)
    }, 'role -> "form") {
     
-    @helper.inputText(jenkinsImportForm("jobUrl"), 
-      'class -> "form-control",
-      'placeholder -> "Job URL",
-	    '_label -> "Job URL", 
-	    '_help -> "URL of a Jenkins job or TeamCity configuration, e.g. http://some-jenkins/job/my-job-name/")
+  @helper.inputText(jenkinsImportForm("jobUrl"), 
+    'class -> "form-control",
+    'placeholder -> "Job URL",
+    '_label -> "Job URL", 
+    '_help -> "URL of a Jenkins job or TeamCity configuration, e.g. http://jenkins/job/my-job-name/ or http://teamcity:8111/viewType.html?buildTypeId=Project_Configuration")
   
-    @helper.inputText(jenkinsImportForm("pollingInterval"), 
-      'class -> "form-control",
-      'placeholder -> "Polling interval",
-	    '_label -> "Polling interval", 
-	    '_help -> "How long to wait between checking for new results")
+  @helper.inputText(jenkinsImportForm("pollingInterval"), 
+    'class -> "form-control",
+    'placeholder -> "Polling interval",
+    '_label -> "Polling interval", 
+    '_help -> "How long to wait between checking for new results")
   
-    @helper.checkbox(jenkinsImportForm("importConsoleLog"),
-      'class -> "checkbox",
-      '_label -> "Import console log",  
-      '_help -> "If true, import the console log of each build")
+  @helper.checkbox(jenkinsImportForm("importConsoleLog"),
+    'class -> "checkbox",
+    '_label -> "Import console log",  
+    '_help -> "If true, import the console log of each build")
     
-    @helper.inputText(jenkinsImportForm("configuration"), 
-      'class -> "form-control",
-      'placeholder -> "Configuration",
-      '_label -> "Configuration", 
-      '_help -> "Configuration label to associate with runs imported from this job. (Or none, if left blank).")
+  @helper.inputText(jenkinsImportForm("configuration"), 
+    'class -> "form-control",
+    'placeholder -> "Configuration",
+    '_label -> "Configuration", 
+    '_help -> "Configuration label to associate with runs imported from this job. (Or none, if left blank).")
  
-    <div class="form-actions">
-      <button type="submit" class="btn btn-primary">
-         @if(specOpt.isDefined){ Update } else { Create }
-       </button>
-      <a href="@routes.CiController.ciImportSpecs()" class="btn btn-default" role="button">Cancel</a>
-    </div>
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">
+       @if(specOpt.isDefined){ Update } else { Create }
+     </button>
+    <a href="@routes.CiController.ciImportSpecs()" class="btn btn-default" role="button">Cancel</a>
+  </div>
 	
   }
  
