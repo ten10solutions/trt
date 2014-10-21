@@ -29,7 +29,7 @@ class TeamCityImporter(clock: Clock,
     val buildLinks = allBuildLinks.filterNot(alreadyImported)
 
     for (link ← buildLinks)
-      importStatusManager.buildExists(spec.id, link.webUrl, buildNumberOpt = None)
+      importStatusManager.buildExists(spec.id, link.webUrl, buildNameOpt = Some(link.number))
     for (link ← buildLinks)
       importBuild(link, spec, buildDownloader, buildType)
 

@@ -114,7 +114,7 @@
 
 @for((build, buildIndex) <- builds.zipWithIndex) {
   <tr>
-    <td class="build-number-cell">@for(buildNumber <- build.buildNumberOpt){<a href="@build.buildUrl">#@buildNumber <i class="fa fa-external-link"></i></a>}</td>
+    <td class="build-number-cell"><a href="@build.buildUrl">@build.buildDescription <i class="fa fa-external-link"></i></a></td>
     <td class="status-cell">@build.importState.description 
       @if(build.importState == ImportState.NotStarted) {
         @*

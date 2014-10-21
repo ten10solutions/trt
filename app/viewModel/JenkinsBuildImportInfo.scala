@@ -9,6 +9,7 @@ import com.thetestpeople.trt.model.Batch
 case class JenkinsBuildImportInfo(
     buildUrl: URI,
     buildNumberOpt: Option[Int],
+    buildNameOpt: Option[String],
     importState: ImportState,
     updatedAtTime: DateTime,
     batchIdOpt: Option[Id[Batch]] = None,
@@ -17,11 +18,13 @@ case class JenkinsBuildImportInfo(
 
   def updatedAt = TimeDescription(updatedAtTime)
 
+  def buildDescription = buildNumberOpt.map(n => "#" + n) orElse buildNameOpt getOrElse ("")
+
 }
 
 case class JenkinsJobImportInfo(
-    importState: ImportState, 
-    updatedAtTimeOpt: Option[DateTime], 
+    importState: ImportState,
+    updatedAtTimeOpt: Option[DateTime],
     summaryOpt: Option[String] = None,
     detailsOpt: Option[String] = None) {
 
@@ -32,7 +35,7 @@ case class JenkinsJobImportInfo(
 sealed abstract class ImportState(val description: String, val done: Boolean) {
 
   override def toString = description
-  
+
 }
 
 object ImportState {
