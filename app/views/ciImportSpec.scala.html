@@ -22,14 +22,14 @@
       pageSize = Some(pageSize)))
 }
 
-@main("Jenkins Import Log", "JenkinsImportStatus", css = css, scripts = scripts) {
+@main("CI Import Log", "CiImportLog", css = css, scripts = scripts) {
 
 <ol class="breadcrumb">
-  <li><a href="@routes.JenkinsController.ciImportSpecs()">Jenkins Jobs</a></li>
+  <li><a href="@routes.JenkinsController.ciImportSpecs()">CI Jobs</a></li>
   <li class="active">@name</li>
 </ol>
 
-<h2>Jenkins Import Log</h2>  
+<h2>CI Import Log</h2>  
 
 <table style="margin-top: 15px" class="table table-striped table-bordered table-hover">
   <tr>

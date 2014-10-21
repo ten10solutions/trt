@@ -4,18 +4,16 @@
   <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/ciImportSpecs.css")">
 }
 
-@main("Jenkins Imports", "Jenkins Imports", css = css) {
+@main("CI Imports", "CiImports", css = css) {
 
-<h2>Jenkins Configuration</h2>  
-
-@jenkinsConfigTabs("jobs")
+<h2>CI Imports</h2>  
 
  @if(specs.isEmpty) {
 
     <div class="panel panel-info">
-      <div class="panel-heading">No jenkins jobs set up</div>
+      <div class="panel-heading">No CI imports set up</div>
       <div class="panel-body">
-        There are no Jenkins jobs set up for import yet. <a href="@routes.JenkinsController.newCiImportSpec()">Configure a new Jenkins job to import from</a>.
+        There are no CI servers yet set up to import results from. <a href="@routes.JenkinsController.newCiImportSpec()">Configure a new CI import</a>.
       </div>
     </div>
 

@@ -2,14 +2,14 @@
 
 @import BootstrapHelpers._
  
-@main("Jenkins Job", "Jenkins Job") {
+@main("CI Job", "CIJob") {
 
   <ol class="breadcrumb">
     <li><a href="@routes.JenkinsController.ciImportSpecs()">Jenkins Jobs</a></li>
     <li class="active">@if(specOpt.isEmpty) { New } else { Edit }</li>
   </ol>
 
-  <h2>Jenkins Job</h2>  
+  <h2>Import from a CI server</h2>  
 
   @helper.form(action = specOpt match { 
     case None       => routes.JenkinsController.createCiImportSpec
@@ -20,7 +20,7 @@
       'class -> "form-control",
       'placeholder -> "Job URL",
 	    '_label -> "Job URL", 
-	    '_help -> "URL of a Jenkins job, e.g. http://some-jenkins/job/my-job-name/")
+	    '_help -> "URL of a Jenkins job or TeamCity configuration, e.g. http://some-jenkins/job/my-job-name/")
   
     @helper.inputText(jenkinsImportForm("pollingInterval"), 
       'class -> "form-control",

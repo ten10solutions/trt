@@ -83,7 +83,11 @@
               <a id="menu-config" href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-cog"></span> Settings <b class="caret"></b></a>
               <ul class="dropdown-menu">
                 <li><a id="menu-config-system" href="@routes.Application.editSystemConfiguration()">System</a></li>
-                <li><a id="menu-config-jenkins" href="@routes.JenkinsController.ciImportSpecs()">Jenkins</a></li>
+                <li class="divider"></li>
+                <li><a id="menu-config-ci-imports" href="@routes.JenkinsController.ciImportSpecs()">CI Imports</a></li>
+                <li><a id="menu-config-jenkins" href="@routes.JenkinsController.auth()">Jenkins</a></li>
+                <li><a id="menu-config-teamcity" href="#">TeamCity</a></li>
+                <li class="divider"></li>
                 <li><a id="menu-config-admin"  href="@routes.Application.admin()">Admin</a></li>
               </ul>
             </li>

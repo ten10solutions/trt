@@ -21,6 +21,12 @@ object JenkinsFormConstraints {
       case None    ⇒ invalid("Job URL must be a link to either a Jenkins job or a TeamCity configuration")
     })
 
+  val isJenkinsJob: Constraint[URI] = Constraint(uri ⇒
+    if (!uri.getPath.contains("/job/"))
+      invalid("Job URL must contain /job/")
+    else
+      Valid)
+
   private def invalid(message: String) = Invalid(Seq(ValidationError(message)))
 
   val parametersAreAllDistinct = Constraint { config: EditableJenkinsConfiguration ⇒
