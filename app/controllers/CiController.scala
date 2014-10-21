@@ -113,7 +113,7 @@ class CiController(service: Service) extends Controller with HasLogger {
     }
   }
 
-  private def getJenkinsImportProgressPercent(allInfos: Seq[JenkinsBuildImportInfo]): Int =
+  private def getJenkinsImportProgressPercent(allInfos: Seq[CiBuildImportInfo]): Int =
     if (allInfos.isEmpty)
       0
     else {
@@ -156,7 +156,7 @@ class CiController(service: Service) extends Controller with HasLogger {
     stringWriter.toString
   }
 
-  private def getBuildImportInfos(spec: CiImportSpec): Seq[JenkinsBuildImportInfo] = {
+  private def getBuildImportInfos(spec: CiImportSpec): Seq[CiBuildImportInfo] = {
     val inMemoryStatuses = service.getBuildImportStatuses(spec.id)
     val inMemoryInfos = inMemoryStatuses.map(makeBuildImportInfoFromImportStatus)
     val inMemoryUrls = inMemoryStatuses.map(_.buildUrl).toSet
@@ -184,7 +184,7 @@ class CiController(service: Service) extends Controller with HasLogger {
     val detailsOpt = PartialFunction.condOpt(status.state) {
       case BuildImportState.Errored(t) ⇒ printStackTrace(t)
     }
-    JenkinsBuildImportInfo(
+    CiBuildImportInfo(
       buildUrl = status.buildUrl,
       buildNumberOpt = status.buildNumberOpt,
       buildNameOpt = status.buildNameOpt,
@@ -196,7 +196,7 @@ class CiController(service: Service) extends Controller with HasLogger {
   }
 
   private def makeBuildImportInfo(build: CiBuild) =
-    JenkinsBuildImportInfo(
+    CiBuildImportInfo(
       buildUrl = build.buildUrl,
       buildNumberOpt = build.buildNumberOpt,
       buildNameOpt = build.buildNameOpt,

@@ -1,7 +1,7 @@
 @(
   spec: CiImportSpec, 
   jobImportInfo: JenkinsJobImportInfo, 
-  builds: Seq[JenkinsBuildImportInfo], 
+  builds: Seq[CiBuildImportInfo], 
   name: String, 
   progress: Int,
   pagination: PaginationData)(implicit flash: Flash, globalViewContext: GlobalViewContext)

@@ -6,7 +6,7 @@ import java.net.URI
 import org.joda.time.DateTime
 import com.thetestpeople.trt.model.Batch
 
-case class JenkinsBuildImportInfo(
+case class CiBuildImportInfo(
     buildUrl: URI,
     buildNumberOpt: Option[Int],
     buildNameOpt: Option[String],
