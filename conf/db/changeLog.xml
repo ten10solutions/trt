@@ -413,5 +413,14 @@
       <column name="password" type="VARCHAR(10485760)" />
     </insert>
   </changeSet>
+
+  <changeSet author="matt" id="add-ci_builds_build_name">
+    <addColumn tableName="ci_builds">
+      <column name="build_name" type="VARCHAR(10485760)" defaultValue="NULL">
+        <constraints nullable="true" />
+      </column>
+    </addColumn>
+  </changeSet> 
+
   
 </databaseChangeLog>

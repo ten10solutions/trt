@@ -80,6 +80,7 @@ trait CiDaoTest { self: AbstractDaoTest ⇒
       jobId = jobId,
       batchId = batchId,
       buildNumberOpt = Some(DummyData.BuildNumber),
+      buildNameOpt = Some(DummyData.BatchName),
       importTime = DummyData.ImportTime,
       buildUrl = DummyData.BuildUrl,
       importSpecIdOpt = Some(specId))

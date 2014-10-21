@@ -199,7 +199,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
     JenkinsBuildImportInfo(
       buildUrl = build.buildUrl,
       buildNumberOpt = build.buildNumberOpt,
-      buildNameOpt = None,
+      buildNameOpt = build.buildNameOpt,
       importState = viewModel.ImportState.Complete,
       updatedAtTime = build.importTime,
       batchIdOpt = Some(build.batchId))

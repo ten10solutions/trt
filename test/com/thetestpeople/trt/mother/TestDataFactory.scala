@@ -112,7 +112,8 @@ object TestDataFactory {
     importTime: DateTime = DummyData.ImportTime,
     buildUrl: URI = DummyData.BuildUrl,
     buildNumberOpt: Option[Int] = Some(DummyData.BuildNumber),
+    buildNameOpt: Option[String] = Some(DummyData.BatchName),
     importSpecIdOpt: Option[Id[CiImportSpec]] = None) =
-    CiBuild(batchId, importTime, buildUrl, buildNumberOpt, jobId, importSpecIdOpt)
+    CiBuild(batchId, importTime, buildUrl, buildNumberOpt, buildNameOpt, jobId, importSpecIdOpt)
 
 }

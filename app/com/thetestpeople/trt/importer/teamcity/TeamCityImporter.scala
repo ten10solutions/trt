@@ -62,7 +62,8 @@ class TeamCityImporter(clock: Clock,
       val jobName = s"${buildType.projectName} > ${buildType.name}"
       val ciJob = CiJob(url = buildType.webUrl, name = jobName)
       val jobId = transaction { dao.ensureCiJob(ciJob) }
-      val ciBuild = CiBuild(batchId, clock.now, buildUrl, None, jobId, Some(importSpec.id))
+      val ciBuild = CiBuild(batchId = batchId, importTime = clock.now, buildUrl = buildUrl,
+        buildNumberOpt = None, buildNameOpt = Some(buildType.name), jobId = jobId, importSpecIdOpt = Some(importSpec.id))
       transaction { dao.newCiBuild(ciBuild) }
       Some(batchId)
     } else
