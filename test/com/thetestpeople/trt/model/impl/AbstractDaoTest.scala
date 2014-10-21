@@ -662,7 +662,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     dao.getTestNames("a") should equal(Seq("a"))
   }
 
-  "it" should "do case-insensitive matching" in transaction { dao ⇒
+  it should "do case-insensitive matching" in transaction { dao ⇒
     dao.ensureTestIsRecorded(F.test(name = "a"))
     dao.ensureTestIsRecorded(F.test(name = "A"))
 

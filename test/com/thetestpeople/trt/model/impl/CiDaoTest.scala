@@ -30,7 +30,7 @@ trait CiDaoTest { self: AbstractDaoTest ⇒
     spec.lastCheckedOpt should equal(Some(DummyData.LastChecked))
   }
 
-  "Deleting animport spec" should "delete it if present" in transaction { dao ⇒
+  "Deleting an import spec" should "delete it if present" in transaction { dao ⇒
     val specId = dao.newCiImportSpec(F.ciImportSpec())
 
     val success = dao.deleteCiImportSpec(specId)
@@ -139,7 +139,7 @@ trait CiDaoTest { self: AbstractDaoTest ⇒
     job.id should equal(jobId)
   }
 
-  "Inserting and retrieving configuration" should "persist all the data" in transaction { dao ⇒
+  "Inserting and retrieving Jenkins configuration" should "persist all the data" in transaction { dao ⇒
     val params: List[JenkinsJobParam] = List(JenkinsJobParam(
       param = DummyData.ParamName,
       value = DummyData.ParamValue))
@@ -154,6 +154,17 @@ trait CiDaoTest { self: AbstractDaoTest ⇒
 
     val fullConfigAgain = dao.getJenkinsConfiguration
     fullConfigAgain should equal(fullConfig)
+  }
+
+  "Inserting and retrieving TeamCity configuration" should "persist all the data" in transaction { dao ⇒
+    val config = TeamCityConfiguration(
+      usernameOpt = Some(DummyData.Username),
+      passwordOpt = Some(DummyData.ApiToken))
+
+    dao.updateTeamCityConfiguration(config)
+
+    val configAgain = dao.getTeamCityConfiguration
+    configAgain should equal(config)
   }
 
 }

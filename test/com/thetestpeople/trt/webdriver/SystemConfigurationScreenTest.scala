@@ -26,7 +26,7 @@ class SystemConfigurationScreenTest extends AbstractBrowserTest {
     }
   }
 
-  "it" should "not let you enter negative values" in {
+  it should "not let you enter negative values" in {
     automate { site ⇒
       val systemConfigScreen = site.launch().mainMenu.config().system()
       systemConfigScreen.brokenDurationThreshold = "-1 hour"
