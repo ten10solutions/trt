@@ -9,14 +9,14 @@ import com.thetestpeople.trt.model.Configuration
 
 object CiImportSpecForm {
 
-  lazy val form: Form[EditableJenkinsImportData] =
+  lazy val form: Form[EditableImportSpec] =
     Form(Forms.mapping(
-      "jobUrl" -> url.verifying(isJenkinsJob),
+      "jobUrl" -> url.verifying(isCiJob),
       "pollingInterval" -> duration,
       "importConsoleLog" -> boolean,
-      "configuration" -> optional(configuration))(EditableJenkinsImportData.apply)(EditableJenkinsImportData.unapply))
+      "configuration" -> optional(configuration))(EditableImportSpec.apply)(EditableImportSpec.unapply))
 
-  lazy val initial: Form[EditableJenkinsImportData] =
+  lazy val initial: Form[EditableImportSpec] =
     form.bind(Map(
       "pollingInterval" -> "5 minutes",
       "configuration" -> Configuration.Default.configuration)).discardingErrors

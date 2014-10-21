@@ -67,7 +67,7 @@ class JenkinsImporter(clock: Clock,
     val batch = new JenkinsBatchCreator(importSpec.configurationOpt).createBatch(build)
     val batchId = batchRecorder.recordBatch(batch).id
 
-    val ciJob = CiJob(url = importSpec.jobUrl, name = job.name)
+    val ciJob = CiJob(url = job.url, name = job.name)
     val jobId = transaction { dao.ensureCiJob(ciJob) }
     val ciBuild = CiBuild(batchId, clock.now, buildUrl, Some(buildLink.buildNumber), jobId, Some(importSpec.id))
     transaction { dao.newCiBuild(ciBuild) }

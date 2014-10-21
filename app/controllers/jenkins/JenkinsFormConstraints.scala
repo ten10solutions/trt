@@ -3,6 +3,7 @@ package controllers.jenkins
 import play.api.data.validation._
 import java.net.URI
 import viewModel.EditableJenkinsConfiguration
+import com.thetestpeople.trt.model.CiType
 
 object JenkinsFormConstraints {
 
@@ -14,13 +15,11 @@ object JenkinsFormConstraints {
     else
       invalid("Not an API key (32 hexadecimal characters)"))
 
-  val isJenkinsJob: Constraint[URI] = Constraint(uri ⇒
-    if (!uri.getPath.contains("/job/"))
-      invalid("Job URL must contain /job/")
-    else if (!uri.getPath.endsWith("/")) // To try and make sure the import URL matches up with the job URL returned by the Jenkins API itself.
-      invalid("Job URL must end with a /")
-    else
-      Valid)
+  val isCiJob: Constraint[URI] = Constraint(uri ⇒
+    CiType.inferCiType(uri) match {
+      case Some(_) ⇒ Valid
+      case None    ⇒ invalid("Job URL must be a link to either a Jenkins job or a TeamCity configuration")
+    })
 
   private def invalid(message: String) = Invalid(Seq(ValidationError(message)))
 

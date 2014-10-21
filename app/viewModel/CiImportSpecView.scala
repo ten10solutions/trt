@@ -3,6 +3,7 @@ package viewModel
 import com.thetestpeople.trt.model.jenkins.CiImportSpec
 import com.thetestpeople.trt.model.jenkins._
 import com.thetestpeople.trt.utils.DateUtils
+import com.thetestpeople.trt.model.CiType
 
 case class CiImportSpecView(spec: CiImportSpec, inProgress: Boolean) {
 
@@ -27,4 +28,5 @@ case class CiImportSpecView(spec: CiImportSpec, inProgress: Boolean) {
 
   def configuration = spec.configurationOpt.getOrElse("")
 
+  def ciType: CiType = spec.ciType
 }

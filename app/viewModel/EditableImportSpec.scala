@@ -7,10 +7,10 @@ import java.net.URI
 import com.thetestpeople.trt.model.Configuration
 import com.thetestpeople.trt.model.CiType
 
-object EditableJenkinsImportData {
+object EditableImportSpec {
 
-  def fromSpec(spec: CiImportSpec): EditableJenkinsImportData =
-    EditableJenkinsImportData(
+  def fromSpec(spec: CiImportSpec): EditableImportSpec =
+    EditableImportSpec(
       jobUrl = spec.jobUrl,
       pollingInterval = spec.pollingInterval,
       importConsoleLog = spec.importConsoleLog,
@@ -18,13 +18,13 @@ object EditableJenkinsImportData {
 
 }
 
-case class EditableJenkinsImportData(
+case class EditableImportSpec(
     jobUrl: URI,
     pollingInterval: Duration,
     importConsoleLog: Boolean,
     configurationOpt: Option[Configuration]) {
 
-  def updatedSpec(spec: CiImportSpec): CiImportSpec =
+  def applyEdits(spec: CiImportSpec): CiImportSpec =
     spec.copy(jobUrl = jobUrl,
       pollingInterval = pollingInterval,
       importConsoleLog = importConsoleLog,
@@ -33,7 +33,7 @@ case class EditableJenkinsImportData(
   def newSpec(): CiImportSpec =
     CiImportSpec(
       jobUrl = jobUrl,
-      ciType = CiType.Jenkins,
+      ciType = CiType.inferCiType(jobUrl).get,
       pollingInterval = pollingInterval,
       importConsoleLog = importConsoleLog,
       configurationOpt = configurationOpt)

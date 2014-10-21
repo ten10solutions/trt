@@ -58,7 +58,7 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
       case None ⇒
         NotFound(s"Could not find Jenkins import spec with id '$id'")
       case Some(spec) ⇒
-        val jenkinsImportData = EditableJenkinsImportData.fromSpec(spec)
+        val jenkinsImportData = EditableImportSpec.fromSpec(spec)
         val populatedForm = CiImportSpecForm.form.fill(jenkinsImportData)
         Ok(html.editCiImportSpec(populatedForm, Some(id)))
     }
@@ -91,8 +91,8 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
     CiImportSpecForm.form.bindFromRequest().fold(
       formWithErrors ⇒
         BadRequest(html.editCiImportSpec(formWithErrors, None)),
-      jenkinsImport ⇒ {
-        val specId = service.newCiImportSpec(jenkinsImport.newSpec)
+      editableSpec ⇒ {
+        val specId = service.newCiImportSpec(editableSpec.newSpec)
         Redirect(JenkinsController.getCiImportSpec(specId)).flashing("success" -> "Created new import specification")
       })
   }
@@ -106,8 +106,8 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
         CiImportSpecForm.form.bindFromRequest.fold(
           formWithErrors ⇒
             BadRequest(html.editCiImportSpec(formWithErrors, Some(id))),
-          jenkinsImport ⇒ {
-            service.updateCiImportSpec(jenkinsImport.updatedSpec(spec))
+          editableSpec ⇒ {
+            service.updateCiImportSpec(editableSpec.applyEdits(spec))
             Redirect(JenkinsController.ciImportSpecs).flashing("success" -> "Updated import specification")
           })
     }
