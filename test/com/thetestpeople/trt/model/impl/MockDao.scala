@@ -38,6 +38,7 @@ class MockDao extends Dao {
   private var systemConfiguration = SystemConfiguration()
   private var jenkinsConfiguration = JenkinsConfiguration()
   private var jenkinsConfigParams: Seq[JenkinsJobParam] = List()
+  private var teamCityConfiguration = TeamCityConfiguration()
 
   def getEnrichedExecution(id: Id[Execution]): Option[EnrichedExecution] =
     for {
@@ -392,5 +393,9 @@ class MockDao extends Dao {
     testComments = TestComment(id, text) +: testComments.filterNot(_.testId == id)
 
   def deleteTestComment(id: Id[Test]) = testComments = testComments.filterNot(_.testId == id)
+
+  def getTeamCityConfiguration(): TeamCityConfiguration = teamCityConfiguration
+
+  def updateTeamCityConfiguration(config: TeamCityConfiguration) = teamCityConfiguration = config
 
 }

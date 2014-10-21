@@ -17,7 +17,7 @@ class TeamCityDownloadException(message: String, cause: Throwable = null) extend
  */
 class TeamCityBuildDownloader(http: Http, jobLink: TeamCityJobLink, credentialsOpt: Option[Credentials] = None) extends HasLogger {
 
-  private val authRoute = if (credentialsOpt.isDefined) "basicAuth" else "guestAuth"
+  private val authRoute = if (credentialsOpt.isDefined) "httpAuth" else "guestAuth"
 
   private val parser = new TeamCityXmlParser
 

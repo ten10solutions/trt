@@ -89,6 +89,13 @@ trait SlickCiDao { this: SlickDao ⇒
     jenkinsJobParams.insertAll(config.params: _*)
   }
 
+  def getTeamCityConfiguration(): TeamCityConfiguration =
+    teamCityConfiguration.firstOption.getOrElse(
+      throw new IllegalStateException("No TeamCity configuration present"))
+
+  def updateTeamCityConfiguration(config: TeamCityConfiguration): Unit =
+    teamCityConfiguration.update(config)
+
   def ensureCiJob(job: CiJob): Id[CiJob] = synchronized {
     ciJobs.filter(_.url === job.url).firstOption match {
       case Some(job) ⇒

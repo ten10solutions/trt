@@ -48,6 +48,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     val ciBuilds = TableQuery[CiBuildMapping]
     val ciImportSpecs = TableQuery[CiImportSpecMapping]
     val jenkinsConfiguration = TableQuery[JenkinsConfigurationMapping]
+    val teamCityConfiguration = TableQuery[TeamCityConfigurationMapping]
     val jenkinsJobParams = TableQuery[JenkinsJobParamMapping]
 
   }
@@ -113,11 +114,12 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       batches.delete
       tests.delete
       jenkinsConfiguration.delete
+      teamCityConfiguration.delete
       systemConfiguration.delete
       systemConfiguration.insert(SystemConfiguration())
 
-      val defaultJenkinsConfiguration = JenkinsConfiguration()
       jenkinsConfiguration.insert(JenkinsConfiguration())
+      teamCityConfiguration.insert(TeamCityConfiguration())
     }
 
     logger.info("Deleted all data")

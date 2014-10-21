@@ -216,6 +216,11 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
     JenkinsConfigurationForm.form.fill(editableConfig)
   }
 
+  private def getTeamCityConfigurationForm: Form[EditableTeamCityConfiguration] = {
+    val editableConfig = EditableTeamCityConfiguration(service.getTeamCityConfiguration)
+    TeamCityConfigurationForm.form.fill(editableConfig)
+  }
+
   def auth() = Action { implicit request ⇒
     logger.debug(s"auth()")
     Ok(html.jenkinsAuth(getJenkinsConfigurationForm))
@@ -247,6 +252,26 @@ class JenkinsController(service: Service) extends Controller with HasLogger {
       jenkinsConfiguration ⇒ {
         service.updateJenkinsConfiguration(jenkinsConfiguration.asJenkinsConfiguration)
         Redirect(JenkinsController.reruns).flashing("success" -> "Updated configuration")
+      })
+  }
+
+  def teamCityConfig() = Action { implicit request ⇒
+    logger.debug(s"teamCityConfig()")
+    Ok(html.teamCityConfig(getTeamCityConfigurationForm))
+  }
+
+  def updateTeamCityConfig() = Action { implicit request ⇒
+    logger.debug(s"updateTeamCityConfig()")
+    TeamCityConfigurationForm.form.bindFromRequest().fold(
+      formWithErrors ⇒ {
+        logger.debug("updateTeamCityConfig() errors: " + formWithErrors.errorsAsJson)
+        BadRequest(html.teamCityConfig(formWithErrors))
+      },
+      configuration ⇒ {
+        val newConfig = configuration.asTeamCityConfiguration
+        service.updateTeamCityConfiguration(newConfig)
+        logger.debug(s"New TeamCity config: $newConfig")
+        Redirect(JenkinsController.teamCityConfig).flashing("success" -> "Updated configuration")
       })
   }
 

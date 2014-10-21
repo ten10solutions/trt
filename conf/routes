@@ -67,3 +67,6 @@ POST    /jenkins/reruns             @controllers.JenkinsController.updateReruns(
 
 POST    /jenkins/tests/rerun        @controllers.JenkinsController.rerunSelectedTests()
 POST    /jenkins/test/:id/rerun     @controllers.JenkinsController.rerunTest(id: Id[Test])
+
+GET     /teamcity/config            @controllers.JenkinsController.teamCityConfig()
+POST    /teamcity/config            @controllers.JenkinsController.updateTeamCityConfig()

@@ -1,0 +1,36 @@
+@(confForm: Form[EditableTeamCityConfiguration])(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
+
+@css = {
+}
+
+@import BootstrapHelpers._
+
+@main("TeamCity Configuration", "TeamCityConfiguration", css = css) {
+
+  <h2>TeamCityConfiguration</h2>  
+   
+  <p style="margin-top: 20px"/>
+
+  @helper.form(routes.JenkinsController.updateTeamCityConfig(), 'role -> "form") {
+    
+    @helper.inputText(confForm("credentials.username"), 
+      'class -> "form-control",
+      'placeholder -> "Username",
+      '_label -> "Username", 
+      '_help -> "TeamCity username.")
+
+    @helper.inputPassword(confForm("credentials.password"), 
+      'class -> "form-control",
+      'placeholder -> "Password",
+      '_label -> "Password", 
+      '_help -> "Password for the TeamCity account")
+        
+    <div class="form-actions" style="margin-bottom: 32px">
+      <button id="submit" type="submit" class="btn btn-primary">Update</button>
+      <a href="@routes.Application.index" class="btn btn-default" role="button">Cancel</a>
+    </div>
+	
+  }
+
+  
+}

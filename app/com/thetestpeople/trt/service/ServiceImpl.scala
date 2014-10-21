@@ -220,4 +220,8 @@ class ServiceImpl(
       true
     }
 
+  def getTeamCityConfiguration(): TeamCityConfiguration = transaction { dao.getTeamCityConfiguration }
+
+  def updateTeamCityConfiguration(config: TeamCityConfiguration) = transaction { dao.updateTeamCityConfiguration(config) }
+
 }

@@ -54,4 +54,8 @@ trait CiDao {
 
   def updateJenkinsConfiguration(config: FullJenkinsConfiguration)
 
+  def getTeamCityConfiguration(): TeamCityConfiguration
+
+  def updateTeamCityConfiguration(config: TeamCityConfiguration)
+
 }

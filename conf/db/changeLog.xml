@@ -402,5 +402,16 @@
     <renameTable oldTableName="jenkins_jobs" newTableName="ci_jobs"/>
     <renameTable oldTableName="jenkins_import_specs" newTableName="ci_import_specs"/>
   </changeSet>
+
+  <changeSet author="matt" id="create-teamcity_configuration">
+    <createTable tableName="teamcity_configuration">
+      <column name="username" type="VARCHAR(10485760)" />
+      <column name="password" type="VARCHAR(10485760)" />
+    </createTable>
+    <insert tableName="teamcity_configuration">
+      <column name="username" type="VARCHAR(10485760)" />
+      <column name="password" type="VARCHAR(10485760)" />
+    </insert>
+  </changeSet>
   
 </databaseChangeLog>

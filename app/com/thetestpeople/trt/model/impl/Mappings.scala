@@ -169,6 +169,15 @@ trait Mappings { self: SlickDao ⇒
 
   }
 
+  class TeamCityConfigurationMapping(tag: Tag) extends Table[TeamCityConfiguration](tag, "teamcity_configuration") {
+
+    def usernameOpt = column[Option[String]]("username")
+    def passwordOpt = column[Option[String]]("password")
+    
+    def * = (usernameOpt, passwordOpt) <> (TeamCityConfiguration.tupled, TeamCityConfiguration.unapply)
+
+  }
+
   class JenkinsJobParamMapping(tag: Tag) extends Table[JenkinsJobParam](tag, "jenkins_job_params") {
 
     def paramName = column[String]("param_name")

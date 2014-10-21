@@ -13,7 +13,6 @@ import com.thetestpeople.trt.utils.http.Http
 import com.thetestpeople.trt.importer.teamcity._
 import com.thetestpeople.trt.importer._
 
-
 class TeamCityImporter(clock: Clock,
     http: Http,
     dao: CiDao,
@@ -25,9 +24,7 @@ class TeamCityImporter(clock: Clock,
   def importBuilds(spec: CiImportSpec) {
     val alreadyImportedBuildUrls = transaction { dao.getCiBuildUrls() }.toSet
     def alreadyImported(link: TeamCityBuildLink) = alreadyImportedBuildUrls contains link.webUrl
-    val teamCityConfiguration = TeamCityUrlParser.parse(spec.jobUrl).right.get
-    val buildDownloader = new TeamCityBuildDownloader(http, teamCityConfiguration)
-
+    val buildDownloader = getBuildDownloader(spec)
     val (buildType, allBuildLinks) = buildDownloader.getBuildType()
     val buildLinks = allBuildLinks.filterNot(alreadyImported)
 
@@ -70,6 +67,13 @@ class TeamCityImporter(clock: Clock,
       Some(batchId)
     } else
       None
+  }
+
+  private def getBuildDownloader(spec: CiImportSpec): TeamCityBuildDownloader = {
+    val jobLink = TeamCityUrlParser.parse(spec.jobUrl).right.get
+    val teamCityConfiguration = transaction { dao.getTeamCityConfiguration() }
+    val credentialsOpt = teamCityConfiguration.credentialsOpt
+    new TeamCityBuildDownloader(http, jobLink, credentialsOpt)
   }
 
 }
