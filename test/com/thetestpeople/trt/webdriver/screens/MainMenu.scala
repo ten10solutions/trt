@@ -4,10 +4,10 @@ import play.api.test.TestBrowser
 import com.thetestpeople.trt.webdriver.screens.RichSelenium._
 import org.openqa.selenium.By.id
 import org.openqa.selenium.WebDriver
-import com.thetestpeople.trt.webdriver.screens.jenkins.JenkinsJobsScreen
 import com.thetestpeople.trt.model.Configuration
 import org.openqa.selenium.By
 import scala.collection.JavaConverters._
+import com.thetestpeople.trt.webdriver.screens.jenkins.JenkinsAuthScreen
 
 class ReportsMenu(implicit automationContext: AutomationContext) extends AbstractComponent {
 
@@ -99,10 +99,10 @@ class MainMenu(implicit automationContext: AutomationContext) extends AbstractCo
       new SystemConfigurationScreen
     }
 
-    def jenkins(): JenkinsJobsScreen = {
+    def jenkins(): JenkinsAuthScreen = {
       log(s"Click 'Jenkins'")
       webDriver.waitForDisplayedAndEnabled(id("menu-config-jenkins")).click()
-      new JenkinsJobsScreen
+      new JenkinsAuthScreen
     }
 
   }

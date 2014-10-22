@@ -2,15 +2,15 @@ package com.thetestpeople.trt
 
 object Config {
 
-  object Jenkins {
+  object Ci {
 
     object Poller {
 
-      val InitialDelay = "jenkins.poller.initialDelay"
+      val InitialDelay = "ci.poller.initialDelay"
 
-      val Interval = "jenkins.poller.interval"
+      val Interval = "ci.poller.interval"
 
-      val Enabled = "jenkins.poller.enabled"
+      val Enabled = "ci.poller.enabled"
 
     }
 
@@ -36,9 +36,9 @@ object Config {
 
     object Poller {
 
-      val InitialDelay = "jenkins.poller.initialDelay"
+      val InitialDelay = "counts.poller.initialDelay"
 
-      val Interval = "jenkins.poller.interval"
+      val Interval = "counts.poller.interval"
 
     }
 

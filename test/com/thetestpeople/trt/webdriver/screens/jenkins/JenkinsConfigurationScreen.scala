@@ -6,12 +6,6 @@ import org.openqa.selenium.By.id
 
 trait JenkinsConfigurationScreen { self: AbstractScreen ⇒
 
-  def selectJobsTab(): JenkinsJobsScreen = {
-    log("Select 'Jobs' tab")
-    webDriver.waitForDisplayedAndEnabled(id("jobs-tab-link")).click()
-    new JenkinsJobsScreen
-  }
-
   def selectAuthTab(): JenkinsAuthScreen = {
     log("Select 'Auth' tab")
     webDriver.waitForDisplayedAndEnabled(id("auth-tab-link")).click()

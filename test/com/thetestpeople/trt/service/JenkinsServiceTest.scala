@@ -17,7 +17,7 @@ import com.thetestpeople.trt.jenkins.importer.FakeCiImportQueue
 import com.thetestpeople.trt.service.indexing.LuceneLogIndexer
 
 @RunWith(classOf[JUnitRunner])
-class JenkinsServiceTest extends FlatSpec with ShouldMatchers {
+class CiServiceTest extends FlatSpec with ShouldMatchers {
 
   "Creating a Jenkins import spec" should "not persist lastCheckedOpt" in {
     val service = setup().service

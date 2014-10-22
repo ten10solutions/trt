@@ -36,7 +36,7 @@ class JenkinsImportTest extends FlatSpec with ShouldMatchers {
 
     http.prefix = "webcache-pentaho-1214-1216"
 
-    service.syncAllJenkins()
+    service.syncAllCiImports()
     ciImporter.importBuilds(specId)
 
     service.getBatches().flatMap(_.nameOpt) should equal(List(
@@ -48,7 +48,7 @@ class JenkinsImportTest extends FlatSpec with ShouldMatchers {
     http.prefix = "webcache-pentaho-1217-1219"
     clock += 10.minutes
 
-    service.syncAllJenkins()
+    service.syncAllCiImports()
     ciImporter.importBuilds(specId)
 
     service.getBatches().flatMap(_.nameOpt) should equal(List(

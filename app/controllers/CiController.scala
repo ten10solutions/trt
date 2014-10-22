@@ -204,10 +204,10 @@ class CiController(service: Service) extends Controller with HasLogger {
       updatedAtTime = build.importTime,
       batchIdOpt = Some(build.batchId))
 
-  def syncJenkins(id: Id[CiImportSpec]) = Action { implicit request ⇒
-    logger.debug(s"syncJenkins($id)")
+  def syncCiImport(id: Id[CiImportSpec]) = Action { implicit request ⇒
+    logger.debug(s"syncCiImport($id)")
     if (service.getCiImportSpec(id).isDefined) {
-      service.syncJenkins(id)
+      service.syncCiImport(id)
       Redirect(CiController.getCiImportSpec(id)).flashing("success" -> "Sync has been triggered")
     } else
       NotFound(s"Could not find Jenkins import spec with id '$id'")

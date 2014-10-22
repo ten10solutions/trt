@@ -7,9 +7,10 @@
 
 @main("TeamCity Configuration", "TeamCityConfiguration", css = css) {
 
-  <h2>TeamCityConfiguration</h2>  
+  <h2>TeamCity Configuration</h2>  
    
   <p style="margin-top: 20px"/>
+  Credentials to access TeamCity API (if guest access is not enabled):
 
   @helper.form(routes.CiController.updateTeamCityConfig(), 'role -> "form") {
     

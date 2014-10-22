@@ -6,11 +6,9 @@ import com.thetestpeople.trt.jenkins.trigger.TriggerResult
 import java.net.URI
 import com.thetestpeople.trt.importer._
 
-trait JenkinsService {
+trait CiService {
 
   /**
-   * Add a new Jenkins import spec.
-   *
    * @param spec -- any value set for id or lastCheckedOpt will be ignored.
    */
   def newCiImportSpec(spec: CiImportSpec): Id[CiImportSpec]
@@ -27,14 +25,14 @@ trait JenkinsService {
   def deleteCiImportSpec(id: Id[CiImportSpec]): Boolean
 
   /**
-   * Schedule the given Jenkins job to be scanned for builds to import
+   * Schedule the given CI job to be scanned for builds to import
    */
-  def syncJenkins(id: Id[CiImportSpec])
+  def syncCiImport(id: Id[CiImportSpec])
 
   /**
-   * Schedule all the Jenkins jobs to be scanned for builds to import
+   * Schedule all the CI jobs to be scanned for builds to import
    */
-  def syncAllJenkins()
+  def syncAllCiImports()
 
   def getJenkinsConfiguration(): FullJenkinsConfiguration
 
@@ -58,4 +56,5 @@ trait JenkinsService {
   def getBuildImportStatuses(specId: Id[CiImportSpec]): Seq[CiBuildImportStatus]
 
   def getJobImportStatus(specId: Id[CiImportSpec]): Option[CiJobImportStatus]
+  
 }

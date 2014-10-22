@@ -9,7 +9,7 @@ object FakeApplicationFactory {
 
   def fakeApplication = new FakeApplication(
     additionalConfiguration = Map(
-      Jenkins.Poller.Enabled -> false,
+      Ci.Poller.Enabled -> false,
       Db.Default.Driver -> "org.h2.Driver",
       Db.Default.Url -> TestJdbcUrl,
       Db.Default.User -> "",

@@ -44,7 +44,7 @@ GET     /ci/:id/log                 @controllers.CiController.getCiImportSpec(id
 GET     /ci/:id/edit                @controllers.CiController.editCiImportSpec(id: Id[CiImportSpec])
 POST    /ci/:id/edit                @controllers.CiController.updateCiImportSpec(id: Id[CiImportSpec])
 POST    /ci/:id/delete              @controllers.CiController.deleteCiImportSpec(id: Id[CiImportSpec])
-POST    /ci/:id/sync                @controllers.CiController.syncJenkins(id: Id[CiImportSpec])
+POST    /ci/:id/sync                @controllers.CiController.syncCiImport(id: Id[CiImportSpec])
 
 GET     /admin                      @controllers.Application.admin()
 POST    /deleteAll                  @controllers.Application.deleteAll()

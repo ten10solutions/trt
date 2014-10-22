@@ -3,7 +3,7 @@ package com.thetestpeople.trt.service
 import com.thetestpeople.trt.model._
 import com.thetestpeople.trt.model.jenkins._
 import com.thetestpeople.trt.utils._
-import com.thetestpeople.trt.service.jenkins.JenkinsServiceImpl
+import com.thetestpeople.trt.service.jenkins.CiServiceImpl
 import com.thetestpeople.trt.analysis._
 import java.net.URI
 import com.thetestpeople.trt.utils.http.Http
@@ -24,7 +24,7 @@ class ServiceImpl(
   protected val batchRecorder: BatchRecorder,
   protected val ciImportQueue: CiImportQueue,
   protected val logIndexer: LogIndexer)
-    extends Service with HasLogger with JenkinsServiceImpl {
+    extends Service with HasLogger with CiServiceImpl {
 
   import dao.transaction
 
@@ -184,44 +184,43 @@ class ServiceImpl(
     new StaleTestCalculator().findStaleTests(analysedTests)
   }
 
-  def setExecutionComment(id: Id[Execution], text: String): Boolean =
-    if (transaction(dao.getEnrichedExecution(id)).isEmpty)
+  def setExecutionComment(id: Id[Execution], text: String): Boolean = transaction {
+    if (dao.getEnrichedExecution(id).isEmpty)
       false
     else {
       logger.info(s"Updating comment for execution $id")
       text.trim match {
-        case "" ⇒ transaction { dao.deleteExecutionComment(id) }
-        case s  ⇒ transaction { dao.setExecutionComment(id, text) }
+        case "" ⇒ dao.deleteExecutionComment(id)
+        case s  ⇒ dao.setExecutionComment(id, text)
       }
       true
     }
+  }
 
-  def setBatchComment(id: Id[Batch], text: String): Boolean =
-    if (transaction(dao.getBatch(id)).isEmpty)
+  def setBatchComment(id: Id[Batch], text: String): Boolean = transaction {
+    if (dao.getBatch(id).isEmpty)
       false
     else {
       logger.info(s"Updating comment for batch $id")
       text.trim match {
-        case "" ⇒ transaction { dao.deleteBatchComment(id) }
-        case s  ⇒ transaction { dao.setBatchComment(id, text) }
+        case "" ⇒ dao.deleteBatchComment(id)
+        case s  ⇒ dao.setBatchComment(id, text)
       }
       true
     }
+  }
 
-  def setTestComment(id: Id[Test], text: String): Boolean =
-    if (transaction(dao.getTestsById(Seq(id))).isEmpty)
+  def setTestComment(id: Id[Test], text: String): Boolean = transaction {
+    if (dao.getTestsById(Seq(id)).isEmpty)
       false
     else {
       logger.info(s"Updating comment for test $id")
       text.trim match {
-        case "" ⇒ transaction { dao.deleteTestComment(id) }
-        case s  ⇒ transaction { dao.setTestComment(id, text) }
+        case "" ⇒ dao.deleteTestComment(id)
+        case s  ⇒ dao.setTestComment(id, text)
       }
       true
     }
-
-  def getTeamCityConfiguration(): TeamCityConfiguration = transaction { dao.getTeamCityConfiguration }
-
-  def updateTeamCityConfiguration(config: TeamCityConfiguration) = transaction { dao.updateTeamCityConfiguration(config) }
+  }
 
 }

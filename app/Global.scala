@@ -15,7 +15,7 @@ object Global extends GlobalSettings with HasLogger {
     factory.dbMigrator.migrate()
 
     initialiseCiImportWorker(app)
-    initialiseJenkinsPoller(app)
+    initialiseCiImportPoller(app)
     initialiseAnalyseExecutionsPoller(app)
   }
 
@@ -28,16 +28,16 @@ object Global extends GlobalSettings with HasLogger {
   private def getDuration(configuration: Configuration, key: String, default: FiniteDuration): FiniteDuration =
     configuration.getMilliseconds(key).map(_.millis).getOrElse(default)
 
-  private def initialiseJenkinsPoller(app: Application) {
+  private def initialiseCiImportPoller(app: Application) {
     val conf = app.configuration
-    val initialDelay = conf.getDuration(Jenkins.Poller.InitialDelay, default = 1.minute)
-    val interval = conf.getDuration(Jenkins.Poller.Interval, default = 1.minute)
+    val initialDelay = conf.getDuration(Ci.Poller.InitialDelay, default = 1.minute)
+    val interval = conf.getDuration(Ci.Poller.Interval, default = 1.minute)
 
-    if (conf.getBoolean(Jenkins.Poller.Enabled).getOrElse(true)) {
+    if (conf.getBoolean(Ci.Poller.Enabled).getOrElse(true)) {
       Akka.system(app).scheduler.schedule(initialDelay, interval) {
-        factory.service.syncAllJenkins()
+        factory.service.syncAllCiImports()
       }
-      logger.info("Initialised Jenkins poller")
+      logger.info("Initialised CI import poller")
     }
   }
 

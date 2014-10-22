@@ -12,7 +12,7 @@ import com.thetestpeople.trt.service._
 import com.thetestpeople.trt.jenkins.trigger.JenkinsTestRunner
 import com.thetestpeople.trt.utils.KeyedLocks
 
-trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
+trait CiServiceImpl extends CiService { self: ServiceImpl ⇒
 
   import dao.transaction
 
@@ -29,7 +29,7 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
   def deleteCiImportSpec(id: Id[CiImportSpec]) = transaction {
     val success = dao.deleteCiImportSpec(id)
     if (success)
-      logger.info(s"Deleted Jenkins import spec $id")
+      logger.info(s"Deleted CI import spec $id")
     success
   }
 
@@ -41,22 +41,21 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
     transaction {
       val success = dao.updateCiImportSpec(spec)
       if (success)
-        logger.info(s"Updated Jenkins import spec $spec.id")
+        logger.info(s"Updated CI import spec $spec.id")
       success
     }
 
-  def syncJenkins(specId: Id[CiImportSpec]) = {
+  def syncCiImport(specId: Id[CiImportSpec]) = {
     ciImportQueue.add(specId)
   }
 
-  def syncAllJenkins() {
-    logger.debug("syncAllJenkins()")
+  def syncAllCiImports() {
+    logger.debug("syncAllCiImports()")
     val specs = transaction { dao.getCiImportSpecs() }
     val now = clock.now
     def isOverdue(spec: CiImportSpec) = spec.nextCheckDueOpt.forall(_ <= now)
     for (spec ← specs if isOverdue(spec))
-      syncJenkins(spec.id)
-
+      syncCiImport(spec.id)
   }
 
   def getJenkinsConfiguration(): FullJenkinsConfiguration = transaction { dao.getJenkinsConfiguration() }
@@ -81,9 +80,16 @@ trait JenkinsServiceImpl extends JenkinsService { self: ServiceImpl ⇒
   def getBuildImportStatuses(specId: Id[CiImportSpec]): Seq[CiBuildImportStatus] = {
     ciImportStatusManager.getBuildImportStatuses(specId)
   }
-  
+
   def getJobImportStatus(specId: Id[CiImportSpec]): Option[CiJobImportStatus] = {
     ciImportStatusManager.getJobImportStatus(specId)
+  }
+
+  def getTeamCityConfiguration(): TeamCityConfiguration = transaction { dao.getTeamCityConfiguration }
+
+  def updateTeamCityConfiguration(config: TeamCityConfiguration) = transaction {
+    dao.updateTeamCityConfiguration(config)
+    logger.info(s"Updated TeamCity configuration to $config")
   }
 
 }

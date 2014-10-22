@@ -2,7 +2,7 @@ package com.thetestpeople.trt.service
 
 import com.thetestpeople.trt.model._
 import com.thetestpeople.trt.model.jenkins._
-import com.thetestpeople.trt.service.jenkins.JenkinsService
+import com.thetestpeople.trt.service.jenkins.CiService
 import com.thetestpeople.trt.analysis.HistoricalTestCounts
 import org.joda.time.Duration
 import java.net.URI
@@ -12,13 +12,18 @@ import com.thetestpeople.trt.analysis.ExecutionTimeMAD
 
 case class TestAndExecutions(test: TestAndAnalysis, executions: Seq[EnrichedExecution], otherConfigurations: Seq[Configuration])
 
-case class BatchAndExecutions(batch: Batch, executions: Seq[EnrichedExecution], logOpt: Option[String], importSpecIdOpt: Option[Id[CiImportSpec]], commentOpt: Option[String])
+case class BatchAndExecutions(
+    batch: Batch, 
+    executions: Seq[EnrichedExecution], 
+    logOpt: Option[String], 
+    importSpecIdOpt: Option[Id[CiImportSpec]], 
+    commentOpt: Option[String])
 
 case class ExecutionsAndTotalCount(executions: Seq[EnrichedExecution], total: Int)
 
 case class ExecutionAndFragment(execution: EnrichedExecution, fragment: String)
 
-trait Service extends JenkinsService {
+trait Service extends CiService {
 
   def addBatch(batch: Incoming.Batch): Id[Batch]
 

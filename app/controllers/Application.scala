@@ -112,8 +112,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
       case BatchAndExecutions(batch, executions, logOpt, importSpecIdOpt, commentOpt) ⇒
         val batchView = new BatchView(batch, executions.toList, logOpt, importSpecIdOpt, commentOpt)
         val paginationData = pagination.paginationData(executions.size)
-        val canRerun = service.canRerun
-        views.html.batch(batchView, passedFilterOpt, canRerun, paginationData)
+        views.html.batch(batchView, passedFilterOpt, service.canRerun, paginationData)
     }
 
   def batchLog(batchId: Id[Batch]) = Action { implicit request ⇒

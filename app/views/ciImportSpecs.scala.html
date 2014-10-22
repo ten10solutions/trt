@@ -50,7 +50,7 @@
           <td class="configuration-cell">@spec.configuration</td>
           <td class="configure-cell"><a href="@routes.CiController.editCiImportSpec(spec.id)">Configure</a></td>
           <td class="sync-cell">
-            <form action="@routes.CiController.syncJenkins(spec.id)" method="post">
+            <form action="@routes.CiController.syncCiImport(spec.id)" method="post">
               <button class="btn btn-default" title="Check for new builds now"><i class="glyphicon glyphicon-refresh"></i> Sync</button>
             </form>
           </td>
