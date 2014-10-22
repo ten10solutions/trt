@@ -21,9 +21,10 @@ class JenkinsBuildDownloader(
   }
 
   private def getJobXml(jobUrl: URI): Elem = {
-    // We need to explicitly set the tree param to fetch the otherwise-hidden "allBuilds" list. Ordinarily the builds
+    // For jenkins, we need to explicitly set the tree param to fetch the otherwise-hidden "allBuilds" list. Ordinarily the builds
     // are capped at 100. See https://issues.jenkins-ci.org/browse/JENKINS-22977
-    val url = (jobUrl / "api/xml") ? "tree=name,url,allBuilds[number,url]"
+    // Hudson doesn't support "allBuilds", so we include "builds" as well (and we later remove duplicates)
+    val url = (jobUrl / "api/xml") ? "tree=name,url,allBuilds[number,url],builds[number,url]"
     try
       http.get(url, basicAuthOpt = credentialsOpt).checkOK.bodyAsXml
     catch {
