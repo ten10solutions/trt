@@ -124,7 +124,8 @@ buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion)
 
 buildInfoPackage := "com.thetestpeople.trt.buildKeys"
 
+doc in Compile <<= target.map(_ / "none") // avoid bundling API docs
+
 // == Misc =====================================================================================
 
 net.virtualvoid.sbt.graph.Plugin.graphSettings
-
