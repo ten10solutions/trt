@@ -8,7 +8,7 @@ name := "trt"
 
 organization := "com.thetestpeople"
 
-version := "0.1.0"
+version := "0.1.1-SNAPSHOT"
 
 scalacOptions ++= List("-deprecation", "-feature")
 
