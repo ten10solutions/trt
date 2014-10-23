@@ -742,4 +742,11 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     dao.getDeletedTests().map(_.id) should equal(Seq())
   }
 
+  "Setting batch duration" should "work" in transaction { dao ⇒
+    val batchId = dao.newBatch(F.batch(durationOpt = None))
+    dao.setBatchDuration(batchId, Some(DummyData.Duration))
+    val Some(batch) = dao.getBatch(batchId)
+    batch.batch.durationOpt should equal(Some(DummyData.Duration))
+  }
+  
 }
