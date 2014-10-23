@@ -166,6 +166,33 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
     service.searchLogs("foo")._2 should equal(0)
   }
 
+  "Batches" should "be able to be recorded incrementally" in {
+    val service = setup().service
+    val batchId = service.addBatch(F.batch(complete = false, executions = Seq(), durationOpt = None))
+
+    {
+      val batchAndExecutions = service.getBatchAndExecutions(batchId).get
+      batchAndExecutions.executions.size should equal(0)
+      batchAndExecutions.batch.durationOpt should equal(None)
+    }
+
+    service.addExecutionsToBatch(batchId, Seq(F.execution(F.test())))
+
+    {
+      val batchAndExecutions = service.getBatchAndExecutions(batchId).get
+      batchAndExecutions.executions.size should equal(1)
+      batchAndExecutions.batch.durationOpt should equal(None)
+    }
+
+    service.completeExecution(batchId, Some(DummyData.Duration))
+
+    {
+      val batchAndExecutions = service.getBatchAndExecutions(batchId).get
+      batchAndExecutions.executions.size should equal(1)
+      batchAndExecutions.batch.durationOpt should equal(Some(DummyData.Duration))
+    }
+  }
+
   private def setup() = TestServiceFactory.setup()
 
 }

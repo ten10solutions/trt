@@ -1,18 +1,14 @@
-package com.thetestpeople.trt
+package com.thetestpeople.trt.service
 
 import org.junit.runner.RunWith
 import org.scalatest._
-import org.scalatest.junit.JUnitRunner
-import com.thetestpeople.trt.analysis.AnalysisService
 import com.thetestpeople.trt.model._
-import com.thetestpeople.trt.model.impl.MockDao
 import com.thetestpeople.trt.mother.{ IncomingFactory ⇒ F }
 import com.thetestpeople.trt.service._
 import com.github.nscala_time.time.Imports._
-import java.net.URI
 import com.thetestpeople.trt.utils.UriUtils._
 import com.thetestpeople.trt.model.impl.DummyData
-import com.thetestpeople.trt.service.indexing.LuceneLogIndexer
+import org.scalatest.junit.JUnitRunner
 
 @RunWith(classOf[JUnitRunner])
 class BatchRecorderTest extends FlatSpec with Matchers {

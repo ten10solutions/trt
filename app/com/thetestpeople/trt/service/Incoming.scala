@@ -1,6 +1,7 @@
 package com.thetestpeople.trt.service
 
 import com.thetestpeople.trt.model._
+import com.thetestpeople.trt.model
 import org.joda.time._
 import java.net.URI
 
@@ -21,6 +22,7 @@ object Incoming {
 
   case class Batch(
     executions: Seq[Execution],
+    complete: Boolean,
     urlOpt: Option[URI],
     nameOpt: Option[String],
     logOpt: Option[String],
@@ -44,5 +46,7 @@ object Incoming {
   case class Test(name: String, groupOpt: Option[String] = None) {
     def qualifiedName = QualifiedName(name, groupOpt)
   }
+
+  case class BatchCompleteMessage(id: Id[model.Batch], durationOpt: Option[Duration])
 
 }

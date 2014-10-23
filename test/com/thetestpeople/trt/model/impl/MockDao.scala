@@ -398,4 +398,10 @@ class MockDao extends Dao {
 
   def updateTeamCityConfiguration(config: TeamCityConfiguration) = teamCityConfiguration = config
 
+  def setBatchDuration(id: Id[Batch], durationOpt: Option[Duration]): Boolean = {
+    val updatedBatches = batches.filter(_.id == id).map(_.copy(durationOpt = durationOpt))
+    batches = batches.filterNot(_.id == id) ++ updatedBatches
+    updatedBatches.nonEmpty
+  }
+
 }

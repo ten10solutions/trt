@@ -10,6 +10,7 @@ class TeamCityBatchCreator(configurationOpt: Option[Configuration]) {
 
   def createBatch(build: TeamCityBuild): Incoming.Batch =
     Incoming.Batch(
+      complete = true,
       executions = build.occurrences map createExecution,
       urlOpt = Some(build.url),
       nameOpt = Some(build.number),

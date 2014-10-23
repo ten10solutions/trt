@@ -2,12 +2,14 @@ package com.thetestpeople.trt.model
 
 import java.net.URI
 import com.thetestpeople.trt.model.jenkins._
+import org.joda.time.Duration
 
 object SortBy {
 
   sealed trait Test {
     def descending: Boolean
   }
+  
   object Test {
     case class Weather(descending: Boolean = false) extends SortBy.Test
     case class Group(descending: Boolean = false) extends SortBy.Test
@@ -42,7 +44,7 @@ trait Dao extends ExecutionDao with CiDao {
    * @return all tests marked as deleted
    */
   def getDeletedTests(): Seq[Test]
-  
+
   /**
    * @return all test names matching the given pattern (case-insensitive, allows * wildcards)
    */
@@ -124,6 +126,8 @@ trait Dao extends ExecutionDao with CiDao {
    * @return ID of the newly added batch.
    */
   def newBatch(batch: Batch, logOpt: Option[String] = None): Id[Batch]
+
+  def setBatchDuration(batchId: Id[Batch], durationOpt: Option[Duration]): Boolean
 
   /**
    * Delete the given batches and any associated data (executions, Jenkins import records, etc).

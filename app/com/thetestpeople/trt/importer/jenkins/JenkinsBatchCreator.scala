@@ -19,6 +19,7 @@ class JenkinsBatchCreator(configurationOpt: Option[Configuration]) {
         if !testCase.skipped
       } yield createExecution(buildSummary.timestampOpt)(testCase)
     Incoming.Batch(
+      complete = true,
       executions = executions,
       urlOpt = Some(build.buildSummary.url),
       nameOpt = build.buildSummary.nameOpt,

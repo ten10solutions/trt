@@ -57,8 +57,10 @@ GET     /webApi/configuration/chart   @controllers.Application.configurationChar
 GET     /api/batches                @controllers.JsonController.getBatches()
 POST    /api/batches                @controllers.JsonController.addBatch()
 POST    /api/deleteAll              @controllers.JsonController.deleteAll()
+POST    /api/batch/:id/executions   @controllers.JsonController.addExecutions(id: Id[Batch])
+POST    /api/batch/:id/complete     @controllers.JsonController.completeBatch(id: Id[Batch])
 
-POST    /api/testing/analyseAllExecutions     @controllers.Application.analyseAllExecutions()
+POST    /testApi/testing/analyseAllExecutions     @controllers.Application.analyseAllExecutions()
 
 GET     /jenkins/auth               @controllers.CiController.auth()
 POST    /jenkins/auth               @controllers.CiController.updateAuth()

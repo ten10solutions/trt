@@ -27,6 +27,10 @@ trait Service extends CiService {
 
   def addBatch(batch: Incoming.Batch): Id[Batch]
 
+  def addExecutionsToBatch(batchId: Id[Batch], executions: Seq[Incoming.Execution]): Boolean
+    
+  def completeExecution(batchId: Id[Batch], durationOpt: Option[Duration]): Boolean
+  
   def getBatchAndExecutions(id: Id[Batch], passedFilterOpt: Option[Boolean] = None): Option[BatchAndExecutions]
 
   /**

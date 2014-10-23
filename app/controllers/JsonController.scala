@@ -29,6 +29,30 @@ class JsonController(service: Service, adminService: AdminService) extends Contr
       BadRequest("Error parsing batch JSON: " + JsError.toFlatJson(e)))
   }
 
+  def addExecutions(batchId: Id[Batch]) = Action(parse.json(maxLength = JsonController.MaxBatchJsonSize)) { implicit request ⇒
+    logger.debug(s"addExecutions($batchId)")
+    request.body.validate[Seq[Incoming.Execution]].map { executions ⇒
+      val batchFound = service.addExecutionsToBatch(batchId, executions)
+      if (batchFound)
+        Ok("Executions added to batch")
+      else
+        NotFound(s"Could not find batch with id batchId")
+    }.recoverTotal(e ⇒
+      BadRequest("Error parsing executions JSON: " + JsError.toFlatJson(e)))
+  }
+
+  def completeBatch(batchId: Id[Batch]) = Action(parse.json) { implicit request ⇒
+    logger.debug(s"completeExecution($batchId)")
+    request.body.validate[Incoming.BatchCompleteMessage].map { batchCompleteMessage ⇒
+      val batchFound = service.completeExecution(batchId, batchCompleteMessage.durationOpt)
+      if (batchFound)
+        Ok("Batch completed")
+      else
+        NotFound(s"Could not find batch with id batchId")
+    }.recoverTotal(e ⇒
+      BadRequest("Error parsing JSON: " + JsError.toFlatJson(e)))
+  }
+
   def getBatches = Action { implicit request ⇒
     val batches = service.getBatches()
     Ok(Json.toJson(batches))

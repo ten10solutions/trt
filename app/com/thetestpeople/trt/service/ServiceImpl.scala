@@ -84,8 +84,15 @@ class ServiceImpl(
       analysisService.scheduleAnalysis(ids)
   }
 
-  def addBatch(incomingBatch: Incoming.Batch): Id[Batch] = transaction {
+  def addBatch(incomingBatch: Incoming.Batch): Id[Batch] =
     batchRecorder.recordBatch(incomingBatch).id
+
+  def addExecutionsToBatch(batchId: Id[Batch], executions: Seq[Incoming.Execution]): Boolean =
+    batchRecorder.recordExecutions(batchId, executions)
+
+  def completeExecution(batchId: Id[Batch], durationOpt: Option[Duration]): Boolean = transaction {
+    logger.info("sBatch completed: $batchId")
+    dao.setBatchDuration(batchId, durationOpt)
   }
 
   def getBatchAndExecutions(id: Id[Batch], passedFilterOpt: Option[Boolean] = None): Option[BatchAndExecutions] =

@@ -51,6 +51,7 @@ object JsonSerializers {
 
   implicit val incomingBatchFormat: Format[Incoming.Batch] = (
     (__ \ "executions").format[Seq[Incoming.Execution]] and
+    (__ \ "complete").format[Boolean] and
     (__ \ "url").formatNullable[URI] and
     (__ \ "name").formatNullable[String] and
     (__ \ "log").formatNullable[String] and
@@ -78,5 +79,9 @@ object JsonSerializers {
   implicit val historicalTestCountsFormat: Format[HistoricalTestCounts] = (
     (__ \ "when").format[DateTime] and
     (__ \ "counts").format[TestCounts])(HistoricalTestCounts, unlift(HistoricalTestCounts.unapply))
-    
+
+  implicit val batchCompleteMessageFormat: Format[Incoming.BatchCompleteMessage] = (
+    (__ \ "id").format[Id[Batch]] and
+    (__ \ "duration").formatNullable[Duration]).apply(Incoming.BatchCompleteMessage, unlift(Incoming.BatchCompleteMessage.unapply))
+
 }

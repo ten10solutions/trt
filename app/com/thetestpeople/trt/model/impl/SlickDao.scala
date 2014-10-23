@@ -311,6 +311,9 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     batchId
   }
 
+  def setBatchDuration(batchId: Id[Batch], durationOpt: Option[Duration]): Boolean =
+    batches.filter(_.id === batchId).map(_.duration).update(durationOpt) > 0
+
   /**
    *  Postgres throws an error on null chars:
    *    "ERROR: invalid byte sequence for encoding "UTF8": 0x00"
