@@ -80,9 +80,9 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
     val List(testId) = service.getTestIdsInBatch(batchId)
     val List(executionId) = service.getExecutionIdsInBatch(batchId)
 
-    val Some(TestAndExecutions(testAndAnalysis, List(execution), configurations)) = service.getTestAndExecutions(testId)
+    val Some(TestAndExecutions(testAndAnalysis, List(execution), configurations, _)) = service.getTestAndExecutions(testId)
 
-    val TestAndAnalysis(test, Some(analysis), _) = testAndAnalysis
+    val EnrichedTest(test, Some(analysis), _) = testAndAnalysis
     analysis.status should equal(TestStatus.Healthy)
     testId should equal(test.id)
     executionId should equal(execution.id)

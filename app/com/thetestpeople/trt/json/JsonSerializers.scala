@@ -38,7 +38,8 @@ object JsonSerializers {
 
   implicit val incomingTestFormat: Format[Incoming.Test] = (
     (__ \ "name").format[String] and
-    (__ \ "group").formatNullable[String])(Incoming.Test, unlift(Incoming.Test.unapply))
+    (__ \ "group").formatNullable[String] and
+    (__ \ "categories").format[Seq[String]])(Incoming.Test, unlift(Incoming.Test.unapply))
 
   implicit val incomingExecutionFormat: Format[Incoming.Execution] = (
     (__ \ "test").format[Incoming.Test] and

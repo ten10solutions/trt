@@ -42,6 +42,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     val executionComments = TableQuery[ExecutionCommentMapping]
     val batchComments = TableQuery[BatchCommentMapping]
     val testComments = TableQuery[TestCommentMapping]
+    val testCategories = TableQuery[TestCategoryMapping]
     val systemConfiguration = TableQuery[SystemConfigurationMapping]
 
     val ciJobs = TableQuery[CiJobMapping]
@@ -85,6 +86,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       executionComments.delete
       batchComments.delete
       testComments.delete
+      testCategories.delete
       analyses.delete
     }
 
@@ -129,14 +131,14 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     for ((test, analysis) ← tests leftJoin analyses on (_.id === _.testId))
       yield (test, analysis)
 
-  def getTestAndAnalysis(id: Id[Test], configuration: Configuration): Option[TestAndAnalysis] = {
+  def getEnrichedTest(id: Id[Test], configuration: Configuration): Option[EnrichedTest] = {
     val query =
       for {
         ((test, analysis), comment) ← testsAndAnalyses leftJoin testComments on (_._1.id === _.testId)
         if test.id === id
         if analysis.configuration === configuration
       } yield (test, analysis.?, comment.?)
-    query.firstOption.map { case (test, analysisOpt, commentOpt) ⇒ TestAndAnalysis(test, analysisOpt, commentOpt.map(_.text)) }
+    query.firstOption.map { case (test, analysisOpt, commentOpt) ⇒ EnrichedTest(test, analysisOpt, commentOpt.map(_.text)) }
   }
 
   def getTestIds(): Seq[Id[Test]] =
@@ -162,7 +164,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
     limitOpt: Option[Int] = None,
-    sortBy: SortBy.Test = SortBy.Test.Group()): Seq[TestAndAnalysis] = {
+    sortBy: SortBy.Test = SortBy.Test.Group()): Seq[EnrichedTest] = {
     var query: TestAnalysisQuery = testsAndAnalyses
     query = query.filter(_._2.configuration === configuration)
     query = query.filterNot(_._1.deleted)
@@ -176,7 +178,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     query = query.drop(startingFrom)
     for (limit ← limitOpt)
       query = query.take(limit)
-    query.map { case (test, analysis) ⇒ (test, analysis.?) }.run.map { case (test, analysisOpt) ⇒ TestAndAnalysis(test, analysisOpt, commentOpt = None) }
+    query.map { case (test, analysis) ⇒ (test, analysis.?) }.run.map { case (test, analysisOpt) ⇒ EnrichedTest(test, analysisOpt, commentOpt = None) }
   }
 
   private def sortQuery(query: TestAnalysisQuery, sortBy: SortBy.Test): TestAnalysisQuery =
@@ -268,13 +270,13 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     Compiled(getTestWithNameAndNoGroup _)
   }
 
-  private def getTestAndAnalysis(qualifiedName: QualifiedName): Option[TestAndAnalysis] = {
+  private def getEnrichedTest(qualifiedName: QualifiedName): Option[EnrichedTest] = {
     val QualifiedName(name, groupOpt) = qualifiedName
     val query = groupOpt match {
       case Some(group) ⇒ getTestWithGroupCompiled(name, group)
       case None        ⇒ getTestWithoutGroupCompiled(name)
     }
-    query.firstOption.map { case (test, analysisOpt) ⇒ TestAndAnalysis(test, analysisOpt, commentOpt = None) }
+    query.firstOption.map { case (test, analysisOpt) ⇒ EnrichedTest(test, analysisOpt, commentOpt = None) }
   }
 
   def getBatch(id: Id[Batch]): Option[BatchAndLog] = {
@@ -329,6 +331,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       } yield test.id
 
     val testIdsToDelete = testsWithoutExecutionsQuery.run
+    testCategories.filter(_.testId inSet testIdsToDelete).delete
     testComments.filter(_.testId inSet testIdsToDelete).delete
     tests.filter(_.id inSet testIdsToDelete).delete
     testIdsToDelete
@@ -353,7 +356,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   private val testInserter = (tests returning tests.map(_.id)).insertInvoker
 
   def ensureTestIsRecorded(test: Test): Id[Test] = synchronized {
-    getTestAndAnalysis(test.qualifiedName) match {
+    getEnrichedTest(test.qualifiedName) match {
       case Some(testAndAnalysis) ⇒
         testAndAnalysis.id
       case None ⇒
@@ -433,5 +436,8 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
 
   def deleteTestComment(id: Id[Test]) = testComments.filter(_.testId === id).delete
 
+  def getCategories(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[String]] =
+    testCategories.filter(_.testId inSet testIds).run.groupBy(_.testId).mapValues(_.map(_.category))
+    
 }
 

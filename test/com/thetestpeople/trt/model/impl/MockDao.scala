@@ -26,6 +26,7 @@ class MockDao extends Dao {
   private var executions: Seq[Execution] = List()
   private var tests: Seq[Test] = List()
   private var testComments: Seq[TestComment] = List()
+  private var testCategories: Seq[TestCategory] = List()
   private var batches: Seq[Batch] = List()
   private var analyses: Seq[Analysis] = List()
   private var executionLogs: Seq[ExecutionLogRow] = List()
@@ -49,12 +50,12 @@ class MockDao extends Dao {
       commentOpt = executionComments.find(_.executionId == id).map(_.text)
     } yield EnrichedExecution(execution, test.qualifiedName, batch.nameOpt, logOpt, commentOpt)
 
-  def getTestAndAnalysis(id: Id[Test], configuration: Configuration): Option[TestAndAnalysis] =
+  def getEnrichedTest(id: Id[Test], configuration: Configuration): Option[EnrichedTest] =
     for {
       test ← tests.find(_.id == id)
       analysis ← analyses.find(a ⇒ a.testId == test.id && a.configuration == configuration)
       commentOpt = testComments.find(_.testId == id).map(_.text)
-    } yield TestAndAnalysis(test, Some(analysis), commentOpt)
+    } yield EnrichedTest(test, Some(analysis), commentOpt)
 
   def getTestIds(): Seq[Id[Test]] = tests.map(_.id)
 
@@ -74,7 +75,7 @@ class MockDao extends Dao {
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
     limitOpt: Option[Int],
-    sortBy: SortBy.Test = SortBy.Test.Group()): Seq[TestAndAnalysis] = {
+    sortBy: SortBy.Test = SortBy.Test.Group()): Seq[EnrichedTest] = {
     val allResults =
       for {
         test ← tests
@@ -83,8 +84,8 @@ class MockDao extends Dao {
         analysisOpt = analyses.find(a ⇒ a.testId == test.id && a.configuration == configuration)
         if testStatusOpt.forall(status ⇒ analysisOpt.exists(_.status == status))
         commentOpt = testComments.find(_.testId == test.id).map(_.text)
-      } yield TestAndAnalysis(test, analysisOpt, commentOpt)
-    def order(x: Seq[TestAndAnalysis], descending: Boolean) = if (descending) x.reverse else x
+      } yield EnrichedTest(test, analysisOpt, commentOpt)
+    def order(x: Seq[EnrichedTest], descending: Boolean) = if (descending) x.reverse else x
     val sortedResults = sortBy match {
       case SortBy.Test.Weather(descending) ⇒
         order(allResults.sortBy(_.analysisOpt.map(_.weather)), descending)
@@ -404,4 +405,7 @@ class MockDao extends Dao {
     updatedBatches.nonEmpty
   }
 
+  def getCategories(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[String]] = 
+    testCategories.filter(t => testIds contains t.testId).groupBy(_.testId).mapValues(_.map(_.category))  
+  
 }

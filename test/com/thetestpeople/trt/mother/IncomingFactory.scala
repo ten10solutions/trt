@@ -11,11 +11,13 @@ import java.net.URI
 
 object IncomingFactory {
 
-  def test(qualifiedName: QualifiedName): Incoming.Test = Incoming.Test(qualifiedName.name, qualifiedName.groupOpt)
+  def test(qualifiedName: QualifiedName): Incoming.Test = 
+    Incoming.Test(qualifiedName.name, qualifiedName.groupOpt)
 
   def test(
     name: String = DummyData.TestName,
-    groupOpt: Option[String] = Some(DummyData.Group)): Incoming.Test = Incoming.Test(name, groupOpt)
+    groupOpt: Option[String] = Some(DummyData.Group),
+    categories: Seq[String] = Seq()): Incoming.Test = Incoming.Test(name, groupOpt, categories)
 
   def execution(
     test: Test = IncomingFactory.test(),

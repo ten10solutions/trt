@@ -33,7 +33,7 @@ trait Dao extends ExecutionDao with CiDao {
   /**
    * @return test and analysis for this configuration. Returns None if there are no analysed results for the given test and configuration.
    */
-  def getTestAndAnalysis(id: Id[Test], configuration: Configuration = Configuration.Default): Option[TestAndAnalysis]
+  def getEnrichedTest(id: Id[Test], configuration: Configuration = Configuration.Default): Option[EnrichedTest]
 
   /**
    * @return the IDs of all tests in the DB (including deleted tests).
@@ -71,7 +71,7 @@ trait Dao extends ExecutionDao with CiDao {
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
     limitOpt: Option[Int] = None,
-    sortBy: SortBy.Test = SortBy.Test.Group()): Seq[TestAndAnalysis]
+    sortBy: SortBy.Test = SortBy.Test.Group()): Seq[EnrichedTest]
 
   /**
    * Gets test counts for all configurations.
@@ -157,6 +157,7 @@ trait Dao extends ExecutionDao with CiDao {
 
   def deleteTestComment(id: Id[Test])
 
+  def getCategories(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[String]]
 }
 
 case class DeleteBatchResult(remainingTestIds: Seq[Id[Test]], deletedExecutionIds: Seq[Id[Execution]])

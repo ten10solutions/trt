@@ -10,14 +10,18 @@ import com.thetestpeople.trt.analysis.HistoricalTestCountsTimeline
 import com.thetestpeople.trt.analysis.ExecutionVolume
 import com.thetestpeople.trt.analysis.ExecutionTimeMAD
 
-case class TestAndExecutions(test: TestAndAnalysis, executions: Seq[EnrichedExecution], otherConfigurations: Seq[Configuration])
+case class TestAndExecutions(
+  test: EnrichedTest,
+  executions: Seq[EnrichedExecution],
+  otherConfigurations: Seq[Configuration],
+  categories: Seq[String] = Seq())
 
 case class BatchAndExecutions(
-    batch: Batch, 
-    executions: Seq[EnrichedExecution], 
-    logOpt: Option[String], 
-    importSpecIdOpt: Option[Id[CiImportSpec]], 
-    commentOpt: Option[String])
+  batch: Batch,
+  executions: Seq[EnrichedExecution],
+  logOpt: Option[String],
+  importSpecIdOpt: Option[Id[CiImportSpec]],
+  commentOpt: Option[String])
 
 case class ExecutionsAndTotalCount(executions: Seq[EnrichedExecution], total: Int)
 
@@ -28,9 +32,9 @@ trait Service extends CiService {
   def addBatch(batch: Incoming.Batch): Id[Batch]
 
   def addExecutionsToBatch(batchId: Id[Batch], executions: Seq[Incoming.Execution]): Boolean
-    
+
   def completeExecution(batchId: Id[Batch], durationOpt: Option[Duration]): Boolean
-  
+
   def getBatchAndExecutions(id: Id[Batch], passedFilterOpt: Option[Boolean] = None): Option[BatchAndExecutions]
 
   /**
@@ -49,14 +53,14 @@ trait Service extends CiService {
     groupOpt: Option[String] = None,
     startingFrom: Int = 0,
     limit: Int = Integer.MAX_VALUE,
-    sortBy: SortBy.Test = SortBy.Test.Group()): (TestCounts, Seq[TestAndAnalysis])
+    sortBy: SortBy.Test = SortBy.Test.Group()): (TestCounts, Seq[EnrichedTest])
 
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts]
 
   /**
    * @return tests that have been marked as deleted. No analysis or comment is retrieved.
    */
-  def getDeletedTests(): Seq[TestAndAnalysis]
+  def getDeletedTests(): Seq[EnrichedTest]
 
   def markTestsAsDeleted(ids: Seq[Id[Test]], deleted: Boolean = true)
 
@@ -89,7 +93,7 @@ trait Service extends CiService {
 
   def getExecutionVolume(configurationOpt: Option[Configuration]): Option[ExecutionVolume]
 
-  def staleTests(configuration: Configuration): (Option[ExecutionTimeMAD], Seq[TestAndAnalysis])
+  def staleTests(configuration: Configuration): (Option[ExecutionTimeMAD], Seq[EnrichedTest])
 
   /**
    * @return true iff an execution with the given id was present in the DB
@@ -105,4 +109,5 @@ trait Service extends CiService {
    * @return true iff a batch with the given id was present in the DB
    */
   def setTestComment(id: Id[Test], text: String): Boolean
+  
 }

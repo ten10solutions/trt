@@ -420,7 +420,17 @@
         <constraints nullable="true" />
       </column>
     </addColumn>
-  </changeSet> 
+  </changeSet>
 
+  <changeSet author="matt" id="create-test_categories">
+    <createTable tableName="test_categories">
+      <column name="test_id" type="INT">
+        <constraints nullable="false" />
+      </column>
+      <column name="category" type="VARCHAR(10485760)">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+  </changeSet>
   
 </databaseChangeLog>

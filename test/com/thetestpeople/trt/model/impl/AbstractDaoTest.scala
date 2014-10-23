@@ -418,16 +418,16 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     dao.getTestIds() should contain theSameElementsAs (List(testId))
   }
 
-  "getTestAndAnalysis" should "not bring anything back if no test with that id" in transaction { dao ⇒
+  "getEnrichedTest" should "not bring anything back if no test with that id" in transaction { dao ⇒
     val Some(bogusId) = Id.parse[Test]("123")
 
-    dao.getTestAndAnalysis(bogusId) should equal(None)
+    dao.getEnrichedTest(bogusId) should equal(None)
   }
 
-  "getTestAndAnalysis" should "bring back None if it has not been analysed in that configuration" in transaction { dao ⇒
+  "getEnrichedTest" should "bring back None if it has not been analysed in that configuration" in transaction { dao ⇒
     val testId = dao.ensureTestIsRecorded(F.test())
 
-    dao.getTestAndAnalysis(testId) should equal(None)
+    dao.getEnrichedTest(testId) should equal(None)
   }
 
   "Getting batches" should "return them all most recent batch first" in transaction { dao ⇒
@@ -487,7 +487,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
       whenAnalysed = DummyData.WhenAnalysed,
       medianDurationOpt = Some(DummyData.Duration)))
 
-    val Some(TestAndAnalysis(_, Some(analysis), _)) = dao.getTestAndAnalysis(testId)
+    val analysis = dao.getEnrichedTest(testId).get.analysisOpt.get
     analysis.testId should equal(testId)
     analysis.status should equal(TestStatus.Healthy)
     analysis.weather should equal(DummyData.Weather)
@@ -514,7 +514,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
       whenAnalysed = DummyData.WhenAnalysed,
       medianDurationOpt = None))
 
-    val Some(TestAndAnalysis(_, Some(analysis2), _)) = dao.getTestAndAnalysis(testId)
+    val analysis2 = dao.getEnrichedTest(testId).get.analysisOpt.get
     analysis2.testId should equal(testId)
     analysis2.status should equal(TestStatus.Warning)
     analysis2.weather should equal(DummyData.Weather)
@@ -539,7 +539,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
       lastFailedExecutionIdOpt = None,
       lastFailedTimeOpt = None))
 
-    val Some(TestAndAnalysis(_, Some(analysis), _)) = dao.getTestAndAnalysis(testId)
+    val analysis = dao.getEnrichedTest(testId).get.analysisOpt.get
     analysis.lastPassedTimeOpt should equal(None)
     analysis.lastPassedExecutionIdOpt should equal(None)
     analysis.lastPassedExecutionIdOpt should equal(None)
@@ -578,7 +578,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     val DeleteBatchResult(Seq(affectedTestId), _) = dao.deleteBatches(List(batchId1))
 
     affectedTestId should be(testId1) // It hasn't been deleted, but it has had some executions removed
-    dao.getTestAndAnalysis(testId2) should be(None) // It has had all its executions removed, so it has been removed too
+    dao.getEnrichedTest(testId2) should be(None) // It has had all its executions removed, so it has been removed too
   }
 
   "Deleting a batch" should "return the ids of the deleted execution IDs" in transaction { dao ⇒
@@ -706,7 +706,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
   "Tests" should "be able to have comments attached" in transaction { dao ⇒
     val testId = dao.ensureTestIsRecorded(F.test())
     dao.upsertAnalysis(F.analysis(testId, configuration = Configuration.Default))
-    def getComment() = dao.getTestAndAnalysis(testId, Configuration.Default).get.commentOpt
+    def getComment() = dao.getEnrichedTest(testId, Configuration.Default).get.commentOpt
 
     getComment() should equal(None)
 
@@ -748,5 +748,5 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     val Some(batch) = dao.getBatch(batchId)
     batch.batch.durationOpt should equal(Some(DummyData.Duration))
   }
-  
+
 }

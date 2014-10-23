@@ -1,6 +1,6 @@
 package com.thetestpeople.trt.analysis
 
-import com.thetestpeople.trt.model.TestAndAnalysis
+import com.thetestpeople.trt.model.EnrichedTest
 import org.joda.time.DateTime
 import org.joda.time.Duration
 import com.github.nscala_time.time.Imports._
@@ -22,7 +22,7 @@ class StaleTestCalculator(deviationsThreshold: Int = 3, absoluteThreshold: Durat
 
   import StaleTestCalculator._
 
-  def findStaleTests(analysedTests: Seq[TestAndAnalysis]): (Option[ExecutionTimeMAD], Seq[TestAndAnalysis]) = {
+  def findStaleTests(analysedTests: Seq[EnrichedTest]): (Option[ExecutionTimeMAD], Seq[EnrichedTest]) = {
     val madOpt = calculateExecutionTimeMAD(analysedTests)
     val tests = madOpt.toSeq.flatMap { mad ⇒
       findOutliers(analysedTests, mad)
@@ -30,7 +30,7 @@ class StaleTestCalculator(deviationsThreshold: Int = 3, absoluteThreshold: Durat
     (madOpt, tests)
   }
 
-  private def calculateExecutionTimeMAD(analysedTests: Seq[TestAndAnalysis]) = {
+  private def calculateExecutionTimeMAD(analysedTests: Seq[EnrichedTest]) = {
     val lastExecutionTimes = analysedTests.flatMap(_.analysisOpt).map(_.lastExecutionTime.getMillis.toDouble)
     for {
       median ← StatsUtils.median(lastExecutionTimes)
@@ -41,7 +41,7 @@ class StaleTestCalculator(deviationsThreshold: Int = 3, absoluteThreshold: Durat
       medianDeviation = Duration.millis((medianDeviation * ConsistencyConstant).toLong))
   }
 
-  private def findOutliers(analysedTests: Seq[TestAndAnalysis], mad: ExecutionTimeMAD): Seq[TestAndAnalysis] = {
+  private def findOutliers(analysedTests: Seq[EnrichedTest], mad: ExecutionTimeMAD): Seq[EnrichedTest] = {
     val tests =
       for {
         test ← analysedTests

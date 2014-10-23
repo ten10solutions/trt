@@ -87,7 +87,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   private def handleTest(testId: Id[Test], configuration: Configuration, resultOpt: Option[Boolean], pagination: Pagination)(implicit request: Request[_]) =
     service.getTestAndExecutions(testId, configuration, resultOpt) map {
-      case TestAndExecutions(test, executions, otherConfigurations) ⇒
+      case TestAndExecutions(test, executions, otherConfigurations, _) ⇒
         val executionViews = executions.map(e ⇒ ExecutionView(e)).toList
         val testView = new TestView(test)
         val paginationData = pagination.paginationData(executions.size)

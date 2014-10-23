@@ -25,12 +25,12 @@ class StaleTestCalculatorTest extends FlatSpec with Matchers {
     staleTests should equal(Seq(test5))
   }
 
-  private def test(executionTime: DateTime): TestAndAnalysis = {
+  private def test(executionTime: DateTime): EnrichedTest = {
     val test = F.test()
     val batch = F.batch()
     val execution = F.execution(batch.id, test.id)
     val analysis: Analysis = F.analysis(test.id, lastPassedExecutionIdOpt = Some(execution.id), lastPassedTimeOpt = Some(executionTime))
-    TestAndAnalysis(test, Some(analysis), None)
+    EnrichedTest(test, Some(analysis), None)
   }
 
 }

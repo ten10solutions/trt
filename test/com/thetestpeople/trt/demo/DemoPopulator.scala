@@ -34,7 +34,7 @@ object DemoPopulator extends App {
 
   case class TestSpec(name: String, groupOpt: Option[String], passRate: Double) {
 
-    def test: Incoming.Test = Incoming.Test(name, groupOpt)
+    def test: Incoming.Test = Incoming.Test(name, groupOpt, categories = Seq())
 
     def randomPassed(fudge: Double) = random.nextDouble <= passRate * fudge
 

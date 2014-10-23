@@ -22,7 +22,7 @@ class AnalysisServiceTest extends FlatSpec with Matchers {
 
     analysisService.analyseTest(testId)
 
-    val Some(TestAndAnalysis(test, Some(analysis), _)) = dao.getTestAndAnalysis(testId)
+    val Some(EnrichedTest(test, Some(analysis), _)) = dao.getEnrichedTest(testId)
     analysis.status should equal(TestStatus.Warning)
     analysis.consecutiveFailures should equal(1)
     analysis.whenAnalysed should equal(clock.now)

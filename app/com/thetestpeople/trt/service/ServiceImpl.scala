@@ -38,10 +38,11 @@ class ServiceImpl(
     }
 
   def getTestAndExecutions(id: Id[Test], configuration: Configuration, resultOpt: Option[Boolean] = None): Option[TestAndExecutions] = transaction {
-    dao.getTestAndAnalysis(id, configuration) map { test ⇒
+    dao.getEnrichedTest(id, configuration) map { test ⇒
       val executions = dao.getEnrichedExecutionsForTest(id, Some(configuration), resultOpt)
       val otherConfigurations = dao.getConfigurations(id).filterNot(_ == configuration)
-      TestAndExecutions(test, executions, otherConfigurations)
+      val categories = dao.getCategories(Seq(id)).getOrElse(id, Seq())
+      TestAndExecutions(test, executions, otherConfigurations, categories)
     }
   }
 
@@ -52,7 +53,7 @@ class ServiceImpl(
     groupOpt: Option[String] = None,
     startingFrom: Int,
     limit: Int,
-    sortBy: SortBy.Test = SortBy.Test.Group()): (TestCounts, Seq[TestAndAnalysis]) = transaction {
+    sortBy: SortBy.Test = SortBy.Test.Group()): (TestCounts, Seq[EnrichedTest]) = transaction {
 
     val testCounts = dao.getTestCounts(
       configuration = configuration,
@@ -72,7 +73,7 @@ class ServiceImpl(
 
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts] = transaction { dao.getTestCountsByConfiguration() }
 
-  def getDeletedTests(): Seq[TestAndAnalysis] = transaction { dao.getDeletedTests().map(t ⇒ TestAndAnalysis(t)) }
+  def getDeletedTests(): Seq[EnrichedTest] = transaction { dao.getDeletedTests().map(t ⇒ EnrichedTest(t)) }
 
   def markTestsAsDeleted(ids: Seq[Id[Test]], deleted: Boolean) = transaction {
     if (deleted)
@@ -186,7 +187,7 @@ class ServiceImpl(
   def getExecutionVolume(configurationOpt: Option[Configuration]): Option[ExecutionVolume] =
     analysisService.getExecutionVolume(configurationOpt)
 
-  def staleTests(configuration: Configuration): (Option[ExecutionTimeMAD], Seq[TestAndAnalysis]) = transaction {
+  def staleTests(configuration: Configuration): (Option[ExecutionTimeMAD], Seq[EnrichedTest]) = transaction {
     val analysedTests = dao.getAnalysedTests(configuration = configuration)
     new StaleTestCalculator().findStaleTests(analysedTests)
   }

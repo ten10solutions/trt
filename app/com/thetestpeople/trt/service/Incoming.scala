@@ -43,7 +43,7 @@ object Incoming {
 
   }
 
-  case class Test(name: String, groupOpt: Option[String] = None) {
+  case class Test(name: String, groupOpt: Option[String] = None, categories: Seq[String] = Seq()) {
     def qualifiedName = QualifiedName(name, groupOpt)
   }
 

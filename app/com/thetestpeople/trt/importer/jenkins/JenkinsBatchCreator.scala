@@ -42,7 +42,10 @@ class JenkinsBatchCreator(configurationOpt: Option[Configuration]) {
   }
 
   private def createTest(testCase: Case): Incoming.Test =
-    Incoming.Test(name = testCase.name, groupOpt = Some(testCase.className))
+    Incoming.Test(
+      name = testCase.name,
+      groupOpt = Some(testCase.className),
+      categories = Seq())
 
   private def createExecution(buildTimeStampOpt: Option[DateTime])(testCase: Case): Incoming.Execution =
     Incoming.Execution(
