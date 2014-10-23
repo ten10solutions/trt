@@ -5,7 +5,8 @@
   resultOpt: Option[Boolean],
   otherConfigurations: Seq[Configuration], 
   canRerun: Boolean, 
-  pagination: PaginationData)(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
+  pagination: PaginationData,
+  categories: Seq[String])(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
  
 @scripts = {
   <script src="@routes.Assets.at("javascripts/chart-utils.js")"></script>
@@ -105,6 +106,10 @@
     <tr>
       <td>Comment</td>
       <td>@for(comment <- test.commentOpt){<span id="comment-text" style="white-space: pre-wrap">@comment</span> }<a id="edit-comment-link" data-toggle="modal" data-target="#comment-dialog"><i class="glyphicon glyphicon-pencil"></i> edit</a></td>
+    </tr>
+    <tr>
+      <td>Categories</td>
+      <td>@for(category <- categories){ @category }<a href="">Add category...</a></td>
     </tr>
   </table>
   <form id="rerun-test-form" action="@routes.CiController.rerunTest(test.id)" role="form" method="post">

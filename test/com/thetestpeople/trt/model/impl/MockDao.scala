@@ -405,7 +405,21 @@ class MockDao extends Dao {
     updatedBatches.nonEmpty
   }
 
-  def getCategories(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[String]] = 
-    testCategories.filter(t => testIds contains t.testId).groupBy(_.testId).mapValues(_.map(_.category))  
-  
+  def getCategories(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[String]] =
+    testCategories.filter(t ⇒ testIds contains t.testId).groupBy(_.testId).mapValues(_.map(_.category))
+
+  def setCategories(testId: Id[Test], categories: Seq[String]) {
+    testCategories = testCategories.filterNot(tc ⇒ tc.testId == testId)
+    addCategories(testId, categories)
+  }
+
+  def addCategories(testId: Id[Test], categories: Seq[String]) {
+    val newRows = categories.map(c ⇒ TestCategory(testId, c))
+    testCategories ++:= newRows
+  }
+
+  def removeCategory(testId: Id[Test], category: String) {
+    testCategories = testCategories.filterNot(tc ⇒ tc.testId == testId && tc.category == category)
+  }
+
 }

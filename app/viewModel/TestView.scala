@@ -12,23 +12,23 @@ case class WeatherInfo(weather: Double) {
   def passRate: String = "Pass rate: " + (weather * 100).toInt + "%"
 }
 
-case class TestView(testAndAnalysis: EnrichedTest) extends HasTestName {
+case class TestView(enrichedTest: EnrichedTest) extends HasTestName {
 
-  private val test = testAndAnalysis.test
+  private val test = enrichedTest.test
 
   def testName = test.qualifiedName
 
   def id = test.id
 
-  def deleted = testAndAnalysis.test.deleted
+  def deleted = enrichedTest.test.deleted
 
-  def ballIconOpt: Option[String] = testAndAnalysis.analysisOpt.map(_.status).map(BallIcons.icon)
+  def ballIconOpt: Option[String] = enrichedTest.analysisOpt.map(_.status).map(BallIcons.icon)
 
-  def weatherInfoOpt: Option[WeatherInfo] = testAndAnalysis.analysisOpt.map(_.weather).map(WeatherInfo)
+  def weatherInfoOpt: Option[WeatherInfo] = enrichedTest.analysisOpt.map(_.weather).map(WeatherInfo)
 
   def consecutiveFailuresOpt: Option[Int] =
     for {
-      analysis ← testAndAnalysis.analysisOpt
+      analysis ← enrichedTest.analysisOpt
       consecutiveFailures = analysis.consecutiveFailures
       if consecutiveFailures > 0
     } yield consecutiveFailures
@@ -36,33 +36,33 @@ case class TestView(testAndAnalysis: EnrichedTest) extends HasTestName {
   def lastExecutionOpt: Option[(Id[Execution], TimeDescription)] =
     for (id ← lastExecutionIdOpt; time ← lastExecutedTimeOpt) yield (id, time)
   def lastExecutionIdOpt: Option[Id[Execution]] =
-    testAndAnalysis.analysisOpt.map(_.lastExecutionId)
+    enrichedTest.analysisOpt.map(_.lastExecutionId)
   def lastExecutedTimeOpt: Option[TimeDescription] =
-    testAndAnalysis.analysisOpt.map(_.lastExecutionTime).map(TimeDescription)
+    enrichedTest.analysisOpt.map(_.lastExecutionTime).map(TimeDescription)
 
   def lastPassedExecutionOpt: Option[(Id[Execution], TimeDescription)] =
     for (id ← lastPassedExecutionIdOpt; time ← lastPassedTimeOpt) yield (id, time)
   def lastPassedExecutionIdOpt: Option[Id[Execution]] =
-    testAndAnalysis.analysisOpt.flatMap(_.lastPassedExecutionIdOpt)
+    enrichedTest.analysisOpt.flatMap(_.lastPassedExecutionIdOpt)
   def lastPassedTimeOpt: Option[TimeDescription] =
-    testAndAnalysis.analysisOpt.flatMap(_.lastPassedTimeOpt).map(TimeDescription)
+    enrichedTest.analysisOpt.flatMap(_.lastPassedTimeOpt).map(TimeDescription)
 
   def lastFailedExecutionOpt: Option[(Id[Execution], TimeDescription)] =
     for (id ← lastFailedExecutionIdOpt; time ← lastFailedTimeOpt) yield (id, time)
   def lastFailedExecutionIdOpt: Option[Id[Execution]] =
-    testAndAnalysis.analysisOpt.flatMap(_.lastFailedExecutionIdOpt)
+    enrichedTest.analysisOpt.flatMap(_.lastFailedExecutionIdOpt)
   def lastFailedTimeOpt: Option[TimeDescription] =
-    testAndAnalysis.analysisOpt.flatMap(_.lastFailedTimeOpt).map(TimeDescription)
+    enrichedTest.analysisOpt.flatMap(_.lastFailedTimeOpt).map(TimeDescription)
 
   def failingSinceOpt: Option[TimeDescription] =
     for {
-      analysis ← testAndAnalysis.analysisOpt
+      analysis ← enrichedTest.analysisOpt
       failingSince ← analysis.failingSinceOpt
     } yield TimeDescription(failingSince)
 
-  def commentOpt: Option[String] = testAndAnalysis.commentOpt
+  def commentOpt: Option[String] = enrichedTest.commentOpt
 
   def medianDurationOpt: Option[String] =
-    testAndAnalysis.analysisOpt.flatMap(_.medianDurationOpt).map(DateUtils.describeDuration)
+    enrichedTest.analysisOpt.flatMap(_.medianDurationOpt).map(DateUtils.describeDuration)
 
 }

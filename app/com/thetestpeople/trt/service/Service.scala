@@ -109,5 +109,9 @@ trait Service extends CiService {
    * @return true iff a batch with the given id was present in the DB
    */
   def setTestComment(id: Id[Test], text: String): Boolean
-  
+
+  def addCategory(testId: Id[Test], category: String)
+
+  def removeCategory(testId: Id[Test], category: String)
+
 }

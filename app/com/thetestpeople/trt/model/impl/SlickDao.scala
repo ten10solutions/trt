@@ -438,6 +438,20 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
 
   def getCategories(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[String]] =
     testCategories.filter(_.testId inSet testIds).run.groupBy(_.testId).mapValues(_.map(_.category))
-    
+
+  def setCategories(testId: Id[Test], categories: Seq[String]) {
+    testCategories.filter(tc ⇒ tc.testId === testId).delete
+    addCategories(testId, categories)
+  }
+
+  def addCategories(testId: Id[Test], categories: Seq[String]) {
+    val newRows = categories.map(c ⇒ TestCategory(testId, c))
+    testCategories.insertAll(newRows: _*)
+  }
+
+  def removeCategory(testId: Id[Test], category: String) {
+    testCategories.filter(tc ⇒ tc.testId === testId && tc.category === category).delete
+  }
+
 }
 

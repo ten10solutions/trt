@@ -112,8 +112,8 @@ class BatchRecorderTest extends FlatSpec with Matchers {
   }
 
   "Submitting a batch with a configuration" should "be the default configuration for executions in that batch" in {
-    val inExecution1 = F.execution(F.test(), configurationOpt = None)
-    val inBatch = F.batch(executions = List(inExecution1), configurationOpt = Some(DummyData.Configuration1))
+    val inExecution = F.execution(F.test(), configurationOpt = None)
+    val inBatch = F.batch(executions = List(inExecution), configurationOpt = Some(DummyData.Configuration1))
     val serviceBundle = TestServiceFactory.setup()
     val dao = serviceBundle.dao
 
@@ -121,7 +121,6 @@ class BatchRecorderTest extends FlatSpec with Matchers {
 
     val List(execution) = dao.getEnrichedExecutionsInBatch(batch.id)
     execution.execution.configuration should equal(DummyData.Configuration1)
-
   }
 
   private def checkBatchDataWasCaptured(batch: Batch, inBatch: Incoming.Batch) {

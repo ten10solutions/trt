@@ -20,6 +20,8 @@ GET     /test/:id                   @controllers.Application.test(id: Id[Test], 
 POST    /test/:id/delete            @controllers.Application.deleteTest(id: Id[Test])
 POST    /test/:id/undelete          @controllers.Application.undeleteTest(id: Id[Test])
 POST    /test/:id/comment           @controllers.Application.setTestComment(id: Id[Test], configuration: Option[Configuration] ?= None)
+POST    /test/:id/addCategory       @controllers.Application.addCategory(id: Id[Test])
+POST    /test/:id/removeCategory    @controllers.Application.removeCategory(id: Id[Test])
 
 GET     /execution/:id              @controllers.Application.execution(id: Id[Execution])
 POST    /execution/:id/comment      @controllers.Application.setExecutionComment(id: Id[Execution])

@@ -87,11 +87,11 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   private def handleTest(testId: Id[Test], configuration: Configuration, resultOpt: Option[Boolean], pagination: Pagination)(implicit request: Request[_]) =
     service.getTestAndExecutions(testId, configuration, resultOpt) map {
-      case TestAndExecutions(test, executions, otherConfigurations, _) ⇒
+      case TestAndExecutions(test, executions, otherConfigurations, categories) ⇒
         val executionViews = executions.map(e ⇒ ExecutionView(e)).toList
         val testView = new TestView(test)
         val paginationData = pagination.paginationData(executions.size)
-        views.html.test(testView, executionViews, Some(configuration), resultOpt, otherConfigurations, service.canRerun, paginationData)
+        views.html.test(testView, executionViews, Some(configuration), resultOpt, otherConfigurations, service.canRerun, paginationData, categories)
     }
 
   def batch(batchId: Id[Batch], passedFilterOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
@@ -164,17 +164,11 @@ class Application(service: Service, adminService: AdminService) extends Controll
     views.html.executions(executionViews, totalExecutionCount, configurationOpt, resultOpt, paginationData, executionVolume)
   }
 
-  private def getSelectedBatchIds(request: Request[AnyContent]): List[Id[Batch]] =
-    for {
-      requestMap ← request.body.asFormUrlEncoded.toList
-      selectedIds ← requestMap.get("selectedBatch").toList
-      idString ← selectedIds
-      id ← Id.parse[Batch](idString)
-    } yield id
+  private def getSelectedBatchIds(implicit request: Request[AnyContent]): Seq[Id[Batch]] =
+    getFormParameters("selectedBatch").flatMap(Id.parse[Batch])
 
   def deletedTests(pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
     logger.debug(s"deletedTests(page = $pageOpt, pageSize = $pageSizeOpt))")
-
     Pagination.validate(pageOpt, pageSizeOpt) match {
       case Left(errorMessage) ⇒
         BadRequest(errorMessage)
@@ -225,7 +219,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   def deleteBatches() = Action { implicit request ⇒
-    val batchIds = getSelectedBatchIds(request)
+    val batchIds = getSelectedBatchIds(request).toList
     logger.debug(s"deleteBatches($batchIds)")
 
     service.deleteBatches(batchIds)
@@ -338,15 +332,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
     Ok(views.html.systemConfiguration(populatedForm))
   }
 
-  private def previousUrlOpt(implicit request: Request[AnyContent]): Option[Call] =
-    for {
-      requestMap ← request.body.asFormUrlEncoded
-      values ← requestMap.get("previousURL")
-      previousUrl ← values.headOption
-    } yield get(previousUrl)
-
-  private def get(url: String) = new Call("GET", url)
-
   def testNames(query: String) = Action { implicit request ⇒
     logger.debug(s"testNames($query)")
     Ok(Json.toJson(service.getTestNames(query)))
@@ -404,7 +389,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   def setExecutionComment(executionId: Id[Execution]) = Action { implicit request ⇒
     logger.debug(s"setExecutionComment($executionId)")
-    getText(request) match {
+    getFormParameter("text") match {
       case Some(text) ⇒
         val result = service.setExecutionComment(executionId, text)
         if (result)
@@ -416,16 +401,25 @@ class Application(service: Service, adminService: AdminService) extends Controll
     }
   }
 
-  private def getText(request: Request[AnyContent]): Option[String] =
+  private def getFormParameters(parameterName: String)(implicit request: Request[AnyContent]): Seq[String] =
     for {
-      requestMap ← request.body.asFormUrlEncoded
-      values ← requestMap.get("text")
-      text ← values.headOption
-    } yield text
+      requestMap ← request.body.asFormUrlEncoded.toSeq
+      values ← requestMap.get(parameterName).toSeq
+      value ← values
+    } yield value
+
+  private def getFormParameter(parameterName: String)(implicit request: Request[AnyContent]): Option[String] =
+    getFormParameters(parameterName).headOption
+
+  private def previousUrlOpt(implicit request: Request[AnyContent]): Option[Call] =
+    getFormParameter("previousURL").map(url ⇒ new Call("GET", url))
+
+  private def previousUrlOrDefault(implicit request: Request[AnyContent]): Call =
+    previousUrlOpt.getOrElse(routes.Application.configurations())
 
   def setBatchComment(batchId: Id[Batch]) = Action { implicit request ⇒
     logger.debug(s"setBatchComment($batchId)")
-    getText(request) match {
+    getFormParameter("text") match {
       case Some(text) ⇒
         val result = service.setBatchComment(batchId, text)
         if (result)
@@ -439,7 +433,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   def setTestComment(testId: Id[Test], configurationOpt: Option[Configuration]) = Action { implicit request ⇒
     logger.debug(s"setTestComment($testId)")
-    getText(request) match {
+    getFormParameter("text") match {
       case Some(text) ⇒
         val result = service.setTestComment(testId, text)
         if (result)
@@ -448,6 +442,28 @@ class Application(service: Service, adminService: AdminService) extends Controll
           NotFound(s"Could not find test with id '$testId'")
       case None ⇒
         BadRequest("No 'text' parameter provided'")
+    }
+  }
+
+  def addCategory(testId: Id[Test]) = Action { implicit request ⇒
+    logger.debug(s"addCategory($testId)")
+    getFormParameter("category") match {
+      case Some(category) ⇒
+        service.addCategory(testId, category)
+        Redirect(previousUrlOrDefault).flashing("success" -> "Category added.")
+      case None ⇒
+        BadRequest("No 'category' parameter provided'")
+    }
+  }
+
+  def removeCategory(testId: Id[Test]) = Action { implicit request ⇒
+    logger.debug(s"removeCategory($testId)")
+    getFormParameter("category") match {
+      case Some(category) ⇒
+        service.removeCategory(testId, category)
+        Redirect(previousUrlOrDefault).flashing("success" -> "Category removed.")
+      case None ⇒
+        BadRequest("No 'category' parameter provided'")
     }
   }
 

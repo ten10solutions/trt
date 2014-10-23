@@ -9,7 +9,7 @@ object SortBy {
   sealed trait Test {
     def descending: Boolean
   }
-  
+
   object Test {
     case class Weather(descending: Boolean = false) extends SortBy.Test
     case class Group(descending: Boolean = false) extends SortBy.Test
@@ -158,6 +158,13 @@ trait Dao extends ExecutionDao with CiDao {
   def deleteTestComment(id: Id[Test])
 
   def getCategories(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[String]]
+
+  def setCategories(testId: Id[Test], categories: Seq[String])
+
+  def addCategories(testId: Id[Test], categories: Seq[String])
+
+  def removeCategory(testId: Id[Test], category: String)
+
 }
 
 case class DeleteBatchResult(remainingTestIds: Seq[Id[Test]], deletedExecutionIds: Seq[Id[Execution]])

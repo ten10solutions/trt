@@ -231,4 +231,14 @@ class ServiceImpl(
     }
   }
 
+  def addCategory(testId: Id[Test], category: String) = transaction {
+    dao.addCategories(testId, Seq(category))
+    logger.info(s"Added category $category to test $testId")
+  }
+
+  def removeCategory(testId: Id[Test], category: String) = transaction {
+    dao.removeCategory(testId, category)
+    logger.info(s"Removed category $category from test $testId")
+  }
+
 }

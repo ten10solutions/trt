@@ -749,4 +749,29 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     batch.batch.durationOpt should equal(Some(DummyData.Duration))
   }
 
+  "Adding and retrieving test categories" should "work" in transaction { dao ⇒
+    val testId = dao.ensureTestIsRecorded(F.test())
+    dao.addCategories(testId, Seq("Category"))
+
+    getCategories(dao, testId) should equal(Seq("Category"))
+
+    dao.addCategories(testId, Seq("Category2"))
+
+    getCategories(dao, testId) should contain theSameElementsAs Seq("Category", "Category2")
+  }
+
+  "Removing categories" should "work" in transaction { dao ⇒
+    val testId = dao.ensureTestIsRecorded(F.test())
+    dao.addCategories(testId, Seq(DummyData.Category))
+
+    getCategories(dao, testId) should equal(Seq(DummyData.Category))
+
+    dao.removeCategory(testId, DummyData.Category)
+
+    getCategories(dao, testId) should equal(Seq())
+  }
+
+  private def getCategories(dao: Dao, testId: Id[Test]): Seq[String] =
+    dao.getCategories(Seq(testId)).getOrElse(testId, Seq())
+
 }

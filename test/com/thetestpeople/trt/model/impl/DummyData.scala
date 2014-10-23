@@ -50,9 +50,10 @@ object DummyData {
   val JenkinsUrl = uri("http://www.example.com/")
   val JenkinsToken = "Token"
   val BuildNumber = 1
-  
+
   val Configuration1 = Configuration("Configuration1")
   val Configuration2 = Configuration("Configuration2")
-  
+
   val Comment = "Comment"
+  val Category = "Category"
 }
