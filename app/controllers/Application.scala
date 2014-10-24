@@ -248,12 +248,13 @@ class Application(service: Service, adminService: AdminService) extends Controll
     testStatusOpt: Option[TestStatus],
     nameOpt: Option[String],
     groupOpt: Option[String],
+    categoryOpt: Option[String],
     pageOpt: Option[Int],
     pageSizeOpt: Option[Int],
     sortOpt: Option[Sort],
     descendingOpt: Option[Boolean]) = Action { implicit request ⇒
     Utils.time("Application.tests()") {
-      logger.debug(s"tests(configuration = $configurationOpt, status = $testStatusOpt, name = $nameOpt, group = $groupOpt, page = $pageOpt, pageSize = $pageSizeOpt, sort = $sortOpt, descending = $descendingOpt)")
+      logger.debug(s"tests(configuration = $configurationOpt, status = $testStatusOpt, name = $nameOpt, group = $groupOpt, category = $categoryOpt, page = $pageOpt, pageSize = $pageSizeOpt, sort = $sortOpt, descending = $descendingOpt)")
       Pagination.validate(pageOpt, pageSizeOpt) match {
         case Left(errorMessage) ⇒
           BadRequest(errorMessage)
@@ -262,7 +263,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
             case None ⇒
               Redirect(routes.Application.index())
             case Some(configuration) ⇒
-              Ok(handleTests(testStatusOpt, configuration, nameOpt, groupOpt, pagination, sortOpt, descendingOpt))
+              Ok(handleTests(testStatusOpt, configuration, nameOpt, groupOpt, categoryOpt, pagination, sortOpt, descendingOpt))
           }
       }
     }
@@ -280,13 +281,22 @@ class Application(service: Service, adminService: AdminService) extends Controll
     case None                           ⇒ SortBy.Test.Group(descending = false)
   }
 
-  private def handleTests(testStatusOpt: Option[TestStatus], configuration: Configuration, nameOpt: Option[String], groupOpt: Option[String], pagination: Pagination, sortOpt: Option[Sort], descendingOpt: Option[Boolean])(implicit request: Request[_]) = {
+  private def handleTests(
+    testStatusOpt: Option[TestStatus],
+    configuration: Configuration,
+    nameOpt: Option[String],
+    groupOpt: Option[String],
+    categoryOpt: Option[String],
+    pagination: Pagination,
+    sortOpt: Option[Sort],
+    descendingOpt: Option[Boolean])(implicit request: Request[_]) = {
     val sortBy = getTestSortBy(sortOpt, descendingOpt)
     val (testCounts, tests) = service.getTests(
       configuration = configuration,
       testStatusOpt = testStatusOpt,
       nameOpt = nameOpt,
       groupOpt = groupOpt,
+      categoryOpt = categoryOpt,
       startingFrom = pagination.firstItem,
       limit = pagination.pageSize,
       sortBy = sortBy)
@@ -294,7 +304,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
     val testViews = tests.map(TestView)
     val testsSummary = TestsSummaryView(configuration, testCounts)
     val paginationData = pagination.paginationData(testCounts.countFor(testStatusOpt))
-    views.html.tests(testsSummary, testViews.toList, configuration, testStatusOpt, nameOpt, groupOpt, service.canRerun, paginationData, sortOpt, descendingOpt)
+    views.html.tests(testsSummary, testViews.toList, configuration, testStatusOpt, nameOpt, groupOpt, categoryOpt, service.canRerun, paginationData, sortOpt, descendingOpt)
   }
 
   def admin() = Action { implicit request ⇒

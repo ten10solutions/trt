@@ -69,6 +69,7 @@ trait Dao extends ExecutionDao with CiDao {
     testStatusOpt: Option[TestStatus] = None,
     nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
+    categoryOpt: Option[String] = None,
     startingFrom: Int = 0,
     limitOpt: Option[Int] = None,
     sortBy: SortBy.Test = SortBy.Test.Group()): Seq[EnrichedTest]
@@ -93,7 +94,8 @@ trait Dao extends ExecutionDao with CiDao {
   def getTestCounts(
     configuration: Configuration = Configuration.Default,
     nameOpt: Option[String] = None,
-    groupOpt: Option[String] = None): TestCounts
+    groupOpt: Option[String] = None,
+    categoryOpt: Option[String] = None): TestCounts
 
   def getTestsById(testIds: Seq[Id[Test]]): Seq[Test]
 

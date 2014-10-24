@@ -51,6 +51,7 @@ class ServiceImpl(
     testStatusOpt: Option[TestStatus] = None,
     nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
+    categoryOpt: Option[String] = None,
     startingFrom: Int,
     limit: Int,
     sortBy: SortBy.Test = SortBy.Test.Group()): (TestCounts, Seq[EnrichedTest]) = transaction {
@@ -58,12 +59,14 @@ class ServiceImpl(
     val testCounts = dao.getTestCounts(
       configuration = configuration,
       nameOpt = nameOpt,
-      groupOpt = groupOpt)
+      groupOpt = groupOpt,
+      categoryOpt = categoryOpt)
     val tests = dao.getAnalysedTests(
       configuration = configuration,
       testStatusOpt = testStatusOpt,
       nameOpt = nameOpt,
       groupOpt = groupOpt,
+      categoryOpt = categoryOpt,
       startingFrom = startingFrom,
       limitOpt = Some(limit),
       sortBy = sortBy)

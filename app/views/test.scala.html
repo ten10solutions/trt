@@ -109,9 +109,19 @@
     </tr>
     <tr>
       <td>Categories</td>
-      <td>@for(category <- categories){ @category }<a href="">Add category...</a></td>
+      <td>
+        @for(category <- categories) { 
+          <span class="tag label label-info" style="margin-bottom: 0px">
+          <span>@category</span><a onclick="removeCategory(@category)" style="opacity: 0.6;" title="Remove category"> <i class="remove glyphicon glyphicon-remove-sign glyphicon-white"></i></a></span>
+        } 
+        <a id="edit-category-link" data-toggle="modal" data-target="#category-dialog">Add ...</a>
+      </td>
     </tr>
   </table>
+  <form id="remove-category-form" action="@routes.Application.removeCategory(test.id)" role="form" method="post">
+    <input type="hidden" name="previousURL" value="@request.uri"/>
+    <input id="remove-category-form-field" type="hidden" name="category" value=""/>
+  </form>
   <form id="rerun-test-form" action="@routes.CiController.rerunTest(test.id)" role="form" method="post">
     <input type="hidden" name="previousURL" value="@request.uri"/>
   </form>
@@ -209,5 +219,30 @@
   @executionsPaginationWidget
 
   @editComment(test.commentOpt, routes.Application.setTestComment(test.id, configurationOpt))
+
+<!-- Modal -->
+<div class="modal fade" id="category-dialog" tabindex="-1" role="dialog">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title">Add Category</h4>
+      </div>
+      <div class="modal-body">
+        <form id="category-form" role="form" method="POST" action="@routes.Application.addCategory(test.id)">
+          <div class="form-group">
+            <label for="category-field">Category</label>
+            <input name="category" id="category-field" class="form-control typeahead" type="text" placeholder="Category"/>
+          </div>
+          <input type="hidden" name="previousURL" value="@request.uri"/>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button id="cancel-button" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button id="save-category-button" type="button" class="btn btn-primary" onclick="$('#category-form').submit()" >Save</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 }

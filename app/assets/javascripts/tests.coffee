@@ -36,9 +36,8 @@ $(document).ready ->
   $(".testCheckbox").click ->
     setButtonEnableState()
 
-  $(document).ready ->
-    $(".tag a").mouseover toggleCloseColor
-    $(".tag a").mouseout toggleCloseColor
+  $(".tag a").mouseover toggleCloseColor
+  $(".tag a").mouseout toggleCloseColor
 
   $("#filter-form").submit (e) ->
     $("#test-name-field").removeAttr "name" if $("#test-name-field").val() is ""

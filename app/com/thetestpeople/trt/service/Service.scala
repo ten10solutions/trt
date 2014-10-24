@@ -51,6 +51,7 @@ trait Service extends CiService {
     testStatusOpt: Option[TestStatus] = None,
     nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
+    categoryOpt: Option[String] = None,
     startingFrom: Int = 0,
     limit: Int = Integer.MAX_VALUE,
     sortBy: SortBy.Test = SortBy.Test.Group()): (TestCounts, Seq[EnrichedTest])

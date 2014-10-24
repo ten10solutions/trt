@@ -73,6 +73,7 @@ class MockDao extends Dao {
     testStatusOpt: Option[TestStatus] = None,
     nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
+    categoryOpt: Option[String] = None,
     startingFrom: Int = 0,
     limitOpt: Option[Int],
     sortBy: SortBy.Test = SortBy.Test.Group()): Seq[EnrichedTest] = {
@@ -115,8 +116,8 @@ class MockDao extends Dao {
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts] =
     getConfigurations().map { c ⇒ c -> getTestCounts(c) }.toMap
 
-  def getTestCounts(configuration: Configuration, nameOpt: Option[String] = None, groupOpt: Option[String] = None): TestCounts = {
-    val tests = getAnalysedTests(configuration, nameOpt = nameOpt, groupOpt = groupOpt)
+  def getTestCounts(configuration: Configuration, nameOpt: Option[String] = None, groupOpt: Option[String] = None, categoryOpt: Option[String] = None): TestCounts = {
+    val tests = getAnalysedTests(configuration, nameOpt = nameOpt, groupOpt = groupOpt, categoryOpt = categoryOpt)
     val passed = tests.count(_.analysisOpt.exists(_.status == TestStatus.Healthy))
     val warning = tests.count(_.analysisOpt.exists(_.status == TestStatus.Warning))
     val failed = tests.count(_.analysisOpt.exists(_.status == TestStatus.Broken))

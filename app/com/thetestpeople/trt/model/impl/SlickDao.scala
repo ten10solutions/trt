@@ -162,6 +162,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     testStatusOpt: Option[TestStatus] = None,
     nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
+    categoryOpt: Option[String] = None,
     startingFrom: Int = 0,
     limitOpt: Option[Int] = None,
     sortBy: SortBy.Test = SortBy.Test.Group()): Seq[EnrichedTest] = {
@@ -172,6 +173,13 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       query = query.filter(_._1.name.toLowerCase like globToSqlPattern(name))
     for (group ← groupOpt)
       query = query.filter(_._1.group.toLowerCase like globToSqlPattern(group))
+    for (category ← categoryOpt)
+      query = for {
+        (test, analysis) ← query
+        testCategory ← testCategories
+        if test.id === testCategory.testId
+        if testCategory.category === category
+      } yield (test, analysis)
     for (status ← testStatusOpt)
       query = query.filter(_._2.status === status)
     query = sortQuery(query, sortBy)
@@ -209,7 +217,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
 
   def getDeletedTests(): Seq[Test] = tests.filter(_.deleted).sortBy(_.name).sortBy(_.group).run
 
-  def getTestCounts(configuration: Configuration, nameOpt: Option[String] = None, groupOpt: Option[String] = None): TestCounts = {
+  def getTestCounts(configuration: Configuration, nameOpt: Option[String] = None, groupOpt: Option[String] = None, categoryOpt: Option[String] = None): TestCounts = {
     var query = testsAndAnalyses
     query = query.filter(_._2.configuration === configuration)
     query = query.filterNot(_._1.deleted)
@@ -217,6 +225,13 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       query = query.filter(_._1.name.toLowerCase like globToSqlPattern(name))
     for (group ← groupOpt)
       query = query.filter(_._1.group.toLowerCase like globToSqlPattern(group))
+    for (category ← categoryOpt)
+      query = for {
+        (test, analysis) ← query
+        testCategory ← testCategories
+        if test.id === testCategory.testId
+        if testCategory.category === category
+      } yield (test, analysis)
     // Workaround for Slick exception if no analysis: "scala.slick.SlickException: Read NULL value for ResultSet column":
     query = query.filter(_._2.testId.?.isDefined)
     val results: Map[TestStatus, Int] =
@@ -280,12 +295,19 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   }
 
   def getBatch(id: Id[Batch]): Option[BatchAndLog] = {
+    val join = batches
+      .leftJoin(batchLogs).on(_.id === _.batchId)
+      .leftJoin(ciBuilds).on(_._1.id === _.batchId)
+      .leftJoin(batchComments).on(_._1._1.id === _.batchId)
     val query =
       for {
-        (((batch, log), ciBuild), comment) ← batches leftJoin batchLogs on (_.id === _.batchId) leftJoin ciBuilds on (_._1.id === _.batchId) leftJoin batchComments on (_._1._1.id === _.batchId)
+        (((batch, log), ciBuild), comment) ← join
         if batch.id === id
       } yield (batch, log.?, ciBuild.?, comment.?)
-    query.firstOption.map { case (batch, logRowOpt, ciBuildOpt, commentOpt) ⇒ BatchAndLog(batch, logRowOpt.map(_.log), ciBuildOpt.flatMap(_.importSpecIdOpt), commentOpt = commentOpt.map(_.text)) }
+    query.firstOption.map {
+      case (batch, logRowOpt, ciBuildOpt, commentOpt) ⇒
+        BatchAndLog(batch, logRowOpt.map(_.log), ciBuildOpt.flatMap(_.importSpecIdOpt), commentOpt = commentOpt.map(_.text))
+    }
   }
 
   def getBatches(jobOpt: Option[Id[CiJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch] = {
@@ -454,4 +476,3 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   }
 
 }
-
