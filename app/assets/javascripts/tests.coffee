@@ -19,6 +19,7 @@ makeEngine = (name, url) ->
 
 nameEngine = makeEngine "testNames", "/webApi/tests/names?query=%QUERY"
 groupEngine = makeEngine "groups", "/webApi/tests/groups?query=%QUERY"
+categoryEngine = makeEngine "categories", "/webApi/categories?query=%QUERY"
 
 $(document).ready ->
   setButtonEnableState = ->
@@ -42,15 +43,18 @@ $(document).ready ->
   $("#filter-form").submit (e) ->
     $("#test-name-field").removeAttr "name" if $("#test-name-field").val() is ""
     $("#group-name-field").removeAttr "name" if $("#group-name-field").val() is ""
+    $("#category-field").removeAttr "name" if $("#category-field").val() is ""
 
   $("#configuration-select").change ->
     $("#configuration-form").submit()
 
   nameEngine.initialize()
   groupEngine.initialize()
+  categoryEngine.initialize()
 
   addTypeahead "test-name-field", "testNames", nameEngine
   addTypeahead "group-name-field", "groupNames", groupEngine
+  addTypeahead "category-field", "categoryNames", categoryEngine
 
 addTypeahead = (id, name, engine) ->
   $("#" + id).typeahead

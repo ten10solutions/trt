@@ -56,6 +56,11 @@ trait Dao extends ExecutionDao with CiDao {
   def getGroups(pattern: String): Seq[String]
 
   /**
+   * @return all categories matching the given pattern (case-insensitive, allows * wildcards)
+   */
+  def getCategories(pattern: String): Seq[String]
+
+  /**
    * Get tests and any analysis for the given configuration and filters.
    *
    * Excludes deleted tests

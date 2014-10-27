@@ -352,6 +352,11 @@ class Application(service: Service, adminService: AdminService) extends Controll
     Ok(Json.toJson(service.getGroups(query)))
   }
 
+  def categories(query: String) = Action { implicit request ⇒
+    logger.debug(s"categories($query)")
+    Ok(Json.toJson(service.getCategories(query)))
+  }
+  
   def configurationChart(configuration: Configuration) = Action { implicit request ⇒
     logger.debug(s"configurationChart($configuration)")
     val counts = service.getHistoricalTestCounts().get(configuration).map(_.counts).getOrElse(List())

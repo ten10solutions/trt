@@ -54,6 +54,7 @@ POST    /analyseAll                 @controllers.Application.analyseAll()
 
 GET     /webApi/tests/names           @controllers.Application.testNames(query: String)
 GET     /webApi/tests/groups          @controllers.Application.groups(query: String)
+GET     /webApi/categories            @controllers.Application.categories(query: String)
 GET     /webApi/configuration/chart   @controllers.Application.configurationChart(configuration: Configuration)
 
 GET     /api/batches                @controllers.JsonController.getBatches()

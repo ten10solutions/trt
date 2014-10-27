@@ -167,6 +167,14 @@ class ServiceImpl(
       helpfullySort(pattern, matches)
   }
 
+  def getCategories(pattern: String): Seq[String] = transaction {
+    val matches = dao.getCategories("*" + pattern + "*").distinct
+    if (pattern.contains("*"))
+      matches.sorted
+    else
+      helpfullySort(pattern, matches)
+  }
+
   /**
    * Sort autocomplete suggestions in a hopefully-useful way: prefix matches first, then infix matches.
    */

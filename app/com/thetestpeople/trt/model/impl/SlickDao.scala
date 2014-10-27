@@ -153,6 +153,9 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       .filter(_.group.toLowerCase like globToSqlPattern(pattern))
       .groupBy(_.group).map(_._1).run.flatten
 
+  def getCategories(pattern: String): Seq[String] = 
+    testCategories.filter(_.category like globToSqlPattern(pattern)).groupBy(_.category).map(_._1).run
+      
   private def globToSqlPattern(pattern: String) = pattern.replace("*", "%").toLowerCase
 
   private type TestAnalysisQuery = Query[(TestMapping, AnalysisMapping), (Test, Analysis), Seq]

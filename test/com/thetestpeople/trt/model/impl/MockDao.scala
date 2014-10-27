@@ -368,19 +368,29 @@ class MockDao extends Dao {
     Pattern.compile(GlobCompiler.globToPerl5(pattern.toCharArray, GlobCompiler.CASE_INSENSITIVE_MASK), Pattern.CASE_INSENSITIVE)
 
   def getTestNames(pattern: String): Seq[String] = {
-    val regexPattern = globToRegex(pattern)
-    def matches(s: String) = regexPattern.matcher(s).matches()
+    val matches = globMatcher(pattern)
     for (test ← tests if matches(test.name))
       yield test.name
   }
 
   def getGroups(pattern: String): Seq[String] = {
-    val regexPattern = globToRegex(pattern)
-    def matches(s: String) = regexPattern.matcher(s).matches()
+    val matches = globMatcher(pattern)
     for (test ← tests; group ← test.groupOpt if matches(group))
       yield group
   }
 
+  def getCategories(pattern: String): Seq[String] = {
+    val matches = globMatcher(pattern)
+    for (comment ← testComments if matches(comment.text))
+      yield comment.text
+  }
+  
+  private def globMatcher(pattern: String): String => Boolean = {
+    val regexPattern = globToRegex(pattern)
+    def matches(s: String) = regexPattern.matcher(s).matches()
+    matches
+  }
+  
   def setExecutionComment(id: Id[Execution], text: String) =
     executionComments = ExecutionComment(id, text) +: executionComments.filterNot(_.executionId == id)
 

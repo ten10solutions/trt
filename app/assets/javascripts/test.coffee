@@ -96,6 +96,6 @@ $(document).ready ->
   $(".tag a").mouseover toggleCloseColor
   $(".tag a").mouseout toggleCloseColor
 
-window.removeCategory(category) ->
+window.removeCategory= (category) ->
   $("#remove-category-form-field").val("category")
   $("#remove-category-form").submit()

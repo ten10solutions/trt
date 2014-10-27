@@ -112,9 +112,11 @@
       <td>
         @for(category <- categories) { 
           <span class="tag label label-info" style="margin-bottom: 0px">
-          <span>@category</span><a onclick="removeCategory(@category)" style="opacity: 0.6;" title="Remove category"> <i class="remove glyphicon glyphicon-remove-sign glyphicon-white"></i></a></span>
+            <span>@category</span>
+            <a onclick="removeCategory('@category')" style="opacity: 0.6;" title="Remove category"><i class="remove glyphicon glyphicon-remove-sign glyphicon-white"></i></a>
+          </span>
         } 
-        <a id="edit-category-link" data-toggle="modal" data-target="#category-dialog">Add ...</a>
+        <a style="margin-left: 4px" id="edit-category-link" data-toggle="modal" data-target="#category-dialog">Add...</a>
       </td>
     </tr>
   </table>
