@@ -18,7 +18,7 @@ chartOptions =
     clickable: true
   xaxis:
     mode: "time"
-    axisLabel: "Time test was executed"
+    axisLabel: "Date test was executed"
   yaxis:
     axisLabel: "Test duration"
     tickFormatter: durationFormatter
