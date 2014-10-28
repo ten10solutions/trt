@@ -47,10 +47,10 @@ class LuceneLogIndexer(directory: Directory) extends LogIndexer with HasLogger {
 
   private val analyzer = new LogAnalyzer
 
-  // Ensure that the directory is set-up for queries
+  // Ensure that the Lucene directory is set-up for queries
   withIndexWriter { indexWriter ⇒ }
 
-  def addExecutions(executions: Seq[EnrichedExecution]) = Utils.time("addExecutions") {
+  def addExecutions(executions: Seq[EnrichedExecution]) = Utils.time("LuceneLogIndexer.addExecutions") {
     withIndexWriter { indexWriter ⇒
       for (execution ← executions)
         addExecution(indexWriter, execution)
