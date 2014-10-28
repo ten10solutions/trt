@@ -111,8 +111,8 @@
       <td>Categories</td>
       <td>
         @for(category <- categories) { 
-          <span class="tag label label-info" style="margin-bottom: 0px">
-            <span>@category</span>
+          <span class="tag label label-info" @*style="margin-bottom: 0px"*@>
+            @category
             <a onclick="removeCategory('@category')" style="opacity: 0.6;" title="Remove category"><i class="remove glyphicon glyphicon-remove-sign glyphicon-white"></i></a>
           </span>
         } 
