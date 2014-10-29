@@ -64,7 +64,7 @@
       <table style="margin-top: 15px" class="table table-striped table-bordered table-hover">
         @if(globalViewContext.multipleConfigurationMode) {
           <tr>
-            <td>Configuration</td>
+            <td style="width: 128px">Configuration</td>
             <td>
               <form id="configuration-form" action="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = groupOpt, category = categoryOpt, sort = sortOpt, descending = descendingOpt)" method="get">
                 @for(name <- nameOpt) { <input name="name" value="@name" type="hidden"/> }
@@ -80,43 +80,43 @@
             </td>
           </tr>
         }
-        @for(group <- groupOpt) {
-          <tr>
-            <td>Group</td>
-            <td>
-              <!-- http://jsfiddle.net/7zkCU/14/ -->
-              <span class="tag label label-info" style="margin-bottom: 0px">
-                <span>@group</span>
-                <a href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = None, category = categoryOpt, sort = sortOpt, descending = descendingOpt)" style="opacity: 0.6;" title="Remove filter by group">
-                  <i class="remove glyphicon glyphicon-remove-sign glyphicon-white"></i>
-                </a> 
-              </span>
-            </td>
-          </tr>
-        }
-        @if(testsSummary.passCount > 0){
-          <tr>
-            <td>Healthy</td>       
-            <td><a href="@testsLink(TestStatus.Healthy)"><span class="badge badge-success">@testsSummary.passCount</span></a></td>
-          </tr>
-        }
-        @if(testsSummary.warnCount > 0){
-          <tr>          
-            <td>Warning</td>
-            <td><a href="@testsLink(TestStatus.Healthy)"><span class="badge badge-warning">@testsSummary.warnCount</span></a></td>
-          </tr>
-        }
-        @if(testsSummary.failCount > 0){
-          <tr>
-            <td>Broken</td>
-            <td><a href="@testsLink(TestStatus.Broken)"><span class="badge badge-error">@testsSummary.failCount</span></a></td>
-          </tr>
-        }
         <tr>
-          <td style="width: 100px;">Total</td>
-          <td><a id="total-test-count" href="@routes.Application.tests(configuration = Some(configuration), name = nameOpt, group = groupOpt, category = categoryOpt, sort = sortOpt, descending = descendingOpt)"><span class="badge badge-inverse">@testsSummary.totalCount</span></a></td>
+          <td>Counts</td>
+          <td>
+            @if(testsSummary.passCount > 0){<a href="@testsLink(TestStatus.Healthy)"><span class="badge badge-success">@testsSummary.passCount</span></a> Healthy }
+            @if(testsSummary.warnCount > 0){<a href="@testsLink(TestStatus.Warning)"><span class="badge badge-warning">@testsSummary.warnCount</span></a> Warning }
+            @if(testsSummary.failCount > 0){<a href="@testsLink(TestStatus.Broken)"><span class="badge badge-error">@testsSummary.failCount</span></a> Broken }
+            <a id="total-test-count" href="@routes.Application.tests(configuration = Some(configuration), name = nameOpt, group = groupOpt, category = categoryOpt, sort = sortOpt, descending = descendingOpt)"><span class="badge badge-inverse">@testsSummary.totalCount</span></a> Total
+          </td>
         </tr>
       </table>
+      <form id="filter-form" role="form" action="@routes.Application.tests(configuration = Some(configuration), sort = sortOpt, descending = descendingOpt)">
+      <table class="table table-striped table-bordered table-hover">
+        <tr>
+          <th colspan="2">Filter tests</th>
+        </tr>
+        <tr>
+          <td style="width: 128px">Group</td>
+          <td>
+            <input name="group" id="group-name-field" value="@{groupOpt.getOrElse("")}" class="form-control typeahead" type="text" placeholder="Group"/>
+          </td>
+        </tr>
+        <tr>
+          <td>Test name</td>
+          <td>
+	    <input name="name" id="test-name-field" value="@{nameOpt.getOrElse("")}" class="form-control typeahead" type="text" placeholder="Test name"/>
+          </td>
+        </tr>
+        <tr>
+          <td>Category</td>
+          <td>
+	    <input name="category" id="category-field" value="@{categoryOpt.getOrElse("")}" class="form-control typeahead" type="text" placeholder="Category"/>
+          </td>
+        </tr>
+      </table>
+      <input name="configuration" value="@configuration" type="hidden"/>
+      <button style="float: right" id="filter-tests" type="submit" class="btn btn-primary">Search</button>
+      </form>
     </div> <!-- col-md-9 -->
     <div class="col-md-3">
       <div id="pie-chart" style="margin-top: 6px; width: 200px; height: 200px"></div>
@@ -138,40 +138,6 @@
       </script>
     </div> <!-- col-md-3 -->
   </div> <!-- row -->
-
-  <br/>
-
-  <div class="panel-group">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h4 class="panel-title">
-          <a data-toggle="collapse" data-target="#collapseOne">
-            Search Options
-          </a>
-        </h4>
-      </div>
-      <div id="collapseOne" class="panel-collapse collapse">
-        <div class="panel-body">
-          <form id="filter-form" role="form" action="@routes.Application.tests(configuration = Some(configuration), sort = sortOpt, descending = descendingOpt)">
-             <div class="form-group">
-               <label for="test-name-field">Test name</label>
-               <input name="name" id="test-name-field" value="@{nameOpt.getOrElse("")}" class="form-control typeahead" type="text" placeholder="Test name"/>
-             </div>
-             <div class="form-group">
-               <label for="group-name-field">Group</label>
-               <input name="group" id="group-name-field" value="@{groupOpt.getOrElse("")}" class="form-control typeahead" type="text" placeholder="Group"/>
-             </div>
-             <div class="form-group">
-               <label for="category-field">Category</label>
-               <input name="category" id="category-field" value="@{categoryOpt.getOrElse("")}" class="form-control typeahead" type="text" placeholder="Category"/>
-             </div>
-             <input name="configuration" value="@configuration" type="hidden"/>
-             <button id="filter-tests" type="submit" class="btn btn-default">Search</button>
-          </form>
-        </div>
-      </div>
-    </div>    
-  </div>
 
   <br/>
 
