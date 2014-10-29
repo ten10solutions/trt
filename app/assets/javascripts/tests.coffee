@@ -56,6 +56,14 @@ $(document).ready ->
   addTypeahead "group-name-field", "groupNames", groupEngine
   addTypeahead "category-field", "categoryNames", categoryEngine
 
+  $("#filter-tests-header-bar").click ->
+    toggleFilters()
+
+toggleFilters = ->
+  $('.filter-widget,#expand-filter,#collapse-filter').toggle()
+        
+
+
 addTypeahead = (id, name, engine) ->
   $("#" + id).typeahead
     hint: true

@@ -432,5 +432,12 @@
       </column>
     </createTable>
   </changeSet>
+
+  <changeSet author="matt" id="test_categories-unique-index">
+    <createIndex indexName="idx_test_categories" tableName="test_categories" unique="true">
+      <column name="test_id" />
+      <column name="category" />
+    </createIndex>
+  </changeSet>
   
 </databaseChangeLog>
