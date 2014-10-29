@@ -22,9 +22,9 @@ class QuickTestAnalyserTest extends FlatSpec with Matchers {
 
     val testAnalyser =
       quickTestAnalyser(
-        pass(2.days.ago),
-        pass(4.days.ago),
-        fail(6.days.ago))
+        pass((2 * 24).hours.ago),
+        pass((4 * 24).hours.ago),
+        fail((6 * 24).hours.ago))
 
     testAnalyser.ignoreExecutionsAfter(1.day.ago)
 
