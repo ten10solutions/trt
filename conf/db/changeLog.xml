@@ -439,5 +439,10 @@
       <column name="category" />
     </createIndex>
   </changeSet>
+
+  <changeSet author="matt" id="test_categories-foreign-key">
+    <addForeignKeyConstraint baseColumnNames="test_id" baseTableName="test_categories" constraintName="test_categories_test_id_fk" deferrable="false"
+      initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="tests" />
+  </changeSet>
   
 </databaseChangeLog>
