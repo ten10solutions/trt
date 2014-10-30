@@ -95,7 +95,8 @@ toggleCloseColor = ->
 $(document).ready ->
   $(".tag a").mouseover toggleCloseColor
   $(".tag a").mouseout toggleCloseColor
+  addTypeahead "category-field", "categoryNames", "/webApi/categories?query=%QUERY"
 
 window.removeCategory= (category) ->
-  $("#remove-category-form-field").val("category")
+  $("#remove-category-form-field").val(category)
   $("#remove-category-form").submit()

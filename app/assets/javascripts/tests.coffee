@@ -6,21 +6,6 @@ toggleCloseColor = ->
 window.performTestAction = (action) ->
   $("#testActionForm").attr("action", action).submit()
 
-makeEngine = (name, url) -> 
-  new Bloodhound(
-    name: name
-    limit: 12
-    remote:
-      url: url
-      filter: (resp) -> ({val: s} for s in resp)
-    datumTokenizer: (d) -> Bloodhound.tokenizers.whitespace d.val
-    queryTokenizer: Bloodhound.tokenizers.whitespace
-   )
-
-nameEngine = makeEngine "testNames", "/webApi/tests/names?query=%QUERY"
-groupEngine = makeEngine "groups", "/webApi/tests/groups?query=%QUERY"
-categoryEngine = makeEngine "categories", "/webApi/categories?query=%QUERY"
-
 $(document).ready ->
   setButtonEnableState = ->
     disabled = $("input:checkbox:checked").length is 0
@@ -48,29 +33,12 @@ $(document).ready ->
   $("#configuration-select").change ->
     $("#configuration-form").submit()
 
-  nameEngine.initialize()
-  groupEngine.initialize()
-  categoryEngine.initialize()
-
-  addTypeahead "test-name-field", "testNames", nameEngine
-  addTypeahead "group-name-field", "groupNames", groupEngine
-  addTypeahead "category-field", "categoryNames", categoryEngine
+  addTypeahead "test-name-field", "testNames", "/webApi/tests/names?query=%QUERY"
+  addTypeahead "group-name-field", "groupNames", "/webApi/tests/groups?query=%QUERY"
+  addTypeahead "category-field", "categoryNames", "/webApi/categories?query=%QUERY"
 
   $("#filter-tests-header-bar").click ->
     toggleFilters()
 
 toggleFilters = ->
   $('.filter-widget,#expand-filter,#collapse-filter').toggle()
-        
-
-
-addTypeahead = (id, name, engine) ->
-  $("#" + id).typeahead
-    hint: true
-    highlight: true
-    minLength: 1
-  ,
-    name: name
-    displayKey: "val"
-    source: engine.ttAdapter()
-

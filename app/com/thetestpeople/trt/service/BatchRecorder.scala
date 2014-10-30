@@ -53,7 +53,9 @@ class BatchRecorder(dao: Dao, clock: Clock, analysisService: AnalysisService, lo
 
   private def recordTest(incomingTest: Incoming.Test): Id[Test] = {
     val test = Test(name = incomingTest.name, groupOpt = incomingTest.groupOpt)
-    dao.ensureTestIsRecorded(test)
+    val testId = dao.ensureTestIsRecorded(test)
+    dao.setCategories(testId, incomingTest.categories)
+    testId
   }
 
   private def recordExecution(incomingExecution: Incoming.Execution, batch: Batch, testId: Id[Test], batchConfigurationOpt: Option[Configuration]): EnrichedExecution = {

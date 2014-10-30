@@ -138,7 +138,9 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     tests.map(_.id).run
 
   def getTestNames(pattern: String): Seq[String] =
-    tests.filter(_.name.toLowerCase like globToSqlPattern(pattern)).map(_.name).run
+    tests
+      .filter(_.name.toLowerCase like globToSqlPattern(pattern))
+      .groupBy(_.name).map(_._1).run
 
   def getGroups(pattern: String): Seq[String] =
     tests
@@ -147,7 +149,9 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       .groupBy(_.group).map(_._1).run.flatten
 
   def getCategories(pattern: String): Seq[String] =
-    testCategories.filter(_.category like globToSqlPattern(pattern)).groupBy(_.category).map(_._1).run
+    testCategories
+      .filter(_.category.toLowerCase like globToSqlPattern(pattern))
+      .groupBy(_.category).map(_._1).run
 
   private def globToSqlPattern(pattern: String) = pattern.replace("*", "%").toLowerCase
 
@@ -459,7 +463,6 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
 
   def setCategories(testId: Id[Test], categories: Seq[String]) {
     deleteTestCategoriesCompiled(testId).execute
-    //testCategories.filter(_.testId === testId).delete
     addCategories(testId, categories)
   }
 

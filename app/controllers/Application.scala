@@ -465,7 +465,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
     getFormParameter("category") match {
       case Some(category) ⇒
         service.addCategory(testId, category)
-        Redirect(previousUrlOrDefault).flashing("success" -> "Category added.")
+        Redirect(previousUrlOrDefault).flashing("success" -> s"Test was added to the '$category' category.")
       case None ⇒
         BadRequest("No 'category' parameter provided'")
     }
@@ -476,7 +476,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
     getFormParameter("category") match {
       case Some(category) ⇒
         service.removeCategory(testId, category)
-        Redirect(previousUrlOrDefault).flashing("success" -> "Category removed.")
+        Redirect(previousUrlOrDefault).flashing("success" -> s"Test was removed from the '$category' category.")
       case None ⇒
         BadRequest("No 'category' parameter provided'")
     }
