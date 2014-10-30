@@ -458,13 +458,8 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
 
   def deleteTestComment(id: Id[Test]) = testComments.filter(_.testId === id).delete
 
-  def getCategories(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[String]] =
-    testCategories.filter(_.testId inSet testIds).run.groupBy(_.testId).mapValues(_.map(_.category))
-
-  def setCategories(testId: Id[Test], categories: Seq[String]) {
-    deleteTestCategoriesCompiled(testId).execute
-    addCategories(testId, categories)
-  }
+  def getCategories(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[TestCategory]] =
+    testCategories.filter(_.testId inSet testIds).run.groupBy(_.testId)
 
   private val deleteTestCategoriesCompiled = {
     def deleteTestCategories(testId: Column[Id[Test]]) =
@@ -473,13 +468,12 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   }
   private val testCategoriesInserter = testCategories.insertInvoker
 
-  def addCategories(testId: Id[Test], categories: Seq[String]) {
-    val newRows = categories.map(c ⇒ TestCategory(testId, c))
-    testCategoriesInserter.insertAll(newRows: _*)
+  def addCategories(categories: Seq[TestCategory]) {
+    testCategoriesInserter.insertAll(categories: _*)
   }
 
-  def removeCategory(testId: Id[Test], category: String) {
-    testCategories.filter(tc ⇒ tc.testId === testId && tc.category === category).delete
+  def removeCategories(testId: Id[Test], categories: Seq[String]) {
+    testCategories.filter(tc ⇒ tc.testId === testId && tc.category.inSet(categories)).delete
   }
 
 }

@@ -54,8 +54,17 @@ class BatchRecorder(dao: Dao, clock: Clock, analysisService: AnalysisService, lo
   private def recordTest(incomingTest: Incoming.Test): Id[Test] = {
     val test = Test(name = incomingTest.name, groupOpt = incomingTest.groupOpt)
     val testId = dao.ensureTestIsRecorded(test)
-    dao.setCategories(testId, incomingTest.categories)
+    recordCategories(testId, incomingTest.categories)
     testId
+  }
+
+  private def recordCategories(testId: Id[Test], categories: Seq[String]) {
+    val existingCategories = dao.getCategories(testId)
+    val (userCategories, importedCategories) = dao.getCategories(testId).partition(_.isUserCategory)
+    dao.removeCategories(testId, importedCategories.map(_.category))
+    val userCats = userCategories.map(_.category).toSet
+    val newCategories = categories.distinct.filterNot(userCats.contains).map(c ⇒ TestCategory(testId, c, isUserCategory = false))
+    dao.addCategories(newCategories)
   }
 
   private def recordExecution(incomingExecution: Incoming.Execution, batch: Batch, testId: Id[Test], batchConfigurationOpt: Option[Configuration]): EnrichedExecution = {

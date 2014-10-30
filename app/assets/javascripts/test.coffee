@@ -87,14 +87,7 @@ window.createDurationChart = (executionUrls, fails, passes) ->
   $("#configuration-select").change ->
     $("#configuration-form").submit()
 
-toggleCloseColor = ->
-  opacity = $(this).css("opacity")
-  opacity = (if opacity < 0.8 then 1 else 0.6)
-  $(this).css opacity: opacity
-
 $(document).ready ->
-  $(".tag a").mouseover toggleCloseColor
-  $(".tag a").mouseout toggleCloseColor
   addTypeahead "category-field", "categoryNames", "/webApi/categories?query=%QUERY"
 
 window.removeCategory= (category) ->

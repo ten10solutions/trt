@@ -41,7 +41,7 @@ class ServiceImpl(
     dao.getEnrichedTest(id, configuration) map { test ⇒
       val executions = dao.getEnrichedExecutionsForTest(id, Some(configuration), resultOpt)
       val otherConfigurations = dao.getConfigurations(id).filterNot(_ == configuration)
-      val categories = dao.getCategories(Seq(id)).getOrElse(id, Seq())
+      val categories = dao.getCategories(Seq(id)).getOrElse(id, Seq()).map(_.category)
       TestAndExecutions(test, executions, otherConfigurations, categories)
     }
   }
@@ -250,7 +250,7 @@ class ServiceImpl(
       if (existingCategories contains category)
         AddCategoryResult.DuplicateCategory
       else {
-        dao.addCategories(testId, Seq(category))
+        dao.addCategories(Seq(TestCategory(testId, category, isUserCategory = true)))
         logger.info(s"Added category $category to test $testId")
         AddCategoryResult.Success
       }
@@ -258,7 +258,7 @@ class ServiceImpl(
   }
 
   def removeCategory(testId: Id[Test], category: String) = transaction {
-    dao.removeCategory(testId, category)
+    dao.removeCategories(testId, Seq(category))
     logger.info(s"Removed category $category from test $testId")
   }
 

@@ -19,21 +19,26 @@ td.configuration-cell {
   line-height: 28px;
 }
 
-.tag a {
-  color: #bbb;
-  cursor: pointer;
-  opacity: .5;
+.tag a.category-link {
+  color: #fff;
 }
 
 .tag .remove {
   vertical-align: middle;
 }
 
-.tag a {
+.tag a.remove-category-link {
+  color: #fff;
+  cursor: pointer;
   margin: 0 0 0 0;
+  opacity: 0.6;
+}
+
+.tag a.remove-category-link:hover {
+  opacity: 1.0;
 }
 
 .tag a .glyphicon-white {
   color: #fff;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }

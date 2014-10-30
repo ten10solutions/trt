@@ -116,4 +116,7 @@ object TestDataFactory {
     importSpecIdOpt: Option[Id[CiImportSpec]] = None) =
     CiBuild(batchId, importTime, buildUrl, buildNumberOpt, buildNameOpt, jobId, importSpecIdOpt)
 
+ def testCategory(testId: Id[Test], category: String = DummyData.Category, isUserCategory: Boolean = false) : TestCategory = 
+   TestCategory(testId, category, isUserCategory)
+    
 }

@@ -444,5 +444,14 @@
     <addForeignKeyConstraint baseColumnNames="test_id" baseTableName="test_categories" constraintName="test_categories_test_id_fk" deferrable="false"
       initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="tests" />
   </changeSet>
+
+  <changeSet author="matt" id="test_categories-add-is_user_category-column">
+    <addColumn tableName="test_categories">
+      <column name="is_user_category" type="BOOL" defaultValue="false">
+        <constraints nullable="false" />
+      </column>
+    </addColumn>
+
+  </changeSet>
   
 </databaseChangeLog>

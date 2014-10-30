@@ -164,13 +164,13 @@ trait Dao extends ExecutionDao with CiDao {
 
   def deleteTestComment(id: Id[Test])
 
-  def getCategories(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[String]]
+  def getCategories(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[TestCategory]]
 
-  def setCategories(testId: Id[Test], categories: Seq[String])
+  def getCategories(testId: Id[Test]): Seq[TestCategory] = getCategories(Seq(testId)).getOrElse(testId, Seq())
+  
+  def addCategories(categories: Seq[TestCategory])
 
-  def addCategories(testId: Id[Test], categories: Seq[String])
-
-  def removeCategory(testId: Id[Test], category: String)
+  def removeCategories(testId: Id[Test], categories: Seq[String])
 
 }
 

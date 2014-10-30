@@ -248,6 +248,7 @@ class MockDao extends Dao {
     val (deleteTestIds, affectedTestIds) = testIds.partition(getExecutionsForTest(_).isEmpty)
     tests = tests.filterNot(deleteTestIds contains _.id)
     testComments = testComments.filterNot(testIds contains _.testId)
+    testCategories = testCategories.filterNot(testIds contains _.testId)
     DeleteBatchResult(affectedTestIds, executionIds)
   }
 
@@ -384,13 +385,13 @@ class MockDao extends Dao {
     for (comment ← testComments if matches(comment.text))
       yield comment.text
   }
-  
-  private def globMatcher(pattern: String): String => Boolean = {
+
+  private def globMatcher(pattern: String): String ⇒ Boolean = {
     val regexPattern = globToRegex(pattern)
     def matches(s: String) = regexPattern.matcher(s).matches()
     matches
   }
-  
+
   def setExecutionComment(id: Id[Execution], text: String) =
     executionComments = ExecutionComment(id, text) +: executionComments.filterNot(_.executionId == id)
 
@@ -416,21 +417,15 @@ class MockDao extends Dao {
     updatedBatches.nonEmpty
   }
 
-  def getCategories(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[String]] =
-    testCategories.filter(t ⇒ testIds contains t.testId).groupBy(_.testId).mapValues(_.map(_.category))
+  def getCategories(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[TestCategory]] =
+    testCategories.filter(t ⇒ testIds contains t.testId).groupBy(_.testId)
 
-  def setCategories(testId: Id[Test], categories: Seq[String]) {
-    testCategories = testCategories.filterNot(tc ⇒ tc.testId == testId)
-    addCategories(testId, categories)
+  def addCategories(categories: Seq[TestCategory]) {
+    testCategories ++:= categories
   }
 
-  def addCategories(testId: Id[Test], categories: Seq[String]) {
-    val newRows = categories.map(c ⇒ TestCategory(testId, c))
-    testCategories ++:= newRows
-  }
-
-  def removeCategory(testId: Id[Test], category: String) {
-    testCategories = testCategories.filterNot(tc ⇒ tc.testId == testId && tc.category == category)
+  def removeCategories(testId: Id[Test], categories: Seq[String]) {
+    testCategories = testCategories.filterNot(tc ⇒ tc.testId == testId && categories.contains(tc.category))
   }
 
 }

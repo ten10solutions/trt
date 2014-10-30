@@ -1,8 +1,3 @@
-toggleCloseColor = ->
-  opacity = $(this).css("opacity")
-  opacity = (if opacity < 0.8 then 1 else 0.6)
-  $(this).css opacity: opacity
-
 window.performTestAction = (action) ->
   $("#testActionForm").attr("action", action).submit()
 
@@ -22,9 +17,6 @@ $(document).ready ->
   $(".testCheckbox").click ->
     setButtonEnableState()
 
-  $(".tag a").mouseover toggleCloseColor
-  $(".tag a").mouseout toggleCloseColor
-
   $("#filter-form").submit (e) ->
     $("#test-name-field").removeAttr "name" if $("#test-name-field").val() is ""
     $("#group-name-field").removeAttr "name" if $("#group-name-field").val() is ""
@@ -38,7 +30,4 @@ $(document).ready ->
   addTypeahead "category-field", "categoryNames", "/webApi/categories?query=%QUERY"
 
   $("#filter-tests-header-bar").click ->
-    toggleFilters()
-
-toggleFilters = ->
-  $('.filter-widget,#expand-filter,#collapse-filter').toggle()
+    $('.filter-widget, #expand-filter, #collapse-filter').toggle()

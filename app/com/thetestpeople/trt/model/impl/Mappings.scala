@@ -281,8 +281,9 @@ trait Mappings { self: SlickDao ⇒
 
     def testId = column[Id[Test]]("test_id", O.PrimaryKey, O.NotNull)
     def category = column[String]("category", O.NotNull)
-
-    def * = (testId, category) <> (TestCategory.tupled, TestCategory.unapply)
+    def isUserCategory = column[Boolean]("is_user_category", O.NotNull)
+    
+    def * = (testId, category, isUserCategory) <> (TestCategory.tupled, TestCategory.unapply)
 
   }
   
