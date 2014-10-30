@@ -242,9 +242,19 @@ class ServiceImpl(
     }
   }
 
-  def addCategory(testId: Id[Test], category: String) = transaction {
-    dao.addCategories(testId, Seq(category))
-    logger.info(s"Added category $category to test $testId")
+  def addCategory(testId: Id[Test], category: String): AddCategoryResult = transaction {
+    if (dao.getTestsById(Seq(testId)).isEmpty)
+      AddCategoryResult.NoTestFound
+    else {
+      val existingCategories = dao.getCategories(Seq(testId)).getOrElse(testId, Seq())
+      if (existingCategories contains category)
+        AddCategoryResult.DuplicateCategory
+      else {
+        dao.addCategories(testId, Seq(category))
+        logger.info(s"Added category $category to test $testId")
+        AddCategoryResult.Success
+      }
+    }
   }
 
   def removeCategory(testId: Id[Test], category: String) = transaction {

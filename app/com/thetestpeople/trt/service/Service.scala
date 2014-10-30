@@ -27,6 +27,13 @@ case class ExecutionsAndTotalCount(executions: Seq[EnrichedExecution], total: In
 
 case class ExecutionAndFragment(execution: EnrichedExecution, fragment: String)
 
+sealed trait AddCategoryResult
+object AddCategoryResult {
+  case object Success extends AddCategoryResult
+  case object NoTestFound extends AddCategoryResult
+  case object DuplicateCategory extends AddCategoryResult
+}
+
 trait Service extends CiService {
 
   def addBatch(batch: Incoming.Batch): Id[Batch]
@@ -113,7 +120,7 @@ trait Service extends CiService {
    */
   def setTestComment(id: Id[Test], text: String): Boolean
 
-  def addCategory(testId: Id[Test], category: String)
+  def addCategory(testId: Id[Test], category: String): AddCategoryResult
 
   def removeCategory(testId: Id[Test], category: String)
 

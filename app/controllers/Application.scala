@@ -356,7 +356,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
     logger.debug(s"categories($query)")
     Ok(Json.toJson(service.getCategories(query)))
   }
-  
+
   def configurationChart(configuration: Configuration) = Action { implicit request ⇒
     logger.debug(s"configurationChart($configuration)")
     val counts = service.getHistoricalTestCounts().get(configuration).map(_.counts).getOrElse(List())
@@ -464,8 +464,15 @@ class Application(service: Service, adminService: AdminService) extends Controll
     logger.debug(s"addCategory($testId)")
     getFormParameter("category") match {
       case Some(category) ⇒
-        service.addCategory(testId, category)
-        Redirect(previousUrlOrDefault).flashing("success" -> s"Test was added to the '$category' category.")
+        val result = service.addCategory(testId, category)
+        result match {
+          case AddCategoryResult.DuplicateCategory ⇒
+            Redirect(previousUrlOrDefault).flashing("error" -> s"Test is already in the '$category' category.")
+          case AddCategoryResult.NoTestFound ⇒
+            BadRequest(s"No test found with id $testId")
+          case AddCategoryResult.Success ⇒
+            Redirect(previousUrlOrDefault).flashing("success" -> s"Test was added to the '$category' category.")
+        }
       case None ⇒
         BadRequest("No 'category' parameter provided'")
     }
