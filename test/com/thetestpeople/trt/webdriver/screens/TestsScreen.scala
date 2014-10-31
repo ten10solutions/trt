@@ -8,8 +8,34 @@ import org.openqa.selenium.By
 
 class TestsScreen(implicit automationContext: AutomationContext) extends AbstractScreen with HasMainMenu {
 
-  def total: Int =
-    webDriver.waitForDisplayedAndEnabled(id(s"total-test-count")).getText.toInt
+  def total: Int = webDriver.waitForDisplayedAndEnabled(id("total-test-count")).getText.toInt
+
+  def expandFilterOptions: FilterTestsWidget = {
+    log("Click the 'Filter Tests' bar to expand the filter options")
+    webDriver.waitForDisplayedAndEnabled(id("filter-tests-header-bar")).click()
+    webDriver.waitForDisplayedAndEnabled(id("collapse-filter"))
+    new FilterTestsWidget
+  }
+
+  class FilterTestsWidget {
+
+    def categoryField = webDriver.waitForDisplayedAndEnabled(id("category-field"))
+
+    def category: String = categoryField.getText
+
+    def category_=(category: String) {
+      log(s"Set 'Category': $category")
+      val field = categoryField
+      field.clear()
+      field.sendKeys(category)
+    }
+
+    def clickSearch() {
+      log(s"Click 'Search'")
+      webDriver.waitForDisplayedAndEnabled(id("filter-tests")).click()
+    }
+
+  }
 
   def testRows: Seq[TestRow] =
     for ((rowElement, index) ← webDriver.findElements_(cssSelector("tr.test-row")).zipWithIndex)
@@ -30,4 +56,5 @@ class TestsScreen(implicit automationContext: AutomationContext) extends Abstrac
     }
 
   }
+
 }

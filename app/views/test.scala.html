@@ -114,12 +114,12 @@
       <td>Categories</td>
       <td>
         @for(category <- categories) { 
-          <span class="tag label label-info" @*style="margin-bottom: 0px"*@>
+          <span class="category-widget tag label label-info">
             <a class="category-link" href="@routes.Application.tests(category = Some(category), configuration = configurationOpt)" title="View tests in the @category category">@category</a>
             <a class="remove-category-link" onclick="removeCategory('@escapeEcmaScript(category)')" title="Remove category"><i class="remove glyphicon glyphicon-remove-sign glyphicon-white"></i></a>
           </span>
         } 
-        <a style="margin-left: 4px" id="edit-category-link" data-toggle="modal" data-target="#category-dialog">Add...</a>
+        <a style="margin-left: 4px" id="add-category-link" data-toggle="modal" data-target="#category-dialog">Add...</a>
       </td>
     </tr>
   </table>

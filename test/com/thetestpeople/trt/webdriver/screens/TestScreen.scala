@@ -37,7 +37,51 @@ class TestScreen(implicit automationContext: AutomationContext) extends Abstract
   def delete() {
     log("Click 'Mark test as deleted'")
     webDriver.waitForDisplayedAndEnabled(id("delete-test")).click()
-    webDriver.waitForDisplayedAndEnabled(id("alert-success"))
+    waitForSuccessMessage()
+  }
+
+  def categoryWidgets: Seq[CategoryWidget] = webDriver.findElements_(cssSelector(".category-widget")).map(CategoryWidget)
+
+  def clickAddCategory(): AddCategoryDialog = {
+    log("Click 'Add' (category)")
+    webDriver.waitForDisplayedAndEnabled(id("add-category-link")).click()
+    webDriver.waitForDisplayedAndEnabled(id("category-dialog"))
+    new AddCategoryDialog
+  }
+
+  class AddCategoryDialog {
+
+    private def categoryField = webDriver.waitForDisplayedAndEnabled(id("category-field"))
+
+    def category: String = categoryField.getText
+
+    def category_=(category: String) {
+      log(s"Set 'Category': $category")
+      val field = categoryField
+      field.clear()
+      field.sendKeys(category)
+    }
+
+    def clickSave() {
+      log(s"Click 'Save'")
+      webDriver.waitForDisplayedAndEnabled(id("save-category-button")).click()
+      waitForSuccessMessage()
+    }
+
+  }
+
+  case class CategoryWidget(categoryElement: WebElement) {
+
+    lazy val categoryLink: WebElement = categoryElement.findElement(cssSelector(".category-link"))
+
+    def categoryName: String = categoryLink.getText
+
+    def clickRemoveCategory() {
+      log(s"Click 'Remove' for category '$categoryName'")
+      categoryElement.findElement(cssSelector(".remove-category-link")).click()
+      waitForSuccessMessage()
+    }
+
   }
 
   case class ExecutionRow(rowElement: WebElement, index: Int) {

@@ -4,6 +4,7 @@ import org.openqa.selenium.By._
 import com.thetestpeople.trt.webdriver.screens.RichSelenium._
 
 abstract class CommentDialog[Screen <: AbstractScreen](implicit automationContext: AutomationContext) extends AbstractComponent {
+  
   webDriver.waitForDisplayedAndEnabled(id("comment-dialog"))
 
   private def commentTextLocator = id("comment-text")
