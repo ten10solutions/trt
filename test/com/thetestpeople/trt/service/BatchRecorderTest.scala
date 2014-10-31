@@ -16,29 +16,30 @@ class BatchRecorderTest extends FlatSpec with Matchers {
   "Submitting a batch with a single test" should "correctly capture all input data" in {
     val serviceBundle = TestServiceFactory.setup()
     val dao = serviceBundle.dao
-    val inTest = F.test("testMethod", Some("TestClass"))
+    val inTest = F.test(DummyData.TestName, Some(DummyData.Group), categories = Seq(DummyData.Category))
     val inExecution = F.execution(inTest,
       passed = true,
-      summaryOpt = Some("Blah"),
-      logOpt = Some("Blither"),
-      executionTimeOpt = Some(new DateTime),
-      durationOpt = Some(8.seconds),
+      summaryOpt = Some(DummyData.Summary),
+      logOpt = Some(DummyData.Log),
+      executionTimeOpt = Some(DummyData.ExecutionTime),
+      durationOpt = Some(DummyData.Duration),
       configurationOpt = Some(DummyData.Configuration1))
     val inBatch = F.batch(
-      urlOpt = Some(uri("http://www.blah.com")),
-      nameOpt = Some("Blahblah"),
-      logOpt = Some("Blitherblither"),
-      executionTimeOpt = Some(new DateTime),
-      durationOpt = Some(8.seconds),
+      urlOpt = Some(DummyData.BuildUrl),
+      nameOpt = Some(DummyData.BatchName),
+      logOpt = Some(DummyData.Log),
+      executionTimeOpt = Some(DummyData.ExecutionTime),
+      durationOpt = Some(DummyData.Duration),
       executions = List(inExecution))
 
     val batch = serviceBundle.batchRecorder.recordBatch(inBatch)
 
     val List(execution) = dao.getEnrichedExecutionsInBatch(batch.id)
     val List(EnrichedTest(test, _, _)) = dao.getAnalysedTests()
+    val categories = dao.getCategories(test.id)
     checkBatchDataWasCaptured(batch, inBatch)
     checkExecutionDataWasCaptured(execution, inExecution)
-    checkTestDataWasCaptured(test, inTest)
+    checkTestDataWasCaptured(test, categories, inTest)
     execution.batchId should equal(batch.id)
     execution.testId should equal(test.id)
   }
@@ -60,11 +61,13 @@ class BatchRecorderTest extends FlatSpec with Matchers {
     val execution2 = findExecution(dao, batch.id, inTest2.qualifiedName)
     val Some(EnrichedTest(test1, _, _)) = dao.getEnrichedTest(execution1.testId)
     val Some(EnrichedTest(test2, _, _)) = dao.getEnrichedTest(execution2.testId)
+    val categories1 = dao.getCategories(test1.id)
+    val categories2 = dao.getCategories(test2.id)
     checkBatchDataWasCaptured(batch, inBatch)
     checkExecutionDataWasCaptured(execution1, inExecution1)
     checkExecutionDataWasCaptured(execution2, inExecution2)
-    checkTestDataWasCaptured(test1, inTest1)
-    checkTestDataWasCaptured(test2, inTest2)
+    checkTestDataWasCaptured(test1, categories1, inTest1)
+    checkTestDataWasCaptured(test2, categories2, inTest2)
   }
 
   "Submitting a batch with a single failing test" should "record the batch as failing" in {
@@ -123,6 +126,31 @@ class BatchRecorderTest extends FlatSpec with Matchers {
     execution.execution.configuration should equal(DummyData.Configuration1)
   }
 
+  "Submitting tests with categories" should "not clobber user-specified categories" in {
+    val serviceBundle = TestServiceFactory.setup()
+    val service = serviceBundle.service
+
+    def addBatch(categories: Seq[String]) {
+      val inTest = F.test(categories = categories)
+      val inExecution = F.execution(inTest)
+      val inBatch = F.batch(executions = List(inExecution))
+      serviceBundle.batchRecorder.recordBatch(inBatch)
+    }
+
+    addBatch(categories = Seq())
+    val Seq(testId) = serviceBundle.dao.getTestIds()
+    service.addCategory(testId, "UserCategory1")
+    service.addCategory(testId, "UserCategory2")
+
+    addBatch(categories = Seq("ImportCategory1", "ImportCategory2", "UserCategory2"))
+    val categories = service.getTestAndExecutions(testId).get.categories
+    categories should contain theSameElementsAs Seq("UserCategory1", "UserCategory2", "ImportCategory1", "ImportCategory2")
+
+    addBatch(categories = Seq())
+    val categoriesAgain = service.getTestAndExecutions(testId).get.categories
+    categoriesAgain should contain theSameElementsAs Seq("UserCategory1", "UserCategory2")
+  }
+
   private def checkBatchDataWasCaptured(batch: Batch, inBatch: Incoming.Batch) {
     batch.nameOpt should equal(inBatch.nameOpt)
     batch.urlOpt should equal(inBatch.urlOpt)
@@ -145,11 +173,12 @@ class BatchRecorderTest extends FlatSpec with Matchers {
     execution.configuration should equal(inExecution.configurationOpt.getOrElse(Configuration.Default))
   }
 
-  private def checkTestDataWasCaptured(test: Test, inTest: Incoming.Test) {
+  private def checkTestDataWasCaptured(test: Test, categories: Seq[TestCategory], inTest: Incoming.Test) {
     test.name should equal(inTest.name)
     test.groupOpt should equal(inTest.groupOpt)
+    val expectedCategories = inTest.categories.map(c ⇒ TestCategory(test.id, c, isUserCategory = false))
+    expectedCategories should contain theSameElementsAs (categories)
   }
-
 
   private def findExecution(dao: Dao, batchId: Id[Batch], qualifiedName: QualifiedName): EnrichedExecution =
     dao.getEnrichedExecutionsInBatch(batchId).find { _.qualifiedName == qualifiedName }.getOrElse(
