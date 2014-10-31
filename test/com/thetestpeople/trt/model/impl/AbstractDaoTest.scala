@@ -28,7 +28,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
       name = DummyData.TestName,
       groupOpt = Some(DummyData.Group)))
 
-    val Seq(test) = dao.getTestsById(List(testId))
+    val Seq(test) = dao.getTestsById(Seq(testId))
     test.name should equal(DummyData.TestName)
     test.groupOpt should equal(Some(DummyData.Group))
   }
@@ -40,7 +40,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     val testIdAgain = dao.ensureTestIsRecorded(test)
 
     testIdAgain should equal(testId)
-    dao.getTestIds() should equal(List(testId))
+    dao.getTestIds() should equal(Seq(testId))
   }
 
   "Inserting a new batch" should "persist all the batch data" in transaction { dao ⇒
@@ -95,7 +95,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
 
     val tests = dao.getAnalysedTests().map(_.test)
 
-    tests.map(_.id) should contain theSameElementsAs (List(testId1, testId2, testId3))
+    tests.map(_.id) should contain theSameElementsAs (Seq(testId1, testId2, testId3))
   }
 
   "Getting tests" should "allow you to filter by group" in transaction { dao ⇒
@@ -440,10 +440,10 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     batches.map(_.id) should equal(List(batchId1, batchId2, batchId3))
   }
 
-  "Getting batches" should "let you filter by Jenkins job" in transaction { dao ⇒
+  "Getting batches" should "let you filter by CI job" in transaction { dao ⇒
     def addBatchAssociatedWithJob(jobId: Id[CiJob], buildUrl: URI) = {
       val batchId = dao.newBatch(F.batch())
-      dao.newCiBuild(F.jenkinsBuild(batchId, jobId, buildUrl = buildUrl))
+      dao.newCiBuild(F.ciBuild(batchId, jobId, buildUrl = buildUrl))
       batchId
     }
     val jobId1 = dao.ensureCiJob(F.ciJob(url = DummyData.JobUrl))
@@ -553,7 +553,7 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     val testId = dao.ensureTestIsRecorded(F.test())
     val executionId = dao.newExecution(F.execution(batchId, testId), logOpt = Some(DummyData.Log))
     val jobId = dao.ensureCiJob(F.ciJob())
-    dao.newCiBuild(F.jenkinsBuild(batchId, jobId = jobId, buildUrl = DummyData.BuildUrl))
+    dao.newCiBuild(F.ciBuild(batchId, jobId = jobId, buildUrl = DummyData.BuildUrl))
     dao.upsertAnalysis(F.analysis(testId, lastPassedExecutionIdOpt = Some(executionId)))
 
     dao.deleteBatches(List(batchId))
@@ -751,27 +751,24 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
 
   "Adding and retrieving test categories" should "work" in transaction { dao ⇒
     val testId = dao.ensureTestIsRecorded(F.test())
-    dao.addCategories(Seq(F.testCategory(testId, "Category")))
+    val category1 = F.testCategory(testId, "Category1", isUserCategory = true)
+    dao.addCategories(Seq(category1))
 
-    getCategories(dao, testId) should equal(Seq("Category"))
+    dao.getCategories(testId) should equal(Seq(category1))
 
-    dao.addCategories(Seq(F.testCategory(testId, "Category2")))
+    val category2 = F.testCategory(testId, "Category2")
+    dao.addCategories(Seq(category2))
 
-    getCategories(dao, testId) should contain theSameElementsAs Seq("Category", "Category2")
+    dao.getCategories(testId) should contain theSameElementsAs Seq(category1, category2)
   }
 
   "Removing categories" should "work" in transaction { dao ⇒
     val testId = dao.ensureTestIsRecorded(F.test())
-    dao.addCategories(Seq(F.testCategory(testId, DummyData.Category)))
-
-    getCategories(dao, testId) should equal(Seq(DummyData.Category))
+    dao.addCategories(Seq(F.testCategory(testId)))
 
     dao.removeCategories(testId, Seq(DummyData.Category))
 
-    getCategories(dao, testId) should equal(Seq())
+    dao.getCategories(testId) should equal(Seq())
   }
-
-  private def getCategories(dao: Dao, testId: Id[Test]): Seq[String] =
-    dao.getCategories(Seq(testId)).getOrElse(testId, Seq()).map(_.category)
 
 }

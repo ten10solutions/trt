@@ -106,7 +106,7 @@ object TestDataFactory {
       url = url,
       name = name)
 
-  def jenkinsBuild(
+  def ciBuild(
     batchId: Id[Batch],
     jobId: Id[CiJob],
     importTime: DateTime = DummyData.ImportTime,

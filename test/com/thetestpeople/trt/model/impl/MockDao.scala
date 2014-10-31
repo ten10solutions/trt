@@ -380,7 +380,7 @@ class MockDao extends Dao {
       yield group
   }
 
-  def getCategories(pattern: String): Seq[String] = {
+  def getCategoryNames(pattern: String): Seq[String] = {
     val matches = globMatcher(pattern)
     for (comment ← testComments if matches(comment.text))
       yield comment.text

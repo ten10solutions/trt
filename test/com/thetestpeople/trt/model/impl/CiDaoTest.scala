@@ -95,8 +95,8 @@ trait CiDaoTest { self: AbstractDaoTest ⇒
     val batchId2 = dao.newBatch(F.batch())
     val jobId = dao.ensureCiJob(F.ciJob(url = DummyData.JobUrl))
     val specId = dao.newCiImportSpec(F.ciImportSpec())
-    val build1 = F.jenkinsBuild(jobId = jobId, batchId = batchId1, buildUrl = DummyData.BuildUrl, importSpecIdOpt = Some(specId))
-    val build2 = F.jenkinsBuild(jobId = jobId, batchId = batchId2, buildUrl = DummyData.BuildUrl2, importSpecIdOpt = Some(specId))
+    val build1 = F.ciBuild(jobId = jobId, batchId = batchId1, buildUrl = DummyData.BuildUrl, importSpecIdOpt = Some(specId))
+    val build2 = F.ciBuild(jobId = jobId, batchId = batchId2, buildUrl = DummyData.BuildUrl2, importSpecIdOpt = Some(specId))
     dao.newCiBuild(build1)
     dao.newCiBuild(build2)
 
@@ -109,9 +109,9 @@ trait CiDaoTest { self: AbstractDaoTest ⇒
     def addBuild(buildUrl: URI) {
       val batchId = dao.newBatch(F.batch())
       val jobId = dao.ensureCiJob(F.ciJob())
-      dao.newCiBuild(F.jenkinsBuild(batchId, jobId = jobId, buildUrl = buildUrl))
+      dao.newCiBuild(F.ciBuild(batchId, jobId = jobId, buildUrl = buildUrl))
     }
-    val buildUrls = List(
+    val buildUrls = Seq(
       "http://www.example.com/1",
       "http://www.example.com/2",
       "http://www.example.com/3").map(uri)
@@ -140,9 +140,7 @@ trait CiDaoTest { self: AbstractDaoTest ⇒
   }
 
   "Inserting and retrieving Jenkins configuration" should "persist all the data" in transaction { dao ⇒
-    val params: List[JenkinsJobParam] = List(JenkinsJobParam(
-      param = DummyData.ParamName,
-      value = DummyData.ParamValue))
+    val params = Seq(JenkinsJobParam(param = DummyData.ParamName, value = DummyData.ParamValue))
     val config = JenkinsConfiguration(
       usernameOpt = Some(DummyData.Username),
       apiTokenOpt = Some(DummyData.ApiToken),

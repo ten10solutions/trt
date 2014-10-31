@@ -167,8 +167,8 @@ class ServiceImpl(
       helpfullySort(pattern, matches)
   }
 
-  def getCategories(pattern: String): Seq[String] = transaction {
-    val matches = dao.getCategories("*" + pattern + "*").distinct
+  def getCategoryNames(pattern: String): Seq[String] = transaction {
+    val matches = dao.getCategoryNames("*" + pattern + "*").distinct
     if (pattern.contains("*"))
       matches.sorted
     else

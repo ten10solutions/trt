@@ -97,7 +97,7 @@ trait Service extends CiService {
 
   def getGroups(pattern: String): Seq[String]
 
-  def getCategories(pattern: String): Seq[String]
+  def getCategoryNames(pattern: String): Seq[String]
   
   def searchLogs(query: String, startingFrom: Int = 0, limit: Int = Integer.MAX_VALUE): (Seq[ExecutionAndFragment], Int)
 

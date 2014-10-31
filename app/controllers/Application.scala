@@ -354,7 +354,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   def categories(query: String) = Action { implicit request ⇒
     logger.debug(s"categories($query)")
-    Ok(Json.toJson(service.getCategories(query)))
+    Ok(Json.toJson(service.getCategoryNames(query)))
   }
 
   def configurationChart(configuration: Configuration) = Action { implicit request ⇒
