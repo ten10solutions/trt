@@ -26,7 +26,6 @@ class CiController(service: Service) extends Controller with HasLogger {
   import views.html
 
   def ciImportSpecs() = Action { implicit request ⇒
-    logger.debug(s"ciImportSpecs()")
     val specs = service.getCiImportSpecs.map(makeView).sortBy(_.jobUrl).toList
     Ok(html.ciImportSpecs(specs))
   }
@@ -39,12 +38,10 @@ class CiController(service: Service) extends Controller with HasLogger {
   }
 
   def newCiImportSpec() = Action { implicit request ⇒
-    logger.debug(s"newCiImportSpec()")
     Ok(html.editCiImportSpec(CiImportSpecForm.initial, specOpt = None))
   }
 
   def deleteCiImportSpec(id: Id[CiImportSpec]) = Action { implicit request ⇒
-    logger.debug(s"deleteCiImportSpec($id)")
     val success = service.deleteCiImportSpec(id)
     if (success)
       Redirect(CiController.ciImportSpecs).flashing("success" -> "Deleted import specification")
@@ -53,7 +50,6 @@ class CiController(service: Service) extends Controller with HasLogger {
   }
 
   def editCiImportSpec(id: Id[CiImportSpec]) = Action { implicit request ⇒
-    logger.debug(s"editCiImportSpec($id)")
     service.getCiImportSpec(id) match {
       case None ⇒
         NotFound(s"Could not find Jenkins import spec with id '$id'")
@@ -65,7 +61,6 @@ class CiController(service: Service) extends Controller with HasLogger {
   }
 
   def getCiImportSpec(id: Id[CiImportSpec], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
-    logger.debug(s"getCiImportSpec($id, page = $pageOpt, pageSize = $pageSizeOpt)")
     Pagination.validate(pageOpt, pageSizeOpt) match {
       case Left(errorMessage) ⇒
         BadRequest(errorMessage)
@@ -87,7 +82,6 @@ class CiController(service: Service) extends Controller with HasLogger {
   }
 
   def createCiImportSpec() = Action { implicit request ⇒
-    logger.debug(s"createCiImportSpec()")
     CiImportSpecForm.form.bindFromRequest().fold(
       formWithErrors ⇒
         BadRequest(html.editCiImportSpec(formWithErrors, None)),
@@ -98,7 +92,6 @@ class CiController(service: Service) extends Controller with HasLogger {
   }
 
   def updateCiImportSpec(id: Id[CiImportSpec]) = Action { implicit request ⇒
-    logger.debug(s"updateCiImportSpec($id)")
     service.getCiImportSpec(id) match {
       case None ⇒
         NotFound(s"Could not find Jenkins import spec with id '$id'")
@@ -205,7 +198,6 @@ class CiController(service: Service) extends Controller with HasLogger {
       batchIdOpt = Some(build.batchId))
 
   def syncCiImport(id: Id[CiImportSpec]) = Action { implicit request ⇒
-    logger.debug(s"syncCiImport($id)")
     if (service.getCiImportSpec(id).isDefined) {
       service.syncCiImport(id)
       Redirect(CiController.getCiImportSpec(id)).flashing("success" -> "Sync has been triggered")
@@ -224,17 +216,14 @@ class CiController(service: Service) extends Controller with HasLogger {
   }
 
   def auth() = Action { implicit request ⇒
-    logger.debug(s"auth()")
     Ok(html.jenkinsAuth(getJenkinsConfigurationForm))
   }
 
   def reruns() = Action { implicit request ⇒
-    logger.debug(s"reruns()")
     Ok(html.jenkinsReruns(getJenkinsConfigurationForm))
   }
 
   def updateAuth() = Action { implicit request ⇒
-    logger.debug(s"updateAuth()")
     JenkinsConfigurationForm.form.bindFromRequest().fold(
       formWithErrors ⇒ {
         logger.debug("updateAuth() errors: " + formWithErrors.errorsAsJson)
@@ -247,7 +236,6 @@ class CiController(service: Service) extends Controller with HasLogger {
   }
 
   def updateReruns() = Action { implicit request ⇒
-    logger.debug(s"updateReruns()")
     JenkinsConfigurationForm.form.bindFromRequest().fold(
       formWithErrors ⇒
         BadRequest(html.jenkinsReruns(formWithErrors)),
@@ -258,12 +246,10 @@ class CiController(service: Service) extends Controller with HasLogger {
   }
 
   def teamCityConfig() = Action { implicit request ⇒
-    logger.debug(s"teamCityConfig()")
     Ok(html.teamCityConfig(getTeamCityConfigurationForm))
   }
 
   def updateTeamCityConfig() = Action { implicit request ⇒
-    logger.debug(s"updateTeamCityConfig()")
     TeamCityConfigurationForm.form.bindFromRequest().fold(
       formWithErrors ⇒ {
         logger.debug("updateTeamCityConfig() errors: " + formWithErrors.errorsAsJson)
@@ -315,7 +301,6 @@ class CiController(service: Service) extends Controller with HasLogger {
   }
 
   def rerunTest(testId: Id[Test]) = Action { implicit request ⇒
-    logger.debug(s"rerunTest($testId)")
     rerunTests(List(testId))
   }
 

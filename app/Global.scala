@@ -6,8 +6,9 @@ import com.thetestpeople.trt.utils.RichConfiguration._
 import com.thetestpeople.trt.Config._
 import com.thetestpeople.trt.utils.HasLogger
 import scala.concurrent.Future
+import play.api.mvc.WithFilters
 
-object Global extends GlobalSettings with HasLogger {
+object Global extends WithFilters(LoggingFilter) with GlobalSettings with HasLogger {
 
   private lazy val factory = new Factory(Play.current.configuration)
 

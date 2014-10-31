@@ -49,7 +49,7 @@ trait Service extends CiService {
    */
   def getBatches(jobOpt: Option[Id[CiJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch]
 
-  def deleteBatches(batchIds: List[Id[Batch]])
+  def deleteBatches(batchIds: Seq[Id[Batch]])
 
   def getTestAndExecutions(id: Id[Test], configuration: Configuration = Configuration.Default, resultOpt: Option[Boolean] = None): Option[TestAndExecutions]
 

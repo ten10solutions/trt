@@ -581,6 +581,20 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     dao.getEnrichedTest(testId2) should be(None) // It has had all its executions removed, so it has been removed too
   }
 
+  "Deleting a batch" should "delete data associated with a test" in transaction { dao ⇒
+    val testId = dao.ensureTestIsRecorded(F.test())
+    dao.addCategories(Seq(F.testCategory(testId)))
+    dao.setTestComment(testId, DummyData.Comment)
+    val batchId = dao.newBatch(F.batch())
+    val executionId = dao.newExecution(F.execution(batchId, testId))
+    dao.setExecutionComment(executionId, DummyData.Comment)
+    dao.setBatchComment(batchId, DummyData.Comment)
+
+    dao.deleteBatches(List(batchId))
+
+    dao.getCategoryNames("*") should equal(Seq())
+  }
+
   "Deleting a batch" should "return the ids of the deleted execution IDs" in transaction { dao ⇒
     val batchId = dao.newBatch(F.batch())
     val testId = dao.ensureTestIsRecorded(F.test())
@@ -683,6 +697,13 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     dao.ensureTestIsRecorded(F.test(groupOpt = Some("test")))
 
     dao.getGroups("*test*") should contain theSameElementsAs (Seq("myTEST", "test"))
+  }
+
+  "Getting category names" should "find matches" in transaction { dao ⇒
+    val testId = dao.ensureTestIsRecorded(F.test())
+    dao.addCategories(Seq(F.testCategory(testId, "category")))
+
+    dao.getCategoryNames("*ateg*") should equal(Seq("category"))
   }
 
   "Caching" should "not prevent updates from being visible" in transaction { dao ⇒

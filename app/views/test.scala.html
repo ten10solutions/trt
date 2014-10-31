@@ -7,7 +7,9 @@
   canRerun: Boolean, 
   pagination: PaginationData,
   categories: Seq[String])(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
- 
+
+@import org.apache.commons.lang3.StringEscapeUtils.escapeEcmaScript 
+
 @scripts = {
   <script src="@routes.Assets.at("javascripts/typeahead.js")"></script>
   <script src="@routes.Assets.at("javascripts/chart-utils.js")"></script>
@@ -114,7 +116,7 @@
         @for(category <- categories) { 
           <span class="tag label label-info" @*style="margin-bottom: 0px"*@>
             <a class="category-link" href="@routes.Application.tests(category = Some(category), configuration = configurationOpt)" title="View tests in the @category category">@category</a>
-            <a class="remove-category-link" onclick="removeCategory('@category')" title="Remove category"><i class="remove glyphicon glyphicon-remove-sign glyphicon-white"></i></a>
+            <a class="remove-category-link" onclick="removeCategory('@escapeEcmaScript(category)')" title="Remove category"><i class="remove glyphicon glyphicon-remove-sign glyphicon-white"></i></a>
           </span>
         } 
         <a style="margin-left: 4px" id="edit-category-link" data-toggle="modal" data-target="#category-dialog">Add...</a>
@@ -227,23 +229,23 @@
 <div class="modal fade" id="category-dialog" tabindex="-1" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-        <h4 class="modal-title">Add Test to Category</h4>
-      </div>
-      <div class="modal-body">
-        <form id="category-form" role="form" method="POST" action="@routes.Application.addCategory(test.id)">
+      <form id="category-form" role="form" method="POST" action="@routes.Application.addCategory(test.id)">
+	<div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          <h4 class="modal-title">Add Test to Category</h4>
+	</div>
+	<div class="modal-body">
           <div class="form-group">
-            <label for="category-field">Category</label>
+            <label class="sr-only" for="category-field">Category</label>
             <input name="category" id="category-field" class="form-control typeahead" type="text" placeholder="Category"/>
           </div>
           <input type="hidden" name="previousURL" value="@request.uri"/>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button id="cancel-button" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-        <button id="save-category-button" type="button" class="btn btn-primary" onclick="$('#category-form').submit()" >Save</button>
-      </div>
+	</div>
+	<div class="modal-footer">
+          <button id="cancel-button" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+          <button id="save-category-button" type="submit" class="btn btn-primary">Save</button>
+	</div>
+      </form>
     </div>
   </div>
 </div>

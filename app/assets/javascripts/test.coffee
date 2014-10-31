@@ -90,6 +90,10 @@ window.createDurationChart = (executionUrls, fails, passes) ->
 $(document).ready ->
   addTypeahead "category-field", "categoryNames", "/webApi/categories?query=%QUERY"
 
+  $('#category-dialog').on 'shown.bs.modal', (e) ->
+    $('#category-field').focus()
+
+
 window.removeCategory= (category) ->
   $("#remove-category-form-field").val(category)
   $("#remove-category-form").submit()

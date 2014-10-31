@@ -111,7 +111,7 @@ class ServiceImpl(
   def getBatches(jobOpt: Option[Id[CiJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch] =
     transaction { dao.getBatches(jobOpt, configurationOpt) }
 
-  def deleteBatches(batchIds: List[Id[Batch]]) = {
+  def deleteBatches(batchIds: Seq[Id[Batch]]) = {
     val DeleteBatchResult(remainingTestIds, executionIds) = transaction {
       dao.deleteBatches(batchIds)
     }

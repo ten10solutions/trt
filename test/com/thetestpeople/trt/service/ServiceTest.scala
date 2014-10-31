@@ -26,13 +26,13 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
       analysis.status
     }
 
-    def getEnrichedExecutionsInBatch(batchId: Id[Batch]): List[EnrichedExecution] =
+    def getEnrichedExecutionsInBatch(batchId: Id[Batch]): Seq[EnrichedExecution] =
       service.getBatchAndExecutions(batchId).toList.flatMap(_.executions)
 
-    def getTestIdsInBatch(batchId: Id[Batch]): List[Id[Test]] =
+    def getTestIdsInBatch(batchId: Id[Batch]): Seq[Id[Test]] =
       getEnrichedExecutionsInBatch(batchId).map(_.testId).distinct
 
-    def getExecutionIdsInBatch(batchId: Id[Batch]): List[Id[Execution]] =
+    def getExecutionIdsInBatch(batchId: Id[Batch]): Seq[Id[Execution]] =
       getEnrichedExecutionsInBatch(batchId).map(_.id).distinct
 
   }
@@ -43,7 +43,7 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
 
     val batchId = service.addBatch(inBatch)
 
-    val List(batch) = service.getBatches()
+    val Seq(batch) = service.getBatches()
     batch.id should equal(batchId)
   }
 
@@ -51,10 +51,10 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
     val service = setup().service
     val inTest = F.test(DummyData.TestName, Some(DummyData.Group))
     val inExecution = F.execution(inTest)
-    val inBatch = F.batch(executions = List(inExecution), logOpt = Some(DummyData.Log))
+    val inBatch = F.batch(executions = Seq(inExecution), logOpt = Some(DummyData.Log))
     val batchId = service.addBatch(inBatch)
 
-    val Some(BatchAndExecutions(batch, List(execution), Some(log), None, None)) = service.getBatchAndExecutions(batchId)
+    val Some(BatchAndExecutions(batch, Seq(execution), Some(log), None, None)) = service.getBatchAndExecutions(batchId)
 
     log should equal(DummyData.Log)
     execution.qualifiedName should equal(inTest.qualifiedName)
@@ -70,17 +70,17 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
 
     val batches = service.getBatches()
 
-    batches.map(_.id) should contain theSameElementsAs (List(batchId1, batchId2))
+    batches.map(_.id) should contain theSameElementsAs (Seq(batchId1, batchId2))
   }
 
   it should "allow you to fetch a test and its executions, including analysis" in {
     val service = setup().service
-    val inBatch = F.batch(executions = List(F.execution(F.test(), passed = true)))
+    val inBatch = F.batch(executions = Seq(F.execution(F.test(), passed = true)))
     val batchId = service.addBatch(inBatch)
-    val List(testId) = service.getTestIdsInBatch(batchId)
-    val List(executionId) = service.getExecutionIdsInBatch(batchId)
+    val Seq(testId) = service.getTestIdsInBatch(batchId)
+    val Seq(executionId) = service.getExecutionIdsInBatch(batchId)
 
-    val Some(TestAndExecutions(testAndAnalysis, List(execution), configurations, _)) = service.getTestAndExecutions(testId)
+    val Some(TestAndExecutions(testAndAnalysis, Seq(execution), configurations, _)) = service.getTestAndExecutions(testId)
 
     val EnrichedTest(test, Some(analysis), _) = testAndAnalysis
     analysis.status should equal(TestStatus.Healthy)
@@ -90,10 +90,10 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
 
   it should "let you fetch a paged list of tests and total counts" in {
     val service = setup().service
-    service.addBatch(F.batch(executions = List(F.execution(F.test("test1"), passed = true))))
-    service.addBatch(F.batch(executions = List(F.execution(F.test("test2"), passed = false))))
-    service.addBatch(F.batch(executions = List(F.execution(F.test("test3"), passed = false))))
-    service.addBatch(F.batch(executions = List(F.execution(F.test("test4"), passed = true))))
+    service.addBatch(F.batch(executions = Seq(F.execution(F.test("test1"), passed = true))))
+    service.addBatch(F.batch(executions = Seq(F.execution(F.test("test2"), passed = false))))
+    service.addBatch(F.batch(executions = Seq(F.execution(F.test("test3"), passed = false))))
+    service.addBatch(F.batch(executions = Seq(F.execution(F.test("test4"), passed = true))))
     val (counts, testsAndAnalysis) = service.getTests(startingFrom = 0, limit = 2)
     counts.total should be(4)
     testsAndAnalysis.size should be(2)
@@ -107,31 +107,31 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
 
     def addBatch(passed: Boolean, executionTime: DateTime): Id[Batch] =
       service.addBatch(
-        F.batch(executions = List(F.execution(passed = passed, executionTimeOpt = Some(executionTime)))))
+        F.batch(executions = Seq(F.execution(passed = passed, executionTimeOpt = Some(executionTime)))))
 
     val batchId1 = addBatch(passed = true, executionTime = 2.days.ago)
     val batchId2 = addBatch(passed = false, executionTime = 1.day.ago)
-    val List(testId) = service.getTestIdsInBatch(batchId1)
+    val Seq(testId) = service.getTestIdsInBatch(batchId1)
 
     service.getStatus(testId) should equal(TestStatus.Broken)
-    service.getBatches().map(_.id) should contain theSameElementsAs List(batchId1, batchId2)
+    service.getBatches().map(_.id) should contain theSameElementsAs Seq(batchId1, batchId2)
 
-    service.deleteBatches(List(batchId2))
+    service.deleteBatches(Seq(batchId2))
 
     service.getStatus(testId) should equal(TestStatus.Healthy)
-    service.getBatches().map(_.id) should contain theSameElementsAs List(batchId1)
+    service.getBatches().map(_.id) should contain theSameElementsAs Seq(batchId1)
   }
 
   "Deleting batches" should "delete its executions from the search index" in {
     val service = setup().service
     def addBatch(): Id[Batch] =
-      service.addBatch(F.batch(executions = List(F.execution(logOpt = Some("foo")))))
+      service.addBatch(F.batch(executions = Seq(F.execution(logOpt = Some("foo")))))
     val batchId1 = addBatch()
     val batchId2 = addBatch()
 
     service.searchLogs("foo")._2 should equal(2)
 
-    service.deleteBatches(List(batchId2))
+    service.deleteBatches(Seq(batchId2))
 
     service.searchLogs("foo")._2 should equal(1)
   }
@@ -139,12 +139,12 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
   "Updating system configuration" should "update the status of tests" in {
     val service = setup().service
     val inTest = F.test()
-    val inBatch = F.batch(executions = List(
+    val inBatch = F.batch(executions = Seq(
       F.execution(inTest, passed = false, executionTimeOpt = Some(1.day.ago)),
       F.execution(inTest, passed = false, executionTimeOpt = Some(2.days.ago)),
       F.execution(inTest, passed = true, executionTimeOpt = Some(3.days.ago))))
     val batchId = service.addBatch(inBatch)
-    val List(testId) = service.getTestIdsInBatch(batchId)
+    val Seq(testId) = service.getTestIdsInBatch(batchId)
 
     val tolerantConfig = SystemConfiguration(failureDurationThreshold = 1.week.toStandardDuration, failureCountThreshold = 100)
     service.updateSystemConfiguration(tolerantConfig)
@@ -157,11 +157,11 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
 
   "Execution logs" should "be removed from the search index if the execution is deleted" in {
     val service = setup().service
-    val batchId = service.addBatch(F.batch(executions = List(
+    val batchId = service.addBatch(F.batch(executions = Seq(
       F.execution(F.test(), logOpt = Some("foo bar baz")))))
     service.searchLogs("foo")._2 should equal(1)
 
-    service.deleteBatches(List(batchId))
+    service.deleteBatches(Seq(batchId))
 
     service.searchLogs("foo")._2 should equal(0)
   }

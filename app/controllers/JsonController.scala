@@ -21,7 +21,6 @@ class JsonController(service: Service, adminService: AdminService) extends Contr
 
   def addBatch = Action(parse.json(maxLength = JsonController.MaxBatchJsonSize)) { implicit request ⇒
     Utils.time("JsonController.addBatch()") {
-      logger.debug(s"addBatch")
       request.body.validate[Incoming.Batch].map { batch ⇒
         val batchId = service.addBatch(batch)
         Ok(JsString(batchId.toString))
@@ -31,7 +30,6 @@ class JsonController(service: Service, adminService: AdminService) extends Contr
   }
 
   def addExecutions(batchId: Id[Batch]) = Action(parse.json(maxLength = JsonController.MaxBatchJsonSize)) { implicit request ⇒
-    logger.debug(s"addExecutions($batchId)")
     request.body.validate[Seq[Incoming.Execution]].map { executions ⇒
       val batchFound = service.addExecutionsToBatch(batchId, executions)
       if (batchFound)
@@ -43,7 +41,6 @@ class JsonController(service: Service, adminService: AdminService) extends Contr
   }
 
   def completeBatch(batchId: Id[Batch]) = Action(parse.json) { implicit request ⇒
-    logger.debug(s"completeExecution($batchId)")
     request.body.validate[Incoming.BatchCompleteMessage].map { batchCompleteMessage ⇒
       val batchFound = service.completeExecution(batchId, batchCompleteMessage.durationOpt)
       if (batchFound)
@@ -60,7 +57,6 @@ class JsonController(service: Service, adminService: AdminService) extends Contr
   }
 
   def deleteAll() = Action { implicit request ⇒
-    logger.debug(s"deleteAll()")
     adminService.deleteAll()
     Ok(JsString("Deleted all data"))
   }

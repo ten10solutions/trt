@@ -382,8 +382,8 @@ class MockDao extends Dao {
 
   def getCategoryNames(pattern: String): Seq[String] = {
     val matches = globMatcher(pattern)
-    for (comment ← testComments if matches(comment.text))
-      yield comment.text
+    for (category ← testCategories if matches(category.category))
+      yield category.category
   }
 
   private def globMatcher(pattern: String): String ⇒ Boolean = {
