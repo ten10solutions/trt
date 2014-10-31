@@ -22,6 +22,8 @@ chartOptions = (showLabels) ->
   legend:
     show: false
 
+unescapeAmpersands = (url) -> url.replace(/&amp;/g, "&")
+
 window.createPieChart = (chartId, counts, urls, showLabels = true) ->
   slices = [
     {
@@ -45,8 +47,8 @@ window.createPieChart = (chartId, counts, urls, showLabels = true) ->
   $("#" + chartId).bind "plotclick", (event, pos, obj) ->
     return unless obj
     if obj.series.label is "Healthy"
-      window.location = urls.pass
+      window.location = unescapeAmpersands urls.pass
     else if obj.series.label is "Warning"
-      window.location = urls.warn
+      window.location = unescapeAmpersands urls.warn
     else if obj.series.label is "Broken"
-      window.location = urls.fail
+      window.location = unescapeAmpersands urls.fail

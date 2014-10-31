@@ -42,7 +42,7 @@ pieClick = (urls) -> (event, pos, obj) ->
   else if (obj.series.label == "Pass")
     window.location = urls.pass
   else if (obj.series.label == "Fail")
-    window.location = urls.fail;
+    window.location = urls.fail
 
 window.createPieChart = (counts, urls) ->
   slices = createSeries(counts)
