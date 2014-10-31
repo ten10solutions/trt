@@ -89,9 +89,9 @@ class Application(service: Service, adminService: AdminService) extends Controll
     service.getTestAndExecutions(testId, configuration, resultOpt) map {
       case TestAndExecutions(test, executions, otherConfigurations, categories) ⇒
         val executionViews = executions.map(e ⇒ ExecutionView(e)).toList
-        val testView = new TestView(test)
+        val testView = new TestView(test, categories)
         val paginationData = pagination.paginationData(executions.size)
-        views.html.test(testView, executionViews, Some(configuration), resultOpt, otherConfigurations, service.canRerun, paginationData, categories)
+        views.html.test(testView, executionViews, Some(configuration), resultOpt, otherConfigurations, service.canRerun, paginationData)
     }
 
   def batch(batchId: Id[Batch], passedFilterOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
@@ -174,7 +174,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
         BadRequest(errorMessage)
       case Right(pagination) ⇒
         val deletedTests = service.getDeletedTests()
-        val testViews = deletedTests.drop(pagination.firstItem).take(pagination.pageSize).map(TestView)
+        val testViews = deletedTests.drop(pagination.firstItem).take(pagination.pageSize).map(TestView(_))
         val paginationData = pagination.paginationData(deletedTests.size)
         Ok(views.html.deletedTests(testViews, paginationData))
     }
@@ -301,7 +301,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
       limit = pagination.pageSize,
       sortBy = sortBy)
 
-    val testViews = tests.map(TestView)
+    val testViews = tests.map(TestView(_))
     val testsSummary = TestsSummaryView(configuration, testCounts)
     val paginationData = pagination.paginationData(testCounts.countFor(testStatusOpt))
     views.html.tests(testsSummary, testViews.toList, configuration, testStatusOpt, nameOpt, groupOpt, categoryOpt, service.canRerun, paginationData, sortOpt, descendingOpt)

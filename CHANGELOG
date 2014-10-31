@@ -1,3 +1,10 @@
+0.1.1 (..)
+
+* Support for test categories
+* Record batches incrementally via API
+* Performance improvements for batch import
+* More compact filter widget on Tests Screen
+	
 0.1.0 (22/Oct/2014)
 
 * Initial release

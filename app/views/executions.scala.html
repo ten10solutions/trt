@@ -118,12 +118,12 @@
           <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.Application.execution(execution.id)"><img src="@routes.Assets.at("images/" + execution.passFailIcon)" alt="@execution.passFailText" title="@execution.passFailText"/></a></td>
           <td class="exec-time-cell"><span title="@execution.executionTime.absolute">@execution.executionTime.relative</span></td>
           <td class="duration-cell">@for(duration <- execution.durationOpt) { @duration }</td>
-          <td class="center-vert">@for(group <- execution.groupOpt) { <a href="@routes.Application.tests(configuration = Some(execution.configuration), group = Some(group.full))"><span class="execution-group" title="@group.full">@group.abbreviate(maxLength = 35)</span></a> }</td>
-          <td class="center-vert"><a class="execution-name" href="@routes.Application.test(execution.testId, configuration = Some(execution.configuration))" title="@execution.name.full">@execution.name.abbreviate(maxLength = 40)</a></td>
+          <td>@for(group <- execution.groupOpt) { <a href="@routes.Application.tests(configuration = Some(execution.configuration), group = Some(group.full))"><span class="execution-group" title="@group.full">@group.abbreviate(maxLength = 35)</span></a> }</td>
+          <td><a class="execution-name" href="@routes.Application.test(execution.testId, configuration = Some(execution.configuration))" title="@execution.name.full">@execution.name.abbreviate(maxLength = 40)</a></td>
           @if(globalViewContext.multipleConfigurationMode) {
-            <td class="center-horiz center-vert"><a href="@routes.Application.tests(configuration = Some(execution.configuration))">@execution.configuration</a></td>
+            <td class="center-horiz"><a href="@routes.Application.tests(configuration = Some(execution.configuration))">@execution.configuration</a></td>
           }
-          <td class="center-vert">@for(summary <- execution.summaryOpt) { <a href="@routes.Application.execution(execution.id)"><span title="@summary.full">@summary.abbreviated</span></a> }</td>
+          <td>@for(summary <- execution.summaryOpt) { <a href="@routes.Application.execution(execution.id)"><span title="@summary.full">@summary.abbreviated</span></a> }</td>
           <td class="execution-links-cell"><a class="execution-link" href="@routes.Application.execution(execution.id)">Execution</a></td>
           <td class="execution-links-cell"><a href="@routes.Application.batch(execution.batchId)">@execution.batchName</a></td>
         </tr>

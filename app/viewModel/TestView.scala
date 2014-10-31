@@ -12,7 +12,7 @@ case class WeatherInfo(weather: Double) {
   def passRate: String = "Pass rate: " + (weather * 100).toInt + "%"
 }
 
-case class TestView(enrichedTest: EnrichedTest) extends HasTestName {
+case class TestView(enrichedTest: EnrichedTest, categories: Seq[String] = Seq()) extends HasTestName {
 
   private val test = enrichedTest.test
 

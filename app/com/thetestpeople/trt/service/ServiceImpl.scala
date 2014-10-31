@@ -41,7 +41,7 @@ class ServiceImpl(
     dao.getEnrichedTest(id, configuration) map { test ⇒
       val executions = dao.getEnrichedExecutionsForTest(id, Some(configuration), resultOpt)
       val otherConfigurations = dao.getConfigurations(id).filterNot(_ == configuration)
-      val categories = dao.getCategories(Seq(id)).getOrElse(id, Seq()).map(_.category)
+      val categories = dao.getCategories(Seq(id)).getOrElse(id, Seq()).map(_.category).sortBy(_.toLowerCase)
       TestAndExecutions(test, executions, otherConfigurations, categories)
     }
   }

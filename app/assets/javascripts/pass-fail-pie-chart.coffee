@@ -1,6 +1,6 @@
 sliceLabel = (label, series) ->
   count = Math.round(series.data[0][1])
-  "<div style=\"font-size:8pt;text-align:center;padding:2px;color:white;\">" + label + "<br/>" + count + "</div>"
+  "<div class='pie-slice-label'>#{label}<br/>#{count}</div>"
 
 chartOptions = (showLabels) ->
   series:

@@ -42,8 +42,8 @@
         @for(test <- tests) {
           <tr class="test-row">
             <td style="text-align: center; width: 50px"><input class="testCheckbox" type="checkbox" name="selectedTest" value="@test.id"/></td>
-            <td class="center-vert">@for(group <- test.groupOpt) {<a href="@routes.Application.tests(group = Some(group.full))"><span title="@group.full">@group.abbreviate(maxLength = 35)</span></a>}</td>
-            <td class="center-vert"><a class="test-link" href="@routes.Application.test(test.id)" title="@test.name.full">@test.name.abbreviate(maxLength = 40)</a></td>
+            <td>@for(group <- test.groupOpt) {<a href="@routes.Application.tests(group = Some(group.full))"><span title="@group.full">@group.abbreviate(maxLength = 35)</span></a>}</td>
+            <td><a class="test-link" href="@routes.Application.test(test.id)" title="@test.name.full">@test.name.abbreviate(maxLength = 40)</a></td>
           </tr>
         }
       <tbody>
@@ -57,7 +57,7 @@
 <div class="panel panel-info">
   <div class="panel-heading">No deleted tests found</div>
   <div class="panel-body">
-    No tests marked as deleted..
+    No tests marked as deleted.
   </div>
 </div>
 

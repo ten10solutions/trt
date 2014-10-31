@@ -14,7 +14,7 @@ createSeries = (counts) ->
 
 sliceLabel = (label, series) ->
   count = Math.round(series.data[0][1])
-  "<div class='slice-label'>#{label}<br/>#{count}</div>"
+  "<div class='pie-slice-label'>#{label}<br/>#{count}</div>"
 
 chartOptions =
   series: 

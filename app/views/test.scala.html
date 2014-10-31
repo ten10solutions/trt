@@ -4,9 +4,8 @@
   configurationOpt: Option[Configuration], 
   resultOpt: Option[Boolean],
   otherConfigurations: Seq[Configuration], 
-  canRerun: Boolean, 
-  pagination: PaginationData,
-  categories: Seq[String])(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
+  canRerun: Boolean,
+  pagination: PaginationData)(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
 
 @import org.apache.commons.lang3.StringEscapeUtils.escapeEcmaScript 
 
@@ -62,7 +61,7 @@
     }
     @for(weatherInfo <- test.weatherInfoOpt) {
       <tr>
-        <td class="center-vert">Weather</td>
+        <td>Weather</td>
         <td><img title="@weatherInfo.passRate" src="@routes.Assets.at("images/" + weatherInfo.iconPath)"/> (@weatherInfo.passRate)</td>
       </tr>
     }
@@ -113,7 +112,7 @@
     <tr>
       <td>Categories</td>
       <td>
-        @for(category <- categories) { 
+        @for(category <- test.categories) { 
           <span class="category-widget tag label label-info">
             <a class="category-link" href="@routes.Application.tests(category = Some(category), configuration = configurationOpt)" title="View tests in the @category category">@category</a>
             <a class="remove-category-link" onclick="removeCategory('@escapeEcmaScript(category)')" title="Remove category"><i class="remove glyphicon glyphicon-remove-sign glyphicon-white"></i></a>
@@ -210,9 +209,9 @@
           <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.Application.execution(execution.id)"><img src="@routes.Assets.at("images/" + execution.passFailIcon)" alt="@execution.passFailText" title="@execution.passFailText"/></a></td>
           <td class="exec-time-cell"><span title="@execution.executionTime.absolute">@execution.executionTime.relative</span></td>
           <td class="duration-cell">@for(duration <- execution.durationOpt) { @duration }</td>
-          <td class="center-vert">@for(summary <- execution.summaryOpt) { <a href="@routes.Application.execution(execution.id)"><span title="@summary.full">@summary.abbreviated</span></a> }</td>
+          <td>@for(summary <- execution.summaryOpt) { <a href="@routes.Application.execution(execution.id)"><span title="@summary.full">@summary.abbreviated</span></a> }</td>
           @if(globalViewContext.multipleConfigurationMode) {
-            <td class="configuration-cellcenter-horiz center-vert"><a href="@routes.Application.tests(configuration = Some(execution.configuration))">@execution.configuration</a></td>
+            <td class="configuration-cell center-horiz"><a href="@routes.Application.tests(configuration = Some(execution.configuration))">@execution.configuration</a></td>
           }
           <td class="execution-links-cell"><a class="execution-link" href="@routes.Application.execution(execution.id)">Execution</a></td>
           <td class="execution-links-cell"><a class="batch-link" href="@routes.Application.batch(execution.batchId)">@execution.batchName</a></td>
