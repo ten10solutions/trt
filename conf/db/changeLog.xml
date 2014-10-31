@@ -451,7 +451,15 @@
         <constraints nullable="false" />
       </column>
     </addColumn>
+  </changeSet>
 
+  <changeSet author="matt" id="test_categories-indexes">
+    <createIndex indexName="idx-test_categories-test_id" tableName="test_categories">
+      <column name="test_id" />
+    </createIndex>
+    <createIndex indexName="idx-test_categories-category" tableName="test_categories">
+      <column name="category" />
+    </createIndex>
   </changeSet>
   
 </databaseChangeLog>
