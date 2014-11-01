@@ -2,15 +2,15 @@
 
 @css = {
   <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/chart-common.css")">
-  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/configurations.css")">
   <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/pie-chart.css")">
+  <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/configurations.css")">
 }
 
 @scripts = {
   <script src="@routes.Assets.at("javascripts/chart-utils.js")"></script>
-  <script src="@routes.Assets.at("javascripts/configurations.js")"></script>
   <script src="@routes.Assets.at("javascripts/pass-fail-pie-chart.js")"></script>
   <script src="@routes.Assets.at("javascripts/history-chart.js")"></script>
+  <script src="@routes.Assets.at("javascripts/configurations.js")"></script>
 }
 
 @main("Dashboard", "Dashboard", css = css, scripts = scripts) {
