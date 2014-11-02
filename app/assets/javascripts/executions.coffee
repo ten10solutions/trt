@@ -59,9 +59,7 @@ window.createExecutionVolumeChart = (data) ->
     minY: 10
 
 onChartHover = (seriesData) -> (event, pos, item) ->
-  console.log "onChartHover()"
   if item
-    console.log "onChartHover: " + item.seriesIndex + ", " + item.dataIndex
     dataItem = seriesData[item.seriesIndex][item.dataIndex]
     date = dataItem[0]
     count = dataItem[1]

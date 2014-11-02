@@ -61,7 +61,8 @@ TwirlKeys.templateImports ++= Seq(
   "com.thetestpeople.trt.model._",
   "com.thetestpeople.trt.model.jenkins._",
   "java.net.URI",
-  "com.thetestpeople.trt.analysis._")
+  "com.thetestpeople.trt.analysis._",
+  "org.apache.commons.lang3.StringEscapeUtils.escapeEcmaScript")
 
 // == Less support ============================================================================
 

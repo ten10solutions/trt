@@ -7,8 +7,6 @@
   canRerun: Boolean,
   pagination: PaginationData)(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
 
-@import org.apache.commons.lang3.StringEscapeUtils.escapeEcmaScript 
-
 @scripts = {
   <script src="@routes.Assets.at("javascripts/typeahead.js")"></script>
   <script src="@routes.Assets.at("javascripts/chart-utils.js")"></script>

@@ -81,8 +81,8 @@
     </div>
     <script>
       $(document).ready(function(){
-        var batchNames = [ @for(batch <- batches) { "@batch.nameOpt.getOrElse("")", } ];
-        var batchUrls = [ @for(batch <- batches) { "@routes.Application.batch(batch.id)", } ];
+        var batchNames = [ @for(batch <- batches) { "@escapeEcmaScript(batch.nameOpt.getOrElse(""))", } ];
+        var batchUrls = [ @for(batch <- batches) { "@escapeEcmaScript(routes.Application.batch(batch.id).toString)", } ];
         var passes = [
           @for(batch <- batches) {
             [ new Date(@batch.epochMillis), @batch.passCount ],
