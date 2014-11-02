@@ -12,7 +12,7 @@ import org.joda.time.DateTime
 import org.joda.time.Duration
 import java.net.URI
 
-trait ExecutionDaoTest { self: AbstractDaoTest ⇒
+trait ExecutionDaoTest { self: DaoTest ⇒
 
   "Inserting a new execution" should "persist all the execution data" in transaction { dao ⇒
     val testName = QualifiedName(DummyData.TestName, Some(DummyData.Group))

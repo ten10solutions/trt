@@ -7,7 +7,7 @@ import org.scalatest.junit.JUnitRunner
  * Verify the MockDao behaves correctly (so that we can happily use it in higher-level tests)
  */
 @RunWith(classOf[JUnitRunner])
-class MockDaoTest extends AbstractDaoTest {
+class MockDaoTest extends DaoTest {
 
   def createDao = new MockDao
 

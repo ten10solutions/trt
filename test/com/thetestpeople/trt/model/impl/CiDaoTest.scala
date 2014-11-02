@@ -12,7 +12,7 @@ import org.joda.time.DateTime
 import org.joda.time.Duration
 import java.net.URI
 
-trait CiDaoTest { self: AbstractDaoTest ⇒
+trait CiDaoTest { self: DaoTest ⇒
 
   "Inserting and retrieving a new import spec" should "persist all the data" in transaction { dao ⇒
     val specId = dao.newCiImportSpec(F.ciImportSpec(

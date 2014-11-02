@@ -13,7 +13,7 @@ import com.thetestpeople.trt.tags.SlowTest
 
 @SlowTest
 @RunWith(classOf[JUnitRunner])
-class SlickDaoTest extends AbstractDaoTest {
+class SlickDaoTest extends DaoTest {
 
   private lazy val (dataSource, url) = {
     val (dataSource, url) = h2DataSource
