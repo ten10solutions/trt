@@ -60,14 +60,14 @@
     @helper.inputText(confForm("rerunJobUrl"), 
       'class -> "form-control", 
       'placeholder -> "Rerun job URL",
-	    '_label -> "Rerun job URL", 
-	    '_help -> "URL of a parameterised Jenkins job which can be used to rerun specific tests, e.g. http://some-jenkins/job/my-job-name/")
+      '_label -> "Rerun job URL", 
+      '_help -> "URL of a parameterised Jenkins job which can be used to rerun specific tests, e.g. http://some-jenkins/job/my-job-name/")
  
     @helper.inputText(confForm("authenticationToken"), 
       'class -> "form-control",
       'placeholder -> "Job authentication token",
-	    '_label -> "Job authentication token", 
-	    '_help -> "Authentication token specified in the rerun job's configuration (or blank if not required). Find on Jenkins via Job -> Configure -> Build Triggers -> Trigger Builds Remotely -> Authentication Token")
+      '_label -> "Job authentication token", 
+      '_help -> "Authentication token specified in the rerun job's configuration (or blank if not required). Find on Jenkins via Job -> Configure -> Build Triggers -> Trigger Builds Remotely -> Authentication Token")
     
     <h3>Job Parameters</h4>
     
@@ -83,7 +83,7 @@
       <button type="submit" class="btn btn-primary">Update</button>
       <a href="@routes.Application.index" class="btn btn-default" role="button">Cancel</a>
     </div>
-	
+
   }
 
 }

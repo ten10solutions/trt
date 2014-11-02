@@ -34,26 +34,26 @@
   <div class="row" style="margin-bottom: 12px;">
     <div class="col-md-4">
       <table style="margin-top: 7px;" class="table table-striped table-bordered table-hover">
-	<tr>
-	  <td style="width: 220px">Number of executions recorded</td>
-	  <td>@totalExecutionsCount</td>
-	</tr>
+        <tr>
+          <td style="width: 220px">Number of executions recorded</td>
+          <td>@totalExecutionsCount</td>
+        </tr>
       </table>
       @if(globalViewContext.multipleConfigurationMode) {
-      <form id="filter-form" role="form" method="get" action="@routes.Application.executions()">
-	<div class="form-group">
-	  <label for="configuration-select">Configuration</label>
-	  <select name="configuration" id="configuration-select" class="form-control">
-            <option value="">All</option>
-            @for(configuration <- globalViewContext.configurations) { 
-              <option value="@configuration" @if(Some(configuration) == configurationOpt){selected}>@configuration</option>
-            }
-	  </select>
+        <form id="filter-form" role="form" method="get" action="@routes.Application.executions()">
+          <div class="form-group">
+            <label for="configuration-select">Configuration</label>
+            <select name="configuration" id="configuration-select" class="form-control">
+              <option value="">All</option>
+              @for(configuration <- globalViewContext.configurations) { 
+                <option value="@configuration" @if(Some(configuration) == configurationOpt){selected}>@configuration</option>
+              }
+            </select>
+	        </div>
           @for(result <- resultOpt) {
             <input type="hidden" name="passed" value="@result"/>
           }
-	</div>
-      </form>
+        </form>
       }
     </div> <!-- col-md-4 -->
    

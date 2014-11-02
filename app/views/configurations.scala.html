@@ -39,50 +39,50 @@
       </tr>
     </thead>
     <tbody>
-    @for((testsSummary, index) <- testsSummaries.zipWithIndex) {
-      <tr>
-        <td class="pass-fail-cell"><a href="@routes.Application.tests(configuration = Some(testsSummary.configuration))"><img alt="@testsSummary.ballDescription" title="@testsSummary.ballDescription" src="@routes.Assets.at("images/" + testsSummary.ballIcon)"/></a></td>
-        @if(globalViewContext.multipleConfigurationMode) {
-          <td class="configuration-cell"><a href="@routes.Application.tests(configuration = Some(testsSummary.configuration))">@testsSummary.configuration</a></td>
-        }
-        <td>
-          <div id="history-chart-@index" @if(globalViewContext.singleConfigurationMode) { style="width: 640x; height: 200px" } else { style="width: 480px; height: 120px" }>
-            <div style="text-align: center">
-              <i @if(globalViewContext.multipleConfigurationMode) { style="margin-top: 48px" } else { style="margin-top: 90px" } class="fa fa-line-chart"></i> Data not yet available
+      @for((testsSummary, index) <- testsSummaries.zipWithIndex) {
+        <tr>
+          <td class="pass-fail-cell"><a href="@routes.Application.tests(configuration = Some(testsSummary.configuration))"><img alt="@testsSummary.ballDescription" title="@testsSummary.ballDescription" src="@routes.Assets.at("images/" + testsSummary.ballIcon)"/></a></td>
+          @if(globalViewContext.multipleConfigurationMode) {
+            <td class="configuration-cell"><a href="@routes.Application.tests(configuration = Some(testsSummary.configuration))">@testsSummary.configuration</a></td>
+          }
+          <td>
+            <div id="history-chart-@index" @if(globalViewContext.singleConfigurationMode) { style="width: 640x; height: 200px" } else { style="width: 480px; height: 120px" }>
+              <div style="text-align: center">
+                <i @if(globalViewContext.multipleConfigurationMode) { style="margin-top: 48px" } else { style="margin-top: 90px" } class="fa fa-line-chart"></i> Data not yet available
+              </div>
             </div>
-          </div>
-          <form class="form-inline" style="float: right">
-            <input class="checkbox chart-checkbox" id="chart-checkbox-healthy-@index" data-chart-index="@index" type="checkbox" checked /> Healthy
-            <input class="checkbox chart-checkbox" id="chart-checkbox-warnings-@index" data-chart-index="@index" type="checkbox" checked /> Warning
-            <input class="checkbox chart-checkbox" id="chart-checkbox-broken-@index" data-chart-index="@index" type="checkbox" checked /> Broken
-          </form>
+            <form class="form-inline" style="float: right">
+              <input class="checkbox chart-checkbox" id="chart-checkbox-healthy-@index" data-chart-index="@index" type="checkbox" checked /> Healthy
+              <input class="checkbox chart-checkbox" id="chart-checkbox-warnings-@index" data-chart-index="@index" type="checkbox" checked /> Warning
+              <input class="checkbox chart-checkbox" id="chart-checkbox-broken-@index" data-chart-index="@index" type="checkbox" checked /> Broken
+            </form>
+            <script>
+              loadHistoryChart("@routes.Application.configurationChart(testsSummary.configuration)", @index);
+            </script>
+          </td>
+          <td class="configuration-count-cell">@if(testsSummary.passCount > 0){<a href="@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Healthy))"><span class="badge badge-success">@testsSummary.passCount</span></a>}</td>
+          <td class="configuration-count-cell">@if(testsSummary.warnCount > 0){<a href="@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Warning))"><span class="badge badge-warning">@testsSummary.warnCount</span></a>}</td>
+          <td class="configuration-count-cell">@if(testsSummary.failCount > 0){<a href="@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Broken))"><span class="badge badge-error">@testsSummary.failCount</span></a>}</td>
+          <td class="configuration-count-cell"><a href="@routes.Application.tests(configuration = Some(testsSummary.configuration))"><span class="badge badge-inverse">@testsSummary.totalCount</span></a></td>
+          <td class="pie-cell"><div id="pie-chart-@index" style="width: 120px; height: 120px"></div></td>
           <script>
-            loadHistoryChart("@routes.Application.configurationChart(testsSummary.configuration)", @index);
+            $(document).ready(function(){
+              createPieChart("pie-chart-@index",
+                {
+                  pass: @testsSummary.passCount,
+                  warn: @testsSummary.warnCount,
+                  fail: @testsSummary.failCount,
+                },
+                {
+                  pass: "@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Healthy))",
+                  warn: "@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Warning))",
+                  fail: "@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Broken))",
+                }, false
+              );
+            });
           </script>
-        </td>
-        <td class="configuration-count-cell">@if(testsSummary.passCount > 0){<a href="@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Healthy))"><span class="badge badge-success">@testsSummary.passCount</span></a>}</td>
-        <td class="configuration-count-cell">@if(testsSummary.warnCount > 0){<a href="@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Warning))"><span class="badge badge-warning">@testsSummary.warnCount</span></a>}</td>
-        <td class="configuration-count-cell">@if(testsSummary.failCount > 0){<a href="@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Broken))"><span class="badge badge-error">@testsSummary.failCount</span></a>}</td>
-        <td class="configuration-count-cell"><a href="@routes.Application.tests(configuration = Some(testsSummary.configuration))"><span class="badge badge-inverse">@testsSummary.totalCount</span></a></td>
-        <td class="pie-cell"><div id="pie-chart-@index" style="width: 120px; height: 120px"></div></td>
-        <script>
-          $(document).ready(function(){
-	    createPieChart("pie-chart-@index",
-	      {
-	        pass: @testsSummary.passCount,
-	        warn: @testsSummary.warnCount,
-	        fail: @testsSummary.failCount,
-	      },
-	      {
-	        pass: "@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Healthy))",
-	        warn: "@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Warning))",
-	        fail: "@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Broken))",
-	      }, false
-            );
-          });
-	</script>
-      </tr>
-    }
+        </tr>
+      }
     </tbody>
   </table>
 
