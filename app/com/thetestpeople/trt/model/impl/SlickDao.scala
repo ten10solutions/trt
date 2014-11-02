@@ -310,8 +310,8 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     }
   }
 
-  def getBatches(jobOpt: Option[Id[CiJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch] = {
-    var baseQuery =
+  def getBatches(jobOpt: Option[Id[CiJob]] = None, configurationOpt: Option[Configuration] = None, resultOpt: Option[Boolean]): Seq[Batch] = {
+    var query =
       jobOpt match {
         case Some(jobId) ⇒
           for {
@@ -324,8 +324,10 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
           batches
       }
     for (configuration ← configurationOpt)
-      baseQuery = baseQuery.filter(_.configuration === configuration)
-    baseQuery.sortBy(_.executionTime.desc).run
+      query = query.filter(_.configuration === configuration)
+    for (result ← resultOpt)
+      query = query.filter(_.passed === result)
+    query.sortBy(_.executionTime.desc).run
   }
 
   def newBatch(batch: Batch, logOpt: Option[String]): Id[Batch] = {

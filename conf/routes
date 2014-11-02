@@ -33,7 +33,7 @@ POST    /batch/:id/comment          @controllers.Application.setBatchComment(id:
 GET     /batch/:id/log              @controllers.Application.batchLog(id: Id[Batch])
 POST    /batch/:id/delete           @controllers.Application.deleteBatch(id: Id[Batch])
 
-GET     /batches                    @controllers.Application.batches(job: Option[CiJobId] ?= None, configuration: Option[Configuration] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
+GET     /batches                    @controllers.Application.batches(job: Option[CiJobId] ?= None, configuration: Option[Configuration] ?= None, passed: Option[Boolean] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 POST    /batches/delete             @controllers.Application.deleteBatches()
  
 GET     /systemConfiguration        @controllers.Application.editSystemConfiguration

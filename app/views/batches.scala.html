@@ -1,4 +1,11 @@
-@(batches: List[BatchView], jobIdOpt: Option[Id[CiJob]], configurationOpt: Option[Configuration], jobs: List[CiJob], pagination: PaginationData, hideChartInitially: Boolean)(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
+@(
+  batches: List[BatchView], 
+  jobIdOpt: Option[Id[CiJob]], 
+  configurationOpt: Option[Configuration], 
+  resultOpt: Option[Boolean], 
+  jobs: List[CiJob],
+  pagination: PaginationData,
+  hideChartInitially: Boolean)(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
 
 @scripts = {
   <script src="@routes.Assets.at("javascripts/chart-utils.js")"></script>
@@ -12,7 +19,7 @@
 
 @batchesPaginationWidget = { 
   @paginationWidget(pagination)((page, pageSize) => 
-    routes.Application.batches(job = jobIdOpt, configuration = configurationOpt, page = Some(page), pageSize = Some(pageSize))) 
+    routes.Application.batches(job = jobIdOpt, configuration = configurationOpt, passed = resultOpt, page = Some(page), pageSize = Some(pageSize))) 
 }
 
 @main("Batches", "Batches", scripts = scripts, css = css) {
@@ -27,7 +34,6 @@
   
   <div style="margin-bottom: 12px;" class="row">
     <div class="col-md-4">
-
       <table style="margin-top: 7px;" class="table table-striped table-bordered table-hover">
         <tr>
           <td style="width: 220px">Number of batches recorded</td>
@@ -57,6 +63,7 @@
             </select>
           </div>
         }
+        @for(result <- resultOpt){ <input name="passed" value="@result" type="hidden"/> }
       </form>
       
       <button style="margin-bottom: 12px; margin-top: 12px" id="delete-selected" type="button" class="btn btn-default" title="Delete selected batches" onclick="deleteSelected('@routes.Application.deleteBatches()')"><i class="glyphicon glyphicon-trash"></i> Delete Selected</button>
@@ -98,6 +105,18 @@
 @if(batches.nonEmpty) {
     
   @batchesPaginationWidget
+
+  <ul class="nav nav-tabs">
+    <li @if(resultOpt.isEmpty){ class="active" }>
+      <a href="@routes.Application.batches(job = jobIdOpt, configuration = configurationOpt)">All</a>
+    </li>
+    <li @if(resultOpt == Some(true)){ class="active" }>
+      <a href="@routes.Application.batches(job = jobIdOpt, configuration = configurationOpt, passed = Some(true))">Pass</a>
+    </li>
+    <li @if(resultOpt == Some(false)){ class="active" }>
+      <a href="@routes.Application.batches(job = jobIdOpt, configuration = configurationOpt, passed = Some(false))">Fail</a>
+    </li>
+  </ul>
   
   <form style="margin-bottom: 0px; display: inline" id="batch-action-form" action="nope" method="post">
     <input type="hidden" name="previousURL" value="@request.uri"/>

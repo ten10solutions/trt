@@ -47,7 +47,7 @@ trait Service extends CiService {
   /**
    * Return batches, ordered most recent first
    */
-  def getBatches(jobOpt: Option[Id[CiJob]] = None, configurationOpt: Option[Configuration] = None): Seq[Batch]
+  def getBatches(jobOpt: Option[Id[CiJob]] = None, configurationOpt: Option[Configuration] = None, resultOpt: Option[Boolean] = None): Seq[Batch]
 
   def deleteBatches(batchIds: Seq[Id[Batch]])
 

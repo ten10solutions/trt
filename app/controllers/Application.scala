@@ -131,20 +131,20 @@ class Application(service: Service, adminService: AdminService) extends Controll
     }
   }
 
-  def batches(jobIdOpt: Option[Id[CiJob]], configurationOpt: Option[Configuration], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
+  def batches(jobIdOpt: Option[Id[CiJob]], configurationOpt: Option[Configuration], resultOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
     logger.debug(s"batches(jobId = $jobIdOpt, configuration = $configurationOpt, page = $pageOpt, pageSize = $pageSizeOpt)")
     Pagination.validate(pageOpt, pageSizeOpt) match {
       case Left(errorMessage) ⇒ BadRequest(errorMessage)
-      case Right(pagination)  ⇒ Ok(handleBatches(jobIdOpt, configurationOpt, pagination))
+      case Right(pagination)  ⇒ Ok(handleBatches(jobIdOpt, configurationOpt, resultOpt, pagination))
     }
   }
 
-  private def handleBatches(jobIdOpt: Option[Id[CiJob]], configurationOpt: Option[Configuration], pagination: Pagination)(implicit request: Request[_]) = {
-    val batches = service.getBatches(jobIdOpt, configurationOpt).map(new BatchView(_))
+  private def handleBatches(jobIdOpt: Option[Id[CiJob]], configurationOpt: Option[Configuration], resultOpt: Option[Boolean], pagination: Pagination)(implicit request: Request[_]) = {
+    val batches = service.getBatches(jobIdOpt, configurationOpt, resultOpt).map(new BatchView(_))
     val jobs = service.getCiJobs().toList
     val paginationData = pagination.paginationData(batches.size)
     val hideChartInitially = batches.size >= HideBatchChartThreshold
-    views.html.batches(batches.toList, jobIdOpt, configurationOpt, jobs, paginationData, hideChartInitially)
+    views.html.batches(batches.toList, jobIdOpt, configurationOpt, resultOpt, jobs, paginationData, hideChartInitially)
   }
 
   def executions(configurationOpt: Option[Configuration], resultOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒

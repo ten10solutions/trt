@@ -465,6 +465,15 @@ abstract class AbstractDaoTest extends FlatSpec with Matchers with ExecutionDaoT
     batch.id should equal(batchId1)
   }
 
+  "Getting batches" should "let you filter by pass/fail" in transaction { dao ⇒
+    val batchId1 = dao.newBatch(F.batch(passed = true))
+    val batchId2 = dao.newBatch(F.batch(passed = false))
+
+    dao.getBatches(resultOpt = Some(true)).map(_.id) should equal(Seq(batchId1))
+    dao.getBatches(resultOpt = Some(false)).map(_.id) should equal(Seq(batchId2))
+    dao.getBatches(resultOpt = None).map(_.id) should contain theSameElementsAs (Seq(batchId1, batchId2))
+  }
+
   "Inserting and updating a new analysis" should "persist all the analysis data" in transaction { dao ⇒
     val testId = dao.ensureTestIsRecorded(F.test())
     val batchId1 = dao.newBatch(F.batch())
