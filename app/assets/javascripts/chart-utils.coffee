@@ -1,7 +1,7 @@
 # (Recursively) merge two objects, returning a new object
 merge = (obj1, obj2) -> $.extend true, {}, obj1, obj2
 
-zoomOutButtonTemplate = "<div class='zoom-out-button btn btn-default'>Zoom out</div>"
+zoomOutButtonTemplate = "<button type='button' class='zoom-out-button btn btn-default'>Zoom out</button>"
 
 addZoomOutButton = (config, originalBounds) ->
   $(zoomOutButtonTemplate).appendTo($("#" + config.chartId)).click (event) ->
