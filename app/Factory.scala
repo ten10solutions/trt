@@ -85,10 +85,13 @@ class Factory(configuration: Configuration) {
     else
       LuceneLogIndexer.fileBackedIndexer(new File(luceneIndexLocation))
 
+  lazy val webApiController = new WebApiController(service)
+
   def getControllerInstance[A](clazz: Class[A]): A = controllerMap(clazz).asInstanceOf[A]
 
   lazy val controllerMap: Map[Class[_], Controller] = Map(
     classOf[Application] -> controller,
     classOf[CiController] -> ciController,
-    classOf[JsonController] -> jsonController)
+    classOf[JsonController] -> jsonController,
+    classOf[WebApiController] -> webApiController)
 }

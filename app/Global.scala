@@ -7,6 +7,7 @@ import com.thetestpeople.trt.Config._
 import com.thetestpeople.trt.utils.HasLogger
 import scala.concurrent.Future
 import play.api.mvc.WithFilters
+import com.thetestpeople.trt.filters.LoggingFilter
 
 object Global extends WithFilters(LoggingFilter) with GlobalSettings with HasLogger {
 

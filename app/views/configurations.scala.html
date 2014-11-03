@@ -57,7 +57,7 @@
               <input class="checkbox chart-checkbox" id="chart-checkbox-broken-@index" data-chart-index="@index" type="checkbox" checked /> Broken
             </form>
             <script>
-              loadHistoryChart("@routes.Application.configurationChart(testsSummary.configuration)", @index);
+              loadHistoryChart("@routes.WebApiController.configurationChart(testsSummary.configuration)", @index);
             </script>
           </td>
           <td class="configuration-count-cell">@if(testsSummary.passCount > 0){<a href="@routes.Application.tests(configuration = Some(testsSummary.configuration), status = Some(TestStatus.Healthy))"><span class="badge badge-success">@testsSummary.passCount</span></a>}</td>

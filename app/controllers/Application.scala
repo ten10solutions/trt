@@ -29,7 +29,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   def searchLogs(queryOpt: Option[String], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
-    logger.debug(s"searchLogs($queryOpt, page = $pageOpt, pageSize = $pageSizeOpt)")
     Pagination.validate(pageOpt, pageSizeOpt, defaultPageSize = 8) match {
       case Left(errorMessage) ⇒
         BadRequest(errorMessage)
@@ -46,8 +45,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   def configurations() = Action { implicit request ⇒
-    logger.debug(s"configurations()")
-
     val testsSummaries =
       service.getTestCountsByConfiguration().map {
         case (configuration, testCounts) ⇒ TestsSummaryView(configuration, testCounts)
@@ -57,7 +54,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   def execution(executionId: Id[Execution]) = Action { implicit request ⇒
-    logger.debug(s"execution($executionId)")
     service.getExecution(executionId) match {
       case None ⇒
         NotFound(s"Could not find test execution with id '$executionId'")
@@ -68,7 +64,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   def test(testId: Id[Test], configurationOpt: Option[Configuration], resultOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
-    logger.debug(s"test($testId, configuration = $configurationOpt, passed = $resultOpt, page = $pageOpt, pageSize = $pageSizeOpt)")
     Pagination.validate(pageOpt, pageSizeOpt) match {
       case Left(errorMessage) ⇒
         BadRequest(errorMessage)
@@ -95,7 +90,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
     }
 
   def batch(batchId: Id[Batch], passedFilterOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
-    logger.debug(s"batch($batchId, passedFilterOpt = $passedFilterOpt, page = $pageOpt, pageSize = $pageSizeOpt)")
     Pagination.validate(pageOpt, pageSizeOpt) match {
       case Left(errorMessage) ⇒
         BadRequest(errorMessage)
@@ -116,7 +110,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
     }
 
   def batchLog(batchId: Id[Batch]) = Action { implicit request ⇒
-    logger.debug(s"batchLog($batchId)")
     service.getBatchAndExecutions(batchId, None) match {
       case None ⇒
         NotFound(s"Could not find batch with id '$batchId'")
@@ -132,7 +125,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   def batches(jobIdOpt: Option[Id[CiJob]], configurationOpt: Option[Configuration], resultOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
-    logger.debug(s"batches(jobId = $jobIdOpt, configuration = $configurationOpt, page = $pageOpt, pageSize = $pageSizeOpt)")
     Pagination.validate(pageOpt, pageSizeOpt) match {
       case Left(errorMessage) ⇒ BadRequest(errorMessage)
       case Right(pagination)  ⇒ Ok(handleBatches(jobIdOpt, configurationOpt, resultOpt, pagination))
@@ -148,7 +140,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   def executions(configurationOpt: Option[Configuration], resultOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
-    logger.debug(s"executions(configuration = $configurationOpt, result = $resultOpt page = $pageOpt, pageSize = $pageSizeOpt)")
     Pagination.validate(pageOpt, pageSizeOpt) match {
       case Left(errorMessage) ⇒ BadRequest(errorMessage)
       case Right(pagination)  ⇒ Ok(handleExecutions(configurationOpt, resultOpt, pagination))
@@ -168,7 +159,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
     getFormParameters("selectedBatch").flatMap(Id.parse[Batch])
 
   def deletedTests(pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
-    logger.debug(s"deletedTests(page = $pageOpt, pageSize = $pageSizeOpt))")
     Pagination.validate(pageOpt, pageSizeOpt) match {
       case Left(errorMessage) ⇒
         BadRequest(errorMessage)
@@ -182,7 +172,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   def deleteTests() = Action { implicit request ⇒
     val selectedTestIds = ControllerHelper.getSelectedTestIds(request)
-    logger.debug(s"deleteTests(${selectedTestIds.mkString(",")})")
 
     service.markTestsAsDeleted(selectedTestIds)
 
@@ -192,8 +181,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   def undeleteTests() = Action { implicit request ⇒
     val selectedTestIds = ControllerHelper.getSelectedTestIds(request)
-    logger.debug(s"undeleteTests(${selectedTestIds.mkString(",")})")
-
     service.markTestsAsDeleted(selectedTestIds, deleted = false)
 
     val redirectTarget = previousUrlOpt.getOrElse(routes.Application.configurations())
@@ -201,8 +188,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   def deleteTest(id: Id[Test]) = Action { implicit request ⇒
-    logger.debug(s"deleteTest($id)")
-
     service.markTestsAsDeleted(Seq(id))
 
     val redirectTarget = previousUrlOpt.getOrElse(routes.Application.configurations())
@@ -210,8 +195,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   def undeleteTest(id: Id[Test]) = Action { implicit request ⇒
-    logger.debug(s"undeleteTest($id)")
-
     service.markTestsAsDeleted(Seq(id), deleted = false)
 
     val redirectTarget = previousUrlOpt.getOrElse(routes.Application.configurations())
@@ -220,7 +203,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   def deleteBatches() = Action { implicit request ⇒
     val batchIds = getSelectedBatchIds(request).toList
-    logger.debug(s"deleteBatches($batchIds)")
 
     service.deleteBatches(batchIds)
 
@@ -230,7 +212,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   def deleteBatch(batchId: Id[Batch]) = Action { implicit request ⇒
-    logger.debug(s"deleteBatch($batchId)")
     val batchIds = List(batchId)
     service.deleteBatches(batchIds)
 
@@ -253,19 +234,16 @@ class Application(service: Service, adminService: AdminService) extends Controll
     pageSizeOpt: Option[Int],
     sortOpt: Option[Sort],
     descendingOpt: Option[Boolean]) = Action { implicit request ⇒
-    Utils.time("Application.tests()") {
-      logger.debug(s"tests(configuration = $configurationOpt, status = $testStatusOpt, name = $nameOpt, group = $groupOpt, category = $categoryOpt, page = $pageOpt, pageSize = $pageSizeOpt, sort = $sortOpt, descending = $descendingOpt)")
-      Pagination.validate(pageOpt, pageSizeOpt) match {
-        case Left(errorMessage) ⇒
-          BadRequest(errorMessage)
-        case Right(pagination) ⇒
-          configurationOpt.orElse(getDefaultConfiguration) match {
-            case None ⇒
-              Redirect(routes.Application.index())
-            case Some(configuration) ⇒
-              Ok(handleTests(testStatusOpt, configuration, nameOpt, groupOpt, categoryOpt, pagination, sortOpt, descendingOpt))
-          }
-      }
+    Pagination.validate(pageOpt, pageSizeOpt) match {
+      case Left(errorMessage) ⇒
+        BadRequest(errorMessage)
+      case Right(pagination) ⇒
+        configurationOpt.orElse(getDefaultConfiguration) match {
+          case None ⇒
+            Redirect(routes.Application.index())
+          case Some(configuration) ⇒
+            Ok(handleTests(testStatusOpt, configuration, nameOpt, groupOpt, categoryOpt, pagination, sortOpt, descendingOpt))
+        }
     }
   }
 
@@ -308,24 +286,20 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   def admin() = Action { implicit request ⇒
-    logger.debug(s"admin()")
     Ok(views.html.admin())
   }
 
   def deleteAll() = Action { implicit request ⇒
-    logger.debug(s"deleteAll()")
     adminService.deleteAll()
     Redirect(routes.Application.admin).flashing("success" -> "All data deleted")
   }
 
   def analyseAll() = Action { implicit request ⇒
-    logger.debug("analyseAll()")
     adminService.analyseAll()
     Redirect(routes.Application.admin).flashing("success" -> "Analysis of all tests scheduled")
   }
 
   def updateSystemConfiguration() = Action { implicit request ⇒
-    logger.debug(s"updateSystemConfiguration()")
     SystemConfigurationForm.form.bindFromRequest().fold(
       formWithErrors ⇒
         BadRequest(views.html.systemConfiguration(formWithErrors)),
@@ -336,35 +310,12 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   def editSystemConfiguration() = Action { implicit request ⇒
-    logger.debug(s"editSystemConfiguration()")
     val systemConfiguration = service.getSystemConfiguration
     val populatedForm = SystemConfigurationForm.form.fill(systemConfiguration)
     Ok(views.html.systemConfiguration(populatedForm))
   }
 
-  def testNames(query: String) = Action { implicit request ⇒
-    logger.debug(s"testNames($query)")
-    Ok(Json.toJson(service.getTestNames(query)))
-  }
-
-  def groups(query: String) = Action { implicit request ⇒
-    logger.debug(s"groups($query)")
-    Ok(Json.toJson(service.getGroups(query)))
-  }
-
-  def categories(query: String) = Action { implicit request ⇒
-    logger.debug(s"categories($query)")
-    Ok(Json.toJson(service.getCategoryNames(query)))
-  }
-
-  def configurationChart(configuration: Configuration) = Action { implicit request ⇒
-    logger.debug(s"configurationChart($configuration)")
-    val counts = service.getHistoricalTestCounts().get(configuration).map(_.counts).getOrElse(List())
-    Ok(Json.toJson(counts))
-  }
-
   def analyseAllExecutions() = Action { implicit request ⇒
-    logger.debug(s"analyseAllExecutions()")
     service.analyseAllExecutions()
     Ok(Json.toJson("OK"))
   }
@@ -378,7 +329,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   def staleTests(configurationOpt: Option[Configuration], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
-    logger.debug(s"staleTests($configurationOpt, page = $pageOpt, pageSize = $pageSizeOpt)")
     Pagination.validate(pageOpt, pageSizeOpt) match {
       case Left(errorMessage) ⇒
         BadRequest(errorMessage)
@@ -403,7 +353,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   def setExecutionComment(executionId: Id[Execution]) = Action { implicit request ⇒
-    logger.debug(s"setExecutionComment($executionId)")
     getFormParameter("text") match {
       case Some(text) ⇒
         val result = service.setExecutionComment(executionId, text)
@@ -433,7 +382,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
     previousUrlOpt.getOrElse(routes.Application.configurations())
 
   def setBatchComment(batchId: Id[Batch]) = Action { implicit request ⇒
-    logger.debug(s"setBatchComment($batchId)")
     getFormParameter("text") match {
       case Some(text) ⇒
         val result = service.setBatchComment(batchId, text)
@@ -447,7 +395,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   def setTestComment(testId: Id[Test], configurationOpt: Option[Configuration]) = Action { implicit request ⇒
-    logger.debug(s"setTestComment($testId)")
     getFormParameter("text") match {
       case Some(text) ⇒
         val result = service.setTestComment(testId, text)
@@ -461,7 +408,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   def addCategory(testId: Id[Test]) = Action { implicit request ⇒
-    logger.debug(s"addCategory($testId)")
     getFormParameter("category") match {
       case Some(category) ⇒
         val result = service.addCategory(testId, category)
@@ -479,7 +425,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   def removeCategory(testId: Id[Test]) = Action { implicit request ⇒
-    logger.debug(s"removeCategory($testId)")
     getFormParameter("category") match {
       case Some(category) ⇒
         service.removeCategory(testId, category)
