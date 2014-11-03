@@ -48,7 +48,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
     val testsSummaries =
       service.getTestCountsByConfiguration().map {
         case (configuration, testCounts) ⇒ TestsSummaryView(configuration, testCounts)
-      }.toList.sortBy(_.configuration)
+      }.toSeq.sortBy(_.configuration)
 
     Ok(views.html.configurations(testsSummaries))
   }
@@ -83,7 +83,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
   private def handleTest(testId: Id[Test], configuration: Configuration, resultOpt: Option[Boolean], pagination: Pagination)(implicit request: Request[_]) =
     service.getTestAndExecutions(testId, configuration, resultOpt) map {
       case TestAndExecutions(test, executions, otherConfigurations, categories) ⇒
-        val executionViews = executions.map(e ⇒ ExecutionView(e)).toList
+        val executionViews = executions.map(e ⇒ ExecutionView(e))
         val testView = new TestView(test, categories)
         val paginationData = pagination.paginationData(executions.size)
         views.html.test(testView, executionViews, Some(configuration), resultOpt, otherConfigurations, service.canRerun, paginationData)
@@ -104,7 +104,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
   private def handleBatch(batchId: Id[Batch], passedFilterOpt: Option[Boolean], pagination: Pagination)(implicit request: Request[_]) =
     service.getBatchAndExecutions(batchId, passedFilterOpt) map {
       case BatchAndExecutions(batch, executions, logOpt, importSpecIdOpt, commentOpt) ⇒
-        val batchView = new BatchView(batch, executions.toList, logOpt, importSpecIdOpt, commentOpt)
+        val batchView = new BatchView(batch, executions, logOpt, importSpecIdOpt, commentOpt)
         val paginationData = pagination.paginationData(executions.size)
         views.html.batch(batchView, passedFilterOpt, service.canRerun, paginationData)
     }
@@ -116,7 +116,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
       case Some(BatchAndExecutions(batch, executions, logOpt, importSpecIdOpt, commentOpt)) ⇒
         logOpt match {
           case Some(log) ⇒
-            val batchView = new BatchView(batch, List(), logOpt, importSpecIdOpt, commentOpt)
+            val batchView = new BatchView(batch, Seq(), logOpt, importSpecIdOpt, commentOpt)
             Ok(views.html.batchLog(batchView, log))
           case None ⇒
             NotFound(s"Batch $batchId does not have an associated log recorded")
@@ -133,10 +133,10 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   private def handleBatches(jobIdOpt: Option[Id[CiJob]], configurationOpt: Option[Configuration], resultOpt: Option[Boolean], pagination: Pagination)(implicit request: Request[_]) = {
     val batches = service.getBatches(jobIdOpt, configurationOpt, resultOpt).map(new BatchView(_))
-    val jobs = service.getCiJobs().toList
+    val jobs = service.getCiJobs()
     val paginationData = pagination.paginationData(batches.size)
     val hideChartInitially = batches.size >= HideBatchChartThreshold
-    views.html.batches(batches.toList, jobIdOpt, configurationOpt, resultOpt, jobs, paginationData, hideChartInitially)
+    views.html.batches(batches, jobIdOpt, configurationOpt, resultOpt, jobs, paginationData, hideChartInitially)
   }
 
   def executions(configurationOpt: Option[Configuration], resultOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
@@ -151,7 +151,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
       service.getExecutions(configurationOpt, resultOpt, startingFrom = pagination.firstItem, limit = pagination.pageSize)
     val executionVolume = service.getExecutionVolume(configurationOpt)
     val paginationData = pagination.paginationData(totalExecutionCount)
-    val executionViews = executions.map(new ExecutionView(_)).toList
+    val executionViews = executions.map(new ExecutionView(_))
     views.html.executions(executionViews, totalExecutionCount, configurationOpt, resultOpt, paginationData, executionVolume)
   }
 
@@ -172,37 +172,28 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   def deleteTests() = Action { implicit request ⇒
     val selectedTestIds = ControllerHelper.getSelectedTestIds(request)
-
     service.markTestsAsDeleted(selectedTestIds)
-
-    val redirectTarget = previousUrlOpt.getOrElse(routes.Application.configurations())
-    Redirect(redirectTarget).flashing("success" -> "Marked tests as deleted.")
+    Redirect(previousUrlOrDefault).flashing("success" -> "Marked tests as deleted.")
   }
 
   def undeleteTests() = Action { implicit request ⇒
     val selectedTestIds = ControllerHelper.getSelectedTestIds(request)
     service.markTestsAsDeleted(selectedTestIds, deleted = false)
-
-    val redirectTarget = previousUrlOpt.getOrElse(routes.Application.configurations())
-    Redirect(redirectTarget).flashing("success" -> "Marked tests as no longer deleted.")
+    Redirect(previousUrlOrDefault).flashing("success" -> "Marked tests as no longer deleted.")
   }
 
   def deleteTest(id: Id[Test]) = Action { implicit request ⇒
     service.markTestsAsDeleted(Seq(id))
-
-    val redirectTarget = previousUrlOpt.getOrElse(routes.Application.configurations())
-    Redirect(redirectTarget).flashing("success" -> "Marked test as deleted.")
+    Redirect(previousUrlOrDefault).flashing("success" -> "Marked test as deleted.")
   }
 
   def undeleteTest(id: Id[Test]) = Action { implicit request ⇒
     service.markTestsAsDeleted(Seq(id), deleted = false)
-
-    val redirectTarget = previousUrlOpt.getOrElse(routes.Application.configurations())
-    Redirect(redirectTarget).flashing("success" -> "Marked test as no longer deleted.")
+    Redirect(previousUrlOrDefault).flashing("success" -> "Marked test as no longer deleted.")
   }
 
   def deleteBatches() = Action { implicit request ⇒
-    val batchIds = getSelectedBatchIds(request).toList
+    val batchIds = getSelectedBatchIds(request)
 
     service.deleteBatches(batchIds)
 
@@ -212,14 +203,14 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   def deleteBatch(batchId: Id[Batch]) = Action { implicit request ⇒
-    val batchIds = List(batchId)
+    val batchIds = Seq(batchId)
     service.deleteBatches(batchIds)
 
     val successMessage = deleteBatchesSuccessMessage(batchIds)
     Redirect(routes.Application.batches()).flashing("success" -> successMessage)
   }
 
-  private def deleteBatchesSuccessMessage(batchIds: List[Id[Batch]]): String = {
+  private def deleteBatchesSuccessMessage(batchIds: Seq[Id[Batch]]): String = {
     val batchWord = if (batchIds.size == 1) "batch" else "batches"
     s"Deleted ${batchIds.size} $batchWord"
   }
@@ -247,18 +238,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
     }
   }
 
-  private def getTestSortBy(sortOpt: Option[Sort], descendingOpt: Option[Boolean]): SortBy.Test = sortOpt match {
-    case Some(Sort.Weather)             ⇒ SortBy.Test.Weather(descendingOpt getOrElse false)
-    case Some(Sort.Group)               ⇒ SortBy.Test.Group(descendingOpt getOrElse false)
-    case Some(Sort.Name)                ⇒ SortBy.Test.Name(descendingOpt getOrElse false)
-    case Some(Sort.Duration)            ⇒ SortBy.Test.Duration(descendingOpt getOrElse false)
-    case Some(Sort.ConsecutiveFailures) ⇒ SortBy.Test.ConsecutiveFailures(descendingOpt getOrElse false)
-    case Some(Sort.StartedFailing)      ⇒ SortBy.Test.StartedFailing(descendingOpt getOrElse false)
-    case Some(Sort.LastPassed)          ⇒ SortBy.Test.LastPassed(descendingOpt getOrElse false)
-    case Some(Sort.LastFailed)          ⇒ SortBy.Test.LastFailed(descendingOpt getOrElse false)
-    case None                           ⇒ SortBy.Test.Group(descending = false)
-  }
-
   private def handleTests(
     testStatusOpt: Option[TestStatus],
     configuration: Configuration,
@@ -268,7 +247,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
     pagination: Pagination,
     sortOpt: Option[Sort],
     descendingOpt: Option[Boolean])(implicit request: Request[_]) = {
-    val sortBy = getTestSortBy(sortOpt, descendingOpt)
+    val sortBy = SortHelper.getTestSortBy(sortOpt, descendingOpt)
     val (testCounts, tests) = service.getTests(
       configuration = configuration,
       testStatusOpt = testStatusOpt,
@@ -282,7 +261,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
     val testViews = tests.map(TestView(_))
     val testsSummary = TestsSummaryView(configuration, testCounts)
     val paginationData = pagination.paginationData(testCounts.countFor(testStatusOpt))
-    views.html.tests(testsSummary, testViews.toList, configuration, testStatusOpt, nameOpt, groupOpt, categoryOpt, service.canRerun, paginationData, sortOpt, descendingOpt)
+    views.html.tests(testsSummary, testViews, configuration, testStatusOpt, nameOpt, groupOpt, categoryOpt, service.canRerun, paginationData, sortOpt, descendingOpt)
   }
 
   def admin() = Action { implicit request ⇒
@@ -321,7 +300,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
   }
 
   private def getDefaultConfiguration: Option[Configuration] = {
-    val configurations = service.getConfigurations().sorted
+    val configurations = service.getConfigurations.sorted
     if (configurations contains Configuration.Default)
       Some(Configuration.Default)
     else
@@ -333,23 +312,22 @@ class Application(service: Service, adminService: AdminService) extends Controll
       case Left(errorMessage) ⇒
         BadRequest(errorMessage)
       case Right(pagination) ⇒
-        configurationOpt match {
+        configurationOpt.orElse(getDefaultConfiguration) match {
           case None ⇒
-            getDefaultConfiguration match {
-              case None ⇒
-                Redirect(routes.Application.configurations())
-              case Some(defaultConfiguration) ⇒
-                Redirect(routes.Application.staleTests(Some(defaultConfiguration)))
-            }
+            Redirect(routes.Application.index())
           case Some(configuration) ⇒
-            val (madOpt, tests) = service.staleTests(configuration)
-            val pageTests = tests.drop(pagination.firstItem).take(pagination.pageSize)
-            val testViews = pageTests.map(new TestView(_))
-            val paginationData = pagination.paginationData(tests.size)
-            val madViewOpt = madOpt.map(mad ⇒ MADView(mad))
-            Ok(views.html.staleTests(madViewOpt, testViews, configuration, paginationData))
+            handleStaleTests(configuration, pagination)
         }
     }
+  }
+
+  private def handleStaleTests(configuration: Configuration, pagination: Pagination)(implicit request: Request[_]) = {
+    val (madOpt, tests) = service.staleTests(configuration)
+    val pageTests = tests.drop(pagination.firstItem).take(pagination.pageSize)
+    val testViews = pageTests.map(new TestView(_))
+    val paginationData = pagination.paginationData(tests.size)
+    val madViewOpt = madOpt.map(mad ⇒ MADView(mad))
+    Ok(views.html.staleTests(madViewOpt, testViews, configuration, paginationData))
   }
 
   def setExecutionComment(executionId: Id[Execution]) = Action { implicit request ⇒
@@ -379,7 +357,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
     getFormParameter("previousURL").map(url ⇒ new Call("GET", url))
 
   private def previousUrlOrDefault(implicit request: Request[AnyContent]): Call =
-    previousUrlOpt.getOrElse(routes.Application.configurations())
+    previousUrlOpt.getOrElse(routes.Application.index())
 
   def setBatchComment(batchId: Id[Batch]) = Action { implicit request ⇒
     getFormParameter("text") match {

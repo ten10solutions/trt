@@ -1,4 +1,4 @@
-@(testsSummaries: List[TestsSummaryView])(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
+@(testsSummaries: Seq[TestsSummaryView])(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
 
 @css = {
   <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/chart-common.css")">

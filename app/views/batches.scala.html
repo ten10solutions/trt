@@ -1,9 +1,9 @@
 @(
-  batches: List[BatchView], 
+  batches: Seq[BatchView], 
   jobIdOpt: Option[Id[CiJob]], 
   configurationOpt: Option[Configuration], 
   resultOpt: Option[Boolean], 
-  jobs: List[CiJob],
+  jobs: Seq[CiJob],
   pagination: PaginationData,
   hideChartInitially: Boolean)(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
 

@@ -6,7 +6,7 @@ import com.thetestpeople.trt.model.jenkins.CiImportSpec
 
 class BatchView(
   batch: Batch,
-  _executions: List[EnrichedExecution] = Nil,
+  _executions: Seq[EnrichedExecution] = Nil,
   logOpt: Option[String] = None,
   val importSpecIdOpt: Option[Id[CiImportSpec]] = None,
   val commentOpt: Option[String] = None)
@@ -14,7 +14,7 @@ class BatchView(
 
   def id = batch.id
 
-  val executions: List[ExecutionView] = _executions.sortBy(_.qualifiedName).map(e ⇒ ExecutionView(e))
+  val executions: Seq[ExecutionView] = _executions.sortBy(_.qualifiedName).map(e ⇒ ExecutionView(e))
 
   def urlOpt: Option[String] = batch.urlOpt.map(_.toString)
 
