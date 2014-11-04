@@ -44,7 +44,7 @@ class HistoricalTestAnalyser(
   private def getSampleTimesByConfiguration(executionIntervalsByConfig: Map[Configuration, Interval]): Map[Configuration, Seq[DateTime]] =
     for {
       (configuration, executionInterval) ← executionIntervalsByConfig
-      sampleTimes = DateUtils.sampleTimesBetween(executionInterval, samples = sampleSize)
+      sampleTimes = DateUtils.sampleTimesBetween2(executionInterval)
     } yield configuration -> sampleTimes.reverse
 
   /**

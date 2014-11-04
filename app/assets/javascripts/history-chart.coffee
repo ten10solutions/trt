@@ -11,14 +11,17 @@ chartOptions =
     tickDecimals: 0
     min: 0
   series:
-    stack: true
-    lines:
+    #stack: true
+    bars:
       show: true
+      #align: "center"
+      barWidth: 24*60*60*1000
       fill: true
+      lineWidth: 1
       fillColor:
         colors: [
-          { opacity: 0.1 }
           { opacity: 0.8 }
+          { opacity: 0.1 }
         ]
     points:
       show: false
@@ -27,30 +30,33 @@ chartOptions =
   legend:
     show: false
 
-badge = (label) ->
-  if label == "Healthy"
-    return "badge-success"
-  else if label == "Warnings"
-    return "badge-warning"
-  else
-    return "badge-error"  
-        
+getTooltipText = (dayCounts) ->
+  tooltipText = "<table style='border: 0;'><tr><td style='text-align: center;' colspan='2'>#{new Date(dayCounts.when).toLocaleDateString()}</td></tr>"
 
-onChartHover = (series, seriesData) -> (event, pos, item) ->
+  total = 0
+
+  n = dayCounts.counts.healthy
+  if n > 0
+    tooltipText +="<tr><td>Healthy</td><td><span class='badge badge-success'>#{n}</span></td></tr>"
+  total += n
+
+  n = dayCounts.counts.warning
+  if n > 0
+    tooltipText +="<tr><td>Warning</td><td><span class='badge badge-warning'>#{n}</span></td></tr>"
+  total += n
+
+  n = dayCounts.counts.broken
+  if n > 0
+    tooltipText +="<tr><td>Broken</td><td><span class='badge badge-error'>#{n}</span></td></tr>"
+  total += n
+
+  tooltipText +="<tr><td>Total</td><td><span class='badge badge-inverse'>#{total}</span></td></tr>"
+
+  tooltipText += "</table>"
+
+onChartHover = (series, counts) -> (event, pos, item) ->
   if item
-    dataItem = seriesData[item.seriesIndex][item.dataIndex]
-    date = dataItem[0]
-    tooltipText = ""
-    i = 0
-    while i < series.length
-      count = seriesData[i][item.dataIndex][1]
-      if count > 0
-        label = series[i].label
-        badgeClass = badge(label)
-        tooltipText +="#{label}: <span class='badge #{badgeClass}'>#{count}</span></br>"
-      i++
-    tooltipText += "Date: #{formatDate(date)}</br>"
-
+    tooltipText = getTooltipText counts[item.dataIndex]
     $("#chart-tooltip").html(tooltipText).css(
       top: item.pageY + 5
       left: item.pageX + 5
@@ -61,27 +67,24 @@ onChartHover = (series, seriesData) -> (event, pos, item) ->
 initialiseTooltip = ->
   $("<div class='chart-tooltip' id='chart-tooltip'/>").appendTo "body" unless $('#chart-tooltip').length
 
-window.createHistoryChart = (chartId, healthy, warnings, broken) ->  
+window.createHistoryChart = (chartId, healthy, warnings, broken, counts) ->  
   series = []
-  seriesData = []
   if healthy.length > 0  # omit empty series otherwise JFlot displays no data
     series.push
       label: "Healthy"
       data: healthy
       color: "#609000"
-    seriesData.push(healthy)
   if warnings.length > 0
     series.push
       label: "Warnings"
       data: warnings
       color: "#FFBF00"
-    seriesData.push(warnings)
   if broken.length > 0
     series.push
-      label: "Failures"
+      label: "Broken"
       data: broken
       color: "#b94a48"
-    seriesData.push(broken)
+
   plot = $.plot $("#" + chartId), series, chartOptions
 
   addZoomSupport
@@ -92,6 +95,6 @@ window.createHistoryChart = (chartId, healthy, warnings, broken) ->
     minX: 10 * 60 * 1000
     minY: 10
   $("#" + chartId).unbind "plothover"
-  $("#" + chartId).bind "plothover", onChartHover(series, seriesData)
+  $("#" + chartId).bind "plothover", onChartHover(series, counts)
 
   initialiseTooltip()
