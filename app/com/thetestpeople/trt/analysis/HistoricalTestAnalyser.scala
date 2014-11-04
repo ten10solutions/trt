@@ -11,15 +11,12 @@ import com.github.nscala_time.time.Imports._
  *
  * @param executionIntervalsByConfig -- for each configuration, the interval between the first execution and
  *                                      last execution against that configuration.
- * @param sampleSize -- how many points in time to compute historical test statuses for.
  */
 class HistoricalTestAnalyser(
   executionIntervalsByConfig: Map[Configuration, Interval],
   analysisConfiguration: AnalysisConfiguration,
-  sampleSize: Int = 200)
+  timeZone: DateTimeZone = DateTimeZone.getDefault)
     extends ExecutionAnalyser[Map[Configuration, HistoricalTestCountsTimeline]] with HasLogger {
-
-  import HistoricalTestAnalyser._
 
   private val sampleTimesByConfig: Map[Configuration, Seq[DateTime]] = getSampleTimesByConfiguration(executionIntervalsByConfig)
   private val testCountsBuilder = new TestCountsBuilder(sampleTimesByConfig)
@@ -44,7 +41,7 @@ class HistoricalTestAnalyser(
   private def getSampleTimesByConfiguration(executionIntervalsByConfig: Map[Configuration, Interval]): Map[Configuration, Seq[DateTime]] =
     for {
       (configuration, executionInterval) ← executionIntervalsByConfig
-      sampleTimes = DateUtils.sampleTimesBetween(executionInterval, samples = sampleSize)
+      sampleTimes = DateUtils.getAllDaysIn(executionInterval, timeZone)
     } yield configuration -> sampleTimes.reverse
 
   /**

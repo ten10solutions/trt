@@ -34,11 +34,38 @@ chartOptions =
   axisLabels:
     show: true
 
+tooltipTemplate = Handlebars.compile """
+<table class='tooltip-table'>
+  <tr>
+    <td class='tooltip-header' colspan='2'>{{when}}</td>
+  </tr>
+  <tr>
+    <td>Result</td>
+    <td class='tooltip-result-cell'>
+      {{#if passed}}
+        <img src="/assets/images/ticks/pass.png" alt="Passed"/>
+      {{else}}
+        <img src="/assets/images/ticks/fail.png" alt="Failed"/>
+      {{/if}}
+    </td>
+  </tr>
+  <tr>
+    <td>Duration</td>
+    <td class='tooltip-duration-cell'>{{duration}}</td>
+  </tr>
+</table>
+"""
+
 onChartHover = (event, pos, item) ->
   if item
     eventDate = item.datapoint[0]
     seconds = item.datapoint[1]
-    tooltipText = "Duration: #{formatDuration(seconds)}<br/>Date: #{formatDate(eventDate)}"
+    passed = item.seriesIndex != 0 
+    tooltipText = tooltipTemplate
+      when: formatDateAndTime(eventDate)
+      result: if passed then "Passed" else "Failed"
+      duration: formatDuration(seconds)
+      passed: passed      
     $("#chart-tooltip").html(tooltipText).css(
       top: item.pageY + 5
       left: item.pageX + 5

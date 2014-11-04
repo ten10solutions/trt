@@ -11,46 +11,76 @@ chartOptions =
     tickDecimals: 0
     min: 0
   series:
-    stack: true
-    lines:
+    bars:
       show: true
+      barWidth: 24 * 60 * 60 * 1000
+      align: "right"
       fill: true
+      lineWidth: 1
       fillColor:
         colors: [
-          { opacity: 0.1 }
-          { opacity: 0.8 }
+          { opacity: 0.9 }
+          { opacity: 0.3 } 
+          { opacity: 0.9 }
         ]
     points:
       show: false
   selection:
     mode: "xy"
+    color: "#bbe"
   legend:
     show: false
 
-badge = (label) ->
-  if label == "Healthy"
-    return "badge-success"
-  else if label == "Warnings"
-    return "badge-warning"
-  else
-    return "badge-error"  
-        
+tooltipTemplate = Handlebars.compile """
+<table class='tooltip-table'>
+  <tr>
+    <td class='tooltip-header' colspan='2'>{{when}}</td>
+  </tr>
+  {{#if healthy}}
+    <tr>
+      <td>Healthy</td>
+      <td><span class='badge badge-success'>{{healthy}}</span></td>
+    </tr>
+  {{/if}}
+  {{#if warning}}
+    <tr>
+      <td>Warning</td>
+      <td><span class='badge badge-warning'>{{warning}}</span></td>
+    </tr>
+  {{/if}}
+  {{#if broken}}
+    <tr>
+      <td>Broken</td>
+      <td><span class='badge badge-error'>{{broken}}</span></td>
+    </tr>
+  {{/if}}
+  <tr>
+    <td>Total</td>
+    <td><span class='badge badge-inverse'>{{total}}</span></td>
+  </tr>
+</table>
+"""
 
-onChartHover = (series, seriesData) -> (event, pos, item) ->
+getLocale = ->
+  (if navigator.languages then navigator.languages[0] else (navigator.language or navigator.userLanguage))
+
+prettyPrint = (date) ->
+  moment.locale(getLocale())
+  moment(date).format('LL')
+      
+getTooltipText = (dayCounts) ->
+  cs = dayCounts.counts
+  displayDate = prettyPrint(moment(dayCounts.when).subtract(1, 'days'))
+  tooltipTemplate
+    when: displayDate
+    healthy: cs.healthy
+    warning: cs.warning
+    broken: cs.broken
+    total: cs.healthy + cs.warning + cs.broken
+
+onChartHover = (series, counts) -> (event, pos, item) ->
   if item
-    dataItem = seriesData[item.seriesIndex][item.dataIndex]
-    date = dataItem[0]
-    tooltipText = ""
-    i = 0
-    while i < series.length
-      count = seriesData[i][item.dataIndex][1]
-      if count > 0
-        label = series[i].label
-        badgeClass = badge(label)
-        tooltipText +="#{label}: <span class='badge #{badgeClass}'>#{count}</span></br>"
-      i++
-    tooltipText += "Date: #{formatDate(date)}</br>"
-
+    tooltipText = getTooltipText counts[item.dataIndex]
     $("#chart-tooltip").html(tooltipText).css(
       top: item.pageY + 5
       left: item.pageX + 5
@@ -61,27 +91,17 @@ onChartHover = (series, seriesData) -> (event, pos, item) ->
 initialiseTooltip = ->
   $("<div class='chart-tooltip' id='chart-tooltip'/>").appendTo "body" unless $('#chart-tooltip').length
 
-window.createHistoryChart = (chartId, healthy, warnings, broken) ->  
+createHistoryChart = (chartId, seriesData, counts) ->  
   series = []
-  seriesData = []
-  if healthy.length > 0  # omit empty series otherwise JFlot displays no data
+  addSeries = (label, data, color) ->
     series.push
-      label: "Healthy"
-      data: healthy
-      color: "#609000"
-    seriesData.push(healthy)
-  if warnings.length > 0
-    series.push
-      label: "Warnings"
-      data: warnings
-      color: "#FFBF00"
-    seriesData.push(warnings)
-  if broken.length > 0
-    series.push
-      label: "Failures"
-      data: broken
-      color: "#b94a48"
-    seriesData.push(broken)
+      label: label
+      data: data
+      color: color
+  addSeries "Healthy",  seriesData.healthy,  "#609000" if seriesData.healthy
+  addSeries "Warnings", seriesData.warnings, "#ffbf00" if seriesData.warnings
+  addSeries "Broken",   seriesData.broken,   "#b94a48" if seriesData.broken
+
   plot = $.plot $("#" + chartId), series, chartOptions
 
   addZoomSupport
@@ -92,6 +112,36 @@ window.createHistoryChart = (chartId, healthy, warnings, broken) ->
     minX: 10 * 60 * 1000
     minY: 10
   $("#" + chartId).unbind "plothover"
-  $("#" + chartId).bind "plothover", onChartHover(series, seriesData)
+  $("#" + chartId).bind "plothover", onChartHover(series, counts)
 
   initialiseTooltip()
+
+getSeriesData = (counts, includeHealthy, includeWarnings, includeBroken) ->
+  healthy = []
+  warnings = []
+  broken = []
+  for c in counts
+    date = new Date(c.when)
+    base = 0
+    makePoint = (n) -> if n == 0 then [date, null] else [date, base + n, base]
+    if includeHealthy
+      n = c.counts.healthy
+      healthy.push makePoint(n)
+      base += n
+    if includeWarnings
+      n = c.counts.warning
+      warnings.push makePoint(n)
+      base += n
+    if includeBroken
+      n = c.counts.broken
+      broken.push makePoint(n)
+      base += n
+  {
+    healthy: healthy
+    warnings: warnings
+    broken: broken
+  }
+
+window.createHistoryChart = (chartId, counts, includeHealthy, includeWarnings, includeBroken) ->
+  seriesData = getSeriesData counts, includeHealthy, includeWarnings, includeBroken
+  createHistoryChart chartId, seriesData, counts

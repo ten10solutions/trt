@@ -64,7 +64,7 @@ onChartHover = (seriesData) -> (event, pos, item) ->
     date = dataItem[0]
     count = dataItem[1]
 
-    tooltipText = "#{count} tests executed on #{formatDateWithoutTime(date)}"
+    tooltipText = "#{count} tests executed on #{formatDate(date)}"
     $("#chart-tooltip").html(tooltipText).css(
       top: item.pageY + 5
       left: item.pageX + 5

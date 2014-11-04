@@ -6,6 +6,7 @@ import org.joda.time.Duration
 import java.math.MathContext
 import org.joda.time.Interval
 import com.github.nscala_time.time.Imports._
+import scala.collection.mutable.ListBuffer
 
 object DateUtils {
 
@@ -41,7 +42,6 @@ object DateUtils {
         s"$seconds s"
       else {
         val secondsDecimal = BigDecimal(seconds + (millis / 1000.0)).round(new MathContext(2))
-        //        val secondsDecimal = BigDecimal(s"${seconds}.${millis}").round(new MathContext(2))
         s"$secondsDecimal s"
       }
     } else
@@ -49,7 +49,24 @@ object DateUtils {
   }
 
   /**
-   * @return points in time evenly spaced across the given interval, including the start and end times. Fewer than 
+   * For each day in the interval, return the DateTime at the start of the day. Includes a final time for midnight after
+   * the end of the interval.
+   */
+  def getAllDaysIn(interval: Interval, timeZone: DateTimeZone = DateTimeZone.getDefault): Seq[DateTime] =
+    getAllDaysBetween(interval.start.toLocalDate, interval.end.toLocalDate).map(_.toDateTimeAtStartOfDay(timeZone))
+
+  private def getAllDaysBetween(start: LocalDate, end: LocalDate): Seq[LocalDate] = {
+    val dates = ListBuffer[LocalDate]()
+    var current = start
+    while (current <= end) {
+      current += 1.day
+      dates += current
+    }
+    dates
+  }
+
+  /**
+   * @return points in time evenly spaced across the given interval, including the start and end times. Fewer than
    *  the requested number of samples will be returned if there are not enough distinct times in the interval.
    */
   def sampleTimesBetween(interval: Interval, samples: Int): Seq[DateTime] =

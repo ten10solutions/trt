@@ -29,6 +29,30 @@ chartOptions =
   axisLabels:
     show: true
 
+tooltipTemplate = Handlebars.compile """
+<table class='tooltip-table'>
+  <tr>
+    <td class='tooltip-header' colspan='2'>{{when}}</td>
+  </tr>
+  {{#if passed}}
+    <tr>
+      <td>Passed</td>
+      <td><span class='badge badge-success'>{{passed}}</span></td>
+    </tr>
+  {{/if}}
+  {{#if failed}}
+    <tr>
+      <td>Failed</td>
+      <td><span class='badge badge-warning'>{{failed}}</span></td>
+    </tr>
+  {{/if}}
+  <tr>
+    <td>Total</td>
+    <td><span class='badge badge-inverse'>{{total}}</span></td>
+  </tr>
+</table>
+"""
+
 onChartHover = (batchNames, passes, fails) -> (event, pos, item) ->
   if item
     dataItem = undefined
@@ -36,12 +60,11 @@ onChartHover = (batchNames, passes, fails) -> (event, pos, item) ->
     passCount = passes[item.dataIndex][1]
     batchName = batchNames[item.dataIndex]
     date = passes[item.dataIndex][0]
-    tooltipText = "#{batchName}<br/>"
-    if passCount > 0
-      tooltipText +="Passed: <span class='badge badge-success'>#{passCount}</span><br/>"
-    if failCount > 0
-      tooltipText +="Failed: <span class='badge badge-error'>#{failCount}</span><br/>"
-    tooltipText += "Date: #{formatDate(date)}<br/>"
+    tooltipText = tooltipTemplate
+      when: formatDateAndTime(date)
+      passed: passCount
+      failed: failCount
+      total: passCount + failCount
     $("#chart-tooltip").html(tooltipText).css(
       top: item.pageY + 5
       left: item.pageX + 5
