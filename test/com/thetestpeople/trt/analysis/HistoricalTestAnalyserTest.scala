@@ -4,12 +4,11 @@ import org.junit.runner.RunWith
 import org.scalatest._
 import org.scalatest.junit.JUnitRunner
 import java.util.concurrent.atomic.AtomicInteger
-
 import com.thetestpeople.trt.model._
 import com.thetestpeople.trt.model.impl.DummyData
 import com.thetestpeople.trt.service._
-
 import com.github.nscala_time.time.Imports._
+import org.joda.time.format.ISODateTimeFormat
 
 @RunWith(classOf[JUnitRunner])
 class HistoricalTestAnalyserTest extends FlatSpec with Matchers {
@@ -19,7 +18,7 @@ class HistoricalTestAnalyserTest extends FlatSpec with Matchers {
       passDurationThreshold = 6.hours, passCountThreshold = 2,
       failureDurationThreshold = 6.hours, failureCountThreshold = 2)
 
-    val executions: List[Execution] = List(
+    val executions: Seq[Execution] = Seq(
       execution(testId = Id(1), passed = true, executionTime = 1.day.ago),
       execution(testId = Id(1), passed = true, executionTime = 2.days.ago),
       execution(testId = Id(2), passed = false, executionTime = 1.day.ago),
@@ -37,48 +36,40 @@ class HistoricalTestAnalyserTest extends FlatSpec with Matchers {
     val analysisConfig = analysisConfiguration(
       passDurationThreshold = 6.hours, passCountThreshold = 2,
       failureDurationThreshold = 6.hours, failureCountThreshold = 2)
-    val execution1 = execution(passed = true, executionTime = 4.days.ago)
-    val execution2 = execution(passed = true, executionTime = 3.days.ago)
-    val execution3 = execution(passed = false, executionTime = 2.days.ago)
-    val execution4 = execution(passed = false, executionTime = 1.day.ago)
-    val executions = List(execution1, execution2, execution3, execution4).map(executionLite)
-    val sampleSize = executions.size + 1 // this should cause the samples to fall between the executions
+    val execution1 = execution(passed = true, executionTime = date("2014-11-01T12:00:00Z"))
+    val execution2 = execution(passed = true, executionTime = date("2014-11-02T12:00:00Z"))
+    val execution3 = execution(passed = false, executionTime = date("2014-11-03T12:00:00Z"))
+    val execution4 = execution(passed = false, executionTime = date("2014-11-04T12:00:00Z"))
+    val executions = Seq(execution1, execution2, execution3, execution4).map(executionLite)
 
-    val List(counts1, counts2, counts3, counts4, counts5) = analyse(executions, analysisConfig, sampleSize = executions.size + 1)(Configuration.Default).counts
+    val Seq(counts2, counts3, counts4, counts5) = analyse(executions, analysisConfig)(Configuration.Default).counts
 
-    counts1.when should equal(execution1.executionTime)
-    counts1.testCounts should equal(TestCounts(warning = 1))
-
-    counts2.when > execution1.executionTime should be(true)
-    counts2.when < execution2.executionTime should be(true)
+    counts2.when.getMillis should equal(date("2014-11-02T00:00:00Z").getMillis)
     counts2.testCounts should equal(TestCounts(warning = 1))
 
-    counts3.when > execution2.executionTime should be(true)
-    counts3.when < execution3.executionTime should be(true)
+    counts3.when.getMillis should equal(date("2014-11-03T00:00:00Z").getMillis)
     counts3.testCounts should equal(TestCounts(passed = 1))
 
-    counts4.when > execution3.executionTime should be(true)
-    counts4.when < execution4.executionTime should be(true)
+    counts4.when.getMillis should equal(date("2014-11-04T00:00:00Z").getMillis)
     counts4.testCounts should equal(TestCounts(warning = 1))
 
-    counts5.when should equal(execution4.executionTime)
+    counts5.when.getMillis should equal(date("2014-11-05T00:00:00Z").getMillis)
     counts5.testCounts should equal(TestCounts(failed = 1))
   }
 
   it should "give correct results with a single execution" in {
     val analysisConfig = analysisConfiguration(
       passDurationThreshold = 0.hours, passCountThreshold = 1)
-    val execution1 = execution(passed = true)
-    val executions = List(executionLite(execution1))
-    val List(counts) = analyse(executions, analysisConfig)(Configuration.Default).counts
+    val executions = Seq(executionLite(execution(passed = true, executionTime = date("2014-11-01T12:00:00Z"))))
+    val Seq(counts) = analyse(executions, analysisConfig)(Configuration.Default).counts
 
-    counts.when should equal(execution1.executionTime)
+    counts.when.getMillis should equal(date("2014-11-02T00:00:00Z").getMillis)
     counts.testCounts should equal(TestCounts(passed = 1))
   }
 
   private def testCounts(pass: Int = 0, warn: Int = 0, fail: Int = 0) = TestCounts(pass, warn, fail)
 
-  private def calculateTestCountsViaRegularAnalyser(analysisConfig: AnalysisConfiguration, executions: List[Execution]): TestCounts = {
+  private def calculateTestCountsViaRegularAnalyser(analysisConfig: AnalysisConfiguration, executions: Seq[Execution]): TestCounts = {
     val testAnalyser = new TestAnalyser(new FakeClock, analysisConfig)
     val countsByStatus = executions.groupBy(_.testId).flatMap(x ⇒ testAnalyser.analyse(x._2)).groupBy(_.status).mapValues(_.size)
     TestCounts(
@@ -87,20 +78,20 @@ class HistoricalTestAnalyserTest extends FlatSpec with Matchers {
       failed = countsByStatus(TestStatus.Broken))
   }
 
-  private def calculateTestCountsViaHistoricalAnalyser(analysisConfig: AnalysisConfiguration, executions: List[Execution]): TestCounts = {
+  private def calculateTestCountsViaHistoricalAnalyser(analysisConfig: AnalysisConfiguration, executions: Seq[Execution]): TestCounts = {
     analyse(executions.map(executionLite), analysisConfig)(Configuration.Default).counts.last.testCounts
   }
 
-  private def analyse(executions: List[ExecutionLite], analysisConfig: AnalysisConfiguration, sampleSize: Int = 200) = {
+  private def analyse(executions: Seq[ExecutionLite], analysisConfig: AnalysisConfiguration) = {
     val executionIntervalsByConfig =
       for ((configuration, configExecutions) ← executions.groupBy(_.configuration))
         yield configuration -> executionInterval(configExecutions)
-    val historicalAnalyser = new HistoricalTestAnalyser(executionIntervalsByConfig, analysisConfig, sampleSize)
+    val historicalAnalyser = new HistoricalTestAnalyser(executionIntervalsByConfig, analysisConfig, DateTimeZone.UTC)
     val executionsIterator = executions.sortBy(e ⇒ (e.configuration, e.testId, e.executionTime)).iterator
     historicalAnalyser.process(executionsIterator)
   }
 
-  private def executionInterval(executions: List[ExecutionLite]): Interval = {
+  private def executionInterval(executions: Seq[ExecutionLite]): Interval = {
     val start = executions.minBy(_.executionTime).executionTime
     val end = executions.maxBy(_.executionTime).executionTime
     new Interval(start, end)
@@ -141,5 +132,7 @@ class HistoricalTestAnalyserTest extends FlatSpec with Matchers {
       testId = execution.testId,
       executionTime = execution.executionTime,
       passed = execution.passed)
+
+  private def date(s: String): DateTime = ISODateTimeFormat.dateTimeParser.parseDateTime(s)
 
 }

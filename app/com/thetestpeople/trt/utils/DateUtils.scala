@@ -42,26 +42,28 @@ object DateUtils {
         s"$seconds s"
       else {
         val secondsDecimal = BigDecimal(seconds + (millis / 1000.0)).round(new MathContext(2))
-        //        val secondsDecimal = BigDecimal(s"${seconds}.${millis}").round(new MathContext(2))
         s"$secondsDecimal s"
       }
     } else
       s"${duration.getMillis} ms"
   }
 
-  private def allDays(start: LocalDate, end: LocalDate): Seq[LocalDate] = {
+  /**
+   * For each day in the interval, return the DateTime at the start of the day. Includes a final time for midnight after
+   * the end of the interval.
+   */
+  def getAllDaysIn(interval: Interval, timeZone: DateTimeZone = DateTimeZone.getDefault): Seq[DateTime] =
+    getAllDaysBetween(interval.start.toLocalDate, interval.end.toLocalDate).map(_.toDateTimeAtStartOfDay(timeZone))
+
+  private def getAllDaysBetween(start: LocalDate, end: LocalDate): Seq[LocalDate] = {
     val dates = ListBuffer[LocalDate]()
     var current = start
     while (current <= end) {
+      current += 1.day
       dates += current
-      current = current plusDays 1
     }
-    dates += current
     dates
   }
-
-  def sampleTimesBetween2(interval: Interval): Seq[DateTime] =
-    allDays(interval.start.toLocalDate, interval.end.toLocalDate).map(_.toDateTimeAtStartOfDay)
 
   /**
    * @return points in time evenly spaced across the given interval, including the start and end times. Fewer than

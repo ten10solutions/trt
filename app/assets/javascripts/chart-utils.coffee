@@ -1,8 +1,9 @@
 # (Recursively) merge two objects, returning a new object
 merge = (obj1, obj2) -> $.extend true, {}, obj1, obj2
 
-zoomOutButtonTemplate = (left, top) ->
-  "<button type='button' style='left: #{left}px; top: #{top}px;' class='zoom-out-button btn btn-default' title='Zoom out'><i class='fa fa-zoom fa-search-minus'></i></button>"
+zoomOutButtonTemplate = (left, top) -> """
+  <button type='button' style='left: #{left}px; top: #{top}px;' class='zoom-out-button btn btn-default' title='Zoom out'><i class='fa fa-zoom fa-search-minus'></i></button>
+"""
 
 addZoomOutButton = (plotOffset, config, originalBounds) ->
   console.log(plotOffset)

@@ -31,32 +31,49 @@ chartOptions =
   legend:
     show: false
 
-getTooltipText = (dayCounts) ->
+tooltipTemplate = Handlebars.compile """
+<table style='border: 0;'>
+  <tr>
+    <td class='tooltip-header' colspan='2'>{{when}}</td>
+  </tr>
+  {{#if healthy}}
+    <tr>
+      <td>Healthy</td>
+      <td><span class='badge badge-success'>{{healthy}}</span></td>
+    </tr>
+  {{/if}}
+  {{#if warning}}
+    <tr>
+      <td>Warning</td>
+      <td><span class='badge badge-warning'>{{warning}}</span></td>
+    </tr>
+  {{/if}}
+  {{#if broken}}
+    <tr>
+      <td>Broken</td>
+      <td><span class='badge badge-error'>{{broken}}</span></td>
+    </tr>
+  {{/if}}
+  <tr>
+    <td>Total</td>
+    <td><span class='badge badge-inverse'>{{total}}</span></td>
+  </tr>
+</table>
+"""
+
+prettyPrint = (date) ->
   locale = (if navigator.languages then navigator.languages[0] else (navigator.language or navigator.userLanguage))
   moment.locale(locale)
-  prettyDate = moment(dayCounts.when).format('LL')
-  tooltipText = "<table style='border: 0;'><tr><td style='text-align: center; border-bottom:1pt solid black;' colspan='2'>#{prettyDate}</td></tr>"
-
-  total = 0
-
-  n = dayCounts.counts.healthy
-  if n > 0
-    tooltipText += "<tr><td>Healthy</td><td><span class='badge badge-success'>#{n}</span></td></tr>"
-  total += n
-
-  n = dayCounts.counts.warning
-  if n > 0
-    tooltipText += "<tr><td>Warning</td><td><span class='badge badge-warning'>#{n}</span></td></tr>"
-  total += n
-
-  n = dayCounts.counts.broken
-  if n > 0
-    tooltipText += "<tr><td>Broken</td><td><span class='badge badge-error'>#{n}</span></td></tr>"
-  total += n
-
-  tooltipText += "<tr><td>Total</td><td><span class='badge badge-inverse'>#{total}</span></td></tr>"
-
-  tooltipText += "</table>"
+  moment(date).format('LL')
+      
+getTooltipText = (dayCounts) ->
+  cs = dayCounts.counts
+  tooltipTemplate
+    when: prettyPrint(moment(dayCounts.when).subtract(1, 'days'))
+    healthy: cs.healthy
+    warning: cs.warning
+    broken: cs.broken
+    total: cs.healthy + cs.warning + cs.broken
 
 onChartHover = (series, counts) -> (event, pos, item) ->
   if item
