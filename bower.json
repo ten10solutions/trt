@@ -23,7 +23,8 @@
     "fontawesome": "~4.2.0",
     "typeahead.js": "~0.10.5",
     "typeahead.js-bootstrap3.less": "~0.2.3",
-    "flot-axislabels": "*"
+    "flot-axislabels": "*",
+    "handlebars": "~2.0.0"
   },
   "resolutions": {
     "bootstrap": "~3.2.0"
