@@ -32,23 +32,27 @@ chartOptions =
 tooltipTemplate = Handlebars.compile """
 <table class='tooltip-table'>
   <tr>
-    <td class='tooltip-header' colspan='2'>{{when}}</td>
+    <td class='tooltip-header' colspan='2'>{{batchName}}</td>
+  </tr>
+  <tr>
+    <td>Date</td>
+    <td>{{when}}</td>
   </tr>
   {{#if passed}}
     <tr>
       <td>Passed</td>
-      <td><span class='badge badge-success'>{{passed}}</span></td>
+      <td style='text-align: center'><span class='badge badge-success'>{{passed}}</span></td>
     </tr>
   {{/if}}
   {{#if failed}}
     <tr>
       <td>Failed</td>
-      <td><span class='badge badge-warning'>{{failed}}</span></td>
+      <td style='text-align: center'><span class='badge badge-error'>{{failed}}</span></td>
     </tr>
   {{/if}}
   <tr>
     <td>Total</td>
-    <td><span class='badge badge-inverse'>{{total}}</span></td>
+    <td style='text-align: center'><span class='badge badge-inverse'>{{total}}</span></td>
   </tr>
 </table>
 """
@@ -62,6 +66,7 @@ onChartHover = (batchNames, passes, fails) -> (event, pos, item) ->
     date = passes[item.dataIndex][0]
     tooltipText = tooltipTemplate
       when: formatDateAndTime(date)
+      batchName: batchName
       passed: passCount
       failed: failCount
       total: passCount + failCount
