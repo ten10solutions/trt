@@ -1,6 +1,7 @@
 0.1.1 (..)
 
 * Revamped test history charts into stacked bar charts with a bar per day
+* Add larger version of each test history chart via an Expand button
 * Support for test categories
 * Record batches incrementally via API
 * Performance improvements for batch import

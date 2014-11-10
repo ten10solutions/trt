@@ -6,6 +6,7 @@ import com.thetestpeople.trt.utils._
 import com.thetestpeople.trt.service.indexing.LogIndexer
 import org.joda.time.Duration
 import scala.PartialFunction.condOpt
+import com.github.nscala_time.time.Imports._
 
 class BatchRecorder(dao: Dao, clock: Clock, analysisService: AnalysisService, logIndexer: LogIndexer) extends HasLogger {
 

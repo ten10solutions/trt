@@ -43,9 +43,9 @@ tooltipTemplate = Handlebars.compile """
     <td>Result</td>
     <td class='tooltip-result-cell'>
       {{#if passed}}
-        <img src="/assets/images/ticks/pass.png" alt="Passed"/>
+        <img src="/assets/images/ticks/pass-24x24.png" alt="Passed"/>
       {{else}}
-        <img src="/assets/images/ticks/fail.png" alt="Failed"/>
+        <img src="/assets/images/ticks/fail-24x24.png" alt="Failed"/>
       {{/if}}
     </td>
   </tr>

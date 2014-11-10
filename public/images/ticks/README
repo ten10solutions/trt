@@ -1,5 +1,7 @@
 convert -background none -resize 40x40 Fairytale_apply.svg          pass.png
 convert -background none -resize 40x40 Fairytale_button_cancel2.svg fail.png
+convert -background none -resize 24x24 Fairytale_apply.svg          pass-24x24.png
+convert -background none -resize 24x24 Fairytale_button_cancel2.svg fail-24x24.png
 
 http://commons.wikimedia.org/wiki/File:Fairytale_button_cancel2.svg
 http://commons.wikimedia.org/wiki/File:Fairytale_apply.svg

@@ -2,11 +2,10 @@
 merge = (obj1, obj2) -> $.extend true, {}, obj1, obj2
 
 zoomOutButtonTemplate = (left, top) -> """
-  <button type='button' style='left: #{left}px; top: #{top}px;' class='zoom-out-button btn btn-default' title='Zoom out'><i class='fa fa-zoom fa-search-minus'></i></button>
+  <button type='button' style='left: #{left}px; top: #{top}px;' class='zoom-out-button btn btn-default btn-xs' title='Zoom out'><i class='fa fa-zoom fa-search-minus'></i></button>
 """
 
 addZoomOutButton = (plotOffset, config, originalBounds) ->
-  console.log(plotOffset)
   left = plotOffset.left + 10
   top = plotOffset.top + 10
   $(zoomOutButtonTemplate(left, top)).appendTo($("#" + config.chartId)).click (event) ->

@@ -30,7 +30,7 @@
         @if(globalViewContext.multipleConfigurationMode) {
           <th class="configuration-col">Configuration</th>
         }
-        <th></th>
+        <th>Test counts over time</th>
         <th class="configuration-count-col">Healthy</th>
         <th class="configuration-count-col">Warning</th>
         <th class="configuration-count-col">Broken</th>
@@ -49,11 +49,12 @@
             <div id="history-chart-@index" class="history-chart-container @if(globalViewContext.singleConfigurationMode) { history-chart-large } else { history-chart-small }">
               <i class="fa fa-line-chart"></i> Data not yet available
             </div>
-            <form class="form-inline" style="float: right">
-              <input class="checkbox chart-checkbox" id="chart-checkbox-healthy-@index" data-chart-index="@index" type="checkbox" checked /> Healthy
-              <input class="checkbox chart-checkbox" id="chart-checkbox-warnings-@index" data-chart-index="@index" type="checkbox" checked /> Warning
-              <input class="checkbox chart-checkbox" id="chart-checkbox-broken-@index" data-chart-index="@index" type="checkbox" checked /> Broken
+            <form style="display: none; float: right" class="chart-widget-@index form-inline">
+              <span title="Show Healthy tests"><img src="@routes.Assets.at("images/balls/green-16x16.png")"/><input class="checkbox chart-checkbox" id="chart-checkbox-healthy-@index" data-chart-index="@index" type="checkbox" checked /></span>
+              <span title="Show Warning tests"><img src="@routes.Assets.at("images/balls/yellow-16x16.png")"/><input class="checkbox chart-checkbox" id="chart-checkbox-warnings-@index" data-chart-index="@index" type="checkbox" checked /></span>
+              <span title="Show Broken tests"><img src="@routes.Assets.at("images/balls/red-16x16.png")"/><input class="checkbox chart-checkbox" id="chart-checkbox-broken-@index" data-chart-index="@index" type="checkbox" checked /></span>
             </form>
+           <button data-chart-index="@index" data-configuration="@testsSummary.configuration" type="button" class="expand-chart-button chart-widget-@index btn btn-default btn-xs" style="display: none;"><i class="fa fa-arrows-alt"></i> Expand</button>
             <script>
               loadHistoryChart("@routes.WebApiController.configurationChart(testsSummary.configuration)", @index);
             </script>
@@ -88,3 +89,30 @@
   
 }
 
+<!-- Chart modal -->
+<div class="modal fade" id="big-chart-modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title">Test counts for <span id="modal-configuration-name">Default</span></h4>
+      </div>
+      <div class="modal-body">
+        <div align="center">
+          <div id="history-chart-modal" class="history-chart-container" style="width: 900px; height: 400px">
+          </div>
+        </div>
+        Test counts over time for each status (Healthy, Warning and Broken). Drag an area on the chart to zoom.
+        <form style="float: right" class="form-inline">
+          <span title="Show Healthy tests"><img src="@routes.Assets.at("images/balls/green-16x16.png")"/><input class="checkbox modal-chart-checkbox" id="chart-checkbox-healthy-modal" data-chart-index="modal" type="checkbox" checked /></span>
+          <span title="Show Warning tests"><img src="@routes.Assets.at("images/balls/yellow-16x16.png")"/><input class="checkbox modal-chart-checkbox" id="chart-checkbox-warnings-modal" data-chart-index="modal" type="checkbox" checked /></span>
+          <span title="Show Broken tests"><img src="@routes.Assets.at("images/balls/red-16x16.png")"/><input class="checkbox modal-chart-checkbox" id="chart-checkbox-broken-modal" data-chart-index="modal" type="checkbox" checked /></span>
+        </form>
+      </div>
+      <div style="clear: both"/>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
