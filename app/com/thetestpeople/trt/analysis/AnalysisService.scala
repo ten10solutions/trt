@@ -112,8 +112,8 @@ class AnalysisService(dao: Dao, clock: Clock, async: Boolean = true) extends Has
     historicalTestCountsByConfig = Map()
   }
 
-  def getHistoricalTestCountsByConfig: Map[Configuration, HistoricalTestCountsTimeline] = analysisResultLock.withLock {
-    historicalTestCountsByConfig
+  def getAllHistoricalTestCounts: AllHistoricalTestCounts = analysisResultLock.withLock {
+    new AllHistoricalTestCounts(historicalTestCountsByConfig)
   }
 
   def getExecutionVolume(configurationOpt: Option[Configuration]): Option[ExecutionVolume] = analysisResultLock.withLock {

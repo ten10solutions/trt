@@ -27,7 +27,7 @@ class WebApiController(service: Service) extends Controller with HasLogger {
   }
 
   def configurationChart(configuration: Configuration) = Action { implicit request ⇒
-    val counts = service.getHistoricalTestCounts().get(configuration).map(_.counts).getOrElse(Seq())
+    val counts = service.getAllHistoricalTestCounts.getHistoricalTestCounts(configuration).map(_.counts).getOrElse(Seq())
     Ok(Json.toJson(counts))
   }
 

@@ -17,7 +17,7 @@ renderChart = (chartIndex, chartIdSuffix) ->
     includeHealthy  = $("#chart-checkbox-healthy-#{chartIdSuffix}").is(":checked")
     includeWarnings = $("#chart-checkbox-warnings-#{chartIdSuffix}").is(":checked")
     includeBroken   = $("#chart-checkbox-broken-#{chartIdSuffix}").is(":checked")
-    createHistoryChart chartId, counts, includeHealthy, includeWarnings, includeBroken
+    createHistoryChart chartId, counts, window.timelineBounds, includeHealthy, includeWarnings, includeBroken
 
 $(document).ready ->
 

@@ -1,4 +1,4 @@
-@(testsSummaries: Seq[TestsSummaryView])(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
+@(testsSummaries: Seq[TestsSummaryView], configurationsView: ConfigurationsView)(implicit flash: Flash, request: RequestHeader, globalViewContext: GlobalViewContext)
 
 @css = {
   <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/chart-common.css")">
@@ -20,6 +20,15 @@
   @noResultsYet()
 
 } else {
+  
+  <script>
+     @for((start, finish) <- configurationsView.timelineOpt) {
+       window.timelineBounds = {
+         "start": @start,
+         "finish": @finish
+       };
+     }
+  </script>
 
   <h2>@globalViewContext.projectNameOpt.getOrElse("Dashboard")</h2>
 

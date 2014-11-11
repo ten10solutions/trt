@@ -9,6 +9,7 @@ import java.net.URI
 import com.thetestpeople.trt.analysis.HistoricalTestCountsTimeline
 import com.thetestpeople.trt.analysis.ExecutionVolume
 import com.thetestpeople.trt.analysis.ExecutionTimeMAD
+import com.thetestpeople.trt.analysis.AllHistoricalTestCounts
 
 case class TestAndExecutions(
   test: EnrichedTest,
@@ -72,7 +73,7 @@ trait Service extends CiService {
 
   def markTestsAsDeleted(ids: Seq[Id[Test]], deleted: Boolean = true)
 
-  def getHistoricalTestCounts(): Map[Configuration, HistoricalTestCountsTimeline]
+  def getAllHistoricalTestCounts: AllHistoricalTestCounts
 
   def getHistoricalTestCounts(configuration: Configuration): Option[HistoricalTestCountsTimeline]
 

@@ -1,3 +1,6 @@
+# (Recursively) merge two objects, returning a new object
+merge = (obj1, obj2) -> $.extend true, {}, obj1, obj2
+
 chartOptions = 
   grid:
     backgroundColor:
@@ -6,6 +9,7 @@ chartOptions =
     clickable: true
   xaxis:
     mode: "time"
+    labelWidth: 70
   yaxis:
     minTickSize: 1
     tickDecimals: 0
@@ -91,7 +95,7 @@ onChartHover = (series, counts) -> (event, pos, item) ->
 initialiseTooltip = ->
   $("<div class='chart-tooltip' id='chart-tooltip'/>").appendTo "body" unless $('#chart-tooltip').length
 
-createHistoryChart = (chartId, seriesData, counts) ->  
+createHistoryChart = (chartId, seriesData, counts, timelineBounds) ->
   series = []
   addSeries = (label, data, color) ->
     series.push
@@ -102,13 +106,20 @@ createHistoryChart = (chartId, seriesData, counts) ->
   addSeries "Warnings", seriesData.warnings, "#ffbf00" if seriesData.warnings
   addSeries "Broken",   seriesData.broken,   "#b94a48" if seriesData.broken
 
-  plot = $.plot $("#" + chartId), series, chartOptions
+  chartOpts = chartOptions
+  if timelineBounds?
+    chartOpts = merge chartOpts,
+      xaxis:
+        min: timelineBounds.start
+        max: timelineBounds.finish
+
+  plot = $.plot $("#" + chartId), series, chartOpts
 
   addZoomSupport
     plot: plot
     chartId: chartId
     series: series
-    chartOptions: chartOptions
+    chartOptions: chartOpts
     minX: 10 * 60 * 1000
     minY: 10
   $("#" + chartId).unbind "plothover"
@@ -142,6 +153,6 @@ getSeriesData = (counts, includeHealthy, includeWarnings, includeBroken) ->
     broken: broken
   }
 
-window.createHistoryChart = (chartId, counts, includeHealthy, includeWarnings, includeBroken) ->
+window.createHistoryChart = (chartId, counts, timelineBounds, includeHealthy, includeWarnings, includeBroken) ->
   seriesData = getSeriesData counts, includeHealthy, includeWarnings, includeBroken
-  createHistoryChart chartId, seriesData, counts
+  createHistoryChart chartId, seriesData, counts, timelineBounds

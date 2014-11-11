@@ -79,4 +79,11 @@ object DateUtils {
     (milliOffsets.map(start + _) :+ end).distinct
   }
 
+  private def min(d1: DateTime, d2: DateTime): DateTime = if (d1 <= d2) d1 else d2
+  
+  private def max(d1: DateTime, d2: DateTime): DateTime = if (d1 >= d2) d1 else d2
+  
+  def mergeIntervals(interval1: Interval, interval2: Interval): Interval =
+    new Interval(min(interval1.start, interval2.start), max(interval1.end, interval2.end))
+
 }

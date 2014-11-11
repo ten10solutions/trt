@@ -138,11 +138,10 @@ class ServiceImpl(
 
   def getConfigurations(): Seq[Configuration] = transaction { dao.getConfigurations() }
 
-  def getHistoricalTestCounts(): Map[Configuration, HistoricalTestCountsTimeline] =
-    analysisService.getHistoricalTestCountsByConfig
+  def getAllHistoricalTestCounts: AllHistoricalTestCounts = analysisService.getAllHistoricalTestCounts
 
   def getHistoricalTestCounts(configuration: Configuration): Option[HistoricalTestCountsTimeline] =
-    analysisService.getHistoricalTestCountsByConfig.get(configuration)
+    analysisService.getAllHistoricalTestCounts.getHistoricalTestCounts(configuration)
 
   def analyseAllExecutions() {
     logger.info("Analysing all executions")

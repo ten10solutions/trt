@@ -26,6 +26,7 @@ chartOptions =
       show: true
   selection:
     mode: "xy"
+    color: "#bbe"
   axisLabels:
     show: true
 

@@ -33,11 +33,11 @@ class AnalysisServiceTest extends FlatSpec with Matchers {
     val batchId = dao.newBatch(F.batch())
     val testId = dao.ensureTestIsRecorded(F.test())
     dao.newExecution(F.execution(testId = testId, batchId = batchId, passed = true))
-    analysisService.getHistoricalTestCountsByConfig should equal(Map())
+    analysisService.getAllHistoricalTestCounts should equal(AllHistoricalTestCounts(Map()))
 
     analysisService.analyseAllExecutions()
 
-    val allCounts = analysisService.getHistoricalTestCountsByConfig(Configuration.Default)
+    val Some(allCounts) = analysisService.getAllHistoricalTestCounts.getHistoricalTestCounts(Configuration.Default)
     val mostRecentCounts = allCounts.counts.last.testCounts
     mostRecentCounts should equal(TestCounts(passed = 1))
   }
@@ -51,7 +51,7 @@ class AnalysisServiceTest extends FlatSpec with Matchers {
 
     analysisService.clearHistoricalTestCounts()
 
-    analysisService.getHistoricalTestCountsByConfig should equal(Map())
+    analysisService.getAllHistoricalTestCounts should equal(AllHistoricalTestCounts(Map()))
   }
 
   private def setUp() = {

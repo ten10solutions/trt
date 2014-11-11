@@ -49,8 +49,8 @@ class Application(service: Service, adminService: AdminService) extends Controll
       service.getTestCountsByConfiguration().map {
         case (configuration, testCounts) ⇒ TestsSummaryView(configuration, testCounts)
       }.toSeq.sortBy(_.configuration)
-
-    Ok(views.html.configurations(testsSummaries))
+    val historicalIntervalOpt = service.getAllHistoricalTestCounts.interval
+    Ok(views.html.configurations(testsSummaries, ConfigurationsView(historicalIntervalOpt)))
   }
 
   def execution(executionId: Id[Execution]) = Action { implicit request ⇒
