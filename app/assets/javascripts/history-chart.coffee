@@ -110,7 +110,7 @@ createHistoryChart = (chartId, seriesData, counts, timelineBounds) ->
   if timelineBounds?
     chartOpts = merge chartOpts,
       xaxis:
-        min: timelineBounds.start
+        min: moment(timelineBounds.start).subtract(1, 'days').valueOf()
         max: timelineBounds.finish
 
   plot = $.plot $("#" + chartId), series, chartOpts
