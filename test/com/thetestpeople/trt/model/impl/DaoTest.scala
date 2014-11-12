@@ -56,7 +56,9 @@ abstract class DaoTest extends FlatSpec with Matchers with ExecutionDaoTest with
       configurationOpt = Some(DummyData.Configuration1)),
       logOpt = Some(DummyData.Log))
 
-    val Some(BatchAndLog(batch, Some(log), None, None)) = dao.getBatch(batchId)
+    val Some(enrichedBatch) = dao.getBatch(batchId)
+    val batch = enrichedBatch.batch
+    val Some(log) = enrichedBatch.logOpt
     batch.urlOpt should equal(Some(DummyData.BuildUrl))
     batch.executionTime should equal(DummyData.ExecutionTime)
     batch.durationOpt should equal(Some(DummyData.Duration))
@@ -76,7 +78,8 @@ abstract class DaoTest extends FlatSpec with Matchers with ExecutionDaoTest with
       nameOpt = None),
       logOpt = None)
 
-    val Some(BatchAndLog(batch, None, None, None)) = dao.getBatch(batchId)
+    val Some(enrichedBatch) = dao.getBatch(batchId)
+    val batch = enrichedBatch.batch
     batch.urlOpt should equal(None)
     batch.durationOpt should equal(None)
     batch.nameOpt should equal(None)
@@ -478,7 +481,7 @@ abstract class DaoTest extends FlatSpec with Matchers with ExecutionDaoTest with
       failCount = 0,
       totalCount = 0))
     val batch = dao.getBatch(batchId).get.batch
-    
+
     val updatedBatch = batch.copy(
       durationOpt = Some(DummyData.Duration),
       passed = true,
@@ -488,7 +491,7 @@ abstract class DaoTest extends FlatSpec with Matchers with ExecutionDaoTest with
     dao.updateBatch(updatedBatch)
 
     val batchAgain = dao.getBatch(batchId).get.batch
-    batchAgain should equal (updatedBatch)
+    batchAgain should equal(updatedBatch)
   }
 
   "Adding and retrieving test categories" should "work" in transaction { dao ⇒

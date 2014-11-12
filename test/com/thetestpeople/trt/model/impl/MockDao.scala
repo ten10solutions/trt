@@ -128,11 +128,11 @@ class MockDao extends Dao {
     analyses = analysis +: analyses.filterNot(_.testId == analysis.testId)
   }
 
-  def getBatch(id: Id[Batch]): Option[BatchAndLog] = batches.find(_.id == id).map { batch ⇒
+  def getBatch(id: Id[Batch]): Option[EnrichedBatch] = batches.find(_.id == id).map { batch ⇒
     val logOpt = batchLogs.find(_.batchId == id).map(_.log)
     val importSpecIdOpt = ciBuilds.find(_.batchId == id).flatMap(_.importSpecIdOpt)
     val commentOpt = batchComments.find(_.batchId == id).map(_.text)
-    BatchAndLog(batch, logOpt, importSpecIdOpt, commentOpt)
+    EnrichedBatch(batch, logOpt = logOpt, importSpecIdOpt = importSpecIdOpt, commentOpt = commentOpt)
   }
 
   def getBatches(jobIdOpt: Option[Id[CiJob]] = None, configurationOpt: Option[Configuration] = None, resultOpt: Option[Boolean]): Seq[Batch] = {

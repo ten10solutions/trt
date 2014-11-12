@@ -103,7 +103,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   private def handleBatch(batchId: Id[Batch], passedFilterOpt: Option[Boolean], pagination: Pagination)(implicit request: Request[_]) =
     service.getBatchAndExecutions(batchId, passedFilterOpt) map {
-      case BatchAndExecutions(batch, executions, logOpt, importSpecIdOpt, commentOpt) ⇒
+      case EnrichedBatch(batch, executions, logOpt, importSpecIdOpt, commentOpt) ⇒
         val batchView = new BatchView(batch, executions, logOpt, importSpecIdOpt, commentOpt)
         val paginationData = pagination.paginationData(executions.size)
         views.html.batch(batchView, passedFilterOpt, service.canRerun, paginationData)
@@ -113,7 +113,7 @@ class Application(service: Service, adminService: AdminService) extends Controll
     service.getBatchAndExecutions(batchId, None) match {
       case None ⇒
         NotFound(s"Could not find batch with id '$batchId'")
-      case Some(BatchAndExecutions(batch, executions, logOpt, importSpecIdOpt, commentOpt)) ⇒
+      case Some(EnrichedBatch(batch, executions, logOpt, importSpecIdOpt, commentOpt)) ⇒
         logOpt match {
           case Some(log) ⇒
             val batchView = new BatchView(batch, Seq(), logOpt, importSpecIdOpt, commentOpt)

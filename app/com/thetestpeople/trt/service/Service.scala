@@ -17,12 +17,6 @@ case class TestAndExecutions(
   otherConfigurations: Seq[Configuration],
   categories: Seq[String] = Seq())
 
-case class BatchAndExecutions(
-  batch: Batch,
-  executions: Seq[EnrichedExecution],
-  logOpt: Option[String],
-  importSpecIdOpt: Option[Id[CiImportSpec]],
-  commentOpt: Option[String])
 
 case class ExecutionsAndTotalCount(executions: Seq[EnrichedExecution], total: Int)
 
@@ -43,7 +37,7 @@ trait Service extends CiService {
 
   def completeBatch(batchId: Id[Batch], durationOpt: Option[Duration]): Boolean
 
-  def getBatchAndExecutions(id: Id[Batch], passedFilterOpt: Option[Boolean] = None): Option[BatchAndExecutions]
+  def getBatchAndExecutions(id: Id[Batch], passedFilterOpt: Option[Boolean] = None): Option[EnrichedBatch]
 
   /**
    * Return batches, ordered most recent first

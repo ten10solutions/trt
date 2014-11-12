@@ -116,7 +116,7 @@ trait Dao extends ExecutionDao with CiDao {
 
   def upsertAnalysis(analysis: Analysis)
 
-  def getBatch(id: Id[Batch]): Option[BatchAndLog]
+  def getBatch(id: Id[Batch]): Option[EnrichedBatch]
 
   /**
    * Return batches, ordered most recent first

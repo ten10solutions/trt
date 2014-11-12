@@ -294,7 +294,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     query.firstOption.map { case (test, analysisOpt) ⇒ EnrichedTest(test, analysisOpt, commentOpt = None) }
   }
 
-  def getBatch(id: Id[Batch]): Option[BatchAndLog] = {
+  def getBatch(id: Id[Batch]): Option[EnrichedBatch] = {
     val join = batches
       .leftJoin(batchLogs).on(_.id === _.batchId)
       .leftJoin(ciBuilds).on(_._1.id === _.batchId)
@@ -306,7 +306,10 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       } yield (batch, log.?, ciBuild.?, comment.?)
     query.firstOption.map {
       case (batch, logRowOpt, ciBuildOpt, commentOpt) ⇒
-        BatchAndLog(batch, logRowOpt.map(_.log), ciBuildOpt.flatMap(_.importSpecIdOpt), commentOpt = commentOpt.map(_.text))
+        EnrichedBatch(batch,
+          logOpt = logRowOpt.map(_.log),
+          importSpecIdOpt = ciBuildOpt.flatMap(_.importSpecIdOpt),
+          commentOpt = commentOpt.map(_.text))
     }
   }
 
@@ -337,9 +340,9 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     batchId
   }
 
-  def updateBatch(batch: Batch) = 
+  def updateBatch(batch: Batch) =
     batches.filter(_.id === batch.id).update(batch)
-  
+
   def setBatchDuration(batchId: Id[Batch], durationOpt: Option[Duration]): Boolean =
     batches.filter(_.id === batchId).map(_.duration).update(durationOpt) > 0
 

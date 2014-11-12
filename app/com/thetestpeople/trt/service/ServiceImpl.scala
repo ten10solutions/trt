@@ -99,12 +99,11 @@ class ServiceImpl(
     dao.setBatchDuration(batchId, durationOpt)
   }
 
-  def getBatchAndExecutions(id: Id[Batch], passedFilterOpt: Option[Boolean] = None): Option[BatchAndExecutions] =
+  def getBatchAndExecutions(id: Id[Batch], passedFilterOpt: Option[Boolean] = None): Option[EnrichedBatch] =
     transaction {
-      dao.getBatch(id).map {
-        case BatchAndLog(batch, logOpt, importSpecIdOpt, commentOpt) ⇒
-          val executions = dao.getEnrichedExecutionsInBatch(id, passedFilterOpt)
-          BatchAndExecutions(batch, executions, logOpt, importSpecIdOpt, commentOpt)
+      dao.getBatch(id).map { batch ⇒
+        val executions = dao.getEnrichedExecutionsInBatch(id, passedFilterOpt)
+        batch.copy(executions = executions)
       }
     }
 
