@@ -29,8 +29,19 @@ class BatchRecorder(dao: Dao, clock: Clock, analysisService: AnalysisService, lo
       recordExecutions(batch, executions)
     }
     handleAffectedEntities(affectedEntities)
+    updateBatchSummaryStats(affectedEntities)
     logger.info(s"Added ${executions.size} to batch ${affectedEntities.batch.nameOpt}")
     true
+  }
+
+  private def updateBatchSummaryStats(affectedEntities: AffectedEntities) {
+    val AffectedEntities(batch, executions, testIds) = affectedEntities
+    val updatedBatch = batch.copy(
+      passed = batch.passed && executions.forall(_.passed),
+      passCount = batch.passCount + executions.count(_.passed),
+      failCount = batch.failCount + executions.count(_.failed),
+      totalCount = batch.totalCount + executions.size)
+    dao.updateBatch(updatedBatch)
   }
 
   private case class AffectedEntities(batch: Batch, executions: Seq[EnrichedExecution], testIds: Seq[Id[Test]])

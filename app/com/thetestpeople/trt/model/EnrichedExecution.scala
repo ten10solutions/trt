@@ -33,6 +33,8 @@ case class EnrichedExecution(
 
   def passed: Boolean = execution.passed
 
+  def failed: Boolean = !passed
+  
   def configuration: Configuration = execution.configuration
 
 }

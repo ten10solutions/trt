@@ -470,6 +470,27 @@ abstract class DaoTest extends FlatSpec with Matchers with ExecutionDaoTest with
     batch.batch.durationOpt should equal(Some(DummyData.Duration))
   }
 
+  "Updating a batch" should "work" in transaction { dao ⇒
+    val batchId = dao.newBatch(F.batch(
+      durationOpt = None,
+      passed = false,
+      passCount = 0,
+      failCount = 0,
+      totalCount = 0))
+    val batch = dao.getBatch(batchId).get.batch
+    
+    val updatedBatch = batch.copy(
+      durationOpt = Some(DummyData.Duration),
+      passed = true,
+      passCount = 1,
+      failCount = 2,
+      totalCount = 3)
+    dao.updateBatch(updatedBatch)
+
+    val batchAgain = dao.getBatch(batchId).get.batch
+    batchAgain should equal (updatedBatch)
+  }
+
   "Adding and retrieving test categories" should "work" in transaction { dao ⇒
     val testId = dao.ensureTestIsRecorded(F.test())
     val category1 = F.testCategory(testId, "Category1", isUserCategory = true)

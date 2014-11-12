@@ -136,6 +136,8 @@ trait Dao extends ExecutionDao with CiDao {
 
   def setBatchDuration(batchId: Id[Batch], durationOpt: Option[Duration]): Boolean
 
+  def updateBatch(batch: Batch)
+  
   /**
    * Delete the given batches and any associated data (executions, Jenkins import records, etc).
    *

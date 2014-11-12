@@ -337,6 +337,9 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     batchId
   }
 
+  def updateBatch(batch: Batch) = 
+    batches.filter(_.id === batch.id).update(batch)
+  
   def setBatchDuration(batchId: Id[Batch], durationOpt: Option[Duration]): Boolean =
     batches.filter(_.id === batchId).map(_.duration).update(durationOpt) > 0
 

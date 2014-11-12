@@ -401,6 +401,10 @@ class MockDao extends Dao {
   def setBatchComment(id: Id[Batch], text: String) =
     batchComments = BatchComment(id, text) +: batchComments.filterNot(_.batchId == id)
 
+  def updateBatch(batch: Batch) {
+    batches = batches.filterNot(_.id == batch.id) :+ batch
+  }
+
   def deleteBatchComment(id: Id[Batch]) = batchComments = batchComments.filterNot(_.batchId == id)
 
   def setTestComment(id: Id[Test], text: String) =

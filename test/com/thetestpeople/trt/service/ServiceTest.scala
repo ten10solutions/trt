@@ -184,13 +184,34 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
       batchAndExecutions.batch.durationOpt should equal(None)
     }
 
-    service.completeExecution(batchId, Some(DummyData.Duration))
+    service.completeBatch(batchId, Some(DummyData.Duration))
 
     {
       val batchAndExecutions = service.getBatchAndExecutions(batchId).get
       batchAndExecutions.executions.size should equal(1)
       batchAndExecutions.batch.durationOpt should equal(Some(DummyData.Duration))
     }
+  }
+
+  "Batch counts and success status" should "change as executions are recorded" in {
+    
+    val service = setup().service
+    val batchId = service.addBatch(F.batch(complete = false, executions = Seq(F.execution(F.test(), passed = true))))
+
+    val batch1 = service.getBatchAndExecutions(batchId).get.batch
+    batch1.passed should be(true)
+    batch1.passCount should equal(1)
+    batch1.failCount should equal(0)
+    batch1.totalCount should equal(1)
+
+    service.addExecutionsToBatch(batchId, Seq(F.execution(F.test(), passed = false)))
+
+    val batch2 = service.getBatchAndExecutions(batchId).get.batch
+    batch2.passed should be(false)
+    batch2.passCount should equal(1)
+    batch2.failCount should equal(1)
+    batch2.totalCount should equal(2)
+
   }
 
   private def setup() = TestServiceFactory.setup()

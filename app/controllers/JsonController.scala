@@ -42,7 +42,7 @@ class JsonController(service: Service, adminService: AdminService) extends Contr
 
   def completeBatch(batchId: Id[Batch]) = Action(parse.json) { implicit request ⇒
     request.body.validate[Incoming.BatchCompleteMessage].map { batchCompleteMessage ⇒
-      val batchFound = service.completeExecution(batchId, batchCompleteMessage.durationOpt)
+      val batchFound = service.completeBatch(batchId, batchCompleteMessage.durationOpt)
       if (batchFound)
         Ok("Batch completed")
       else

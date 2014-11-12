@@ -94,7 +94,7 @@ class ServiceImpl(
   def addExecutionsToBatch(batchId: Id[Batch], executions: Seq[Incoming.Execution]): Boolean =
     batchRecorder.recordExecutions(batchId, executions)
 
-  def completeExecution(batchId: Id[Batch], durationOpt: Option[Duration]): Boolean = transaction {
+  def completeBatch(batchId: Id[Batch], durationOpt: Option[Duration]): Boolean = transaction {
     logger.info("sBatch completed: $batchId")
     dao.setBatchDuration(batchId, durationOpt)
   }
