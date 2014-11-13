@@ -9,5 +9,5 @@ class LetterDigitTokenizer(version: Version = Version.LUCENE_4_9, reader: Reader
   override def isTokenChar(c: Int) = Character.isLetterOrDigit(c)
 
   override def normalize(c: Int) = Character.toLowerCase(c)
-  
+
 }

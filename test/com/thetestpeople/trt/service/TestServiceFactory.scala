@@ -26,5 +26,5 @@ object TestServiceFactory {
 }
 
 case class ServiceBundle(service: Service, batchRecorder: BatchRecorder, ciImporter: CiImporter, analysisService: AnalysisService, dao: Dao) {
-  
+
 }

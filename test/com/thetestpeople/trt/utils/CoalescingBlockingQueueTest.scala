@@ -42,5 +42,5 @@ class CoalescingBlockingQueueTest extends FlatSpec with Matchers {
       items = items :+ queue.take()
     items
   }
-  
+
 }

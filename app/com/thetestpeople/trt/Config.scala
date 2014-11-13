@@ -49,7 +49,7 @@ object Config {
     final val IndexDirectory = "lucene.indexDirectory"
 
     final val InMemory = "lucene.inMemory"
-      
+
   }
 
   object Http {

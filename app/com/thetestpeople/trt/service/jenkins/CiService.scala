@@ -56,5 +56,5 @@ trait CiService {
   def getBuildImportStatuses(specId: Id[CiImportSpec]): Seq[CiBuildImportStatus]
 
   def getJobImportStatus(specId: Id[CiImportSpec]): Option[CiJobImportStatus]
-  
+
 }

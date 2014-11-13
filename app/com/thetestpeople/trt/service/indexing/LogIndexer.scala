@@ -11,7 +11,7 @@ trait LogIndexer {
   def searchExecutions(query: String, startingFrom: Int = 0, limit: Int = Integer.MAX_VALUE): SearchResult
 
   def deleteExecutions(ids: Seq[Id[Execution]])
-  
+
   def deleteAll()
 
 }

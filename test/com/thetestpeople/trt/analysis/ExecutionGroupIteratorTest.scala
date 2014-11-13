@@ -29,7 +29,7 @@ class ExecutionGroupIteratorTest extends FlatSpec with Matchers {
   }
 
   private def executionGroup(executions: ExecutionLite*): ExecutionGroup = ExecutionGroup(executions.toList)
-  
+
   private def executionGroupIterator(executions: ExecutionLite*): ExecutionGroupIterator =
     new ExecutionGroupIterator(executions.iterator)
 

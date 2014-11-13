@@ -11,5 +11,5 @@ case class FakeClock(private var _now: DateTime = new DateTime) extends Clock {
   def now_=(time: DateTime) = synchronized { _now = time }
 
   def +=(duration: Duration) = now += duration
-  
+
 }

@@ -4,7 +4,7 @@ import org.openqa.selenium.By._
 import com.thetestpeople.trt.webdriver.screens.RichSelenium._
 
 abstract class CommentDialog[Screen <: AbstractScreen](implicit automationContext: AutomationContext) extends AbstractComponent {
-  
+
   webDriver.waitForDisplayedAndEnabled(id("comment-dialog"))
 
   private def commentTextLocator = id("comment-text")
@@ -16,7 +16,7 @@ abstract class CommentDialog[Screen <: AbstractScreen](implicit automationContex
   }
 
   def returnScreen: Screen
-  
+
   def cancel(): TestScreen = {
     log("Click 'Cancel'")
     webDriver.waitForDisplayedAndEnabled(id("cancel-button")).click()

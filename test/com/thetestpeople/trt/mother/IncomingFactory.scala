@@ -11,7 +11,7 @@ import java.net.URI
 
 object IncomingFactory {
 
-  def test(qualifiedName: QualifiedName): Incoming.Test = 
+  def test(qualifiedName: QualifiedName): Incoming.Test =
     Incoming.Test(qualifiedName.name, qualifiedName.groupOpt)
 
   def test(

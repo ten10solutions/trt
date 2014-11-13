@@ -9,7 +9,7 @@ object BallIcons {
   def icon(status: TestStatus) = status match {
     case TestStatus.Healthy ⇒ BallIcons.PassBall
     case TestStatus.Warning ⇒ BallIcons.WarnBall
-    case TestStatus.Broken ⇒ BallIcons.FailBall
+    case TestStatus.Broken  ⇒ BallIcons.FailBall
   }
 
   val PassBall = "balls/green.png"

@@ -20,7 +20,7 @@ class TestCountsBuilder(sampleTimesByConfig: Map[Configuration, Seq[DateTime]]) 
     status match {
       case TestStatus.Healthy ⇒ mutableCounts.passes += 1
       case TestStatus.Warning ⇒ mutableCounts.warnings += 1
-      case TestStatus.Broken ⇒ mutableCounts.failures += 1
+      case TestStatus.Broken  ⇒ mutableCounts.failures += 1
     }
   }
 

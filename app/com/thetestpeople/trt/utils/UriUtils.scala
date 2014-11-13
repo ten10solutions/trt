@@ -11,7 +11,7 @@ object UriUtils {
     def /(s: String): URI = new URI(uri.toString + "/" + s).normalize
 
     def ?(s: String): URI = new URI(uri.toString + "?" + s)
-    
+
   }
 
   @throws[URISyntaxException]

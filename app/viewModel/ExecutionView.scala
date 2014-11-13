@@ -5,9 +5,9 @@ import com.thetestpeople.trt.model._
 import com.thetestpeople.trt.service.ExecutionAndFragment
 
 object ExecutionView {
-  
+
   def fromExecutionAndFragment(execution: ExecutionAndFragment) = ExecutionView(execution.execution, Some(execution.fragment))
-  
+
 }
 
 case class ExecutionView(execution: EnrichedExecution, fragmentOpt: Option[String] = None) extends AbstractExecutionView(execution.execution) with HasTestName {
@@ -29,7 +29,7 @@ case class ExecutionView(execution: EnrichedExecution, fragmentOpt: Option[Strin
   def logOpt = execution.logOpt
 
   def commentOpt = execution.commentOpt
-  
+
   def configuration: Configuration = execution.configuration
-  
+
 }

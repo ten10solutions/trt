@@ -14,7 +14,7 @@ object Utils extends HasLogger {
 
     }
   }
-  
+
   def ordinalName(n: Int): String = n match {
     case 11 | 12 | 13 ⇒ n + "th"
     case _ ⇒ (n % 10) match {

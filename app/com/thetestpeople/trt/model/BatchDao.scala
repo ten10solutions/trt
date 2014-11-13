@@ -42,7 +42,6 @@ trait BatchDao {
 
 }
 
-
 /**
  * @param remainingTestIds -- ids of tests that had executions in the deleted batch, but weren't themselves deleted
  */

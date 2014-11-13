@@ -88,5 +88,5 @@ class BatchScreen(implicit automationContext: AutomationContext) extends Abstrac
     webDriver.waitForDisplayedAndEnabled(id("edit-comment-link")).click()
     new CommentDialog[BatchScreen]() { def returnScreen = new BatchScreen }
   }
-  
-}   
+
+}

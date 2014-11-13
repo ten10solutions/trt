@@ -13,5 +13,5 @@ trait ExecutionAnalyser[T] {
       executionGroup(group)
     finalise()
   }
-  
+
 }

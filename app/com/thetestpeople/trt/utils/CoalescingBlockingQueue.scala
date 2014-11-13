@@ -33,7 +33,7 @@ class CoalescingBlockingQueue[T] {
   def isEmpty = set.size == 0
 
   def nonEmpty = set.size != 0
-  
+
   override def toString = synchronized {
     val itemList = queue.asScala.mkString(", ")
     s"CoalescingBlockingQueue($itemList)"

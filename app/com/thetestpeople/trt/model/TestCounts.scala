@@ -7,8 +7,8 @@ case class TestCounts(passed: Int = 0, warning: Int = 0, failed: Int = 0) {
   def countFor(testStatusOpt: Option[TestStatus]): Int = testStatusOpt match {
     case Some(TestStatus.Healthy) ⇒ passed
     case Some(TestStatus.Warning) ⇒ warning
-    case Some(TestStatus.Broken) ⇒ failed
-    case None                  ⇒ total
+    case Some(TestStatus.Broken)  ⇒ failed
+    case None                     ⇒ total
   }
 
 }

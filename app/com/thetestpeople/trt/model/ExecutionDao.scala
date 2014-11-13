@@ -9,7 +9,7 @@ trait ExecutionDao {
    * Iterate over all executions. Results are sorted by configuration, testId and executionTime.
    *
    * Executions of deleted tests are excluded.
-   * 
+   *
    * Once this method is complete, it will close any resources used.
    *
    * @param a function to process the executions
@@ -38,10 +38,10 @@ trait ExecutionDao {
    * @return executions matching given ids. No execution logs will be included.
    */
   def getEnrichedExecutions(ids: Seq[Id[Execution]]): Seq[EnrichedExecution]
-  
+
   /**
    * @param configurationOpt -- if defined, filter executions to those against the given configuration
-   * @param resultOpt -- if Some(true), only return passing executions; if Some(false), failing executions; else either 
+   * @param resultOpt -- if Some(true), only return passing executions; if Some(false), failing executions; else either
    * @return executions, ordered most recent first, then by test group, then by test name. No execution logs will be provided.
    */
   def getEnrichedExecutions(configurationOpt: Option[Configuration] = None, resultOpt: Option[Boolean] = None, startingFrom: Int = 0, limit: Int = Integer.MAX_VALUE): Seq[EnrichedExecution]
@@ -61,7 +61,7 @@ trait ExecutionDao {
 
   /**
    * @param configurationOpt -- if defined, only count executions against the given configuration.
-    * @param resultOpt -- if Some(true), only return passing executions; if Some(false), failing executions; else either 
+   * @param resultOpt -- if Some(true), only return passing executions; if Some(false), failing executions; else either
    * @return count of the executions recorded
    */
   def countExecutions(configurationOpt: Option[Configuration] = None, resultOpt: Option[Boolean] = None): Int
@@ -76,7 +76,7 @@ trait ExecutionDao {
   def newExecution(execution: Execution, logOpt: Option[String] = None): Id[Execution]
 
   def setExecutionComment(id: Id[Execution], text: String)
-  
+
   def deleteExecutionComment(id: Id[Execution])
-  
+
 }

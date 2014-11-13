@@ -18,7 +18,7 @@ case class CiBuildImportInfo(
 
   def updatedAt = TimeDescription(updatedAtTime)
 
-  def buildDescription = buildNumberOpt.map(n => "#" + n) orElse buildNameOpt getOrElse ("")
+  def buildDescription = buildNumberOpt.map(n ⇒ "#" + n) orElse buildNameOpt getOrElse ("")
 
 }
 

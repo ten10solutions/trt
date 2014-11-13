@@ -76,7 +76,7 @@ class CiImportStatusManagerTest extends FlatSpec with Matchers {
     val Seq(buildStatus3) = statusManager.getBuildImportStatuses(specId)
     buildStatus3.updatedAt should equal(clock.now)
     val BuildImportState.Complete(Some(batchIdAgain)) = buildStatus3.state
-    batchIdAgain should equal(batchId) 
+    batchIdAgain should equal(batchId)
   }
 
 }

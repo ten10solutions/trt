@@ -19,9 +19,9 @@ import org.openqa.selenium.firefox.FirefoxDriver
 abstract class AbstractBrowserTest extends FlatSpec with Matchers {
 
   private val port = 9001
- 
+
   private val siteUrl = new URI("http://localhost:" + port)
-  
+
   private val retainBrowser: Boolean = Option(System.getenv("TRT_RETAIN_BROWSER")).exists(_.toBoolean)
 
   protected def automate(testBlock: Site ⇒ Any) =

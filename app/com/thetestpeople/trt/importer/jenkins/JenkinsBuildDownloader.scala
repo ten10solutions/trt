@@ -90,7 +90,7 @@ class JenkinsBuildDownloader(
   def getJenkinsBuild(buildUrl: URI, jobUrl: URI): Option[JenkinsBuild] = {
     val buildXml = getBuildXml(buildUrl)
     val buildSummary = parseBuild(buildUrl, buildXml)
-    
+
     // Note: it's not sufficient to check buildSummary.hasTestReport, as you can have a partial test report while building, 
     // e.g. a multimodule Maven project.
     if (buildSummary.hasTestReport && !buildSummary.isBuilding) {

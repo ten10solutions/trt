@@ -12,7 +12,7 @@ case class HistoricalTestCountsTimeline(configuration: Configuration, counts: Se
   def earliestTime: DateTime = counts.head.when
 
   def latestTime: DateTime = counts.last.when
-  
+
   def interval = new Interval(earliestTime, latestTime)
-  
+
 }

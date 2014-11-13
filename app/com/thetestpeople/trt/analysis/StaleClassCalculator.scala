@@ -16,7 +16,7 @@ object StaleTestCalculator {
 
 /**
  * @param deviationsThreshold -- how many standard deviations (or equivalent) we need to be before the median execution time to classify a test as stale
- * @param absoluteThreshold -- how much earlier than the median execution time we need to be (in absolute duration) to classify a test as stale 
+ * @param absoluteThreshold -- how much earlier than the median execution time we need to be (in absolute duration) to classify a test as stale
  */
 class StaleTestCalculator(deviationsThreshold: Int = 3, absoluteThreshold: Duration = 48.hours) {
 

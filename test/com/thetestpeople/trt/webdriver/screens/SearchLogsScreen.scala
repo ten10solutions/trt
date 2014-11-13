@@ -48,7 +48,7 @@ class SearchLogsScreen(implicit automationContext: AutomationContext) extends Ab
     private def ordinal = Utils.ordinalName(index + 1)
 
     def fragmentText: String = fragmentElement.getText
-    
+
   }
 
 }

@@ -17,7 +17,7 @@ class AdminServiceImpl(daoAdmin: DaoAdmin, dao: Dao, logIndexer: LogIndexer, ana
   }
 
   def analyseAll() {
-    analysisService.scheduleAnalysis(dao.transaction { dao.getTestIds() } )
+    analysisService.scheduleAnalysis(dao.transaction { dao.getTestIds() })
   }
-  
+
 }

@@ -67,5 +67,5 @@ class TeamCityXmlParserTest extends FlatSpec with Matchers {
   }
 
   private def getXml(filename: String): Elem = TestUtils.loadXmlFromClasspath("/teamcity/" + filename)
-  
+
 }

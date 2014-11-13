@@ -22,7 +22,7 @@ class ReportsMenu(implicit automationContext: AutomationContext) extends Abstrac
     webDriver.waitForDisplayedAndEnabled(id("deleted-tests")).click()
     new DeletedTestsScreen
   }
-  
+
 }
 
 class TestsMenu(implicit automationContext: AutomationContext) extends AbstractComponent {

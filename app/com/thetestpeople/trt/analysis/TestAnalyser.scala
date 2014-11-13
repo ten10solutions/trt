@@ -57,9 +57,9 @@ class TestAnalyser(clock: Clock, config: AnalysisConfiguration) {
 
   private def medianDuration(executions: Seq[Execution]): Option[Duration] = {
     val durations = executions.flatMap(_.durationOpt).map(_.getMillis.toDouble)
-    StatsUtils.median(durations).map(m => Duration.millis(m.longValue))
+    StatsUtils.median(durations).map(m ⇒ Duration.millis(m.longValue))
   }
-  
+
   private def calculateWeather(sortedExecutions: Seq[Execution]): Double = {
     val recentExecutions = sortedExecutions.take(10)
     recentExecutions.count(_.passed).toDouble / recentExecutions.size

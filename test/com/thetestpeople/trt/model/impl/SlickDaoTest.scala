@@ -52,5 +52,5 @@ class SlickDaoTest extends DaoTest {
     dataSource.setPassword(password)
     (dataSource, url)
   }
-  
+
 }

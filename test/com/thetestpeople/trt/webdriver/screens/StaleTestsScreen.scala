@@ -14,8 +14,8 @@ class StaleTestsScreen(implicit automationContext: AutomationContext) extends Ab
 
   case class TestRow(rowElement: WebElement, index: Int) {
 
-    def name: String = rowElement.findElement(By.cssSelector(".test-link")).getText  
-      
+    def name: String = rowElement.findElement(By.cssSelector(".test-link")).getText
+
     def clickLastPassedLink(): ExecutionScreen = {
       log(s"Click 'Last executed' link for the ${index + 1}th row")
       rowElement.findElement(By.cssSelector("a.last-executed-link")).click()

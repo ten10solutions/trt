@@ -26,7 +26,7 @@ trait CiDao {
   def getCiBuildUrls(): Seq[URI]
 
   def getCiJobs(): Seq[CiJob]
-  
+
   def getCiBuilds(specId: Id[CiImportSpec]): Seq[CiBuild]
 
   def newCiImportSpec(spec: CiImportSpec): Id[CiImportSpec]

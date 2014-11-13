@@ -62,6 +62,6 @@ class JenkinsImportTest extends FlatSpec with ShouldMatchers {
 
   }
 
-  private def setup(http: Http = AlwaysFailingHttp, clock: Clock = FakeClock()) = 
+  private def setup(http: Http = AlwaysFailingHttp, clock: Clock = FakeClock()) =
     TestServiceFactory.setup(http = http, clock = clock)
 }

@@ -29,12 +29,12 @@ class BatchScreenBrowserTest extends AbstractBrowserTest {
       batchScreen.nameOpt should equal(batch.nameOpt)
       batchScreen.urlOpt should equal(batch.urlOpt.map(_.toString))
       batchScreen.hasBatchLog should be(true)
-    
+
       val List(executionRow) = batchScreen.executionRows
-      executionRow.passed should be (true)
+      executionRow.passed should be(true)
       executionRow.name should equal(test.name)
       executionRow.groupOpt should equal(test.groupOpt)
-    
+
       val batchLogScreen = batchScreen.clickBatchLog()
       batchLogScreen.log should equal(DummyData.Log)
     }

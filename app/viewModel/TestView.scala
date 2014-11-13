@@ -6,9 +6,9 @@ import org.joda.time.LocalDate
 import com.thetestpeople.trt.utils.DateUtils
 
 case class WeatherInfo(weather: Double) {
-  
+
   def iconPath: String = WeatherIcons.weatherIcon(weather)
-  
+
   def passRate: String = "Pass rate: " + (weather * 100).toInt + "%"
 }
 

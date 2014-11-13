@@ -2,7 +2,6 @@ package com.thetestpeople.trt.jenkins.trigger
 
 import com.thetestpeople.trt.utils.http.HttpResponse
 
-
 object CommonHttpResponses {
 
   def badCredentialsResponse() = HttpResponse(

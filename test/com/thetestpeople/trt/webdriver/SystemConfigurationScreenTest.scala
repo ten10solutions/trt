@@ -33,9 +33,9 @@ class SystemConfigurationScreenTest extends AbstractBrowserTest {
       systemConfigScreen.brokenCountThreshold = "-1"
       systemConfigScreen.clickUpdate()
       systemConfigScreen.waitForValidationError()
-      
-      systemConfigScreen.errorsForBrokenCountThreshold should be ('defined)
-      systemConfigScreen.errorsForBrokenDurationThreshold should be ('defined)
+
+      systemConfigScreen.errorsForBrokenCountThreshold should be('defined)
+      systemConfigScreen.errorsForBrokenDurationThreshold should be('defined)
     }
   }
 

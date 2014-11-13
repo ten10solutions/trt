@@ -1,9 +1,6 @@
 package com.thetestpeople.trt.model
 
-import java.net.URI
-import com.thetestpeople.trt.model.jenkins._
-import org.joda.time.Duration
-
+import com.thetestpeople.trt.model.jenkins.CiDao
 
 trait Dao extends ExecutionDao with CiDao with BatchDao with TestDao {
 
@@ -26,7 +23,7 @@ trait Dao extends ExecutionDao with CiDao with BatchDao with TestDao {
   def getCategories(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[TestCategory]]
 
   def getCategories(testId: Id[Test]): Seq[TestCategory] = getCategories(Seq(testId)).getOrElse(testId, Seq())
-  
+
   def addCategories(categories: Seq[TestCategory])
 
   def removeCategories(testId: Id[Test], categories: Seq[String])

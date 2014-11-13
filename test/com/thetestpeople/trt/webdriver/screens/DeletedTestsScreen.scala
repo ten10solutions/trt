@@ -14,8 +14,8 @@ class DeletedTestsScreen(implicit automationContext: AutomationContext) extends 
 
   case class TestRow(rowElement: WebElement, index: Int) {
 
-    def name: String = rowElement.findElement(By.cssSelector(".test-link")).getText  
-      
+    def name: String = rowElement.findElement(By.cssSelector(".test-link")).getText
+
   }
 
 }

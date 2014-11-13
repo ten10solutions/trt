@@ -29,7 +29,6 @@ object RichSelenium {
     def findElements_(locator: By): List[WebElement] =
       element.findElements(locator).asScala.toList
 
-
   }
 
   implicit class RichWebDriver(webDriver: WebDriver) {

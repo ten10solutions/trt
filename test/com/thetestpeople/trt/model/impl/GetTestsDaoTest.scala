@@ -305,7 +305,6 @@ trait GetTestsDaoTest { self: DaoTest ⇒
     testCounts should equal(TestCounts(passed = 0, warning = 0, failed = 0))
   }
 
-  
   "getEnrichedTest" should "not bring anything back if no test with that id" in transaction { dao ⇒
     val Some(bogusId) = Id.parse[Test]("123")
 

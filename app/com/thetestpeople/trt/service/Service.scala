@@ -17,7 +17,6 @@ case class TestAndExecutions(
   otherConfigurations: Seq[Configuration],
   categories: Seq[String] = Seq())
 
-
 case class ExecutionsAndTotalCount(executions: Seq[EnrichedExecution], total: Int)
 
 /**
@@ -96,7 +95,7 @@ trait Service extends CiService {
   def getGroups(pattern: String): Seq[String]
 
   def getCategoryNames(pattern: String): Seq[String]
-  
+
   def searchLogs(query: String, startingFrom: Int = 0, limit: Int = Integer.MAX_VALUE): (Seq[ExecutionAndFragment], Int)
 
   def getExecutionVolume(configurationOpt: Option[Configuration]): Option[ExecutionVolume]

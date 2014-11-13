@@ -21,7 +21,7 @@ class AnalysisService(dao: Dao, clock: Clock, async: Boolean = true) extends Has
 
   private var historicalTestCountsByConfig: Map[Configuration, HistoricalTestCountsTimeline] = Map()
   private var executionVolumeAnalysisResultOpt: Option[ExecutionVolumeAnalysisResult] = None
-  
+
   /**
    * Queue of tests which need their analysis updating
    */

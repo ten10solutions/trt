@@ -11,7 +11,7 @@ class Site(automationContext: AutomationContext, startUrl: URI) {
     automationContext.webDriver.navigate().to(startUrl.toURL)
     new TestsScreen()(automationContext)
   }
-  
+
   def restApi = new RestApi(startUrl)
 
 }

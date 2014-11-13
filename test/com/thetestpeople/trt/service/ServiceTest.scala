@@ -194,7 +194,7 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
   }
 
   "Batch counts and success status" should "change as executions are recorded" in {
-    
+
     val service = setup().service
     val batchId = service.addBatch(F.batch(complete = false, executions = Seq(F.execution(F.test(), passed = true))))
 

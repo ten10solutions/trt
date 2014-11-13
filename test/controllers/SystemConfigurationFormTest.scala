@@ -17,8 +17,8 @@ class SystemConfigurationFormTest extends FlatSpec with ShouldMatchers {
   "System configuration" should "not allow negative values" in {
     val config = SystemConfiguration(failureCountThreshold = -1)
     val Seq(error) = SystemConfigurationForm.form.fillAndValidate(config).errors
-    error.key should equal ("brokenCountThreshold")
-    error.message should include ("negative")
+    error.key should equal("brokenCountThreshold")
+    error.message should include("negative")
   }
 
 }

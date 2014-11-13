@@ -22,7 +22,7 @@ class JenkinsTestResultXmlParser {
 
   @throws[ParseException]
   def parseTestResult(root: Elem): TestResult = {
-    if (root.label == "matrixTestResult" )
+    if (root.label == "matrixTestResult")
       MatrixTestResult(getChildReportUrls(root))
     else if (root.label == "surefireAggregatedReport")
       AggregatedTestResult(getChildReportUrls(root))
