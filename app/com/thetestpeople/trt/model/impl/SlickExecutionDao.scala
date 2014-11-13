@@ -164,4 +164,14 @@ trait SlickExecutionDao extends ExecutionDao { this: SlickDao ⇒
 
   def deleteExecutionComment(id: Id[Execution]) = executionComments.filter(_.executionId === id).delete
 
+  private lazy val executionInserter = (executions returning executions.map(_.id)).insertInvoker
+  private lazy val executionLogInserter = executionLogs.insertInvoker
+
+  def newExecution(execution: Execution, logOpt: Option[String]): Id[Execution] = Cache.invalidate(configurationsCache, executionCountCache) {
+    val executionId = executionInserter.insert(execution)
+    for (log ← logOpt)
+      executionLogInserter.insert(ExecutionLogRow(executionId, removeNullChars(log)))
+    executionId
+  }
+
 }

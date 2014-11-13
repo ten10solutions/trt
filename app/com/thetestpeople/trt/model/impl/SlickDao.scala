@@ -13,8 +13,15 @@ import java.net.URI
 import scala.slick.util.CloseableIterator
 import scala.slick.driver.H2Driver
 
-class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extends Dao
-    with DaoAdmin with HasLogger with SlickCiDao with SlickExecutionDao with Mappings {
+class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None)
+    extends Dao
+    with DaoAdmin
+    with HasLogger
+    with Mappings
+    with SlickCiDao
+    with SlickExecutionDao
+    with SlickTestDao
+    with SlickBatchDao {
 
   protected val driver = DriverLookup(jdbcUrl)
 
@@ -48,8 +55,8 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
     val ciJobs = TableQuery[CiJobMapping]
     val ciBuilds = TableQuery[CiBuildMapping]
     val ciImportSpecs = TableQuery[CiImportSpecMapping]
-    val jenkinsConfiguration = TableQuery[JenkinsConfigurationMapping]
     val teamCityConfiguration = TableQuery[TeamCityConfigurationMapping]
+    val jenkinsConfiguration = TableQuery[JenkinsConfigurationMapping]
     val jenkinsJobParams = TableQuery[JenkinsJobParamMapping]
 
   }
@@ -90,7 +97,28 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
       analyses.delete
     }
 
-    // Batch delete executions:
+    deleteAllExecutions()
+
+    transaction {
+      batches.delete
+      tests.delete
+      jenkinsConfiguration.delete
+      teamCityConfiguration.delete
+      systemConfiguration.delete
+      initialiseConfiguration()
+    }
+
+    logger.info("Deleted all data")
+  }
+
+  private def initialiseConfiguration() {
+    systemConfiguration.insert(SystemConfiguration())
+    jenkinsConfiguration.insert(JenkinsConfiguration())
+    teamCityConfiguration.insert(TeamCityConfiguration())
+  }
+
+  // Delete executions in batches to avoid performance issues on larger data sets
+  private def deleteAllExecutions() {
     var continue = true
     while (continue) {
       transaction {
@@ -102,337 +130,14 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
           executions.filter(_.id inSet ids).delete
         }
       }
-      logger.debug("Deleted 5000")
-    }
-
-    transaction {
-      batches.delete
-      tests.delete
-      jenkinsConfiguration.delete
-      teamCityConfiguration.delete
-      systemConfiguration.delete
-      systemConfiguration.insert(SystemConfiguration())
-
-      jenkinsConfiguration.insert(JenkinsConfiguration())
-      teamCityConfiguration.insert(TeamCityConfiguration())
-    }
-
-    logger.info("Deleted all data")
-  }
-
-  private val testsAndAnalyses =
-    for ((test, analysis) ← tests leftJoin analyses on (_.id === _.testId))
-      yield (test, analysis)
-
-  def getEnrichedTest(id: Id[Test], configuration: Configuration): Option[EnrichedTest] = {
-    val query =
-      for {
-        ((test, analysis), comment) ← testsAndAnalyses leftJoin testComments on (_._1.id === _.testId)
-        if test.id === id
-        if analysis.configuration === configuration
-      } yield (test, analysis.?, comment.?)
-    query.firstOption.map { case (test, analysisOpt, commentOpt) ⇒ EnrichedTest(test, analysisOpt, commentOpt.map(_.text)) }
-  }
-
-  def getTestIds(): Seq[Id[Test]] =
-    tests.map(_.id).run
-
-  def getTestNames(pattern: String): Seq[String] =
-    tests
-      .filter(_.name.toLowerCase like globToSqlPattern(pattern))
-      .groupBy(_.name).map(_._1).run
-
-  def getGroups(pattern: String): Seq[String] =
-    tests
-      .filter(_.group.isDefined)
-      .filter(_.group.toLowerCase like globToSqlPattern(pattern))
-      .groupBy(_.group).map(_._1).run.flatten
-
-  def getCategoryNames(pattern: String): Seq[String] =
-    testCategories
-      .filter(_.category.toLowerCase like globToSqlPattern(pattern))
-      .groupBy(_.category).map(_._1).run
-
-  private def globToSqlPattern(pattern: String) = pattern.replace("*", "%").toLowerCase
-
-  private type TestAnalysisQuery = Query[(TestMapping, AnalysisMapping), (Test, Analysis), Seq]
-
-  def getAnalysedTests(
-    configuration: Configuration,
-    testStatusOpt: Option[TestStatus] = None,
-    nameOpt: Option[String] = None,
-    groupOpt: Option[String] = None,
-    categoryOpt: Option[String] = None,
-    startingFrom: Int = 0,
-    limitOpt: Option[Int] = None,
-    sortBy: SortBy.Test = SortBy.Test.Group()): Seq[EnrichedTest] = {
-    var query: TestAnalysisQuery = testsAndAnalyses
-    query = query.filter(_._2.configuration === configuration)
-    query = query.filterNot(_._1.deleted)
-    for (name ← nameOpt)
-      query = query.filter(_._1.name.toLowerCase like globToSqlPattern(name))
-    for (group ← groupOpt)
-      query = query.filter(_._1.group.toLowerCase like globToSqlPattern(group))
-    for (category ← categoryOpt)
-      query = for {
-        (test, analysis) ← query
-        testCategory ← testCategories
-        if test.id === testCategory.testId
-        if testCategory.category === category
-      } yield (test, analysis)
-    for (status ← testStatusOpt)
-      query = query.filter(_._2.status === status)
-    query = sortQuery(query, sortBy)
-    query = query.drop(startingFrom)
-    for (limit ← limitOpt)
-      query = query.take(limit)
-    query.map { case (test, analysis) ⇒ (test, analysis.?) }.run.map { case (test, analysisOpt) ⇒ EnrichedTest(test, analysisOpt, commentOpt = None) }
-  }
-
-  private def sortQuery(query: TestAnalysisQuery, sortBy: SortBy.Test): TestAnalysisQuery =
-    sortBy match {
-      case SortBy.Test.Weather(descending) ⇒
-        query.sortBy { case (test, analysis) ⇒ order(analysis.weather, descending) }
-      case SortBy.Test.Group(descending) ⇒
-        query.sortBy { case (test, analysis) ⇒ order(test.name, descending) }
-          .sortBy { case (test, analysis) ⇒ order(test.group, descending) }
-      case SortBy.Test.Name(descending) ⇒
-        query.sortBy { case (test, analysis) ⇒ order(test.name, descending) }
-      case SortBy.Test.Duration(descending) ⇒
-        query.sortBy { case (test, analysis) ⇒ order(analysis.medianDuration, descending) }
-      case SortBy.Test.ConsecutiveFailures(descending) ⇒
-        query.sortBy { case (test, analysis) ⇒ order(analysis.consecutiveFailures, descending) }
-      case SortBy.Test.StartedFailing(descending) ⇒
-        query.sortBy { case (test, analysis) ⇒ order(analysis.failingSince, descending) }
-      case SortBy.Test.LastPassed(descending) ⇒
-        query.sortBy { case (test, analysis) ⇒ order(analysis.lastPassedTime, descending) }
-      case SortBy.Test.LastFailed(descending) ⇒
-        query.sortBy { case (test, analysis) ⇒ order(analysis.lastFailedTime, descending) }
-    }
-
-  private def order[T](column: Column[T], descending: Boolean) =
-    if (descending) column.desc else column.asc
-
-  def getTestsById(testIds: Seq[Id[Test]]): Seq[Test] = tests.filter(_.id inSet testIds).run
-
-  def getDeletedTests(): Seq[Test] = tests.filter(_.deleted).sortBy(_.name).sortBy(_.group).run
-
-  def getTestCounts(configuration: Configuration, nameOpt: Option[String] = None, groupOpt: Option[String] = None, categoryOpt: Option[String] = None): TestCounts = {
-    var query = testsAndAnalyses
-    query = query.filter(_._2.configuration === configuration)
-    query = query.filterNot(_._1.deleted)
-    for (name ← nameOpt)
-      query = query.filter(_._1.name.toLowerCase like globToSqlPattern(name))
-    for (group ← groupOpt)
-      query = query.filter(_._1.group.toLowerCase like globToSqlPattern(group))
-    for (category ← categoryOpt)
-      query = for {
-        (test, analysis) ← query
-        testCategory ← testCategories
-        if test.id === testCategory.testId
-        if testCategory.category === category
-      } yield (test, analysis)
-    // Workaround for Slick exception if no analysis: "scala.slick.SlickException: Read NULL value for ResultSet column":
-    query = query.filter(_._2.testId.?.isDefined)
-    val results: Map[TestStatus, Int] =
-      query.groupBy(_._2.status).map { case (status, results) ⇒ status -> results.length }.run.toMap
-    def count(status: TestStatus) = results.collect { case (`status`, count) ⇒ count }.headOption.getOrElse(0)
-    TestCounts(passed = count(TestStatus.Healthy), warning = count(TestStatus.Warning), failed = count(TestStatus.Broken))
-  }
-
-  def getTestCountsByConfiguration(): Map[Configuration, TestCounts] = {
-    val baseQuery =
-      for {
-        test ← tests
-        analysis ← analyses
-        if analysis.testId === test.id
-        if !test.deleted
-      } yield (test, analysis)
-    case class CountRecord(configuration: Configuration, status: TestStatus, count: Int)
-    val countRecords: Seq[CountRecord] =
-      baseQuery.groupBy {
-        case (test, analysis) ⇒ (analysis.configuration, analysis.status)
-      }.map {
-        case ((configuration, status), results) ⇒ (configuration, status, results.length)
-      }.run.map(CountRecord.tupled)
-    def testCounts(countRecords: Seq[CountRecord]): TestCounts = {
-      def count(status: TestStatus) = countRecords.find(_.status == status).map(_.count).getOrElse(0)
-      TestCounts(
-        passed = count(TestStatus.Healthy),
-        warning = count(TestStatus.Warning),
-        failed = count(TestStatus.Broken))
-    }
-    countRecords.groupBy(_.configuration).map {
-      case (configuration, countRecords) ⇒ configuration -> testCounts(countRecords)
     }
   }
-
-  private def getTestWithName(name: Column[String]) =
-    for {
-      (test, analysis) ← testsAndAnalyses
-      if test.name === name
-    } yield (test, analysis.?)
-
-  private val getTestWithGroupCompiled = {
-    def getTestWithNameAndGroup(name: Column[String], group: Column[String]) =
-      getTestWithName(name).filter(_._1.group === group)
-    Compiled(getTestWithNameAndGroup _)
-  }
-
-  private val getTestWithoutGroupCompiled = {
-    def getTestWithNameAndNoGroup(name: Column[String]) =
-      getTestWithName(name).filter(_._1.group.isEmpty)
-    Compiled(getTestWithNameAndNoGroup _)
-  }
-
-  private def getEnrichedTest(qualifiedName: QualifiedName): Option[EnrichedTest] = {
-    val QualifiedName(name, groupOpt) = qualifiedName
-    val query = groupOpt match {
-      case Some(group) ⇒ getTestWithGroupCompiled(name, group)
-      case None        ⇒ getTestWithoutGroupCompiled(name)
-    }
-    query.firstOption.map { case (test, analysisOpt) ⇒ EnrichedTest(test, analysisOpt, commentOpt = None) }
-  }
-
-  def getBatch(id: Id[Batch]): Option[EnrichedBatch] = {
-    val join = batches
-      .leftJoin(batchLogs).on(_.id === _.batchId)
-      .leftJoin(ciBuilds).on(_._1.id === _.batchId)
-      .leftJoin(batchComments).on(_._1._1.id === _.batchId)
-    val query =
-      for {
-        (((batch, log), ciBuild), comment) ← join
-        if batch.id === id
-      } yield (batch, log.?, ciBuild.?, comment.?)
-    query.firstOption.map {
-      case (batch, logRowOpt, ciBuildOpt, commentOpt) ⇒
-        EnrichedBatch(batch,
-          logOpt = logRowOpt.map(_.log),
-          importSpecIdOpt = ciBuildOpt.flatMap(_.importSpecIdOpt),
-          commentOpt = commentOpt.map(_.text))
-    }
-  }
-
-  def getBatches(jobOpt: Option[Id[CiJob]] = None, configurationOpt: Option[Configuration] = None, resultOpt: Option[Boolean]): Seq[Batch] = {
-    var query =
-      jobOpt match {
-        case Some(jobId) ⇒
-          for {
-            batch ← batches
-            ciBuild ← ciBuilds
-            if ciBuild.batchId === batch.id
-            if ciBuild.jobId === jobId
-          } yield batch
-        case None ⇒
-          batches
-      }
-    for (configuration ← configurationOpt)
-      query = query.filter(_.configuration === configuration)
-    for (result ← resultOpt)
-      query = query.filter(_.passed === result)
-    query.sortBy(_.executionTime.desc).run
-  }
-
-  def newBatch(batch: Batch, logOpt: Option[String]): Id[Batch] = {
-    val batchId = (batches returning batches.map(_.id)).insert(batch)
-    for (log ← logOpt)
-      batchLogs.insert(BatchLogRow(batchId, removeNullChars(log)))
-    batchId
-  }
-
-  def updateBatch(batch: Batch) =
-    batches.filter(_.id === batch.id).update(batch)
-
-  def setBatchDuration(batchId: Id[Batch], durationOpt: Option[Duration]): Boolean =
-    batches.filter(_.id === batchId).map(_.duration).update(durationOpt) > 0
 
   /**
-   *  Postgres throws an error on null chars:
+   *  Strip out null chars, since Postgres throws an error:
    *    "ERROR: invalid byte sequence for encoding "UTF8": 0x00"
    */
-  private def removeNullChars(s: String) = s.filterNot(_ == '\u0000')
-
-  private def deleteTestsWithoutExecutions(testIds: Seq[Id[Test]]): Seq[Id[Test]] = {
-    val testsWithoutExecutionsQuery =
-      for {
-        (test, execution) ← tests leftJoin executions on (_.id === _.testId)
-        if test.id inSet testIds
-        if execution.id.?.isEmpty
-      } yield test.id
-
-    val testIdsToDelete = testsWithoutExecutionsQuery.run
-    testCategories.filter(_.testId inSet testIdsToDelete).delete
-    testComments.filter(_.testId inSet testIdsToDelete).delete
-    tests.filter(_.id inSet testIdsToDelete).delete
-    testIdsToDelete
-  }
-
-  def deleteBatches(batchIds: Seq[Id[Batch]]): DeleteBatchResult =
-    Cache.invalidate(configurationsCache, executionCountCache) {
-      val (executionIds, testIds) = executions.filter(_.batchId inSet batchIds).map(e ⇒ (e.id, e.testId)).run.unzip
-      ciBuilds.filter(_.batchId inSet batchIds).delete
-      analyses.filter(_.testId inSet testIds).delete
-      executionLogs.filter(_.executionId inSet executionIds).delete
-      executionComments.filter(_.executionId inSet executionIds).delete
-      executions.filter(_.id inSet executionIds).delete
-      batchLogs.filter(_.batchId inSet batchIds).delete
-      batchComments.filter(_.batchId inSet batchIds).delete
-      batches.filter(_.id inSet batchIds).delete
-      val deletedTestIds = deleteTestsWithoutExecutions(testIds).toSet
-      val remainingTestIds = testIds.filterNot(deletedTestIds.contains)
-      DeleteBatchResult(remainingTestIds, executionIds)
-    }
-
-  private val testInserter = (tests returning tests.map(_.id)).insertInvoker
-
-  def ensureTestIsRecorded(test: Test): Id[Test] = synchronized {
-    getEnrichedTest(test.qualifiedName) match {
-      case Some(testAndAnalysis) ⇒
-        testAndAnalysis.id
-      case None ⇒
-        testInserter.insert(test)
-    }
-  }
-
-  def markTestsAsDeleted(ids: Seq[Id[Test]], deleted: Boolean = true) =
-    tests.filter(_.id.inSet(ids)).map(_.deleted).update(deleted)
-
-  private val executionInserter = (executions returning executions.map(_.id)).insertInvoker
-  private val executionLogInserter = executionLogs.insertInvoker
-
-  def newExecution(execution: Execution, logOpt: Option[String]): Id[Execution] = Cache.invalidate(configurationsCache, executionCountCache) {
-    val executionId = executionInserter.insert(execution)
-    for (log ← logOpt)
-      executionLogInserter.insert(ExecutionLogRow(executionId, removeNullChars(log)))
-    executionId
-  }
-
-  private val analysisInserter = analyses.insertInvoker
-
-  private val updateAnalysisCompiled = {
-    def updateAnalysis(testId: Column[Id[Test]], configuration: Column[Configuration]) =
-      for {
-        analysis ← analyses
-        if analysis.testId === testId
-        if analysis.configuration === configuration
-      } yield analysis
-    Compiled(updateAnalysis _)
-  }
-
-  private val getAnalysisCompiled = {
-    def getAnalysis(testId: Column[Id[Test]], configuration: Column[Configuration]) =
-      analyses.filter(_.testId === testId).filter(_.configuration === configuration)
-    Compiled(getAnalysis _)
-  }
-
-  def upsertAnalysis(newAnalysis: Analysis) = synchronized {
-    getAnalysisCompiled(newAnalysis.testId, newAnalysis.configuration).firstOption match {
-      case Some(analysis) ⇒
-        updateAnalysisCompiled(newAnalysis.testId, newAnalysis.configuration).update(newAnalysis)
-      case None ⇒
-        analysisInserter.insert(newAnalysis)
-    }
-  }
+  protected def removeNullChars(s: String) = s.filterNot(_ == '\u0000')
 
   def getSystemConfiguration(): SystemConfiguration =
     systemConfiguration.firstOption.getOrElse(throw new IllegalStateException("No system configuration present"))
@@ -440,7 +145,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
   def updateSystemConfiguration(newConfig: SystemConfiguration) =
     systemConfiguration.update(newConfig)
 
-  private val configurationsCache: Cache[Seq[Configuration]] = Cache { rawGetConfigurations() }
+  protected val configurationsCache: Cache[Seq[Configuration]] = Cache { rawGetConfigurations() }
 
   def getConfigurations(): Seq[Configuration] = configurationsCache.get
 
@@ -449,39 +154,5 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None) extend
 
   def getConfigurations(testId: Id[Test]): Seq[Configuration] =
     executions.filter(_.testId === testId).groupBy(_.configuration).map(_._1).sorted.run
-
-  def setBatchComment(id: Id[Batch], text: String) =
-    if (batchComments.filter(_.batchId === id).firstOption.isDefined)
-      batchComments.filter(_.batchId === id).map(_.text).update(text)
-    else
-      batchComments.insert(BatchComment(id, text))
-
-  def deleteBatchComment(id: Id[Batch]) = batchComments.filter(_.batchId === id).delete
-
-  def setTestComment(id: Id[Test], text: String) =
-    if (testComments.filter(_.testId === id).firstOption.isDefined)
-      testComments.filter(_.testId === id).map(_.text).update(text)
-    else
-      testComments.insert(TestComment(id, text))
-
-  def deleteTestComment(id: Id[Test]) = testComments.filter(_.testId === id).delete
-
-  def getCategories(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[TestCategory]] =
-    testCategories.filter(_.testId inSet testIds).run.groupBy(_.testId)
-
-  private val deleteTestCategoriesCompiled = {
-    def deleteTestCategories(testId: Column[Id[Test]]) =
-      testCategories.filter(_.testId === testId)
-    Compiled(deleteTestCategories _)
-  }
-  private val testCategoriesInserter = testCategories.insertInvoker
-
-  def addCategories(categories: Seq[TestCategory]) {
-    testCategoriesInserter.insertAll(categories: _*)
-  }
-
-  def removeCategories(testId: Id[Test], categories: Seq[String]) {
-    testCategories.filter(tc ⇒ tc.testId === testId && tc.category.inSet(categories)).delete
-  }
 
 }
