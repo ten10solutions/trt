@@ -20,6 +20,9 @@ case class TestAndExecutions(
 
 case class ExecutionsAndTotalCount(executions: Seq[EnrichedExecution], total: Int)
 
+/**
+ * Execution and an associated search match fragment
+ */
 case class ExecutionAndFragment(execution: EnrichedExecution, fragment: String)
 
 sealed trait AddCategoryResult
