@@ -18,7 +18,7 @@ object Application {
 
 }
 
-class Application(service: Service, adminService: AdminService) extends Controller with HasLogger {
+class Application(service: Service) extends Controller with HasLogger {
 
   import Application._
 
@@ -264,19 +264,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
     views.html.tests(testsSummary, testViews, configuration, testStatusOpt, nameOpt, groupOpt, categoryOpt, service.canRerun, paginationData, sortOpt, descendingOpt)
   }
 
-  def admin() = Action { implicit request ⇒
-    Ok(views.html.admin())
-  }
-
-  def deleteAll() = Action { implicit request ⇒
-    adminService.deleteAll()
-    Redirect(routes.Application.admin).flashing("success" -> "All data deleted")
-  }
-
-  def analyseAll() = Action { implicit request ⇒
-    adminService.analyseAll()
-    Redirect(routes.Application.admin).flashing("success" -> "Analysis of all tests scheduled")
-  }
 
   def updateSystemConfiguration() = Action { implicit request ⇒
     SystemConfigurationForm.form.bindFromRequest().fold(

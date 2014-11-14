@@ -48,9 +48,9 @@ POST    /ci/:id/edit                @controllers.CiController.updateCiImportSpec
 POST    /ci/:id/delete              @controllers.CiController.deleteCiImportSpec(id: Id[CiImportSpec])
 POST    /ci/:id/sync                @controllers.CiController.syncCiImport(id: Id[CiImportSpec])
 
-GET     /admin                      @controllers.Application.admin()
-POST    /deleteAll                  @controllers.Application.deleteAll()
-POST    /analyseAll                 @controllers.Application.analyseAll()
+GET     /admin                      @controllers.AdminController.admin()
+POST    /deleteAll                  @controllers.AdminController.deleteAll()
+POST    /analyseAll                 @controllers.AdminController.analyseAll()
 
 GET     /webApi/tests/names           @controllers.WebApiController.testNames(query: String)
 GET     /webApi/tests/groups          @controllers.WebApiController.groups(query: String)

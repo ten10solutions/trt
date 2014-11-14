@@ -59,13 +59,7 @@ class Factory(configuration: Configuration) {
 
   lazy val adminService = new AdminServiceImpl(dao, logIndexer, analysisService)
 
-  lazy val controller = new Application(service, adminService)
-
-  lazy val ciController = new CiController(service)
-
   lazy val ciImportStatusManager: CiImportStatusManager = new CiImportStatusManager(clock)
-
-  lazy val jsonController = new JsonController(service, adminService)
 
   lazy val batchRecorder = new BatchRecorder(dao, clock, analysisService, logIndexer)
 
@@ -85,12 +79,21 @@ class Factory(configuration: Configuration) {
     else
       LuceneLogIndexer.fileBackedIndexer(new File(luceneIndexLocation))
 
+  def getControllerInstance[A](clazz: Class[A]): A = controllerMap(clazz).asInstanceOf[A]
+
   lazy val webApiController = new WebApiController(service)
 
-  def getControllerInstance[A](clazz: Class[A]): A = controllerMap(clazz).asInstanceOf[A]
+  lazy val ciController = new CiController(service)
+
+  lazy val jsonController = new JsonController(service, adminService)
+
+  lazy val controller = new Application(service)
+
+  lazy val adminController = new AdminController(service, adminService)
 
   lazy val controllerMap: Map[Class[_], Controller] = Map(
     classOf[Application] -> controller,
+    classOf[AdminController] -> adminController,
     classOf[CiController] -> ciController,
     classOf[JsonController] -> jsonController,
     classOf[WebApiController] -> webApiController)
