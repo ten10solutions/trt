@@ -20,7 +20,7 @@
 
 @executionsPaginationWidget = { 
   @paginationWidget(pagination)((page, pageSize) => 
-    routes.Application.test(test.id, configuration = configurationOpt, passed = resultOpt, page = Some(page), pageSize = Some(pageSize))) 
+    routes.TestController.test(test.id, configuration = configurationOpt, passed = resultOpt, page = Some(page), pageSize = Some(pageSize))) 
 }
 
 @main("Test", "Test", scripts = scripts, css = css) {
@@ -46,7 +46,7 @@
         <tr>
           <td>Configuration</td>
           <td>
-            <form id="configuration-form" role="form" method="get" action="@routes.Application.test(id = test.id, configuration = Some(configuration), passed = resultOpt)">
+            <form id="configuration-form" role="form" method="get" action="@routes.TestController.test(id = test.id, configuration = Some(configuration), passed = resultOpt)">
               <select name="configuration" id="configuration-select" class="form-control">
                 @for(configuration <- (configuration +: otherConfigurations).sorted) {
                   <option value="@configuration" @if(Some(configuration) == configurationOpt){selected}>@configuration</option>
@@ -120,17 +120,17 @@
       </td>
     </tr>
   </table>
-  <form id="remove-category-form" action="@routes.Application.removeCategory(test.id)" role="form" method="post">
+  <form id="remove-category-form" action="@routes.TestController.removeCategory(test.id)" role="form" method="post">
     <input type="hidden" name="previousURL" value="@request.uri"/>
     <input id="remove-category-form-field" type="hidden" name="category" value=""/>
   </form>
   <form id="rerun-test-form" action="@routes.CiController.rerunTest(test.id)" role="form" method="post">
     <input type="hidden" name="previousURL" value="@request.uri"/>
   </form>
-  <form id="undelete-test-form" action="@routes.Application.undeleteTest(test.id)" role="form" method="post">
+  <form id="undelete-test-form" action="@routes.TestController.undeleteTest(test.id)" role="form" method="post">
     <input type="hidden" name="previousURL" value="@request.uri"/>
   </form>
-  <form id="delete-test-form" action="@routes.Application.deleteTest(test.id)" role="form" method="post">
+  <form id="delete-test-form" action="@routes.TestController.deleteTest(test.id)" role="form" method="post">
     <input type="hidden" name="previousURL" value="@request.uri"/>
   </form>
   @if(canRerun) {
@@ -177,13 +177,13 @@
     
   <ul class="nav nav-tabs">
     <li @if(resultOpt.isEmpty){ class="active" }>
-      <a href="@routes.Application.test(test.id, configuration = configurationOpt)">All</a>
+      <a href="@routes.TestController.test(test.id, configuration = configurationOpt)">All</a>
     </li>
     <li @if(resultOpt == Some(true)){ class="active" }>
-      <a href="@routes.Application.test(test.id, configuration = configurationOpt, passed = Some(true))">Pass</a>
+      <a href="@routes.TestController.test(test.id, configuration = configurationOpt, passed = Some(true))">Pass</a>
     </li>
     <li @if(resultOpt == Some(false)){ class="active" }>
-      <a href="@routes.Application.test(test.id, configuration = configurationOpt, passed = Some(false))">Fail</a>
+      <a href="@routes.TestController.test(test.id, configuration = configurationOpt, passed = Some(false))">Fail</a>
     </li>
   </ul>
 
@@ -220,13 +220,13 @@
   
   @executionsPaginationWidget
 
-  @editComment(test.commentOpt, routes.Application.setTestComment(test.id, configurationOpt))
+  @editComment(test.commentOpt, routes.TestController.setTestComment(test.id, configurationOpt))
 
 <!-- Modal -->
 <div class="modal fade" id="category-dialog" tabindex="-1" role="dialog">
   <div class="modal-dialog">
     <div class="modal-content">
-      <form id="category-form" role="form" method="POST" action="@routes.Application.addCategory(test.id)">
+      <form id="category-form" role="form" method="POST" action="@routes.TestController.addCategory(test.id)">
 	<div class="modal-header">
           <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
           <h4 class="modal-title">Add Test to Category</h4>

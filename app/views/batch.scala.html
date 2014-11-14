@@ -121,7 +121,7 @@
         <tr class="execution-row">
           <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.Application.execution(execution.id)"><img src="@routes.Assets.at("images/" + execution.passFailIcon)" alt="@execution.passFailText" title="@execution.passFailText"/></a></td>
           <td>@for(group <- execution.groupOpt) { <a href="@routes.Application.tests(group = Some(group.full), configuration = Some(execution.configuration))"><span class="execution-group" title="@group.full">@group.abbreviate(maxLength = 35)</span></a> }</td>
-          <td><a href="@routes.Application.test(execution.testId, configuration = Some(execution.configuration))" class="execution-name" title="@execution.name.full">@execution.name.abbreviate(maxLength = 40)</a></td>
+          <td><a href="@routes.TestController.test(execution.testId, configuration = Some(execution.configuration))" class="execution-name" title="@execution.name.full">@execution.name.abbreviate(maxLength = 40)</a></td>
           <td>@for(summary <- execution.summaryOpt){ <span class="execution-summary" title="@summary.full">@summary.abbreviated</span> }</td>
           <td class="duration-cell">@for(duration <- execution.durationOpt) { @duration }</td>
           <td class="execution-links-cell"><a class="execution-link" href="@routes.Application.execution(execution.id)">Execution</a></td>

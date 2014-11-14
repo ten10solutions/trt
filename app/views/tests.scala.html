@@ -202,10 +202,10 @@
         @for(test <- tests) {
           <tr class="test-row">
             <td style="text-align: center; width: 50px"><input class="testCheckbox" type="checkbox" name="selectedTest" value="@test.id"/></td>
-            <td class="pass-fail-cell">@for(icon <- test.ballIconOpt){<a href="@routes.Application.test(test.id, configuration = Some(configuration))"><img src="@routes.Assets.at("images/" + icon)"/></a>}</td>
+            <td class="pass-fail-cell">@for(icon <- test.ballIconOpt){<a href="@routes.TestController.test(test.id, configuration = Some(configuration))"><img src="@routes.Assets.at("images/" + icon)"/></a>}</td>
             <td class="pass-fail-cell">@for(weatherInfo <- test.weatherInfoOpt){<img title="@weatherInfo.passRate" src="@routes.Assets.at("images/" + weatherInfo.iconPath)"/>}</td>
             <td>@for(group <- test.groupOpt) {<a href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = Some(group.full), category = categoryOpt, sort = sortOpt, descending = descendingOpt)"><span title="@group.full">@group.abbreviate(maxLength = 35)</span></a>}</td>
-            <td><a class="test-link" href="@routes.Application.test(test.id, configuration = Some(configuration))" title="@test.name.full">@test.name.abbreviate(maxLength = 40)</a></td>
+            <td><a class="test-link" href="@routes.TestController.test(test.id, configuration = Some(configuration))" title="@test.name.full">@test.name.abbreviate(maxLength = 40)</a></td>
             <td class="duration-cell">@for(duration <- test.medianDurationOpt){@duration}</td>
             <td class="consecutive-failures-cell">@for(consecutiveFailures <- test.consecutiveFailuresOpt){@consecutiveFailures}</td>            
             <td class="failing-since-cell">@for(failingSince <- test.failingSinceOpt){<span title="@failingSince.absolute">@failingSince.relative</span>}</td>

@@ -18,16 +18,17 @@ object Application {
 
 }
 
-class Application(service: Service) extends Controller with HasLogger {
+class Application(service: Service) extends AbstractController(service) with HasLogger {
 
   import Application._
-
-  private implicit def globalViewContext: GlobalViewContext = ControllerHelper.globalViewContext(service)
 
   def index = Action {
     Redirect(routes.Application.configurations())
   }
 
+  // Search logs screen
+  // ------------------
+  
   def searchLogs(queryOpt: Option[String], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
     Pagination.validate(pageOpt, pageSizeOpt, defaultPageSize = 8) match {
       case Left(errorMessage) ⇒
@@ -44,6 +45,9 @@ class Application(service: Service) extends Controller with HasLogger {
     }
   }
 
+  // Configurations screen
+  // ---------------------
+  
   def configurations() = Action { implicit request ⇒
     val testsSummaries =
       service.getTestCountsByConfiguration().map {
@@ -52,6 +56,9 @@ class Application(service: Service) extends Controller with HasLogger {
     val historicalIntervalOpt = service.getAllHistoricalTestCounts.interval
     Ok(views.html.configurations(testsSummaries, ConfigurationsView(historicalIntervalOpt)))
   }
+
+  // Execution screen
+  // ----------------
 
   def execution(executionId: Id[Execution]) = Action { implicit request ⇒
     service.getExecution(executionId) match {
@@ -63,31 +70,21 @@ class Application(service: Service) extends Controller with HasLogger {
     }
   }
 
-  def test(testId: Id[Test], configurationOpt: Option[Configuration], resultOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
-    Pagination.validate(pageOpt, pageSizeOpt) match {
-      case Left(errorMessage) ⇒
-        BadRequest(errorMessage)
-      case Right(pagination) ⇒
-        configurationOpt.orElse(getDefaultConfiguration) match {
-          case None ⇒
-            Redirect(routes.Application.index())
-          case Some(configuration) ⇒
-            handleTest(testId, configuration, resultOpt, pagination) match {
-              case None       ⇒ NotFound(s"Could not find test with id '$testId'")
-              case Some(html) ⇒ Ok(html)
-            }
-        }
+  def setExecutionComment(executionId: Id[Execution]) = Action { implicit request ⇒
+    getFormParameter("text") match {
+      case Some(text) ⇒
+        val result = service.setExecutionComment(executionId, text)
+        if (result)
+          Redirect(routes.Application.execution(executionId)).flashing("success" -> "Comment updated.")
+        else
+          NotFound(s"Could not find test execution with id '$executionId'")
+      case None ⇒
+        BadRequest("No 'text' parameter provided'")
     }
   }
 
-  private def handleTest(testId: Id[Test], configuration: Configuration, resultOpt: Option[Boolean], pagination: Pagination)(implicit request: Request[_]) =
-    service.getTestAndExecutions(testId, configuration, resultOpt) map {
-      case TestAndExecutions(test, executions, otherConfigurations, categories) ⇒
-        val executionViews = executions.map(e ⇒ ExecutionView(e))
-        val testView = new TestView(test, categories)
-        val paginationData = pagination.paginationData(executions.size)
-        views.html.test(testView, executionViews, Some(configuration), resultOpt, otherConfigurations, service.canRerun, paginationData)
-    }
+  // Batch screen
+  // ------------
 
   def batch(batchId: Id[Batch], passedFilterOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
     Pagination.validate(pageOpt, pageSizeOpt) match {
@@ -109,6 +106,35 @@ class Application(service: Service) extends Controller with HasLogger {
         views.html.batch(batchView, passedFilterOpt, service.canRerun, paginationData)
     }
 
+  def setBatchComment(batchId: Id[Batch]) = Action { implicit request ⇒
+    getFormParameter("text") match {
+      case Some(text) ⇒
+        val result = service.setBatchComment(batchId, text)
+        if (result)
+          Redirect(routes.Application.batch(batchId)).flashing("success" -> "Comment updated.")
+        else
+          NotFound(s"Could not find batch with id '$batchId'")
+      case None ⇒
+        BadRequest("No 'text' parameter provided'")
+    }
+  }
+
+  def deleteBatch(batchId: Id[Batch]) = Action { implicit request ⇒
+    val batchIds = Seq(batchId)
+    service.deleteBatches(batchIds)
+
+    val successMessage = deleteBatchesSuccessMessage(batchIds)
+    Redirect(routes.Application.batches()).flashing("success" -> successMessage)
+  }
+
+  private def deleteBatchesSuccessMessage(batchIds: Seq[Id[Batch]]): String = {
+    val batchWord = if (batchIds.size == 1) "batch" else "batches"
+    s"Deleted ${batchIds.size} $batchWord"
+  }
+
+  // Batch log screen
+  // ----------------
+
   def batchLog(batchId: Id[Batch]) = Action { implicit request ⇒
     service.getBatchAndExecutions(batchId, None) match {
       case None ⇒
@@ -124,6 +150,9 @@ class Application(service: Service) extends Controller with HasLogger {
     }
   }
 
+  // Batches screen
+  // --------------
+
   def batches(jobIdOpt: Option[Id[CiJob]], configurationOpt: Option[Configuration], resultOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
     Pagination.validate(pageOpt, pageSizeOpt) match {
       case Left(errorMessage) ⇒ BadRequest(errorMessage)
@@ -138,6 +167,22 @@ class Application(service: Service) extends Controller with HasLogger {
     val hideChartInitially = batches.size >= HideBatchChartThreshold
     views.html.batches(batches, jobIdOpt, configurationOpt, resultOpt, jobs, paginationData, hideChartInitially)
   }
+
+  def deleteBatches() = Action { implicit request ⇒
+    val batchIds = getSelectedBatchIds(request)
+
+    service.deleteBatches(batchIds)
+
+    val redirectTarget = previousUrlOpt.getOrElse(routes.Application.batches())
+    val successMessage = deleteBatchesSuccessMessage(batchIds)
+    Redirect(redirectTarget).flashing("success" -> successMessage)
+  }
+
+  private def getSelectedBatchIds(implicit request: Request[AnyContent]): Seq[Id[Batch]] =
+    getFormParameters("selectedBatch").flatMap(Id.parse[Batch])
+
+  // Executions screen
+  // -----------------
 
   def executions(configurationOpt: Option[Configuration], resultOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
     Pagination.validate(pageOpt, pageSizeOpt) match {
@@ -155,8 +200,8 @@ class Application(service: Service) extends Controller with HasLogger {
     views.html.executions(executionViews, totalExecutionCount, configurationOpt, resultOpt, paginationData, executionVolume)
   }
 
-  private def getSelectedBatchIds(implicit request: Request[AnyContent]): Seq[Id[Batch]] =
-    getFormParameters("selectedBatch").flatMap(Id.parse[Batch])
+  // Deleted tests screen
+  // --------------------
 
   def deletedTests(pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
     Pagination.validate(pageOpt, pageSizeOpt) match {
@@ -170,50 +215,8 @@ class Application(service: Service) extends Controller with HasLogger {
     }
   }
 
-  def deleteTests() = Action { implicit request ⇒
-    val selectedTestIds = ControllerHelper.getSelectedTestIds(request)
-    service.markTestsAsDeleted(selectedTestIds)
-    Redirect(previousUrlOrDefault).flashing("success" -> "Marked tests as deleted.")
-  }
-
-  def undeleteTests() = Action { implicit request ⇒
-    val selectedTestIds = ControllerHelper.getSelectedTestIds(request)
-    service.markTestsAsDeleted(selectedTestIds, deleted = false)
-    Redirect(previousUrlOrDefault).flashing("success" -> "Marked tests as no longer deleted.")
-  }
-
-  def deleteTest(id: Id[Test]) = Action { implicit request ⇒
-    service.markTestsAsDeleted(Seq(id))
-    Redirect(previousUrlOrDefault).flashing("success" -> "Marked test as deleted.")
-  }
-
-  def undeleteTest(id: Id[Test]) = Action { implicit request ⇒
-    service.markTestsAsDeleted(Seq(id), deleted = false)
-    Redirect(previousUrlOrDefault).flashing("success" -> "Marked test as no longer deleted.")
-  }
-
-  def deleteBatches() = Action { implicit request ⇒
-    val batchIds = getSelectedBatchIds(request)
-
-    service.deleteBatches(batchIds)
-
-    val redirectTarget = previousUrlOpt.getOrElse(routes.Application.batches())
-    val successMessage = deleteBatchesSuccessMessage(batchIds)
-    Redirect(redirectTarget).flashing("success" -> successMessage)
-  }
-
-  def deleteBatch(batchId: Id[Batch]) = Action { implicit request ⇒
-    val batchIds = Seq(batchId)
-    service.deleteBatches(batchIds)
-
-    val successMessage = deleteBatchesSuccessMessage(batchIds)
-    Redirect(routes.Application.batches()).flashing("success" -> successMessage)
-  }
-
-  private def deleteBatchesSuccessMessage(batchIds: Seq[Id[Batch]]): String = {
-    val batchWord = if (batchIds.size == 1) "batch" else "batches"
-    s"Deleted ${batchIds.size} $batchWord"
-  }
+  // Tests screen
+  // ------------
 
   def tests(
     configurationOpt: Option[Configuration],
@@ -264,6 +267,20 @@ class Application(service: Service) extends Controller with HasLogger {
     views.html.tests(testsSummary, testViews, configuration, testStatusOpt, nameOpt, groupOpt, categoryOpt, service.canRerun, paginationData, sortOpt, descendingOpt)
   }
 
+  def deleteTests() = Action { implicit request ⇒
+    val selectedTestIds = ControllerHelper.getSelectedTestIds(request)
+    service.markTestsAsDeleted(selectedTestIds)
+    Redirect(previousUrlOrDefault).flashing("success" -> "Marked tests as deleted.")
+  }
+
+  def undeleteTests() = Action { implicit request ⇒
+    val selectedTestIds = ControllerHelper.getSelectedTestIds(request)
+    service.markTestsAsDeleted(selectedTestIds, deleted = false)
+    Redirect(previousUrlOrDefault).flashing("success" -> "Marked tests as no longer deleted.")
+  }
+
+  // System Configuration screen
+  // ----------------------------
 
   def updateSystemConfiguration() = Action { implicit request ⇒
     SystemConfigurationForm.form.bindFromRequest().fold(
@@ -281,10 +298,15 @@ class Application(service: Service) extends Controller with HasLogger {
     Ok(views.html.systemConfiguration(populatedForm))
   }
 
+  //  Test API
+  //  --------  
   def analyseAllExecutions() = Action { implicit request ⇒
     service.analyseAllExecutions()
     Ok(Json.toJson("OK"))
   }
+
+  // State Tests screen
+  // ------------------
 
   def staleTests(configurationOpt: Option[Configuration], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
     Pagination.validate(pageOpt, pageSizeOpt) match {
@@ -307,96 +329,6 @@ class Application(service: Service) extends Controller with HasLogger {
     val paginationData = pagination.paginationData(tests.size)
     val madViewOpt = madOpt.map(mad ⇒ MADView(mad))
     Ok(views.html.staleTests(madViewOpt, testViews, configuration, paginationData))
-  }
-
-  private def getDefaultConfiguration: Option[Configuration] = {
-    val configurations = service.getConfigurations.sorted
-    if (configurations contains Configuration.Default)
-      Some(Configuration.Default)
-    else
-      configurations.headOption
-  }
-
-  private def getFormParameters(parameterName: String)(implicit request: Request[AnyContent]): Seq[String] =
-    for {
-      requestMap ← request.body.asFormUrlEncoded.toSeq
-      values ← requestMap.get(parameterName).toSeq
-      value ← values
-    } yield value
-
-  private def getFormParameter(parameterName: String)(implicit request: Request[AnyContent]): Option[String] =
-    getFormParameters(parameterName).headOption
-
-  private def previousUrlOpt(implicit request: Request[AnyContent]): Option[Call] =
-    getFormParameter("previousURL").map(url ⇒ new Call("GET", url))
-
-  private def previousUrlOrDefault(implicit request: Request[AnyContent]): Call =
-    previousUrlOpt.getOrElse(routes.Application.index())
-
-  def setExecutionComment(executionId: Id[Execution]) = Action { implicit request ⇒
-    getFormParameter("text") match {
-      case Some(text) ⇒
-        val result = service.setExecutionComment(executionId, text)
-        if (result)
-          Redirect(routes.Application.execution(executionId)).flashing("success" -> "Comment updated.")
-        else
-          NotFound(s"Could not find test execution with id '$executionId'")
-      case None ⇒
-        BadRequest("No 'text' parameter provided'")
-    }
-  }
-
-  def setBatchComment(batchId: Id[Batch]) = Action { implicit request ⇒
-    getFormParameter("text") match {
-      case Some(text) ⇒
-        val result = service.setBatchComment(batchId, text)
-        if (result)
-          Redirect(routes.Application.batch(batchId)).flashing("success" -> "Comment updated.")
-        else
-          NotFound(s"Could not find batch with id '$batchId'")
-      case None ⇒
-        BadRequest("No 'text' parameter provided'")
-    }
-  }
-
-  def setTestComment(testId: Id[Test], configurationOpt: Option[Configuration]) = Action { implicit request ⇒
-    getFormParameter("text") match {
-      case Some(text) ⇒
-        val result = service.setTestComment(testId, text)
-        if (result)
-          Redirect(routes.Application.test(testId, configurationOpt)).flashing("success" -> "Comment updated.")
-        else
-          NotFound(s"Could not find test with id '$testId'")
-      case None ⇒
-        BadRequest("No 'text' parameter provided'")
-    }
-  }
-
-  def addCategory(testId: Id[Test]) = Action { implicit request ⇒
-    getFormParameter("category") match {
-      case Some(category) ⇒
-        val result = service.addCategory(testId, category)
-        result match {
-          case AddCategoryResult.DuplicateCategory ⇒
-            Redirect(previousUrlOrDefault).flashing("error" -> s"Test is already in the '$category' category.")
-          case AddCategoryResult.NoTestFound ⇒
-            BadRequest(s"No test found with id $testId")
-          case AddCategoryResult.Success ⇒
-            Redirect(previousUrlOrDefault).flashing("success" -> s"Test was added to the '$category' category.")
-        }
-      case None ⇒
-        BadRequest("No 'category' parameter provided'")
-    }
-  }
-
-  def removeCategory(testId: Id[Test]) = Action { implicit request ⇒
-    getFormParameter("category") match {
-      case Some(category) ⇒
-        service.removeCategory(testId, category)
-        Redirect(previousUrlOrDefault).flashing("success" -> s"Test was removed from the '$category' category.")
-      case None ⇒
-        BadRequest("No 'category' parameter provided'")
-    }
   }
 
 }

@@ -91,7 +91,10 @@ class Factory(configuration: Configuration) {
 
   lazy val adminController = new AdminController(service, adminService)
 
+  lazy val testController = new TestController(service)
+
   lazy val controllerMap: Map[Class[_], Controller] = Map(
+    classOf[TestController] -> testController,
     classOf[Application] -> controller,
     classOf[AdminController] -> adminController,
     classOf[CiController] -> ciController,

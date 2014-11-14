@@ -7,7 +7,7 @@
     <table class="table table-striped table-bordered table-hover table-condensed">
       <tr>
         <td>Name</td>
-        <td><a id="test-name" href="@routes.Application.test(execution.testId, configuration = Some(execution.configuration))">@execution.name.full</a></td>
+        <td><a id="test-name" href="@routes.TestController.test(execution.testId, configuration = Some(execution.configuration))">@execution.name.full</a></td>
       </tr>
       @for(group <- execution.groupOpt) {
         <tr>

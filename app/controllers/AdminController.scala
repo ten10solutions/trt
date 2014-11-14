@@ -6,9 +6,7 @@ import com.thetestpeople.trt.utils.HasLogger
 import play.api.mvc._
 import viewModel._
 
-class AdminController(service: Service, adminService: AdminService) extends Controller with HasLogger {
-
-  private implicit def globalViewContext: GlobalViewContext = ControllerHelper.globalViewContext(service)
+class AdminController(service: Service, adminService: AdminService) extends AbstractController(service) with HasLogger {
 
   def admin() = Action { implicit request ⇒
     Ok(views.html.admin())
