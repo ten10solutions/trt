@@ -13,7 +13,7 @@ import java.net.URI
 import scala.slick.util.CloseableIterator
 import scala.slick.driver.H2Driver
 
-trait SlickBatchDao { this: SlickDao ⇒
+trait SlickBatchDao extends BatchDao { this: SlickDao ⇒
 
   import driver.simple._
   import Database.dynamicSession

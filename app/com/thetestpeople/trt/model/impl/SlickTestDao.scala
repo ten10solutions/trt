@@ -13,7 +13,7 @@ import java.net.URI
 import scala.slick.util.CloseableIterator
 import scala.slick.driver.H2Driver
 
-trait SlickTestDao { this: SlickDao ⇒
+trait SlickTestDao extends TestDao { this: SlickDao ⇒
 
   import driver.simple._
   import Database.dynamicSession
@@ -262,5 +262,8 @@ trait SlickTestDao { this: SlickDao ⇒
   def removeCategories(testId: Id[Test], categories: Seq[String]) {
     testCategories.filter(tc ⇒ tc.testId === testId && tc.category.inSet(categories)).delete
   }
+
+  def getConfigurations(testId: Id[Test]): Seq[Configuration] =
+    executions.filter(_.testId === testId).groupBy(_.configuration).map(_._1).sorted.run
 
 }

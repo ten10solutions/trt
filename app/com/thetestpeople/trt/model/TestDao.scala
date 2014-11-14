@@ -92,4 +92,17 @@ trait TestDao {
 
   def deleteTestComment(id: Id[Test])
 
+  def getCategories(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[TestCategory]]
+
+  def getCategories(testId: Id[Test]): Seq[TestCategory] = getCategories(Seq(testId)).getOrElse(testId, Seq())
+
+  def addCategories(categories: Seq[TestCategory])
+
+  def removeCategories(testId: Id[Test], categories: Seq[String])
+
+  /**
+   * Return the configurations of executions that have been recorded for the given test.
+   */
+  def getConfigurations(testId: Id[Test]): Seq[Configuration]
+
 }
