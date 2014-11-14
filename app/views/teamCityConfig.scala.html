@@ -12,7 +12,7 @@
   <p style="margin-top: 20px"/>
   Credentials to access TeamCity API (if guest access is not enabled):
 
-  @helper.form(routes.CiController.updateTeamCityConfig(), 'role -> "form") {
+  @helper.form(routes.TeamCityController.updateTeamCityConfig(), 'role -> "form") {
     
     @helper.inputText(confForm("credentials.username"), 
       'class -> "form-control",

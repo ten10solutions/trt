@@ -52,7 +52,7 @@
     </div>
   }
   
-  @helper.form(routes.CiController.updateReruns(), 'role -> "form") {
+  @helper.form(routes.JenkinsController.updateReruns(), 'role -> "form") {
   
     <input type="hidden" name="@confForm("credentials.username").name" value="@confForm("credentials.username").value"/>
     <input type="hidden" name="@confForm("credentials.apiToken").name" value="@confForm("credentials.apiToken").value"/>

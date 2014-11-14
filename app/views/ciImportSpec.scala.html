@@ -1,6 +1,6 @@
 @(
   spec: CiImportSpec, 
-  jobImportInfo: JenkinsJobImportInfo, 
+  jobImportInfo: CiJobImportInfo, 
   builds: Seq[CiBuildImportInfo], 
   name: String, 
   progress: Int,
@@ -16,7 +16,7 @@
 
 @buildsPaginationWidget = { 
   @paginationWidget(pagination)((page, pageSize) => 
-    routes.CiController.getCiImportSpec(
+    routes.ImportLogController.getCiImportSpec(
       id = spec.id, 
       page = Some(page),
       pageSize = Some(pageSize)))

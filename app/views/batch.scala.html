@@ -29,7 +29,7 @@
           <tr><td>URL</td><td><a href="@url" id="batch-url">@url <i class="fa fa-external-link"></i></a></td></tr>
         }  
         @for(specId <- batch.importSpecIdOpt) {
-          <tr><td>Imported by</td><td><a href="@routes.CiController.getCiImportSpec(specId)">CI importer</a></td></tr>
+          <tr><td>Imported by</td><td><a href="@routes.ImportLogController.getCiImportSpec(specId)">CI importer</a></td></tr>
         }  
         @for(configuration <- batch.configurationOpt) {
           <tr>
@@ -79,7 +79,7 @@
   </div>
 
   @if(canRerun) {
-    <button style="margin-bottom: 10px" id="rerunSelected" type="button" class="btn btn-default" title="Rerun selected tests on Jenkins" onclick="rerunSelected('@routes.CiController.rerunSelectedTests()')"><i class="glyphicon glyphicon-refresh"></i> Rerun Selected</button>
+    <button style="margin-bottom: 10px" id="rerunSelected" type="button" class="btn btn-default" title="Rerun selected tests on Jenkins" onclick="rerunSelected('@routes.TestsController.rerunSelectedTests()')"><i class="glyphicon glyphicon-refresh"></i> Rerun Selected</button>
   }
   <button style="margin-bottom: 10px" id="delete-batch-button" class="btn btn-default" onclick="deleteBatch()" type="button" title="Delete batch"><i class="glyphicon glyphicon-trash"></i> Delete batch</button>
   <form id="delete-batch-form" action="@routes.BatchController.deleteBatch(batch.id)" role="form" method="post"></form>

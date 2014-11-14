@@ -124,7 +124,7 @@
     <input type="hidden" name="previousURL" value="@request.uri"/>
     <input id="remove-category-form-field" type="hidden" name="category" value=""/>
   </form>
-  <form id="rerun-test-form" action="@routes.CiController.rerunTest(test.id)" role="form" method="post">
+  <form id="rerun-test-form" action="@routes.TestController.rerunTest(test.id)" role="form" method="post">
     <input type="hidden" name="previousURL" value="@request.uri"/>
   </form>
   <form id="undelete-test-form" action="@routes.TestController.undeleteTest(test.id)" role="form" method="post">

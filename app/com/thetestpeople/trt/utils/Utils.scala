@@ -1,6 +1,8 @@
 package com.thetestpeople.trt.utils
 
 import play.api.Logger
+import java.io.StringWriter
+import java.io.PrintWriter
 
 object Utils extends HasLogger {
 
@@ -23,6 +25,12 @@ object Utils extends HasLogger {
       case 3 ⇒ n + "rd"
       case _ ⇒ n + "th"
     }
+  }
+
+  def printStackTrace(t: Throwable): String = {
+    val stringWriter = new StringWriter
+    t.printStackTrace(new PrintWriter(stringWriter))
+    stringWriter.toString
   }
 
 }

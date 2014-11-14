@@ -5,14 +5,19 @@
 
 GET     /                           @controllers.Application.index()
 
-# Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)
+
+# Web application routes:
 
 GET     /dashboard                  @controllers.Application.configurations()
 
 GET     /tests                      @controllers.TestsController.tests(configuration: Option[Configuration] ?= None, status: Option[TestStatus] ?= None, name: Option[String] ?= None, group: Option[String] ?= None, category: Option[String] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None, sort: Option[Sort] ?= None, descending: Option[Boolean] ?= None)
 POST    /tests/undelete             @controllers.TestsController.undeleteTests()
 POST    /tests/delete               @controllers.TestsController.deleteTests()
+POST    /tests/rerun                @controllers.TestsController.rerunSelectedTests()
+
+GET     /tests/deleted              @controllers.Application.deletedTests(page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
+GET     /tests/stale                @controllers.Application.staleTests(configuration: Option[Configuration] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 
 GET     /test/:id                   @controllers.TestController.test(id: Id[Test], configuration: Option[Configuration] ?= None, passed: Option[Boolean] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 POST    /test/:id/delete            @controllers.TestController.deleteTest(id: Id[Test])
@@ -20,12 +25,11 @@ POST    /test/:id/undelete          @controllers.TestController.undeleteTest(id:
 POST    /test/:id/comment           @controllers.TestController.setTestComment(id: Id[Test], configuration: Option[Configuration] ?= None)
 POST    /test/:id/addCategory       @controllers.TestController.addCategory(id: Id[Test])
 POST    /test/:id/removeCategory    @controllers.TestController.removeCategory(id: Id[Test])
+POST    /test/:id/rerun             @controllers.TestController.rerunTest(id: Id[Test])
 
 GET     /execution/:id              @controllers.ExecutionController.execution(id: Id[Execution])
 POST    /execution/:id/comment      @controllers.ExecutionController.setExecutionComment(id: Id[Execution])
 
-GET     /tests/deleted              @controllers.Application.deletedTests(page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
-GET     /tests/stale                @controllers.Application.staleTests(configuration: Option[Configuration] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 GET     /executions                 @controllers.Application.executions(configuration: Option[Configuration] ?= None, passed: Option[Boolean] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 GET     /executions/logs            @controllers.Application.searchLogs(query: Option[String] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 
@@ -43,7 +47,7 @@ POST    /systemConfiguration        @controllers.Application.updateSystemConfigu
 GET     /ci                         @controllers.CiController.ciImportSpecs()
 GET     /ci/new                     @controllers.CiController.newCiImportSpec()
 POST    /ci/new                     @controllers.CiController.createCiImportSpec()
-GET     /ci/:id/log                 @controllers.CiController.getCiImportSpec(id: Id[CiImportSpec], page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
+GET     /ci/:id/log                 @controllers.ImportLogController.getCiImportSpec(id: Id[CiImportSpec], page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 GET     /ci/:id/edit                @controllers.CiController.editCiImportSpec(id: Id[CiImportSpec])
 POST    /ci/:id/edit                @controllers.CiController.updateCiImportSpec(id: Id[CiImportSpec])
 POST    /ci/:id/delete              @controllers.CiController.deleteCiImportSpec(id: Id[CiImportSpec])
@@ -53,10 +57,22 @@ GET     /admin                      @controllers.AdminController.admin()
 POST    /deleteAll                  @controllers.AdminController.deleteAll()
 POST    /analyseAll                 @controllers.AdminController.analyseAll()
 
+GET     /jenkins/auth               @controllers.JenkinsController.auth()
+POST    /jenkins/auth               @controllers.JenkinsController.updateAuth()
+GET     /jenkins/reruns             @controllers.JenkinsController.reruns()
+POST    /jenkins/reruns             @controllers.JenkinsController.updateReruns()
+
+GET     /teamcity/config            @controllers.TeamCityController.teamCityConfig()
+POST    /teamcity/config            @controllers.TeamCityController.updateTeamCityConfig()
+
+# Routes for web application AJAX:
+
 GET     /webApi/tests/names           @controllers.WebApiController.testNames(query: String)
 GET     /webApi/tests/groups          @controllers.WebApiController.groups(query: String)
 GET     /webApi/categories            @controllers.WebApiController.categories(query: String)
 GET     /webApi/configuration/chart   @controllers.WebApiController.configurationChart(configuration: Configuration)
+
+# Routes for external JSON API:
 
 GET     /api/batches                @controllers.JsonController.getBatches()
 POST    /api/batches                @controllers.JsonController.addBatch()
@@ -64,15 +80,6 @@ POST    /api/deleteAll              @controllers.JsonController.deleteAll()
 POST    /api/batch/:id/executions   @controllers.JsonController.addExecutions(id: Id[Batch])
 POST    /api/batch/:id/complete     @controllers.JsonController.completeBatch(id: Id[Batch])
 
+# Routes for test-only API:
+
 POST    /testApi/testing/analyseAllExecutions     @controllers.Application.analyseAllExecutions()
-
-GET     /jenkins/auth               @controllers.CiController.auth()
-POST    /jenkins/auth               @controllers.CiController.updateAuth()
-GET     /jenkins/reruns             @controllers.CiController.reruns()
-POST    /jenkins/reruns             @controllers.CiController.updateReruns()
-
-POST    /jenkins/tests/rerun        @controllers.CiController.rerunSelectedTests()
-POST    /jenkins/test/:id/rerun     @controllers.CiController.rerunTest(id: Id[Test])
-
-GET     /teamcity/config            @controllers.CiController.teamCityConfig()
-POST    /teamcity/config            @controllers.CiController.updateTeamCityConfig()

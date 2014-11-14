@@ -154,7 +154,7 @@
   @if(tests.nonEmpty) {
 
   @if(canRerun) {
-    <button style="margin-bottom: 12px" id="rerunSelected" type="button" class="btn btn-default" title="Rerun selected tests on Jenkins" onclick="performTestAction('@routes.CiController.rerunSelectedTests()')"><i class="glyphicon glyphicon-refresh"></i> Rerun Selected</button>
+    <button style="margin-bottom: 12px" id="rerunSelected" type="button" class="btn btn-default" title="Rerun selected tests on Jenkins" onclick="performTestAction('@routes.TestsController.rerunSelectedTests()')"><i class="glyphicon glyphicon-refresh"></i> Rerun Selected</button>
   }
   <button style="margin-bottom: 12px" id="deleteSelected" type="button" class="btn btn-default" title="Mark selected tests as deleted" onclick="performTestAction('@routes.TestsController.deleteTests()')"><i class="glyphicon glyphicon-trash"></i> Mark selected tests as deleted</button>
   <div style="clear: both;"></div>

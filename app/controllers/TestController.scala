@@ -13,7 +13,7 @@ import java.net.URI
 /**
  * Controller for the Test screen.
  */
-class TestController(service: Service) extends AbstractController(service) with HasLogger {
+class TestController(service: Service) extends AbstractController(service) with RerunTestHandler with HasLogger {
 
   def test(testId: Id[Test], configurationOpt: Option[Configuration], resultOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
     Pagination.validate(pageOpt, pageSizeOpt) match {
@@ -89,6 +89,10 @@ class TestController(service: Service) extends AbstractController(service) with 
   def undeleteTest(id: Id[Test]) = Action { implicit request ⇒
     service.markTestsAsDeleted(Seq(id), deleted = false)
     Redirect(previousUrlOrDefault).flashing("success" -> "Marked test as no longer deleted.")
+  }
+
+  def rerunTest(testId: Id[Test]) = Action { implicit request ⇒
+    rerunTests(Seq(testId))
   }
 
 }

@@ -9,11 +9,12 @@ import play.Logger
 import play.api.mvc._
 import viewModel._
 import java.net.URI
+import com.thetestpeople.trt.jenkins.trigger.TriggerResult
 
 /**
  * Controller for the Tests screen.
  */
-class TestsController(service: Service) extends AbstractController(service) with HasLogger {
+class TestsController(service: Service) extends AbstractController(service) with RerunTestHandler with HasLogger {
 
   def tests(
     configurationOpt: Option[Configuration],
@@ -74,6 +75,11 @@ class TestsController(service: Service) extends AbstractController(service) with
     val selectedTestIds = getFormParameters("selectedTest").flatMap(Id.parse[Test])
     service.markTestsAsDeleted(selectedTestIds, deleted = false)
     Redirect(previousUrlOrDefault).flashing("success" -> "Marked tests as no longer deleted.")
+  }
+
+  def rerunSelectedTests() = Action { implicit request ⇒
+    val selectedTestIds = getFormParameters("selectedTest").flatMap(Id.parse[Test])
+    rerunTests(selectedTestIds)
   }
 
 }

@@ -35,7 +35,7 @@
       @for(spec <- specs) {
         <tr>
           <td class=""><a href="@spec.jobUrl">@spec.jobName <i class="fa fa-external-link"></i></a></td>
-          <td class="view-log-cell"><a href="@routes.CiController.getCiImportSpec(spec.id)">Log</a></td>
+          <td class="view-log-cell"><a href="@routes.ImportLogController.getCiImportSpec(spec.id)">Log</a></td>
           <td class="last-checked-cell">
             @if(spec.inProgress) {
               <div class="progress">

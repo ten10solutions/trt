@@ -91,8 +91,14 @@ class Factory(configuration: Configuration) {
   lazy val batchController = new BatchController(service)
   lazy val batchesController = new BatchesController(service)
   lazy val executionController = new ExecutionController(service)
+  lazy val jenkinsController = new JenkinsController(service)
+  lazy val teamCityController = new TeamCityController(service)
+  lazy val importLogController = new ImportLogController(service)
 
   lazy val controllerMap: Map[Class[_], Controller] = Map(
+    classOf[ImportLogController] -> importLogController,
+    classOf[TeamCityController] -> teamCityController,
+    classOf[JenkinsController] -> jenkinsController,
     classOf[ExecutionController] -> executionController,
     classOf[BatchController] -> batchController,
     classOf[BatchesController] -> batchesController,

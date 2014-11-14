@@ -2,9 +2,9 @@
 
 <ul class="nav nav-tabs">
   <li @if(tab == "auth"){class="active"}>
-    <a id="auth-tab-link"  href="@routes.CiController.auth()">Auth</a>
+    <a id="auth-tab-link"  href="@routes.JenkinsController.auth()">Auth</a>
   </li>
   <li @if(tab == "reruns"){class="active"}>
-    <a id="reruns-tab-link" href="@routes.CiController.reruns()">Reruns</a>
+    <a id="reruns-tab-link" href="@routes.JenkinsController.reruns()">Reruns</a>
   </li>
 </ul>

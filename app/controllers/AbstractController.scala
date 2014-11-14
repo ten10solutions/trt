@@ -12,7 +12,7 @@ import java.net.URI
 import play.api.libs.json._
 import com.thetestpeople.trt.json.JsonSerializers._
 
-abstract class AbstractController(service: Service) extends Controller {
+abstract class AbstractController(protected val service: Service) extends Controller {
 
   protected implicit def globalViewContext: GlobalViewContext = ControllerHelper.globalViewContext(service)
 

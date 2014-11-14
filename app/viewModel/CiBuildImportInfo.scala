@@ -22,7 +22,7 @@ case class CiBuildImportInfo(
 
 }
 
-case class JenkinsJobImportInfo(
+case class CiJobImportInfo(
     importState: ImportState,
     updatedAtTimeOpt: Option[DateTime],
     summaryOpt: Option[String] = None,
