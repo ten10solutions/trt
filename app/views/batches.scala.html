@@ -19,7 +19,7 @@
 
 @batchesPaginationWidget = { 
   @paginationWidget(pagination)((page, pageSize) => 
-    routes.Application.batches(job = jobIdOpt, configuration = configurationOpt, passed = resultOpt, page = Some(page), pageSize = Some(pageSize))) 
+    routes.BatchesController.batches(job = jobIdOpt, configuration = configurationOpt, passed = resultOpt, page = Some(page), pageSize = Some(pageSize))) 
 }
 
 @main("Batches", "Batches", scripts = scripts, css = css) {
@@ -40,7 +40,7 @@
         <td>@batches.size</td>
       </tr>
     </table>
-    <form id="filter-form" role="form" action="@routes.Application.batches()">
+    <form id="filter-form" role="form" action="@routes.BatchesController.batches()">
       @if(jobs.size > 1) {
         <div class="form-group">
           <label for="job-select">Jenkins Job</label>
@@ -66,7 +66,7 @@
       @for(result <- resultOpt){ <input name="passed" value="@result" type="hidden"/> }
     </form>
     
-    <button style="margin-bottom: 12px; margin-top: 12px" id="delete-selected" type="button" class="btn btn-default" title="Delete selected batches" onclick="deleteSelected('@routes.Application.deleteBatches()')"><i class="glyphicon glyphicon-trash"></i> Delete Selected</button>
+    <button style="margin-bottom: 12px; margin-top: 12px" id="delete-selected" type="button" class="btn btn-default" title="Delete selected batches" onclick="deleteSelected('@routes.BatchesController.deleteBatches()')"><i class="glyphicon glyphicon-trash"></i> Delete Selected</button>
     
   </div>
   <div class="col-md-8">
@@ -82,7 +82,7 @@
     <script>
       $(document).ready(function(){
         var batchNames = [ @for(batch <- batches) { "@escapeEcmaScript(batch.nameOpt.getOrElse(""))", } ];
-        var batchUrls = [ @for(batch <- batches) { "@escapeEcmaScript(routes.Application.batch(batch.id).toString)", } ];
+        var batchUrls = [ @for(batch <- batches) { "@escapeEcmaScript(routes.BatchController.batch(batch.id).toString)", } ];
         var passes = [
           @for(batch <- batches) {
             [ new Date(@batch.epochMillis), @batch.passCount ],
@@ -108,13 +108,13 @@
 
   <ul class="nav nav-tabs">
     <li @if(resultOpt.isEmpty){ class="active" }>
-      <a href="@routes.Application.batches(job = jobIdOpt, configuration = configurationOpt)">All</a>
+      <a href="@routes.BatchesController.batches(job = jobIdOpt, configuration = configurationOpt)">All</a>
     </li>
     <li @if(resultOpt == Some(true)){ class="active" }>
-      <a href="@routes.Application.batches(job = jobIdOpt, configuration = configurationOpt, passed = Some(true))">Pass</a>
+      <a href="@routes.BatchesController.batches(job = jobIdOpt, configuration = configurationOpt, passed = Some(true))">Pass</a>
     </li>
     <li @if(resultOpt == Some(false)){ class="active" }>
-      <a href="@routes.Application.batches(job = jobIdOpt, configuration = configurationOpt, passed = Some(false))">Fail</a>
+      <a href="@routes.BatchesController.batches(job = jobIdOpt, configuration = configurationOpt, passed = Some(false))">Fail</a>
     </li>
   </ul>
   
@@ -143,10 +143,10 @@
         @for(batch <- batches.drop(pagination.startFrom).take(pagination.pageSize)) {
           <tr class="batch-row" id="batch-@batch.id">
             <td style="text-align: center; width: 50px"><input class="batchCheckbox" type="checkbox" name="selectedBatch" value="@batch.id"/></td>
-            <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.Application.batch(batch.id)"><img src="@routes.Assets.at("images/" + batch.passFailIcon)" alt="@batch.passFailText" title="@batch.passFailText"/></a></td>
-            <td class="batch-name-cell">@for(name <- batch.nameOpt){ <a href="@routes.Application.batch(batch.id)">@name</a> }</td>
+            <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.BatchController.batch(batch.id)"><img src="@routes.Assets.at("images/" + batch.passFailIcon)" alt="@batch.passFailText" title="@batch.passFailText"/></a></td>
+            <td class="batch-name-cell">@for(name <- batch.nameOpt){ <a href="@routes.BatchController.batch(batch.id)">@name</a> }</td>
               @if(globalViewContext.multipleConfigurationMode) {
-                <td class="configuration-cell">@for(configuration <- batch.configurationOpt){<a href="@routes.Application.tests(configuration = Some(configuration))">@configuration</a>}</td>
+                <td class="configuration-cell">@for(configuration <- batch.configurationOpt){<a href="@routes.TestsController.tests(configuration = Some(configuration))">@configuration</a>}</td>
               }
             <td class="time-cell"><span title="@batch.executionTime.absolute">@batch.executionTime.relative</span></td>
             <td class="url-cell">@for(url <- batch.urlOpt){<a href="@url">External Link <i class="fa fa-external-link"></i></a>}</td>
@@ -154,16 +154,16 @@
             <td style="position: relative"><div style="position: relative; height: 48px;"><div class="pass-bar" style="float: left; width: @batch.passPercent%; height: 48px;"></div><div class="fail-bar" style="float: right; width: @batch.failPercent%; height: 48px;"></div></div></td>
             <td class="counts-cell">
               @if(batch.passCount > 0) {
-                <a href="@routes.Application.batch(batch.id, passed = Some(true))"><span class="badge badge-success">@batch.passCount</span></a>
+                <a href="@routes.BatchController.batch(batch.id, passed = Some(true))"><span class="badge badge-success">@batch.passCount</span></a>
               }
             </td>
             <td class="counts-cell">
               @if(batch.failCount > 0) {
-                <a href="@routes.Application.batch(batch.id, passed = Some(false))"><span class="badge badge-error">@batch.failCount</span></a>
+                <a href="@routes.BatchController.batch(batch.id, passed = Some(false))"><span class="badge badge-error">@batch.failCount</span></a>
               }
             </td>
             <td class="counts-cell">
-              <a href="@routes.Application.batch(batch.id)"><span class="badge badge-inverse">@batch.totalCount</span></a>
+              <a href="@routes.BatchController.batch(batch.id)"><span class="badge badge-inverse">@batch.totalCount</span></a>
             </td>
           </tr>
         }

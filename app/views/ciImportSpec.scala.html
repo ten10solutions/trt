@@ -159,7 +159,7 @@
     <td class="updated-cell"><span title="@build.updatedAt.absolute">@build.updatedAt.relative</span></td>
     <td class="batch-cell">
       @for(batchId <- build.batchIdOpt) {
-        <a href="@routes.Application.batch(batchId)">Batch</a>
+        <a href="@routes.BatchController.batch(batchId)">Batch</a>
       }
     </td>
   </tr>

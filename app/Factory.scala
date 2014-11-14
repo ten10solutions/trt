@@ -82,18 +82,21 @@ class Factory(configuration: Configuration) {
   def getControllerInstance[A](clazz: Class[A]): A = controllerMap(clazz).asInstanceOf[A]
 
   lazy val webApiController = new WebApiController(service)
-
   lazy val ciController = new CiController(service)
-
   lazy val jsonController = new JsonController(service, adminService)
-
   lazy val controller = new Application(service)
-
   lazy val adminController = new AdminController(service, adminService)
-
   lazy val testController = new TestController(service)
+  lazy val testsController = new TestsController(service)
+  lazy val batchController = new BatchController(service)
+  lazy val batchesController = new BatchesController(service)
+  lazy val executionController = new ExecutionController(service)
 
   lazy val controllerMap: Map[Class[_], Controller] = Map(
+    classOf[ExecutionController] -> executionController,
+    classOf[BatchController] -> batchController,
+    classOf[BatchesController] -> batchesController,
+    classOf[TestsController] -> testsController,
     classOf[TestController] -> testController,
     classOf[Application] -> controller,
     classOf[AdminController] -> adminController,

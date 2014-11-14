@@ -15,8 +15,6 @@ import java.net.URI
  */
 class TestController(service: Service) extends AbstractController(service) with HasLogger {
 
-  import Application._
-
   def test(testId: Id[Test], configurationOpt: Option[Configuration], resultOpt: Option[Boolean], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
     Pagination.validate(pageOpt, pageSizeOpt) match {
       case Left(errorMessage) ⇒

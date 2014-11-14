@@ -58,7 +58,7 @@
 
 @if(tests.nonEmpty) {
 
-  <button style="margin-bottom: 12px; margin-top: 12px" id="deleteSelected" type="button" class="btn btn-default" title="Mark selected tests as deleted" onclick="performTestAction('@routes.Application.deleteTests()')"><i class="glyphicon glyphicon-trash"></i> Mark selected tests as deleted</button>
+  <button style="margin-bottom: 12px; margin-top: 12px" id="deleteSelected" type="button" class="btn btn-default" title="Mark selected tests as deleted" onclick="performTestAction('@routes.TestsController.deleteTests()')"><i class="glyphicon glyphicon-trash"></i> Mark selected tests as deleted</button>
 
   <div style="clear: both;"></div>
 
@@ -84,11 +84,11 @@
             <td style="text-align: center; width: 50px"><input class="testCheckbox" type="checkbox" name="selectedTest" value="@test.id"/></td>
             <td class="pass-fail-cell">@for(icon <- test.ballIconOpt){<a href="@routes.TestController.test(test.id, configuration = Some(configuration))"><img src="@routes.Assets.at("images/" + icon)"/></a>}</td>
             <td class="pass-fail-cell">@for(weatherInfo <- test.weatherInfoOpt){<img title="@weatherInfo.passRate" src="@routes.Assets.at("images/" + weatherInfo.iconPath)"/>}</td>
-            <td>@for(group <- test.groupOpt) {<a href="@routes.Application.tests(configuration = Some(configuration), status = None, name = None, group = Some(group.full))"><span title="@group.full">@group.abbreviate(maxLength = 35)</span></a>}</td>
+            <td>@for(group <- test.groupOpt) {<a href="@routes.TestsController.tests(configuration = Some(configuration), status = None, name = None, group = Some(group.full))"><span title="@group.full">@group.abbreviate(maxLength = 35)</span></a>}</td>
             <td><a class="test-link" href="@routes.TestController.test(test.id, configuration = Some(configuration))" title="@test.name.full">@test.name.abbreviate(maxLength = 40)</a></td>
             <td class="consecutive-failures-cell">@for(consecutiveFailures <- test.consecutiveFailuresOpt){@consecutiveFailures}</td>
             <td class="failing-since-cell">@for(failingSince <- test.failingSinceOpt){<span title="@failingSince.absolute">@failingSince.relative</span>}</td>
-            <td class="last-passfail-cell">@for((executionId, time) <- test.lastExecutionOpt){<a class="last-executed-link" href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a>}</td>
+            <td class="last-passfail-cell">@for((executionId, time) <- test.lastExecutionOpt){<a class="last-executed-link" href="@routes.ExecutionController.execution(executionId)" title="@time.absolute">@time.relative</a>}</td>
           </tr>
         }
       <tbody>

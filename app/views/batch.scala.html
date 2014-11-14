@@ -12,7 +12,7 @@
 
 @executionsPaginationWidget = { 
   @paginationWidget(pagination)((page, pageSize) => 
-    routes.Application.batch(batch.id, passed = passedFilterOpt, page = Some(page), pageSize = Some(pageSize))) 
+    routes.BatchController.batch(batch.id, passed = passedFilterOpt, page = Some(page), pageSize = Some(pageSize))) 
 }
 
 @main("Batch", "Batch", scripts = scripts, css = css) {
@@ -34,7 +34,7 @@
         @for(configuration <- batch.configurationOpt) {
           <tr>
             <td>Configuration</td>
-            <td><a id="configuration-link" href="@routes.Application.tests(configuration = Some(configuration))">@configuration</a></td>
+            <td><a id="configuration-link" href="@routes.TestsController.tests(configuration = Some(configuration))">@configuration</a></td>
           </tr>
         }
         <tr><td>Date</td><td>@batch.executionTime.absolute (@batch.executionTime.relative)</span></td></tr>
@@ -43,12 +43,12 @@
         }
         <tr>
           <td>Counts</td>
-          <td>@if(batch.passCount > 0){<a href="@routes.Application.batch(batch.id, passed = Some(true))"><span class="badge badge-success">@batch.passCount</span> passed</a>  }@if(batch.failCount > 0){<a href="@routes.Application.batch(batch.id, passed = Some(false))"><span class="badge badge-error">@batch.failCount</span> failed</a> }<a href="@routes.Application.batch(batch.id)"><span class="badge badge-inverse">@batch.totalCount</span> total</a></td>
+          <td>@if(batch.passCount > 0){<a href="@routes.BatchController.batch(batch.id, passed = Some(true))"><span class="badge badge-success">@batch.passCount</span> passed</a>  }@if(batch.failCount > 0){<a href="@routes.BatchController.batch(batch.id, passed = Some(false))"><span class="badge badge-error">@batch.failCount</span> failed</a> }<a href="@routes.BatchController.batch(batch.id)"><span class="badge badge-inverse">@batch.totalCount</span> total</a></td>
         </tr>     
         @if(batch.hasLog) {
           <tr>
             <td>Log</td>
-            <td><a href="@routes.Application.batchLog(batch.id)" id="batch-log-link">View</a></td>
+            <td><a href="@routes.BatchController.batchLog(batch.id)" id="batch-log-link">View</a></td>
           </tr>
         }
         <tr>
@@ -68,8 +68,8 @@
               fail: @batch.failCount,
             },
             {
-              pass: "@routes.Application.batch(batch.id, passed = Some(true))",
-              fail: "@routes.Application.batch(batch.id, passed = Some(false))",
+              pass: "@routes.BatchController.batch(batch.id, passed = Some(true))",
+              fail: "@routes.BatchController.batch(batch.id, passed = Some(false))",
             }
           );
         });
@@ -82,7 +82,7 @@
     <button style="margin-bottom: 10px" id="rerunSelected" type="button" class="btn btn-default" title="Rerun selected tests on Jenkins" onclick="rerunSelected('@routes.CiController.rerunSelectedTests()')"><i class="glyphicon glyphicon-refresh"></i> Rerun Selected</button>
   }
   <button style="margin-bottom: 10px" id="delete-batch-button" class="btn btn-default" onclick="deleteBatch()" type="button" title="Delete batch"><i class="glyphicon glyphicon-trash"></i> Delete batch</button>
-  <form id="delete-batch-form" action="@routes.Application.deleteBatch(batch.id)" role="form" method="post"></form>
+  <form id="delete-batch-form" action="@routes.BatchController.deleteBatch(batch.id)" role="form" method="post"></form>
   
   <h3>Test Executions</h3>
   
@@ -90,16 +90,16 @@
    
   <ul class="nav nav-tabs">
     <li @if(passedFilterOpt.isEmpty){ class="active" }>
-      <a href="@routes.Application.batch(batch.id)">All</a>
+      <a href="@routes.BatchController.batch(batch.id)">All</a>
     </li>
     @if(batch.passCount > 0) {
       <li @if(passedFilterOpt == Some(true)){ class="active" }>
-        <a href="@routes.Application.batch(batch.id, passed = Some(true))">Pass</a>
+        <a href="@routes.BatchController.batch(batch.id, passed = Some(true))">Pass</a>
       </li>
     }
     @if(batch.failCount > 0) {
       <li @if(passedFilterOpt == Some(false)){ class="active" }>
-        <a href="@routes.Application.batch(batch.id, passed = Some(false))">Fail</a>
+        <a href="@routes.BatchController.batch(batch.id, passed = Some(false))">Fail</a>
       </li>
     }
   </ul>
@@ -119,12 +119,12 @@
     <tbody>
       @for(execution <- batch.executions.drop(pagination.startFrom).take(pagination.pageSize)) {
         <tr class="execution-row">
-          <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.Application.execution(execution.id)"><img src="@routes.Assets.at("images/" + execution.passFailIcon)" alt="@execution.passFailText" title="@execution.passFailText"/></a></td>
-          <td>@for(group <- execution.groupOpt) { <a href="@routes.Application.tests(group = Some(group.full), configuration = Some(execution.configuration))"><span class="execution-group" title="@group.full">@group.abbreviate(maxLength = 35)</span></a> }</td>
+          <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.ExecutionController.execution(execution.id)"><img src="@routes.Assets.at("images/" + execution.passFailIcon)" alt="@execution.passFailText" title="@execution.passFailText"/></a></td>
+          <td>@for(group <- execution.groupOpt) { <a href="@routes.TestsController.tests(group = Some(group.full), configuration = Some(execution.configuration))"><span class="execution-group" title="@group.full">@group.abbreviate(maxLength = 35)</span></a> }</td>
           <td><a href="@routes.TestController.test(execution.testId, configuration = Some(execution.configuration))" class="execution-name" title="@execution.name.full">@execution.name.abbreviate(maxLength = 40)</a></td>
           <td>@for(summary <- execution.summaryOpt){ <span class="execution-summary" title="@summary.full">@summary.abbreviated</span> }</td>
           <td class="duration-cell">@for(duration <- execution.durationOpt) { @duration }</td>
-          <td class="execution-links-cell"><a class="execution-link" href="@routes.Application.execution(execution.id)">Execution</a></td>
+          <td class="execution-links-cell"><a class="execution-link" href="@routes.ExecutionController.execution(execution.id)">Execution</a></td>
         </tr>
       }
     <tbody>
@@ -132,6 +132,6 @@
   
   @executionsPaginationWidget
 
-  @editComment(batch.commentOpt, routes.Application.setBatchComment(batch.id))
+  @editComment(batch.commentOpt, routes.BatchController.setBatchComment(batch.id))
   
 }

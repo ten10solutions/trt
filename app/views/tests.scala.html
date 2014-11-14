@@ -25,7 +25,7 @@
 
 @testsPaginationWidget = { 
   @paginationWidget(pagination)((page, pageSize) => 
-    routes.Application.tests(
+    routes.TestsController.tests(
       configuration = Some(configuration), 
       status = testStatusOpt, 
       name = nameOpt,
@@ -41,21 +41,21 @@
   @if(nameOpt.isEmpty && groupOpt.isEmpty && categoryOpt.isEmpty) { display: none; }
 }
 
-@testsLink(status: TestStatus) = {@routes.Application.tests(configuration = Some(configuration), status = Some(status), name = nameOpt, group = groupOpt, sort = sortOpt, category = categoryOpt, descending = descendingOpt)}
+@testsLink(status: TestStatus) = {@routes.TestsController.tests(configuration = Some(configuration), status = Some(status), name = nameOpt, group = groupOpt, sort = sortOpt, category = categoryOpt, descending = descendingOpt)}
 
 @sortLink(sort: Sort) = {
   @if(sortOpt.getOrElse(Sort.Group) == sort) {
     @if(descendingOpt.getOrElse(false)) {
-      <a class="sort-link" href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = groupOpt, sort = Some(sort))">
+      <a class="sort-link" href="@routes.TestsController.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = groupOpt, sort = Some(sort))">
         <i class="fa fa-sort-desc"></i>
       </a> 
     } else {
-      <a class="sort-link" href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = groupOpt, sort = Some(sort), descending = Some(true))">
+      <a class="sort-link" href="@routes.TestsController.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = groupOpt, sort = Some(sort), descending = Some(true))">
         <i class="fa fa-sort-asc"></i>
       </a> 
     } 
   } else {
-    <a class="sort-link" href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = groupOpt, sort = Some(sort))">
+    <a class="sort-link" href="@routes.TestsController.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = groupOpt, sort = Some(sort))">
       <i class="fa fa-sort"></i>
     </a> 
   }
@@ -72,7 +72,7 @@
           <tr>
             <td>Configuration</td>
             <td>
-              <form id="configuration-form" action="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = groupOpt, category = categoryOpt, sort = sortOpt, descending = descendingOpt)" method="get">
+              <form id="configuration-form" action="@routes.TestsController.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = groupOpt, category = categoryOpt, sort = sortOpt, descending = descendingOpt)" method="get">
                 @for(name <- nameOpt) { <input name="name" value="@name" type="hidden"/> }
                 @for(group <- groupOpt) { <input name="group" value="@group" type="hidden"/> }
                 @for(category <- categoryOpt) { <input name="category" value="@category" type="hidden"/> }
@@ -92,11 +92,11 @@
             @if(testsSummary.passCount > 0){<a href="@testsLink(TestStatus.Healthy)"><span class="badge badge-success">@testsSummary.passCount</span></a> Healthy }
             @if(testsSummary.warnCount > 0){<a href="@testsLink(TestStatus.Warning)"><span class="badge badge-warning">@testsSummary.warnCount</span></a> Warning }
             @if(testsSummary.failCount > 0){<a href="@testsLink(TestStatus.Broken)"><span class="badge badge-error">@testsSummary.failCount</span></a> Broken }
-            <a id="total-test-count" href="@routes.Application.tests(configuration = Some(configuration), name = nameOpt, group = groupOpt, category = categoryOpt, sort = sortOpt, descending = descendingOpt)"><span class="badge badge-inverse">@testsSummary.totalCount</span></a> Total
+            <a id="total-test-count" href="@routes.TestsController.tests(configuration = Some(configuration), name = nameOpt, group = groupOpt, category = categoryOpt, sort = sortOpt, descending = descendingOpt)"><span class="badge badge-inverse">@testsSummary.totalCount</span></a> Total
           </td>
         </tr>
       </table>
-      <form id="filter-form" role="form" action="@routes.Application.tests(configuration = Some(configuration), sort = sortOpt, descending = descendingOpt)">
+      <form id="filter-form" role="form" action="@routes.TestsController.tests(configuration = Some(configuration), sort = sortOpt, descending = descendingOpt)">
 	<table class="table table-bordered">
           <tr id="filter-tests-header-bar">
             <td colspan="2">
@@ -156,14 +156,14 @@
   @if(canRerun) {
     <button style="margin-bottom: 12px" id="rerunSelected" type="button" class="btn btn-default" title="Rerun selected tests on Jenkins" onclick="performTestAction('@routes.CiController.rerunSelectedTests()')"><i class="glyphicon glyphicon-refresh"></i> Rerun Selected</button>
   }
-  <button style="margin-bottom: 12px" id="deleteSelected" type="button" class="btn btn-default" title="Mark selected tests as deleted" onclick="performTestAction('@routes.Application.deleteTests()')"><i class="glyphicon glyphicon-trash"></i> Mark selected tests as deleted</button>
+  <button style="margin-bottom: 12px" id="deleteSelected" type="button" class="btn btn-default" title="Mark selected tests as deleted" onclick="performTestAction('@routes.TestsController.deleteTests()')"><i class="glyphicon glyphicon-trash"></i> Mark selected tests as deleted</button>
   <div style="clear: both;"></div>
 
   @testsPaginationWidget
   
   <ul class="nav nav-tabs">
     <li @if(testStatusOpt.isEmpty){ class="active" }>
-      <a href="@routes.Application.tests(configuration = Some(configuration), name = nameOpt, group = groupOpt, category = categoryOpt, sort = sortOpt, descending = descendingOpt)">All</a>
+      <a href="@routes.TestsController.tests(configuration = Some(configuration), name = nameOpt, group = groupOpt, category = categoryOpt, sort = sortOpt, descending = descendingOpt)">All</a>
     </li>
     @if(testsSummary.passCount > 0) {
       <li @if(testStatusOpt == Some(TestStatus.Healthy)){ class="active" }>
@@ -204,13 +204,13 @@
             <td style="text-align: center; width: 50px"><input class="testCheckbox" type="checkbox" name="selectedTest" value="@test.id"/></td>
             <td class="pass-fail-cell">@for(icon <- test.ballIconOpt){<a href="@routes.TestController.test(test.id, configuration = Some(configuration))"><img src="@routes.Assets.at("images/" + icon)"/></a>}</td>
             <td class="pass-fail-cell">@for(weatherInfo <- test.weatherInfoOpt){<img title="@weatherInfo.passRate" src="@routes.Assets.at("images/" + weatherInfo.iconPath)"/>}</td>
-            <td>@for(group <- test.groupOpt) {<a href="@routes.Application.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = Some(group.full), category = categoryOpt, sort = sortOpt, descending = descendingOpt)"><span title="@group.full">@group.abbreviate(maxLength = 35)</span></a>}</td>
+            <td>@for(group <- test.groupOpt) {<a href="@routes.TestsController.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = Some(group.full), category = categoryOpt, sort = sortOpt, descending = descendingOpt)"><span title="@group.full">@group.abbreviate(maxLength = 35)</span></a>}</td>
             <td><a class="test-link" href="@routes.TestController.test(test.id, configuration = Some(configuration))" title="@test.name.full">@test.name.abbreviate(maxLength = 40)</a></td>
             <td class="duration-cell">@for(duration <- test.medianDurationOpt){@duration}</td>
             <td class="consecutive-failures-cell">@for(consecutiveFailures <- test.consecutiveFailuresOpt){@consecutiveFailures}</td>            
             <td class="failing-since-cell">@for(failingSince <- test.failingSinceOpt){<span title="@failingSince.absolute">@failingSince.relative</span>}</td>
-            <td class="last-passfail-cell">@for((executionId, time) <- test.lastPassedExecutionOpt){<a class="last-passed-link" href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a>}</td>
-            <td class="last-passfail-cell">@for((executionId, time) <- test.lastFailedExecutionOpt){<a href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a>}</td>
+            <td class="last-passfail-cell">@for((executionId, time) <- test.lastPassedExecutionOpt){<a class="last-passed-link" href="@routes.ExecutionController.execution(executionId)" title="@time.absolute">@time.relative</a>}</td>
+            <td class="last-passfail-cell">@for((executionId, time) <- test.lastFailedExecutionOpt){<a href="@routes.ExecutionController.execution(executionId)" title="@time.absolute">@time.relative</a>}</td>
           </tr>
          }
       <tbody>

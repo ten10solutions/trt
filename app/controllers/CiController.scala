@@ -18,9 +18,7 @@ import com.thetestpeople.trt.importer._
 /**
  * Handle HTTP requests specific to Jenkins functionality
  */
-class CiController(service: Service) extends Controller with HasLogger {
-
-  private implicit def globalViewContext: GlobalViewContext = ControllerHelper.globalViewContext(service)
+class CiController(service: Service) extends AbstractController(service) with HasLogger {
 
   import routes.CiController
   import views.html
@@ -263,15 +261,8 @@ class CiController(service: Service) extends Controller with HasLogger {
       })
   }
 
-  private def previousUrlOpt(implicit request: Request[AnyContent]): Option[Call] =
-    for {
-      requestMap ← request.body.asFormUrlEncoded
-      values ← requestMap.get("previousURL")
-      previousUrl ← values.headOption
-    } yield new Call("GET", previousUrl)
-
   def rerunSelectedTests() = Action { implicit request ⇒
-    val selectedTestIds: Seq[Id[Test]] = ControllerHelper.getSelectedTestIds(request)
+    val selectedTestIds = getFormParameters("selectedTest").flatMap(Id.parse[Test])
     logger.debug(s"rerunSelectedTests(${selectedTestIds.mkString(",")})")
     rerunTests(selectedTestIds)
   }
@@ -279,7 +270,7 @@ class CiController(service: Service) extends Controller with HasLogger {
   private def rerunTests(testIds: Seq[Id[Test]])(implicit request: Request[AnyContent]) = {
     val triggerResult = service.rerunTests(testIds)
 
-    val redirectTarget = previousUrlOpt.getOrElse(routes.Application.tests())
+    val redirectTarget = previousUrlOpt.getOrElse(routes.TestsController.tests())
 
     triggerResult match {
       case TriggerResult.Success(jobUrl) ⇒

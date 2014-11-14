@@ -29,7 +29,7 @@
 
   @testsPaginationWidget
 
-  <form style="margin-bottom: 0px; display: inline" id="testActionForm" action="@routes.Application.undeleteTests()" method="post">
+  <form style="margin-bottom: 0px; display: inline" id="testActionForm" action="@routes.TestsController.undeleteTests()" method="post">
     <input type="hidden" name="previousURL" value="@request.uri"/>
     <table class="table table-striped table-bordered table-hover table-condensed">
       <thead>
@@ -42,7 +42,7 @@
         @for(test <- tests) {
           <tr class="test-row">
             <td style="text-align: center; width: 50px"><input class="testCheckbox" type="checkbox" name="selectedTest" value="@test.id"/></td>
-            <td>@for(group <- test.groupOpt) {<a href="@routes.Application.tests(group = Some(group.full))"><span title="@group.full">@group.abbreviate(maxLength = 35)</span></a>}</td>
+            <td>@for(group <- test.groupOpt) {<a href="@routes.TestsController.tests(group = Some(group.full))"><span title="@group.full">@group.abbreviate(maxLength = 35)</span></a>}</td>
             <td><a class="test-link" href="@routes.TestController.test(test.id)" title="@test.name.full">@test.name.abbreviate(maxLength = 40)</a></td>
           </tr>
         }

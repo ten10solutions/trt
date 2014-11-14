@@ -61,15 +61,15 @@
                 <a id="menu-tests" href="#" class="dropdown-toggle" data-toggle="dropdown">Tests <b class="caret"></b></a>
                 <ul class="dropdown-menu">
                   @for(configuration <- globalViewContext.configurations) {
-                    <li><a class="configuration-menu-item" href="@routes.Application.tests(configuration=Some(configuration))">@configuration</a></li>
+                    <li><a class="configuration-menu-item" href="@routes.TestsController.tests(configuration=Some(configuration))">@configuration</a></li>
                   }
                 </ul>
               </li>
             }
             @if(globalViewContext.singleConfigurationMode) {
-              <li class="@if(currentPage == "Tests") {active}"><a id="menu-tests" href="@routes.Application.tests(configuration=globalViewContext.configurations.headOption)">Tests</a></li>
+              <li class="@if(currentPage == "Tests") {active}"><a id="menu-tests" href="@routes.TestsController.tests(configuration=globalViewContext.configurations.headOption)">Tests</a></li>
             } 
-            <li class="@if(currentPage == "Batches") {active}"><a id="menu-batches" href="@routes.Application.batches()">Batches</a></li>
+            <li class="@if(currentPage == "Batches") {active}"><a id="menu-batches" href="@routes.BatchesController.batches()">Batches</a></li>
             <li class="@if(currentPage == "Executions") {active}"><a id="menu-executions" href="@routes.Application.executions()">Executions</a></li>
             <li class="@if(currentPage == "SearchLogs") {active}"><a id="menu-search-logs" href="@routes.Application.searchLogs()"><span class="glyphicon glyphicon-search"></span> Search Logs</a></li>
             <li class="dropdown @if(currentPage == "Reports") {active}">

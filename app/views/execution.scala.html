@@ -12,12 +12,12 @@
       @for(group <- execution.groupOpt) {
         <tr>
           <td>Group</td>
-          <td id="test-group"><a href="@routes.Application.tests(configuration = Some(execution.configuration), group = Some(group.full))"><span title="@group.full">@group.full</span></a></td>
+          <td id="test-group"><a href="@routes.TestsController.tests(configuration = Some(execution.configuration), group = Some(group.full))"><span title="@group.full">@group.full</span></a></td>
         </tr>
       }
       <tr>
         <td>Batch</td>
-        <td><a id="batch-name" href="@routes.Application.batch(execution.batchId)">@execution.batchName</a></td>
+        <td><a id="batch-name" href="@routes.BatchController.batch(execution.batchId)">@execution.batchName</a></td>
       </tr>
       @for(summary <- execution.summaryOpt) {
         <tr><td>Summary</td><td id="execution-summary">@summary.full</td></tr>
@@ -31,7 +31,7 @@
       }
       <tr>
         <td>Configuration</td>
-        <td><a id="configuration-link" href="@routes.Application.tests(configuration = Some(execution.configuration))">@execution.configuration</a></td>
+        <td><a id="configuration-link" href="@routes.TestsController.tests(configuration = Some(execution.configuration))">@execution.configuration</a></td>
       </tr>
       <tr>
         <td>Comment</td>
@@ -44,6 +44,6 @@
      <pre id="log">@log</pre>
    }
 
-   @editComment(execution.commentOpt, routes.Application.setExecutionComment(execution.id))
+   @editComment(execution.commentOpt, routes.ExecutionController.setExecutionComment(execution.id))
 
 }

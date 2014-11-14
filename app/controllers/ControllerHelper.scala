@@ -10,14 +10,6 @@ import com.thetestpeople.trt.utils.Utils
 
 object ControllerHelper {
 
-  def getSelectedTestIds(request: Request[AnyContent]): Seq[Id[Test]] =
-    for {
-      requestMap ← request.body.asFormUrlEncoded.toSeq
-      selectedIds ← requestMap.get("selectedTest").toSeq
-      idString ← selectedIds
-      id ← Id.parse[Test](idString)
-    } yield id
-
   def globalViewContext(service: Service): GlobalViewContext = {
     val configurations = service.getConfigurations()
     val projectNameOpt = service.getSystemConfiguration().projectNameOpt

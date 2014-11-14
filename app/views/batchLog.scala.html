@@ -3,7 +3,7 @@
 @main("Batch Log", "BatchLog") {
 
   <ol class="breadcrumb">
-    <li><a href="@routes.Application.batch(batch.id)">@batch.nameOpt.getOrElse("Batch")</a></li>
+    <li><a href="@routes.BatchController.batch(batch.id)">@batch.nameOpt.getOrElse("Batch")</a></li>
     <li class="active">Log</li>
   </ol>
 

@@ -10,11 +10,9 @@ GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 GET     /dashboard                  @controllers.Application.configurations()
 
-GET     /tests                      @controllers.Application.tests(configuration: Option[Configuration] ?= None, status: Option[TestStatus] ?= None, name: Option[String] ?= None, group: Option[String] ?= None, category: Option[String] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None, sort: Option[Sort] ?= None, descending: Option[Boolean] ?= None)
-GET     /tests/stale                @controllers.Application.staleTests(configuration: Option[Configuration] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
-GET     /tests/deleted              @controllers.Application.deletedTests(page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
-POST    /tests/delete               @controllers.Application.deleteTests()
-POST    /tests/undelete             @controllers.Application.undeleteTests()
+GET     /tests                      @controllers.TestsController.tests(configuration: Option[Configuration] ?= None, status: Option[TestStatus] ?= None, name: Option[String] ?= None, group: Option[String] ?= None, category: Option[String] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None, sort: Option[Sort] ?= None, descending: Option[Boolean] ?= None)
+POST    /tests/undelete             @controllers.TestsController.undeleteTests()
+POST    /tests/delete               @controllers.TestsController.deleteTests()
 
 GET     /test/:id                   @controllers.TestController.test(id: Id[Test], configuration: Option[Configuration] ?= None, passed: Option[Boolean] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 POST    /test/:id/delete            @controllers.TestController.deleteTest(id: Id[Test])
@@ -23,18 +21,21 @@ POST    /test/:id/comment           @controllers.TestController.setTestComment(i
 POST    /test/:id/addCategory       @controllers.TestController.addCategory(id: Id[Test])
 POST    /test/:id/removeCategory    @controllers.TestController.removeCategory(id: Id[Test])
 
-GET     /execution/:id              @controllers.Application.execution(id: Id[Execution])
-POST    /execution/:id/comment      @controllers.Application.setExecutionComment(id: Id[Execution])
+GET     /execution/:id              @controllers.ExecutionController.execution(id: Id[Execution])
+POST    /execution/:id/comment      @controllers.ExecutionController.setExecutionComment(id: Id[Execution])
+
+GET     /tests/deleted              @controllers.Application.deletedTests(page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
+GET     /tests/stale                @controllers.Application.staleTests(configuration: Option[Configuration] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 GET     /executions                 @controllers.Application.executions(configuration: Option[Configuration] ?= None, passed: Option[Boolean] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 GET     /executions/logs            @controllers.Application.searchLogs(query: Option[String] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 
-GET     /batch/:id                  @controllers.Application.batch(id: Id[Batch], passed: Option[Boolean] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
-POST    /batch/:id/comment          @controllers.Application.setBatchComment(id: Id[Batch])
-GET     /batch/:id/log              @controllers.Application.batchLog(id: Id[Batch])
-POST    /batch/:id/delete           @controllers.Application.deleteBatch(id: Id[Batch])
+GET     /batch/:id                  @controllers.BatchController.batch(id: Id[Batch], passed: Option[Boolean] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
+POST    /batch/:id/comment          @controllers.BatchController.setBatchComment(id: Id[Batch])
+POST    /batch/:id/delete           @controllers.BatchController.deleteBatch(id: Id[Batch])
+GET     /batch/:id/log              @controllers.BatchController.batchLog(id: Id[Batch])
 
-GET     /batches                    @controllers.Application.batches(job: Option[CiJobId] ?= None, configuration: Option[Configuration] ?= None, passed: Option[Boolean] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
-POST    /batches/delete             @controllers.Application.deleteBatches()
+GET     /batches                    @controllers.BatchesController.batches(job: Option[CiJobId] ?= None, configuration: Option[Configuration] ?= None, passed: Option[Boolean] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
+POST    /batches/delete             @controllers.BatchesController.deleteBatches()
  
 GET     /systemConfiguration        @controllers.Application.editSystemConfiguration
 POST    /systemConfiguration        @controllers.Application.updateSystemConfiguration

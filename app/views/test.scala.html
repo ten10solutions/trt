@@ -38,7 +38,7 @@
     @for(group <- test.groupOpt) {
       <tr>
         <td>Group</td>
-        <td><a href="@routes.Application.tests(configuration = configurationOpt, group = Some(group.full))"><span id="group" title="@group.full">@group.abbreviate(50)</span></a></td>
+        <td><a href="@routes.TestsController.tests(configuration = configurationOpt, group = Some(group.full))"><span id="group" title="@group.full">@group.abbreviate(50)</span></a></td>
       </tr>
     }
     @if(globalViewContext.multipleConfigurationMode) {
@@ -78,19 +78,19 @@
     @for((executionId, time) <- test.lastExecutionOpt) {
       <tr>
         <td>Last executed</td>
-        <td><a href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a></td>
+        <td><a href="@routes.ExecutionController.execution(executionId)" title="@time.absolute">@time.relative</a></td>
       </tr>
     }
     @for((executionId, time) <- test.lastPassedExecutionOpt) {
       <tr>
         <td>Last passed</td>
-        <td><a href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a></td>
+        <td><a href="@routes.ExecutionController.execution(executionId)" title="@time.absolute">@time.relative</a></td>
       </tr>
     }
     @for((executionId, time) <- test.lastFailedExecutionOpt) {
       <tr>
         <td>Last failed</td>
-        <td><a href="@routes.Application.execution(executionId)" title="@time.absolute">@time.relative</a></td>
+        <td><a href="@routes.ExecutionController.execution(executionId)" title="@time.absolute">@time.relative</a></td>
       </tr>
     }
     @for(medianDuration <- test.medianDurationOpt) {
@@ -112,7 +112,7 @@
       <td>
         @for(category <- test.categories) { 
           <span class="category-widget tag label label-info">
-            <a class="category-link" href="@routes.Application.tests(category = Some(category), configuration = configurationOpt)" title="View tests in the @category category">@category</a>
+            <a class="category-link" href="@routes.TestsController.tests(category = Some(category), configuration = configurationOpt)" title="View tests in the @category category">@category</a>
             <a class="remove-category-link" onclick="removeCategory('@escapeEcmaScript(category)')" title="Remove category"><i class="remove glyphicon glyphicon-remove-sign glyphicon-white"></i></a>
           </span>
         } 
@@ -151,10 +151,10 @@
     $(document).ready(function(){
       var executionUrls = [
         [@for(execution <- executions; if execution.failed && execution.durationSecondsOpt.isDefined) {
-          "@routes.Application.execution(execution.id)",
+          "@routes.ExecutionController.execution(execution.id)",
         }],
         [@for(execution <- executions; if execution.passed && execution.durationSecondsOpt.isDefined) {
-          "@routes.Application.execution(execution.id)",
+          "@routes.ExecutionController.execution(execution.id)",
         }]
       ];
       var fails = [
@@ -204,15 +204,15 @@
     <tbody>
       @for(execution <- executions.drop(pagination.startFrom).take(pagination.pageSize)) {
         <tr class="execution-row">
-          <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.Application.execution(execution.id)"><img src="@routes.Assets.at("images/" + execution.passFailIcon)" alt="@execution.passFailText" title="@execution.passFailText"/></a></td>
+          <td class="pass-fail-cell"><a class="pass-fail-icon" href="@routes.ExecutionController.execution(execution.id)"><img src="@routes.Assets.at("images/" + execution.passFailIcon)" alt="@execution.passFailText" title="@execution.passFailText"/></a></td>
           <td class="exec-time-cell"><span title="@execution.executionTime.absolute">@execution.executionTime.relative</span></td>
           <td class="duration-cell">@for(duration <- execution.durationOpt) { @duration }</td>
-          <td>@for(summary <- execution.summaryOpt) { <a href="@routes.Application.execution(execution.id)"><span title="@summary.full">@summary.abbreviated</span></a> }</td>
+          <td>@for(summary <- execution.summaryOpt) { <a href="@routes.ExecutionController.execution(execution.id)"><span title="@summary.full">@summary.abbreviated</span></a> }</td>
           @if(globalViewContext.multipleConfigurationMode) {
-            <td class="configuration-cell center-horiz"><a href="@routes.Application.tests(configuration = Some(execution.configuration))">@execution.configuration</a></td>
+            <td class="configuration-cell center-horiz"><a href="@routes.TestsController.tests(configuration = Some(execution.configuration))">@execution.configuration</a></td>
           }
-          <td class="execution-links-cell"><a class="execution-link" href="@routes.Application.execution(execution.id)">Execution</a></td>
-          <td class="execution-links-cell"><a class="batch-link" href="@routes.Application.batch(execution.batchId)">@execution.batchName</a></td>
+          <td class="execution-links-cell"><a class="execution-link" href="@routes.ExecutionController.execution(execution.id)">Execution</a></td>
+          <td class="execution-links-cell"><a class="batch-link" href="@routes.BatchController.batch(execution.batchId)">@execution.batchName</a></td>
         </tr>
       }
     </tbody>
