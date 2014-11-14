@@ -15,7 +15,6 @@ import scala.slick.driver.H2Driver
 
 class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None)
     extends Dao
-    with DaoAdmin
     with HasLogger
     with Mappings
     with SlickCiDao

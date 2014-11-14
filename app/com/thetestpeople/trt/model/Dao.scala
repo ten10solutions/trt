@@ -15,4 +15,6 @@ trait Dao extends ExecutionDao with CiDao with BatchDao with TestDao {
 
   def getConfigurations(): Seq[Configuration]
 
+  def deleteAll()
+  
 }

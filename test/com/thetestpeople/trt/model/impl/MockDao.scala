@@ -23,22 +23,22 @@ class MockDao extends Dao {
       lock.unlock()
   }
 
-  private var executions: Seq[Execution] = List()
-  private var tests: Seq[Test] = List()
-  private var testComments: Seq[TestComment] = List()
-  private var testCategories: Seq[TestCategory] = List()
-  private var batches: Seq[Batch] = List()
-  private var analyses: Seq[Analysis] = List()
-  private var executionLogs: Seq[ExecutionLogRow] = List()
-  private var executionComments: Seq[ExecutionComment] = List()
-  private var batchLogs: Seq[BatchLogRow] = List()
-  private var batchComments: Seq[BatchComment] = List()
-  private var ciJobs: Seq[CiJob] = List()
-  private var ciBuilds: Seq[CiBuild] = List()
-  private var importSpecs: Seq[CiImportSpec] = List()
+  private var executions: Seq[Execution] = Seq()
+  private var tests: Seq[Test] = Seq()
+  private var testComments: Seq[TestComment] = Seq()
+  private var testCategories: Seq[TestCategory] = Seq()
+  private var batches: Seq[Batch] = Seq()
+  private var analyses: Seq[Analysis] = Seq()
+  private var executionLogs: Seq[ExecutionLogRow] = Seq()
+  private var executionComments: Seq[ExecutionComment] = Seq()
+  private var batchLogs: Seq[BatchLogRow] = Seq()
+  private var batchComments: Seq[BatchComment] = Seq()
+  private var ciJobs: Seq[CiJob] = Seq()
+  private var ciBuilds: Seq[CiBuild] = Seq()
+  private var importSpecs: Seq[CiImportSpec] = Seq()
   private var systemConfiguration = SystemConfiguration()
   private var jenkinsConfiguration = JenkinsConfiguration()
-  private var jenkinsConfigParams: Seq[JenkinsJobParam] = List()
+  private var jenkinsConfigParams: Seq[JenkinsJobParam] = Seq()
   private var teamCityConfiguration = TeamCityConfiguration()
 
   def getEnrichedExecution(id: Id[Execution]): Option[EnrichedExecution] =
@@ -433,4 +433,24 @@ class MockDao extends Dao {
     testCategories = testCategories.filterNot(tc ⇒ tc.testId == testId && categories.contains(tc.category))
   }
 
+  def deleteAll() = {
+   executions = Seq()
+   tests = Seq()
+   testComments = Seq()
+   testCategories = Seq()
+   batches = Seq()
+   analyses = Seq()
+   executionLogs = Seq()
+   executionComments = Seq()
+   batchLogs = Seq()
+   batchComments = Seq()
+   ciJobs = Seq()
+   ciBuilds = Seq()
+   importSpecs = Seq()
+   systemConfiguration = SystemConfiguration()
+   jenkinsConfiguration = JenkinsConfiguration()
+   jenkinsConfigParams = Seq()
+   teamCityConfiguration = TeamCityConfiguration()
+  }
+  
 }

@@ -299,14 +299,6 @@ class Application(service: Service, adminService: AdminService) extends Controll
     Ok(Json.toJson("OK"))
   }
 
-  private def getDefaultConfiguration: Option[Configuration] = {
-    val configurations = service.getConfigurations.sorted
-    if (configurations contains Configuration.Default)
-      Some(Configuration.Default)
-    else
-      configurations.headOption
-  }
-
   def staleTests(configurationOpt: Option[Configuration], pageOpt: Option[Int], pageSizeOpt: Option[Int]) = Action { implicit request ⇒
     Pagination.validate(pageOpt, pageSizeOpt) match {
       case Left(errorMessage) ⇒
@@ -330,17 +322,12 @@ class Application(service: Service, adminService: AdminService) extends Controll
     Ok(views.html.staleTests(madViewOpt, testViews, configuration, paginationData))
   }
 
-  def setExecutionComment(executionId: Id[Execution]) = Action { implicit request ⇒
-    getFormParameter("text") match {
-      case Some(text) ⇒
-        val result = service.setExecutionComment(executionId, text)
-        if (result)
-          Redirect(routes.Application.execution(executionId)).flashing("success" -> "Comment updated.")
-        else
-          NotFound(s"Could not find test execution with id '$executionId'")
-      case None ⇒
-        BadRequest("No 'text' parameter provided'")
-    }
+  private def getDefaultConfiguration: Option[Configuration] = {
+    val configurations = service.getConfigurations.sorted
+    if (configurations contains Configuration.Default)
+      Some(Configuration.Default)
+    else
+      configurations.headOption
   }
 
   private def getFormParameters(parameterName: String)(implicit request: Request[AnyContent]): Seq[String] =
@@ -358,6 +345,19 @@ class Application(service: Service, adminService: AdminService) extends Controll
 
   private def previousUrlOrDefault(implicit request: Request[AnyContent]): Call =
     previousUrlOpt.getOrElse(routes.Application.index())
+
+  def setExecutionComment(executionId: Id[Execution]) = Action { implicit request ⇒
+    getFormParameter("text") match {
+      case Some(text) ⇒
+        val result = service.setExecutionComment(executionId, text)
+        if (result)
+          Redirect(routes.Application.execution(executionId)).flashing("success" -> "Comment updated.")
+        else
+          NotFound(s"Could not find test execution with id '$executionId'")
+      case None ⇒
+        BadRequest("No 'text' parameter provided'")
+    }
+  }
 
   def setBatchComment(batchId: Id[Batch]) = Action { implicit request ⇒
     getFormParameter("text") match {
