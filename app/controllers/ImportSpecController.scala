@@ -14,17 +14,11 @@ import play.api.libs.concurrent.Execution.Implicits._
 import play.api.data.Form
 import com.thetestpeople.trt.importer.jenkins._
 import com.thetestpeople.trt.importer._
-import routes.CiController
+import routes.ImportSpecController
 import views.html
 import com.thetestpeople.trt.utils.Utils
 
-/**
- * Controller for CI screens
- */
-class CiController(service: Service) extends AbstractController(service) with HasLogger {
-
-  // Import specs screen
-  // -------------------
+class ImportSpecController(service: Service) extends AbstractController(service) with HasLogger {
 
   def ciImportSpecs() = Action { implicit request ⇒
     val specs = service.getCiImportSpecs.map(makeView).sortBy(_.jobUrl).toList
@@ -49,13 +43,10 @@ class CiController(service: Service) extends AbstractController(service) with Ha
   def deleteCiImportSpec(id: Id[CiImportSpec]) = Action { implicit request ⇒
     val success = service.deleteCiImportSpec(id)
     if (success)
-      Redirect(CiController.ciImportSpecs).flashing("success" -> "Deleted import specification")
+      Redirect(ImportSpecController.ciImportSpecs).flashing("success" -> "Deleted import specification")
     else
       NotFound(s"Could not find import spec with id '$id'")
   }
-
-  // Edit import spec screen
-  // -----------------------
 
   def newCiImportSpec() = Action { implicit request ⇒
     Ok(html.editCiImportSpec(CiImportSpecForm.initial, specOpt = None))
@@ -92,7 +83,7 @@ class CiController(service: Service) extends AbstractController(service) with Ha
             BadRequest(html.editCiImportSpec(formWithErrors, Some(id))),
           editableSpec ⇒ {
             service.updateCiImportSpec(editableSpec.applyEdits(spec))
-            Redirect(CiController.ciImportSpecs).flashing("success" -> "Updated import specification")
+            Redirect(ImportSpecController.ciImportSpecs).flashing("success" -> "Updated import specification")
           })
     }
   }

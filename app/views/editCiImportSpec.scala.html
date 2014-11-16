@@ -5,15 +5,15 @@
 @main("CI Job", "CIJob") {
 
   <ol class="breadcrumb">
-    <li><a href="@routes.CiController.ciImportSpecs()">CI Jobs</a></li>
+    <li><a href="@routes.ImportSpecController.ciImportSpecs()">CI Jobs</a></li>
     <li class="active">@if(specOpt.isEmpty) { New } else { Edit }</li>
   </ol>
 
   <h2>Import from a CI server</h2>  
 
   @helper.form(action = specOpt match { 
-    case None       => routes.CiController.createCiImportSpec
-    case Some(id) => routes.CiController.updateCiImportSpec(id)
+    case None       => routes.ImportSpecController.createCiImportSpec
+    case Some(id) => routes.ImportSpecController.updateCiImportSpec(id)
    }, 'role -> "form") {
     
   @helper.inputText(jenkinsImportForm("jobUrl"), 
@@ -43,7 +43,7 @@
     <button type="submit" class="btn btn-primary">
        @if(specOpt.isDefined){ Update } else { Create }
      </button>
-    <a href="@routes.CiController.ciImportSpecs()" class="btn btn-default" role="button">Cancel</a>
+    <a href="@routes.ImportSpecController.ciImportSpecs()" class="btn btn-default" role="button">Cancel</a>
   </div>
 	
   }

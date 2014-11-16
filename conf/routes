@@ -44,14 +44,14 @@ POST    /batches/delete             @controllers.BatchesController.deleteBatches
 GET     /systemConfiguration        @controllers.Application.editSystemConfiguration
 POST    /systemConfiguration        @controllers.Application.updateSystemConfiguration
 
-GET     /ci                         @controllers.CiController.ciImportSpecs()
-GET     /ci/new                     @controllers.CiController.newCiImportSpec()
-POST    /ci/new                     @controllers.CiController.createCiImportSpec()
+GET     /ci                         @controllers.ImportSpecController.ciImportSpecs()
+GET     /ci/new                     @controllers.ImportSpecController.newCiImportSpec()
+POST    /ci/new                     @controllers.ImportSpecController.createCiImportSpec()
 GET     /ci/:id/log                 @controllers.ImportLogController.getCiImportSpec(id: Id[CiImportSpec], page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
-GET     /ci/:id/edit                @controllers.CiController.editCiImportSpec(id: Id[CiImportSpec])
-POST    /ci/:id/edit                @controllers.CiController.updateCiImportSpec(id: Id[CiImportSpec])
-POST    /ci/:id/delete              @controllers.CiController.deleteCiImportSpec(id: Id[CiImportSpec])
-POST    /ci/:id/sync                @controllers.CiController.syncCiImport(id: Id[CiImportSpec])
+GET     /ci/:id/edit                @controllers.ImportSpecController.editCiImportSpec(id: Id[CiImportSpec])
+POST    /ci/:id/edit                @controllers.ImportSpecController.updateCiImportSpec(id: Id[CiImportSpec])
+POST    /ci/:id/delete              @controllers.ImportSpecController.deleteCiImportSpec(id: Id[CiImportSpec])
+POST    /ci/:id/sync                @controllers.ImportSpecController.syncCiImport(id: Id[CiImportSpec])
 
 GET     /admin                      @controllers.AdminController.admin()
 POST    /deleteAll                  @controllers.AdminController.deleteAll()

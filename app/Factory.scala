@@ -82,7 +82,7 @@ class Factory(configuration: Configuration) {
   def getControllerInstance[A](clazz: Class[A]): A = controllerMap(clazz).asInstanceOf[A]
 
   lazy val webApiController = new WebApiController(service)
-  lazy val ciController = new CiController(service)
+  lazy val ciController = new ImportSpecController(service)
   lazy val jsonController = new JsonController(service, adminService)
   lazy val controller = new Application(service)
   lazy val adminController = new AdminController(service, adminService)
@@ -106,7 +106,7 @@ class Factory(configuration: Configuration) {
     classOf[TestController] -> testController,
     classOf[Application] -> controller,
     classOf[AdminController] -> adminController,
-    classOf[CiController] -> ciController,
+    classOf[ImportSpecController] -> ciController,
     classOf[JsonController] -> jsonController,
     classOf[WebApiController] -> webApiController)
 }

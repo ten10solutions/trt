@@ -14,7 +14,7 @@ import play.api.libs.concurrent.Execution.Implicits._
 import play.api.data.Form
 import com.thetestpeople.trt.importer.jenkins._
 import com.thetestpeople.trt.importer._
-import routes.CiController
+import routes.ImportSpecController
 import views.html
 
 trait RerunTestHandler { self: AbstractController ⇒

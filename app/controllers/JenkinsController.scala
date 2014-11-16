@@ -5,7 +5,7 @@ import com.thetestpeople.trt.utils.HasLogger
 
 import play.api.data.Form
 import play.api.mvc._
-import routes.CiController
+import routes.ImportSpecController
 import viewModel._
 import views.html
 
