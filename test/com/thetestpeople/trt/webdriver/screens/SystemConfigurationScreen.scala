@@ -40,10 +40,6 @@ class SystemConfigurationScreen(implicit automationContext: AutomationContext) e
   def healthyCountThreshold_=(text: String) =
     setField("Count threshold for Healthy status", Locators.HealthyCountThreshold, text)
 
-  def waitForValidationError() {
-    webDriver.waitForDisplayedAndEnabled(By.className("alert-danger"))
-  }
-
   def errorsForBrokenDurationThreshold = getOptionalText(Locators.ErrorsForBrokenDurationThreshold)
   def errorsForBrokenCountThreshold = getOptionalText(Locators.ErrorsForBrokenCountThreshold)
   def errorsForHealthyDurationThreshold = getOptionalText(Locators.ErrorsForHealthyDurationThreshold)

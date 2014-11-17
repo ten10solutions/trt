@@ -30,7 +30,7 @@ class TestScreen(implicit automationContext: AutomationContext) extends Abstract
     new CommentDialog[TestScreen]() { def returnScreen = new TestScreen }
   }
 
-  def executionRows: List[ExecutionRow] =
+  def executionRows: Seq[ExecutionRow] =
     for ((rowElement, index) ← webDriver.findElements_(cssSelector("tr.execution-row")).zipWithIndex)
       yield ExecutionRow(rowElement, index)
 

@@ -12,4 +12,10 @@ trait JenkinsConfigurationScreen { self: AbstractScreen ⇒
     new JenkinsAuthScreen
   }
 
+  def selectRerunsTab(): JenkinsRerunsScreen = {
+    log("Select 'Reruns' tab")
+    webDriver.waitForDisplayedAndEnabled(id("reruns-tab-link")).click()
+    new JenkinsRerunsScreen
+  }
+
 }

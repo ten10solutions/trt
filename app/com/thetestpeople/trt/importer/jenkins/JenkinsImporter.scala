@@ -9,8 +9,11 @@ import com.thetestpeople.trt.model.jenkins.CiJob
 import com.thetestpeople.trt.service.BatchRecorder
 import com.thetestpeople.trt.service.Clock
 import com.thetestpeople.trt.utils.HasLogger
+import com.thetestpeople.trt.utils.UriUtils._
 import com.thetestpeople.trt.utils.http.Http
 import com.thetestpeople.trt.importer.CiImportStatusManager
+import java.net.URI
+import org.apache.http.client.utils.URIBuilder
 
 class JenkinsImporter(clock: Clock,
     http: Http,
@@ -36,6 +39,13 @@ class JenkinsImporter(clock: Clock,
 
     transaction { dao.updateCiImportSpec(spec.id, Some(clock.now)) }
   }
+
+  /**
+   * Update links returned by jenkins to use the same host and port as the original job link (in case it gets returned
+   * as something different by the Jenkins API).
+   */
+  private def updateJenkinsUrl(jobUrl: URI)(otherUrl: URI): URI =
+    otherUrl.withSameHostAndPortAs(jobUrl)
 
   private def getJenkinsBuildDownloader(importConsoleLog: Boolean): JenkinsBuildDownloader = {
     val jenkinsConfiguration = transaction { dao.getJenkinsConfiguration() }

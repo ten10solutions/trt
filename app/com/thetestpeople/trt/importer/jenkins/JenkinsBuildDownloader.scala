@@ -6,6 +6,7 @@ import com.thetestpeople.trt.utils.HasLogger
 import com.thetestpeople.trt.utils.UriUtils._
 import com.thetestpeople.trt.utils.http.Credentials
 import com.thetestpeople.trt.utils.http._
+import com.thetestpeople.trt.utils.UriUtils._
 
 class JenkinsBuildDownloaderException(message: String, cause: Throwable = null) extends RuntimeException(message, cause)
 
@@ -17,7 +18,10 @@ class JenkinsBuildDownloader(
   @throws[JenkinsBuildDownloaderException]
   def getJenkinsJob(jobUrl: URI): JenkinsJob = {
     val jobXml = getJobXml(jobUrl)
-    parseJobXml(jobUrl, jobXml)
+    var job = parseJobXml(jobUrl, jobXml)
+    job = job.copy(url = job.url.withSameHostAndPortAs(jobUrl))
+    job = job.copy(buildLinks = job.buildLinks.map(bl ⇒ bl.copy(buildUrl = bl.buildUrl.withSameHostAndPortAs(jobUrl))))
+    job
   }
 
   private def getJobXml(jobUrl: URI): Elem = {
@@ -46,8 +50,8 @@ class JenkinsBuildDownloader(
     val testResult = parseTestResultsXml(testResultsUrl(buildUrl), testXml)
     testResult match {
       case result: OrdinaryTestResult   ⇒ Some(result)
-      case result: MatrixTestResult     ⇒ processMatrixTestResult(result)
-      case result: AggregatedTestResult ⇒ processAggregatedTestResult(result)
+      case result: MatrixTestResult     ⇒ processMatrixTestResult(result, buildUrl)
+      case result: AggregatedTestResult ⇒ processAggregatedTestResult(result, buildUrl)
     }
   }
 
@@ -59,20 +63,22 @@ class JenkinsBuildDownloader(
         throw new JenkinsBuildDownloaderException(s"Problem parsing test result XML from $testUrl: ${e.getMessage}", e)
     }
 
-  private def processAggregatedTestResult(testResult: AggregatedTestResult): Option[OrdinaryTestResult] = {
+  private def processAggregatedTestResult(testResult: AggregatedTestResult, buildUrl: URI): Option[OrdinaryTestResult] = {
     val childResults =
       for {
         childUrl ← testResult.urls
-        childTestXml = getTestResultsXml(childUrl)
+        actualChildUrl = childUrl.withSameHostAndPortAs(buildUrl)
+        childTestXml = getTestResultsXml(actualChildUrl)
       } yield parseOrdinaryTestResult(childTestXml)
     val aggregatedResults = childResults.reduce(_ combine _)
     Some(aggregatedResults)
   }
 
-  private def processMatrixTestResult(testResult: MatrixTestResult): Option[OrdinaryTestResult] =
+  private def processMatrixTestResult(testResult: MatrixTestResult, buildUrl: URI): Option[OrdinaryTestResult] =
     for {
       childUrl ← testResult.urls.headOption // TODO: handle more than one matrix result, maybe auto-assign to a configuration?
-      childTestXml = getTestResultsXml(childUrl)
+      actualChildUrl = childUrl.withSameHostAndPortAs(buildUrl)
+      childTestXml = getTestResultsXml(actualChildUrl)
     } yield parseOrdinaryTestResult(childTestXml)
 
   private def parseOrdinaryTestResult(testResultXml: Elem): OrdinaryTestResult =

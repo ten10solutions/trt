@@ -16,8 +16,8 @@ class WsHttp(client: WSClient = WS.client, timeout: Duration = 60.seconds) exten
 
   def get(url: URI, basicAuthOpt: Option[Credentials] = None): HttpResponse =
     try {
-      val future = client.url(url.toString).withBasicAuth(basicAuthOpt).get()
       logger.debug(curlGet(url, basicAuthOpt))
+      val future = client.url(url.toString).withBasicAuth(basicAuthOpt).get()
       val response = await(future)
       response
     } catch {
@@ -27,8 +27,8 @@ class WsHttp(client: WSClient = WS.client, timeout: Duration = 60.seconds) exten
 
   def post(url: URI, basicAuthOpt: Option[Credentials] = None, bodyParams: Map[String, Seq[String]]): HttpResponse =
     try {
-      val future = client.url(url.toString).withBasicAuth(basicAuthOpt).post(bodyParams)
       logger.debug(curlPost(url, basicAuthOpt, bodyParams))
+      val future = client.url(url.toString).withBasicAuth(basicAuthOpt).post(bodyParams)
       val response = await(future)
       response
     } catch {

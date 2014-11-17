@@ -29,12 +29,20 @@ object RichSelenium {
     def findElements_(locator: By): List[WebElement] =
       element.findElements(locator).asScala.toList
 
+    def setText(s: String) = {
+      element.clear()
+      element.sendKeys(s)
+    }
+    
   }
 
   implicit class RichWebDriver(webDriver: WebDriver) {
 
-    def findElements_(locator: By): List[WebElement] =
-      webDriver.findElements(locator).asScala.toList
+    /**
+     * findElements() vesion that returns a Seq
+     */
+    def findElements_(locator: By): Seq[WebElement] =
+      webDriver.findElements(locator).asScala
 
     def isDisplayedAndEnabled(locator: By) = findImmediateDisplayedAndEnabled(locator).isDefined
 

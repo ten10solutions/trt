@@ -13,7 +13,7 @@
   <div class="panel panel-info">
     <div class="panel-heading">No CI imports set up</div>
     <div class="panel-body">
-      There are no CI servers yet set up to import results from. <a href="@routes.ImportSpecController.newCiImportSpec()">Configure a new CI import</a>.
+      There are no CI servers yet set up to import results from. <a id="add-import-spec-helper" href="@routes.ImportSpecController.newCiImportSpec()">Configure a new CI import</a>.
     </div>
   </div>
   
@@ -63,7 +63,7 @@
       }
       <tr>
         <td colspan="9" style="text-align: center">
-           <a href="@routes.ImportSpecController.newCiImportSpec"><i class="glyphicon glyphicon-plus"></i> Add new</a>
+           <a id="add-new-link" href="@routes.ImportSpecController.newCiImportSpec"><i class="glyphicon glyphicon-plus"></i> Add new</a>
         </td>
       </tr>
     </tbody>

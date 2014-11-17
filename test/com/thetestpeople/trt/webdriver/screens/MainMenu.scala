@@ -104,6 +104,12 @@ class MainMenu(implicit automationContext: AutomationContext) extends AbstractCo
       webDriver.waitForDisplayedAndEnabled(id("menu-config-jenkins")).click()
       new JenkinsAuthScreen
     }
+    
+    def ciImports(): CiImportsScreen = {
+      log("Click 'CI Imports'")
+      webDriver.waitForDisplayedAndEnabled(id("menu-config-ci-imports")).click()
+      new CiImportsScreen
+    }
 
   }
 

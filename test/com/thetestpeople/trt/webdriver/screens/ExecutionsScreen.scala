@@ -11,7 +11,7 @@ class ExecutionsScreen(implicit automationContext: AutomationContext) extends Ab
 
   webDriver.waitForDisplayedAndEnabled(id("page-Executions"))
 
-  def executionRows: List[ExecutionRow] =
+  def executionRows: Seq[ExecutionRow] =
     for ((rowElement, index) ← webDriver.findElements_(cssSelector("tr.execution-row")).zipWithIndex)
       yield ExecutionRow(rowElement, index)
 
