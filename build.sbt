@@ -130,3 +130,11 @@ doc in Compile <<= target.map(_ / "none") // avoid bundling API docs
 // == Misc =====================================================================================
 
 net.virtualvoid.sbt.graph.Plugin.graphSettings
+
+// == Docker ===================================================================================
+
+maintainer in Docker := "Matt Russell <MattRussellUK@gmail.com>"
+
+dockerExposedPorts in Docker := Seq(9000)
+
+dockerRepository := Some("mattrusselluk")
