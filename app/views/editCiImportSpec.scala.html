@@ -40,7 +40,7 @@
     '_help -> "Configuration label to associate with runs imported from this job. (Or none, if left blank).")
  
   <div class="form-actions">
-    <button type="submit" class="btn btn-primary">
+    <button id="submit-button" type="submit" class="btn btn-primary">
        @if(specOpt.isDefined){ Update } else { Create }
      </button>
     <a href="@routes.ImportSpecController.ciImportSpecs()" class="btn btn-default" role="button">Cancel</a>
