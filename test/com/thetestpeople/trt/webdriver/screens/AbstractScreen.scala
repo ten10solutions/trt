@@ -30,7 +30,6 @@ abstract class AbstractScreen(implicit protected val automationContext: Automati
     webDriver.waitForDisplayedAndEnabled(className("alert-danger"))
   }
 
-  def refresh() {
-    webDriver.navigate().refresh()
-  }
+  def refresh() = webDriver.navigate().refresh()
+
 }
