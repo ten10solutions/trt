@@ -35,7 +35,7 @@ class SearchLogsScreen(implicit automationContext: AutomationContext) extends Ab
     webDriver.waitForDisplayedAndEnabled(By.id("search-button")).click()
   }
 
-  def executionRows: List[ExecutionRow] = {
+  def executionRows: Seq[ExecutionRow] = {
     val executionRowElements = webDriver.findElements_(cssSelector("tr.execution-row"))
     val fragmentRowElements = webDriver.findElements_(cssSelector("tr.fragment-row"))
 

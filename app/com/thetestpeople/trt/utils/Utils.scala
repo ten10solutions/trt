@@ -17,14 +17,18 @@ object Utils extends HasLogger {
     }
   }
 
-  def ordinalName(n: Int): String = n match {
-    case 11 | 12 | 13 ⇒ n + "th"
-    case _ ⇒ (n % 10) match {
-      case 1 ⇒ n + "st"
-      case 2 ⇒ n + "nd"
-      case 3 ⇒ n + "rd"
-      case _ ⇒ n + "th"
-    }
+  def ordinalName(n: Int): String = {
+    val suffix =
+      n match {
+        case 11 | 12 | 13 ⇒ "th"
+        case _ ⇒ (n % 10) match {
+          case 1 ⇒ "st"
+          case 2 ⇒ "nd"
+          case 3 ⇒ "rd"
+          case _ ⇒ "th"
+        }
+      }
+    n + suffix
   }
 
   def printStackTrace(t: Throwable): String = {

@@ -26,4 +26,7 @@ abstract class AbstractScreen(implicit protected val automationContext: Automati
       webDriver.findImmediateDisplayedAndEnabled(Locators.AlertSuccessMessage)
     }
 
+  def refresh() {
+    webDriver.navigate().refresh()
+  }
 }

@@ -87,7 +87,7 @@
     <td>Sync</td>
     <td>
       <form action="@routes.ImportSpecController.syncCiImport(spec.id)" method="post">
-        <button class="btn btn-default" title="Check for new builds now"><i class="glyphicon glyphicon-refresh"></i> Sync</button>
+        <button id="sync-button" class="btn btn-default" title="Check for new builds now"><i class="glyphicon glyphicon-refresh"></i> Sync</button>
       </form>
      </td>
   </tr>
@@ -113,7 +113,7 @@
 </tr>
 
 @for((build, buildIndex) <- builds.zipWithIndex) {
-  <tr>
+  <tr class="build-row">
     <td class="build-number-cell"><a href="@build.buildUrl">@build.buildDescription <i class="fa fa-external-link"></i></a></td>
     <td class="status-cell">@build.importState.description 
       @if(build.importState == ImportState.NotStarted) {

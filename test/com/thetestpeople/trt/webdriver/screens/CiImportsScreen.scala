@@ -7,13 +7,19 @@ import org.openqa.selenium.By.id
 class CiImportsScreen(implicit automationContext: AutomationContext) extends AbstractScreen with HasMainMenu {
 
   object wizard {
-    
-    def configureANewCiImport()  = {
+
+    def configureANewCiImport() = {
       log("Click 'Configure a new CI import'")
       webDriver.waitFor(id("add-import-spec-helper")).click()
       new CiImportScreen
     }
-    
+
   }
-  
+
+  def clickAddNew(): CiImportScreen = {
+    log("Click 'Add new'")
+    webDriver.waitForDisplayedAndEnabled(id("add-new-link")).click()
+    new CiImportScreen
+  }
+
 }

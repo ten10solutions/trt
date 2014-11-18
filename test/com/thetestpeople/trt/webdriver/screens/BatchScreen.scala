@@ -42,7 +42,7 @@ class BatchScreen(implicit automationContext: AutomationContext) extends Abstrac
 
   }
 
-  def executionRows: List[ExecutionRow] =
+  def executionRows: Seq[ExecutionRow] =
     for ((rowElement, index) ← webDriver.findElements_(cssSelector("tr.execution-row")).zipWithIndex)
       yield ExecutionRow(rowElement, index)
 

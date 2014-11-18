@@ -12,7 +12,7 @@ class BatchesScreen(implicit automationContext: AutomationContext) extends Abstr
 
   webDriver.waitForDisplayedAndEnabled(id("page-Batches"))
 
-  def batchRows: List[BatchRow] =
+  def batchRows: Seq[BatchRow] =
     for ((rowElement, index) ← webDriver.findElements_(cssSelector("tr.batch-row")).zipWithIndex)
       yield BatchRow(rowElement, index)
 
