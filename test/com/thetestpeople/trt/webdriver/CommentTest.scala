@@ -36,7 +36,7 @@ class CommentTest extends AbstractBrowserTest {
       site.restApi.addBatch(batch)
 
       val batchesScreen = site.launch().mainMenu.batches()
-      val List(batchRow) = batchesScreen.batchRows
+      val Seq(batchRow) = batchesScreen.batchRows
       var batchScreen = batchRow.viewBatch()
 
       batchScreen.comment should equal("")
@@ -54,7 +54,7 @@ class CommentTest extends AbstractBrowserTest {
       site.restApi.addBatch(batch)
 
       val executionsScreen = site.launch().mainMenu.executions()
-      val List(executionRow) = executionsScreen.executionRows
+      val Seq(executionRow) = executionsScreen.executionRows
       var executionScreen = executionRow.viewExecution()
 
       executionScreen.comment should equal("")

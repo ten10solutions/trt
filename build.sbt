@@ -16,8 +16,6 @@ scalaVersion := "2.11.1"
 
 // == Dependencies ============================================================================
 
-// resolvers += "libvirt" at "http://www.libvirt.org/maven2/"
-
 libraryDependencies ++= List(
   ws,
   jdbc,
@@ -41,8 +39,8 @@ libraryDependencies ++= List(
   "com.google.guava" % "guava" % "16.0.1",
   "org.liquibase" % "liquibase-core" % "3.1.1",
   "oro" % "oro" % "2.0.8",
-  "org.apache.httpcomponents" % "httpclient" % "4.3.1")
-  //"com.xebialabs.cloud" % "overcast" % "2.4.0")
+  "org.apache.httpcomponents" % "httpclient" % "4.3.1",
+  "com.xebialabs.cloud" % "overcast" % "2.4.0" exclude("org.libvirt", "libvirt"))
 
 libraryDependencies ++= List(
   "org.scalatest" %% "scalatest" % "2.2.1" % "test",

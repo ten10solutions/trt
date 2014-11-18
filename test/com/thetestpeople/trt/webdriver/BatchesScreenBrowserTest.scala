@@ -18,7 +18,7 @@ class BatchesScreenBrowserTest extends AbstractBrowserTest {
       site.restApi.addBatch(batch)
 
       val batchesScreen = site.launch().mainMenu.batches()
-      val List(batchRow) = batchesScreen.batchRows
+      val Seq(batchRow) = batchesScreen.batchRows
       batchRow.passed should be(true)
       batchRow.passes should equal(1)
       batchRow.fails should equal(0)

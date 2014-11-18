@@ -1,10 +1,11 @@
 package com.thetestpeople.trt.webdriver.screens
 
 import org.openqa.selenium.WebDriver
-import org.openqa.selenium.By._
+import org.openqa.selenium._
 import com.thetestpeople.trt.webdriver.screens.RichSelenium._
 import org.openqa.selenium.WebElement
 import org.openqa.selenium.By
+import org.openqa.selenium.By._
 import com.thetestpeople.trt.utils.Utils
 
 class TestsScreen(implicit automationContext: AutomationContext) extends AbstractScreen with HasMainMenu {
@@ -46,29 +47,31 @@ class TestsScreen(implicit automationContext: AutomationContext) extends Abstrac
 
     def clickLastPassedLink(): ExecutionScreen = {
       log(s"Click 'Last passed' link for the $ordinalName row")
-      rowElement.findElement(By.cssSelector("a.last-passed-link")).click()
+      rowElement.findElement(cssSelector("a.last-passed-link")).click()
       new ExecutionScreen
     }
 
     def clickTestLink(): TestScreen = {
       log(s"Click the test link for the $ordinalName row")
-      rowElement.findElement(By.cssSelector("a.test-link")).click()
+      rowElement.findElement(cssSelector("a.test-link")).click()
       new TestScreen
     }
 
     private def ordinalName = Utils.ordinalName(index + 1)
 
-    def name: String = rowElement.findElement(By.cssSelector("a.test-link")).getAttribute("title")
+    def name: String = rowElement.findElement(cssSelector("a.test-link")).getAttribute("title")
 
-    def selected: Boolean = ???
+    private def getCheckBox = rowElement.findElement(cssSelector(".testCheckbox"))
+
+    def selected: Boolean = getCheckBox.isSelected
 
     def selected_=(value: Boolean) {
       if (value)
-        log(s"Select the ${index + 1}th row")
+        log(s"Select the $ordinalName row")
       else
-        log(s"Unselect the ${index + 1}th row")
+        log(s"Unselect the $ordinalName row")
 
-      val checkBox = rowElement.findElement(By.cssSelector(".testCheckbox"))
+      val checkBox = getCheckBox
       val currentlySelected = checkBox.isSelected
       if (currentlySelected != value)
         checkBox.click()

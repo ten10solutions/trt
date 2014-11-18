@@ -26,13 +26,13 @@ class TestScreenBrowserTest extends AbstractBrowserTest {
       site.restApi.addBatch(batch)
 
       val executionsScreen = site.launch().mainMenu.executions()
-      val List(executionRow) = executionsScreen.executionRows
+      val Seq(executionRow) = executionsScreen.executionRows
       val testScreen = executionRow.viewTest()
 
       testScreen.name should equal(test.name)
       testScreen.groupOpt should equal(test.groupOpt)
       testScreen.configurationOpt should equal(None) // No configuration shown in single-configuration mode
-      val List(executionRow2) = testScreen.executionRows
+      val Seq(executionRow2) = testScreen.executionRows
       executionRow2.passed should be(true)
 
     }

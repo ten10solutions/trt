@@ -26,7 +26,7 @@ class ExecutionScreenBrowserTest extends AbstractBrowserTest {
       site.restApi.addBatch(batch)
 
       val executionsScreen = site.launch().mainMenu.executions()
-      val List(executionRow) = executionsScreen.executionRows
+      val Seq(executionRow) = executionsScreen.executionRows
       val executionScreen = executionRow.viewExecution()
 
       executionScreen.testName should equal(test.name)
