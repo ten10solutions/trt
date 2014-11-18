@@ -10,7 +10,7 @@ abstract class AbstractComponent(implicit automationContext: AutomationContext) 
 
   protected def log(message: String) = automationContext.log(message)
 
-  protected def webDriver = automationContext.webDriver
+  protected implicit def webDriver = automationContext.webDriver
 
 }
 

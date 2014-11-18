@@ -11,24 +11,13 @@ import com.thetestpeople.trt.webdriver.screens.AbstractScreen
 import com.thetestpeople.trt.webdriver.screens.jenkins.JenkinsAuthScreen
 import com.thetestpeople.trt.webdriver.screens.jenkins.JenkinsRerunsScreen
 import com.xebialabs.overcast.host.CloudHostFactory
+import com.thetestpeople.trt.tags.DockerTest
+import com.thetestpeople.trt.webdriver.screens.ImportLogScreen
 
+@DockerTest
 @SlowTest
 @RunWith(classOf[JUnitRunner])
 class JenkinsTest extends AbstractBrowserTest {
-
-//  val jenkinsHost = "http://localhost:8080"
-
-  private def withJenkins[T](p: String ⇒ T): T = {
-    val host = CloudHostFactory.getCloudHost("jenkins")
-    host.setup()
-    val hostName = host.getHostName
-    val port = host.getPort(8080)
-    val url = s"http://$hostName:$port"
-    try
-      p(url)
-    finally
-      host.teardown()
-  }
 
   "Jenkins" should "work" in {
     withJenkins { jenkinsHost ⇒
@@ -39,13 +28,10 @@ class JenkinsTest extends AbstractBrowserTest {
         val rerunsScreen = authScreen.selectRerunsTab()
         configureJenkinsReruns(rerunsScreen, rerunJobUrl = s"$jenkinsHost/job/Rerun%20Test%20Job/", parameter = "test", value = "$MAVEN_TEST")
 
-        var importsScreen = rerunsScreen.mainMenu.config.ciImports
-        var importScreen = importsScreen.wizard.configureANewCiImport()
-        importScreen.jobUrl = s"$jenkinsHost/job/Maven%20Test%20Project/"
-        var importLogScreen = importScreen.clickCreate()
+        var importLogScreen = addNewImportSpec(rerunsScreen, s"$jenkinsHost/job/Maven%20Test%20Project/")
 
         var batchesScreen = importLogScreen.mainMenu.batches()
-        WaitUtils.waitUntil() {
+        WaitUtils.waitUntil {
           batchesScreen.refresh()
           batchesScreen.batchRows.size == 3
         }
@@ -57,31 +43,34 @@ class JenkinsTest extends AbstractBrowserTest {
         testRow.selected = true
         testsScreen.clickRerunSelectedTests()
 
-        importsScreen = testsScreen.mainMenu.config.ciImports
-        importScreen = importsScreen.clickAddNew()
-        importScreen.jobUrl = s"$jenkinsHost/job/Rerun%20Test%20Job/"
-        importLogScreen = importScreen.clickCreate()
-
-        WaitUtils.waitUntil() {
-          importLogScreen.clickSyncButton()
-          val buildRows = importLogScreen.buildRows
-          buildRows.nonEmpty && buildRows.forall(_.isSuccess)
-        }
+        importLogScreen = addNewImportSpec(testsScreen, s"$jenkinsHost/job/Rerun%20Test%20Job/")
 
         batchesScreen = importLogScreen.mainMenu.batches()
-        WaitUtils.waitUntil() {
+        WaitUtils.waitUntil {
           batchesScreen.refresh()
           batchesScreen.batchRows.size == 4
         }
 
-        val latestBatchRow = batchesScreen.batchRows.head
-        latestBatchRow.total should equal(1)
-        val batchScreen = latestBatchRow.viewBatch()
+        val batchScreen = batchesScreen.batchRows.head.viewBatch()
 
         val Seq(executionRow) = batchScreen.executionRows
         executionRow.name should equal("testMethod1")
       }
     }
+  }
+
+  private def addNewImportSpec(startScreen: AbstractScreen, jobUrl: String): ImportLogScreen = {
+    val importsScreen = startScreen.mainMenu.config.ciImports
+    val importScreen = importsScreen.addNew()
+    importScreen.jobUrl = jobUrl
+    val importLogScreen = importScreen.clickCreate()
+
+    WaitUtils.waitUntil {
+      importLogScreen.clickSyncButton()
+      val buildRows = importLogScreen.buildRows
+      buildRows.nonEmpty && buildRows.forall(_.isSuccess)
+    }
+    importLogScreen
   }
 
   private def configureJenkinsAuth(authScreen: JenkinsAuthScreen, username: String, apiToken: String): JenkinsAuthScreen = {
@@ -98,6 +87,18 @@ class JenkinsTest extends AbstractBrowserTest {
     param.parameter = parameter
     param.value = value
     rerunsScreen.clickSubmit()
+  }
+
+  private def withJenkins[T](p: String ⇒ T): T = {
+    val host = CloudHostFactory.getCloudHost("jenkins")
+    host.setup()
+    val hostName = host.getHostName
+    val port = host.getPort(8080)
+    val url = s"http://$hostName:$port"
+    try
+      p(url)
+    finally
+      host.teardown()
   }
 
 }

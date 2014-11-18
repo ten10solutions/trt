@@ -26,6 +26,10 @@ abstract class AbstractScreen(implicit protected val automationContext: Automati
       webDriver.findImmediateDisplayedAndEnabled(Locators.AlertSuccessMessage)
     }
 
+  def waitForValidationError() {
+    webDriver.waitForDisplayedAndEnabled(className("alert-danger"))
+  }
+
   def refresh() {
     webDriver.navigate().refresh()
   }
