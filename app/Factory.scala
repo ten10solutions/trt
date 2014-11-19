@@ -18,6 +18,7 @@ import play.api.mvc.Controller
 import java.io.File
 import com.thetestpeople.trt.service.indexing.LogIndexer
 import com.thetestpeople.trt.importer._
+import play.api.libs.ws.WS
 
 /**
  * Lightweight dependency injection: constructs the objects used by the application
@@ -25,11 +26,11 @@ import com.thetestpeople.trt.importer._
 class Factory(configuration: Configuration) {
 
   import Config._
+  import play.api.Play.current
 
   lazy val jdbcUrl: String = configuration.getString(Db.Default.Url).getOrElse(
     throw new RuntimeException(s"No value set for property '${Db.Default.Url}'"))
 
-  import play.api.Play.current
   lazy val dataSource = DB.getDataSource()
 
   lazy val dbMigrator = new DbMigrator(dataSource)
@@ -47,11 +48,15 @@ class Factory(configuration: Configuration) {
   lazy val useCachingHttp: Boolean =
     configuration.getBoolean(Http.UseCache).getOrElse(false)
 
-  lazy val http: Http =
+  lazy val wsClient = WS.client
+
+  lazy val http: Http = {
+    val baseHttp = new WsHttp(client = wsClient, timeout = urlFetchTimeout)
     if (useCachingHttp)
-      new PathCachingHttp(new WsHttp(timeout = urlFetchTimeout))
+      new PathCachingHttp(baseHttp)
     else
-      new WsHttp(timeout = urlFetchTimeout)
+      baseHttp
+  }
 
   lazy val analysisService = new AnalysisService(dao, clock, async = true)
 

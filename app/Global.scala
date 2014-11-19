@@ -11,9 +11,11 @@ import com.thetestpeople.trt.filters.LoggingFilter
 
 object Global extends WithFilters(LoggingFilter) with GlobalSettings with HasLogger {
 
-  private lazy val factory = new Factory(Play.current.configuration)
+  private var factory: Factory = _
 
   override def onStart(app: Application) {
+    logger.debug("onStart()")
+    factory = new Factory(Play.current.configuration)
     factory.dbMigrator.migrate()
 
     initialiseCiImportWorker(app)
@@ -58,6 +60,7 @@ object Global extends WithFilters(LoggingFilter) with GlobalSettings with HasLog
   }
 
   override def onStop(app: Application) {
+    logger.debug("onStop()")
     factory.ciImportWorker.stop()
   }
 

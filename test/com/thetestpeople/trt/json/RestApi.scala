@@ -12,6 +12,9 @@ import play.api.libs.json.Json
 import play.api.libs.ws.WS
 import play.api.mvc.Call
 import play.api.libs.ws.WSClient
+import play.api.libs.ws.ning.NingWSClient
+import play.api.libs.ws.ning.NingAsyncHttpClientConfigBuilder
+import play.api.libs.ws.DefaultWSClientConfig
 
 object RestApi {
 
@@ -19,7 +22,7 @@ object RestApi {
 
 }
 
-case class RestApi(siteUrl: URI, client: WSClient = WS.client) {
+case class RestApi(siteUrl: URI, client: WSClient = new NingWSClient(new NingAsyncHttpClientConfigBuilder(new DefaultWSClientConfig).build())) {
 
   import RestApi._
 

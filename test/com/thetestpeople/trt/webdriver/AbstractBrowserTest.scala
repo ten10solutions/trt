@@ -15,6 +15,7 @@ import play.api.test.Helpers
 import play.api.test.TestServer
 import org.scalatest.junit.JUnitRunner
 import org.openqa.selenium.firefox.FirefoxDriver
+import play.api.libs.ws.WS
 
 abstract class AbstractBrowserTest extends FlatSpec with Matchers {
 

@@ -25,28 +25,43 @@ class CiImportWorker(dao: CiDao, ciImporter: CiImporter) extends CiImportQueue w
 
   private var continue = true
 
+  private var currentThread: Thread = _
+
   def add(importSpecId: Id[CiImportSpec]) {
     logger.debug(s"Queued import for $importSpecId")
     importSpecQueue.offer(importSpecId)
   }
 
   def run() {
-    logger.debug("CI import worker started")
-    while (continue) {
-      val specId = importSpecQueue.take()
-      logger.info(s"Checking if there is anything to import from import spec $specId")
-      try
-        ciImporter.importBuilds(specId)
-      catch {
-        case e: Exception ⇒ logger.error(s"Problem importing from import spec $specId", e)
+    logger.debug(s"CI import worker started")
+    currentThread = Thread.currentThread
+    try
+      while (continue) {
+        val specIdOpt =
+          try
+            Some(importSpecQueue.take())
+          catch {
+            case e: InterruptedException ⇒
+              logger.debug("CI import worker interruped")
+              None
+          }
+        for (specId ← specIdOpt) {
+          logger.info(s"Checking if there is anything to import from import spec $specId")
+          try
+            ciImporter.importBuilds(specId)
+          catch {
+            case e: Exception ⇒ logger.error(s"Problem importing from import spec $specId", e)
+          }
+        }
       }
-    }
-    logger.debug("CI import worker finished")
+    finally
+      logger.debug(s"CI import worker finished")
   }
 
   def stop() {
-    logger.debug("CI Jenkins import worker")
+    logger.debug(s"CI import worker requested to stop")
     continue = false
+    currentThread.interrupt()
   }
 
 }

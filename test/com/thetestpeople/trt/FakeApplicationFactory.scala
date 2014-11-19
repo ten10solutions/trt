@@ -14,6 +14,7 @@ object FakeApplicationFactory {
       Db.Default.Url -> TestJdbcUrl,
       Db.Default.User -> "",
       Db.Default.Password -> "",
+//      Http.UseTestingClient -> true,
       Lucene.InMemory -> "true"),
     additionalPlugins = Seq(classOf[DontStopBoneCPPlugin].getName))
 

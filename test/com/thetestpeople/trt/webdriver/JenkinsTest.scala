@@ -11,14 +11,13 @@ import play.api.libs.ws.WS
 import play.api.Play.current
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import play.api.libs.ws.ning.NingWSClient
-import play.api.libs.ws.ning.NingAsyncHttpClientConfigBuilder
-import play.api.libs.ws.DefaultWSClientConfig
+import com.thetestpeople.trt.utils.WsUtils
+import com.thetestpeople.trt.utils.HasLogger
 
 @DockerTest
 @SlowTest
 @RunWith(classOf[JUnitRunner])
-class JenkinsTest extends AbstractBrowserTest {
+class JenkinsTest extends AbstractBrowserTest with HasLogger {
 
   "A user" should "be able to import results from Jenkins, and rerun selected tests" in {
     withJenkins { jenkinsHost ⇒
@@ -93,27 +92,30 @@ class JenkinsTest extends AbstractBrowserTest {
   }
 
   private def withJenkins[T](p: String ⇒ T): T = {
+    logger.info("Starting Jenkins")
     val host = CloudHostFactory.getCloudHost("jenkins")
     host.setup()
     val hostName = host.getHostName
     val port = host.getPort(8080)
     val url = s"http://$hostName:$port"
     try {
+      logger.info("Waiting for Jenkins to fully start...")
       WaitUtils.waitUntil(jenkinsHasBooted(url))
       p(url)
-    } finally
+    } finally {
+      logger.info("Stopping Jenkins")
       host.teardown()
+    }
   }
 
   private def jenkinsHasBooted(url: String): Boolean = {
-    val wsClient = new NingWSClient(new NingAsyncHttpClientConfigBuilder(new DefaultWSClientConfig).build())
+    val wsClient = WsUtils.newWsClient
     val future = wsClient.url(s"$url/api/xml").get()
     try {
       val result = Await.result(future, 5.seconds)
       result.status == 200
     } catch {
       case e: Exception ⇒
-        e.printStackTrace()
         false
     }
   }
