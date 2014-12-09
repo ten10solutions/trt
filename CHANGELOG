@@ -1,4 +1,4 @@
-0.1.1 (..)
+0.8.0 (9/Nov/2014)
 
 * Revamped test history charts into stacked bar charts with a bar per day
 * Add larger version of each test history chart via an Expand button
