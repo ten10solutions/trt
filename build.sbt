@@ -8,7 +8,7 @@ name := "trt"
 
 organization := "com.thetestpeople"
 
-version := "0.8.0"
+version := "0.8.1-SNAPSHOT"
 
 scalacOptions ++= List("-deprecation", "-feature")
 
@@ -127,6 +127,8 @@ buildInfoKeys := Seq[BuildInfoKey](name, version, scalaVersion, sbtVersion)
 buildInfoPackage := "com.thetestpeople.trt.buildKeys"
 
 doc in Compile <<= target.map(_ / "none") // avoid bundling API docs
+
+scriptClasspath := Seq("*") // To avoid long classpath in Windows dist, see https://github.com/sbt/sbt-native-packager/issues/72
 
 // == Misc =====================================================================================
 
