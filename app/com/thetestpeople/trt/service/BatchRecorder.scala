@@ -29,7 +29,9 @@ class BatchRecorder(dao: Dao, clock: Clock, analysisService: AnalysisService, lo
       recordExecutions(batch, executions)
     }
     handleAffectedEntities(affectedEntities)
-    updateBatchSummaryStats(affectedEntities)
+    dao.transaction {
+      updateBatchSummaryStats(affectedEntities)
+    }
     logger.info(s"Added ${executions.size} to batch ${affectedEntities.batch.nameOpt}")
     true
   }
