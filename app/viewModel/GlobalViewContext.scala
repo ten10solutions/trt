@@ -5,7 +5,7 @@ import com.thetestpeople.trt.model.Configuration
 /**
  * Data that might be needed by all the views
  */
-case class GlobalViewContext(projectNameOpt: Option[String], configurations: Seq[Configuration], hasExecutions: Boolean) {
+case class GlobalViewContext(applicationName: String, projectNameOpt: Option[String], configurations: Seq[Configuration], hasExecutions: Boolean) {
 
   def noData = !hasExecutions
 
@@ -13,4 +13,5 @@ case class GlobalViewContext(projectNameOpt: Option[String], configurations: Seq
 
   def multipleConfigurationMode = configurations.size > 1
 
+  
 }

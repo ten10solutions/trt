@@ -8,6 +8,7 @@ import com.thetestpeople.trt.utils.HasLogger
 import scala.concurrent.Future
 import play.api.mvc.WithFilters
 import com.thetestpeople.trt.filters.LoggingFilter
+import controllers.ControllerHelper
 
 object Global extends WithFilters(LoggingFilter) with GlobalSettings with HasLogger {
 
@@ -17,6 +18,9 @@ object Global extends WithFilters(LoggingFilter) with GlobalSettings with HasLog
     logger.debug("onStart()")
     factory = new Factory(Play.current.configuration)
     factory.dbMigrator.migrate()
+
+    for (name ← app.configuration.getString("ui.applicationName"))
+      ControllerHelper.applicationName = name
 
     initialiseCiImportWorker(app)
     initialiseCiImportPoller(app)

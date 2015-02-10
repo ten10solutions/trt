@@ -3,6 +3,7 @@
 * Fix bug with Windows build -- avoid large classpath which was exceeding the max line length on Windows
 * Automatically assign a configuration when importing from a Jenkins matrix job
 * Fix bug with adding executions incrementally to a batch
+* Add ui.applicationName configuration property to allow customisation of the project name
 
 0.8.0 (9/Nov/2014)
 

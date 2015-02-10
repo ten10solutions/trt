@@ -10,10 +10,12 @@ import com.thetestpeople.trt.utils.Utils
 
 object ControllerHelper {
 
+  var applicationName: String = "Test Reporty Thing"
+
   def globalViewContext(service: Service): GlobalViewContext = {
     val configurations = service.getConfigurations()
     val projectNameOpt = service.getSystemConfiguration().projectNameOpt
-    GlobalViewContext(projectNameOpt, configurations, service.hasExecutions())
+    GlobalViewContext(applicationName, projectNameOpt, configurations, service.hasExecutions())
   }
 
 }
