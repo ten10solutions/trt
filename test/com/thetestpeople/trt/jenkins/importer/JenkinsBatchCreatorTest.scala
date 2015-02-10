@@ -19,10 +19,10 @@ class JenkinsBatchCreatorTest extends FlatSpec with Matchers {
   "Creating an incoming batch record from a Jenkins build" should "capture all the relevant data" in {
     val buildSummary = makeBuildSummary()
     val case1: Case = makeCase()
-    val suite = makeSuite(cases = List(case1))
-    val testResult = makeTestResult(suites = List(suite))
+    val suite = makeSuite(cases = Seq(case1))
+    val testResult = makeTestResult(suites = Seq(suite))
     val consoleLog = DummyData.Log
-    val jenkinsBuild = JenkinsBuild(DummyData.JobUrl, buildSummary, testResult, Some(consoleLog))
+    val jenkinsBuild = JenkinsBuild(DummyData.JobUrl, buildSummary, Seq(testResult), Some(consoleLog))
 
     val batch = new JenkinsBatchCreator(configurationOpt = None).createBatch(jenkinsBuild)
 
@@ -32,7 +32,7 @@ class JenkinsBatchCreatorTest extends FlatSpec with Matchers {
     batch.logOpt should equal(Some(consoleLog))
     batch.urlOpt should equal(Some(buildSummary.url))
 
-    val List(execution) = batch.executions
+    val Seq(execution) = batch.executions
     execution.durationOpt should equal(Some(case1.duration))
     execution.executionTimeOpt should equal(buildSummary.timestampOpt)
     execution.passed should equal(case1.passed)
@@ -44,7 +44,7 @@ class JenkinsBatchCreatorTest extends FlatSpec with Matchers {
     test.groupOpt should equal(Some(case1.className))
   }
 
-  private def makeTestResult(duration: Duration = DummyData.Duration, suites: List[Suite]): OrdinaryTestResult =
+  private def makeTestResult(duration: Duration = DummyData.Duration, suites: Seq[Suite]): OrdinaryTestResult =
     OrdinaryTestResult(duration = duration, suites = suites)
 
   private def makeBuildSummary(
@@ -67,7 +67,7 @@ class JenkinsBatchCreatorTest extends FlatSpec with Matchers {
   private def makeSuite(
     name: String = DummyData.Group,
     duration: Duration = DummyData.Duration,
-    cases: List[Case]) =
+    cases: Seq[Case]) =
     Suite(
       name = name,
       duration = duration,

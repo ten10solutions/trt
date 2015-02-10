@@ -11,6 +11,7 @@ import com.thetestpeople.trt.importer.jenkins.TestResult
 import com.thetestpeople.trt.importer.jenkins.Suite
 import com.thetestpeople.trt.importer.jenkins.OrdinaryTestResult
 import com.thetestpeople.trt.importer.jenkins.MatrixTestResult
+import com.thetestpeople.trt.model.impl.DummyData
 
 @RunWith(classOf[JUnitRunner])
 class JenkinsTestResultXmlParserTest extends FlatSpec with Matchers {
@@ -39,7 +40,7 @@ class JenkinsTestResultXmlParserTest extends FlatSpec with Matchers {
         </suite>
       </testResult>
 
-    val OrdinaryTestResult(duration, List(suite)) = parse(xml)
+    val OrdinaryTestResult(duration, List(suite), None) = parse(xml)
     duration should be(Duration.millis(4336852))
 
     suite.name should be("hudson.cli.ConnectionMockTest")
@@ -109,7 +110,7 @@ class JenkinsTestResultXmlParserTest extends FlatSpec with Matchers {
         </suite>
       </testResult>
 
-    val OrdinaryTestResult(_, List(Suite(_, _, cases))) = parse(xml)
+    val OrdinaryTestResult(_, List(Suite(_, _, cases)), None) = parse(xml)
     val Some(passCase) = cases.find(_.name == "test1")
     passCase.passed should be(true)
 

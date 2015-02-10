@@ -10,7 +10,7 @@ case class MatrixConfiguration(axisValues: Seq[AxisValue])
 
 object MatrixJobUrlParser {
 
-  private val UrlRegex = """^/job/[^/]+/([^/]+)/.*$""".r
+  private val UrlRegex = """.*/job/[^/]+/([^/]+)/.*""".r
 
   /**
    * From a URL like:

@@ -5,6 +5,6 @@ import java.net.URI
 case class JenkinsBuild(
   jobUrl: URI,
   buildSummary: JenkinsBuildSummary,
-  testResult: OrdinaryTestResult,
+  testResults: Seq[OrdinaryTestResult],
   consoleTextOpt: Option[String])
 

@@ -1,3 +1,9 @@
+0.8.1 (..)
+
+* Fix bug with Windows build -- avoid large classpath which was exceeding the max line length on Windows
+* Automatically assign a configuration when importing from a Jenkins matrix job
+* Fix bug with adding executions incrementally to a batch
+
 0.8.0 (9/Nov/2014)
 
 * Revamped test history charts into stacked bar charts with a bar per day

@@ -45,11 +45,11 @@ class JenkinsBuildDownloader(
         throw new JenkinsBuildDownloaderException(s"Problem parsing Jenkins job XML from $jobUrl", e)
     }
 
-  private def scrapeTestResult(buildUrl: URI): Option[OrdinaryTestResult] = {
+  private def scrapeTestResults(buildUrl: URI): Seq[OrdinaryTestResult] = {
     val testXml = getTestResultsXml(buildUrl)
     val testResult = parseTestResultsXml(testResultsUrl(buildUrl), testXml)
     testResult match {
-      case result: OrdinaryTestResult   ⇒ Some(result)
+      case result: OrdinaryTestResult   ⇒ Seq(result)
       case result: MatrixTestResult     ⇒ processMatrixTestResult(result, buildUrl)
       case result: AggregatedTestResult ⇒ processAggregatedTestResult(result, buildUrl)
     }
@@ -63,23 +63,20 @@ class JenkinsBuildDownloader(
         throw new JenkinsBuildDownloaderException(s"Problem parsing test result XML from $testUrl: ${e.getMessage}", e)
     }
 
-  private def processAggregatedTestResult(testResult: AggregatedTestResult, buildUrl: URI): Option[OrdinaryTestResult] = {
-    val childResults =
-      for {
-        childUrl ← testResult.urls
-        actualChildUrl = childUrl.withSameHostAndPortAs(buildUrl)
-        childTestXml = getTestResultsXml(actualChildUrl)
-      } yield parseOrdinaryTestResult(childTestXml)
-    val aggregatedResults = childResults.reduce(_ combine _)
-    Some(aggregatedResults)
-  }
-
-  private def processMatrixTestResult(testResult: MatrixTestResult, buildUrl: URI): Option[OrdinaryTestResult] =
+  private def processAggregatedTestResult(testResult: AggregatedTestResult, buildUrl: URI): Seq[OrdinaryTestResult] =
     for {
-      childUrl ← testResult.urls.headOption // TODO: handle more than one matrix result, maybe auto-assign to a configuration?
+      childUrl ← testResult.childUrls
       actualChildUrl = childUrl.withSameHostAndPortAs(buildUrl)
       childTestXml = getTestResultsXml(actualChildUrl)
     } yield parseOrdinaryTestResult(childTestXml)
+
+  private def processMatrixTestResult(testResult: MatrixTestResult, buildUrl: URI): Seq[OrdinaryTestResult] =
+    for {
+      childUrl ← testResult.childUrls
+      actualChildUrl = childUrl.withSameHostAndPortAs(buildUrl)
+      childTestXml = getTestResultsXml(actualChildUrl)
+      matrixConfigurationOpt = MatrixJobUrlParser.getConfigurations(childUrl)
+    } yield parseOrdinaryTestResult(childTestXml).copy(matrixConfigurationOpt = matrixConfigurationOpt)
 
   private def parseOrdinaryTestResult(testResultXml: Elem): OrdinaryTestResult =
     try
@@ -100,10 +97,13 @@ class JenkinsBuildDownloader(
     // Note: it's not sufficient to check buildSummary.hasTestReport, as you can have a partial test report while building, 
     // e.g. a multimodule Maven project.
     if (buildSummary.hasTestReport && !buildSummary.isBuilding) {
-      for {
-        testResult ← scrapeTestResult(buildUrl)
-        consoleTextOpt = if (fetchConsole) Some(getConsole(buildUrl)) else None
-      } yield JenkinsBuild(jobUrl, buildSummary, testResult, consoleTextOpt)
+      val testResults = scrapeTestResults(buildUrl)
+      if (testResults.isEmpty)
+        None
+      else {
+        val consoleTextOpt = if (fetchConsole) Some(getConsole(buildUrl)) else None
+        Some(JenkinsBuild(jobUrl, buildSummary, testResults, consoleTextOpt))
+      }
     } else
       None
   }
