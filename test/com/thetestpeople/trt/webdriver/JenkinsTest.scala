@@ -19,7 +19,7 @@ import com.thetestpeople.trt.utils.HasLogger
 @RunWith(classOf[JUnitRunner])
 class JenkinsTest extends AbstractBrowserTest with HasLogger {
 
-  "A user" should "be able to import results from Jenkins, and rerun selected tests" in {
+  "A user" should "be able to import results from Jenkins, and rerun selected tests" ignore {
     withJenkins { jenkinsHost ⇒
       automate { site ⇒
         importBuildsFromJenkins(site, jenkinsHost)
