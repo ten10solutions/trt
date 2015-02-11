@@ -71,6 +71,8 @@ GET     /webApi/tests/names           @controllers.WebApiController.testNames(qu
 GET     /webApi/tests/groups          @controllers.WebApiController.groups(query: String)
 GET     /webApi/categories            @controllers.WebApiController.categories(query: String)
 GET     /webApi/configuration/chart   @controllers.WebApiController.configurationChart(configuration: Configuration)
+GET     /javascriptRoutes             @controllers.WebApiController.javascriptRoutes
+
 
 # Routes for external JSON API:
 

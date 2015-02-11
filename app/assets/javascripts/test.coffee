@@ -116,7 +116,8 @@ window.createDurationChart = (executionUrls, fails, passes) ->
     $("#configuration-form").submit()
 
 $(document).ready ->
-  addTypeahead "category-field", "categoryNames", "/webApi/categories?query=%QUERY"
+  queryTemplate = jsRoutes.controllers.WebApiController.categories("__QUERY__").url
+  addTypeahead "category-field", "categoryNames", queryTemplate
 
   $('#category-dialog').on 'shown.bs.modal', (e) ->
     $('#category-field').focus()

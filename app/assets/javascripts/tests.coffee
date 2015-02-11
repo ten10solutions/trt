@@ -25,9 +25,14 @@ $(document).ready ->
   $("#configuration-select").change ->
     $("#configuration-form").submit()
 
-  addTypeahead "test-name-field", "testNames", "/webApi/tests/names?query=%QUERY"
-  addTypeahead "group-name-field", "groupNames", "/webApi/tests/groups?query=%QUERY"
-  addTypeahead "category-field", "categoryNames", "/webApi/categories?query=%QUERY"
+  testQueryTemplate = jsRoutes.controllers.WebApiController.testNames("__QUERY__").url
+  addTypeahead "test-name-field", "testNames", testQueryTemplate
+
+  groupQueryTemplate = jsRoutes.controllers.WebApiController.groups("__QUERY__").url
+  addTypeahead "group-name-field", "groupNames", groupQueryTemplate
+
+  categoryQueryTemplate = jsRoutes.controllers.WebApiController.categories("__QUERY__").url
+  addTypeahead "category-field", "categoryNames", categoryQueryTemplate
 
   $("#filter-tests-header-bar").click ->
     $('.filter-widget, #expand-filter, #collapse-filter').toggle()

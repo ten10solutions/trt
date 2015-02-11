@@ -4,6 +4,7 @@ makeEngine = (name, url) ->
     limit: 12
     remote:
       url: url
+      wildcard: "__QUERY__"
       filter: (resp) -> ({val: s} for s in resp)
     datumTokenizer: (d) -> Bloodhound.tokenizers.whitespace d.val
     queryTokenizer: Bloodhound.tokenizers.whitespace
