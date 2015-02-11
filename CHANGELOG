@@ -4,6 +4,7 @@
 * Automatically assign a configuration when importing from a Jenkins matrix job
 * Fix bug with adding executions incrementally to a batch
 * Add ui.applicationName configuration property to allow customisation of the project name
+* Use JS router instead of hard-coded URLs in case it is deployed with a different application.context
 
 0.8.0 (9/Nov/2014)
 
