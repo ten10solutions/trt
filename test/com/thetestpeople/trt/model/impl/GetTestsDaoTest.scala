@@ -67,7 +67,7 @@ trait GetTestsDaoTest { self: DaoTest ⇒
     val testId2 = addTest("some test 2")
     val testId3 = addTest("Another thing")
 
-    val testIds = dao.getAnalysedTests(nameOpt = Some("*test*")).map(_.test.id)
+    val testIds = dao.getAnalysedTests(nameOpt = Some("*test*")).map(_.id)
     testIds should contain theSameElementsAs (Seq(testId1, testId2))
   }
 
@@ -85,7 +85,7 @@ trait GetTestsDaoTest { self: DaoTest ⇒
     val testId5 = addTest(TestStatus.Broken)
     val testId6 = addTest(TestStatus.Broken)
 
-    def getTestIds(status: TestStatus) = dao.getAnalysedTests(testStatusOpt = Some(status)).map(_.test.id)
+    def getTestIds(status: TestStatus) = dao.getAnalysedTests(testStatusOpt = Some(status)).map(_.id)
     getTestIds(TestStatus.Healthy) should contain theSameElementsAs (List(testId1))
     getTestIds(TestStatus.Warning) should contain theSameElementsAs (List(testId2, testId3))
     getTestIds(TestStatus.Broken) should contain theSameElementsAs (List(testId4, testId5, testId6))
@@ -105,8 +105,8 @@ trait GetTestsDaoTest { self: DaoTest ⇒
     val testId4 = addTest()
     val testId5 = addTest()
 
-    dao.getAnalysedTests(startingFrom = 3, limitOpt = Some(2)).map(_.test.id) should contain theSameElementsAs (List(testId3, testId4))
-    dao.getAnalysedTests(startingFrom = 4, limitOpt = None).map(_.test.id) should contain theSameElementsAs (List(testId4, testId5))
+    dao.getAnalysedTests(startingFrom = 3, limitOpt = Some(2)).map(_.id) should contain theSameElementsAs (List(testId3, testId4))
+    dao.getAnalysedTests(startingFrom = 4, limitOpt = None).map(_.id) should contain theSameElementsAs (List(testId4, testId5))
   }
 
   "Getting tests" should "by default return results ordered by group, then name" in transaction { dao ⇒
@@ -122,7 +122,7 @@ trait GetTestsDaoTest { self: DaoTest ⇒
     val testId_C0 = addTest(name = "0", group = "C")
     val testId_B1 = addTest(name = "1", group = "B")
 
-    dao.getAnalysedTests().map(_.test.id) should equal(Seq(
+    dao.getAnalysedTests().map(_.id) should equal(Seq(
       testId_A0, testId_A1, testId_B0, testId_B1, testId_C0, testId_C1))
   }
 
@@ -136,8 +136,8 @@ trait GetTestsDaoTest { self: DaoTest ⇒
     val test3 = addTest(weather = 1.0)
     val test2 = addTest(weather = 0.5)
 
-    dao.getAnalysedTests(sortBy = SortBy.Test.Weather()).map(_.test.id) should equal(Seq(test1, test2, test3))
-    dao.getAnalysedTests(sortBy = SortBy.Test.Weather(descending = true)).map(_.test.id) should equal(Seq(test3, test2, test1))
+    dao.getAnalysedTests(sortBy = SortBy.Test.Weather()).map(_.id) should equal(Seq(test1, test2, test3))
+    dao.getAnalysedTests(sortBy = SortBy.Test.Weather(descending = true)).map(_.id) should equal(Seq(test3, test2, test1))
   }
 
   "Getting tests" should "support ordering by name" in transaction { dao ⇒
@@ -150,8 +150,8 @@ trait GetTestsDaoTest { self: DaoTest ⇒
     val test3 = addTest(name = "Cat", group = "Xenomorph")
     val test2 = addTest(name = "Badger", group = "Yeti")
 
-    dao.getAnalysedTests(sortBy = SortBy.Test.Name()).map(_.test.id) should equal(Seq(test1, test2, test3))
-    dao.getAnalysedTests(sortBy = SortBy.Test.Name(descending = true)).map(_.test.id) should equal(Seq(test3, test2, test1))
+    dao.getAnalysedTests(sortBy = SortBy.Test.Name()).map(_.id) should equal(Seq(test1, test2, test3))
+    dao.getAnalysedTests(sortBy = SortBy.Test.Name(descending = true)).map(_.id) should equal(Seq(test3, test2, test1))
   }
 
   "Getting tests" should "support ordering by consecutive failures" in transaction { dao ⇒
@@ -164,8 +164,8 @@ trait GetTestsDaoTest { self: DaoTest ⇒
     val test3 = addTest(consecutiveFailures = 3)
     val test2 = addTest(consecutiveFailures = 2)
 
-    dao.getAnalysedTests(sortBy = SortBy.Test.ConsecutiveFailures()).map(_.test.id) should equal(Seq(test1, test2, test3))
-    dao.getAnalysedTests(sortBy = SortBy.Test.ConsecutiveFailures(descending = true)).map(_.test.id) should equal(Seq(test3, test2, test1))
+    dao.getAnalysedTests(sortBy = SortBy.Test.ConsecutiveFailures()).map(_.id) should equal(Seq(test1, test2, test3))
+    dao.getAnalysedTests(sortBy = SortBy.Test.ConsecutiveFailures(descending = true)).map(_.id) should equal(Seq(test3, test2, test1))
   }
 
   "Getting tests" should "support ordering by started failing" in transaction { dao ⇒
@@ -178,8 +178,8 @@ trait GetTestsDaoTest { self: DaoTest ⇒
     val test3 = addTest(failingSince = Some(2.days.ago))
     val test2 = addTest(failingSince = Some(3.days.ago))
 
-    dao.getAnalysedTests(sortBy = SortBy.Test.StartedFailing()).map(_.test.id) should equal(Seq(test1, test2, test3))
-    dao.getAnalysedTests(sortBy = SortBy.Test.StartedFailing(descending = true)).map(_.test.id) should equal(Seq(test3, test2, test1))
+    dao.getAnalysedTests(sortBy = SortBy.Test.StartedFailing()).map(_.id) should equal(Seq(test1, test2, test3))
+    dao.getAnalysedTests(sortBy = SortBy.Test.StartedFailing(descending = true)).map(_.id) should equal(Seq(test3, test2, test1))
   }
 
   "Getting tests" should "support ordering by last passed" in transaction { dao ⇒
@@ -192,8 +192,8 @@ trait GetTestsDaoTest { self: DaoTest ⇒
     val test3 = addTest(lastPassed = Some(2.days.ago))
     val test2 = addTest(lastPassed = Some(3.days.ago))
 
-    dao.getAnalysedTests(sortBy = SortBy.Test.LastPassed()).map(_.test.id) should equal(Seq(test1, test2, test3))
-    dao.getAnalysedTests(sortBy = SortBy.Test.LastPassed(descending = true)).map(_.test.id) should equal(Seq(test3, test2, test1))
+    dao.getAnalysedTests(sortBy = SortBy.Test.LastPassed()).map(_.id) should equal(Seq(test1, test2, test3))
+    dao.getAnalysedTests(sortBy = SortBy.Test.LastPassed(descending = true)).map(_.id) should equal(Seq(test3, test2, test1))
   }
 
   "Getting tests" should "support ordering by last failed" in transaction { dao ⇒
@@ -206,8 +206,26 @@ trait GetTestsDaoTest { self: DaoTest ⇒
     val test3 = addTest(lastFailed = Some(2.days.ago))
     val test2 = addTest(lastFailed = Some(3.days.ago))
 
-    dao.getAnalysedTests(sortBy = SortBy.Test.LastFailed()).map(_.test.id) should equal(Seq(test1, test2, test3))
-    dao.getAnalysedTests(sortBy = SortBy.Test.LastFailed(descending = true)).map(_.test.id) should equal(Seq(test3, test2, test1))
+    dao.getAnalysedTests(sortBy = SortBy.Test.LastFailed()).map(_.id) should equal(Seq(test1, test2, test3))
+    dao.getAnalysedTests(sortBy = SortBy.Test.LastFailed(descending = true)).map(_.id) should equal(Seq(test3, test2, test1))
+  }
+
+  "Getting tests" should "respect blacklist" in transaction { dao ⇒
+    val testId1 = dao.ensureTestIsRecorded(F.test())
+    dao.upsertAnalysis(F.analysis(testId1))
+    val testId2 = dao.ensureTestIsRecorded(F.test())
+    dao.upsertAnalysis(F.analysis(testId2))
+
+    dao.getAnalysedTests(blackListOpt = Some(Seq(testId1))).map(_.id) shouldEqual (Seq(testId2))
+  }
+
+  "Getting tests" should "respect whitelist" in transaction { dao ⇒
+    val testId1 = dao.ensureTestIsRecorded(F.test())
+    dao.upsertAnalysis(F.analysis(testId1))
+    val testId2 = dao.ensureTestIsRecorded(F.test())
+    dao.upsertAnalysis(F.analysis(testId2))
+
+    dao.getAnalysedTests(whiteListOpt = Some(Seq(testId1))).map(_.id) shouldEqual (Seq(testId1))
   }
 
   "Getting tests by ID" should "work" in transaction { dao ⇒
@@ -236,31 +254,6 @@ trait GetTestsDaoTest { self: DaoTest ⇒
     val testCounts = dao.getTestCounts()
 
     testCounts should equal(TestCounts(passed = 1, warning = 2, failed = 3))
-  }
-
-  "Getting test counts by configuration" should "work" in transaction { dao ⇒
-    val dao = createDao
-    def addTest(configuration: Configuration, status: TestStatus) {
-      val testId = dao.ensureTestIsRecorded(F.test())
-      val batchId = dao.newBatch(F.batch())
-      dao.newExecution(F.execution(batchId, testId, configuration = configuration))
-      dao.upsertAnalysis(F.analysis(testId, status, configuration))
-    }
-    addTest(DummyData.Configuration1, TestStatus.Healthy)
-    addTest(DummyData.Configuration1, TestStatus.Warning)
-    addTest(DummyData.Configuration1, TestStatus.Warning)
-    addTest(DummyData.Configuration1, TestStatus.Broken)
-    addTest(DummyData.Configuration1, TestStatus.Broken)
-    addTest(DummyData.Configuration1, TestStatus.Broken)
-    addTest(DummyData.Configuration2, TestStatus.Healthy)
-    addTest(DummyData.Configuration2, TestStatus.Warning)
-    addTest(DummyData.Configuration2, TestStatus.Broken)
-
-    val testCountsByConfiguration = dao.getTestCountsByConfiguration()
-
-    testCountsByConfiguration should equal(Map(
-      DummyData.Configuration1 -> TestCounts(passed = 1, warning = 2, failed = 3),
-      DummyData.Configuration2 -> TestCounts(passed = 1, warning = 1, failed = 1)))
   }
 
   "Getting test counts" should "allow filtering by test name" in transaction { dao ⇒
@@ -303,6 +296,18 @@ trait GetTestsDaoTest { self: DaoTest ⇒
     val testId = dao.ensureTestIsRecorded(F.test())
     val testCounts = dao.getTestCounts()
     testCounts should equal(TestCounts(passed = 0, warning = 0, failed = 0))
+  }
+
+  "Getting test counts" should "exclude ignored tests" in transaction { dao ⇒
+    val dao = createDao
+    val testId = dao.ensureTestIsRecorded(F.test())
+    dao.upsertAnalysis(F.analysis(testId, TestStatus.Healthy))
+
+    val testCounts1 = dao.getTestCounts(ignoredTests = Seq())
+    testCounts1 should equal(TestCounts(passed = 1, ignored = 0))
+
+    val testCounts2 = dao.getTestCounts(ignoredTests = Seq(testId))
+    testCounts2 should equal(TestCounts(passed = 0, ignored = 1))
   }
 
   "getEnrichedTest" should "not bring anything back if no test with that id" in transaction { dao ⇒

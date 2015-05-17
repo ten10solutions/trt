@@ -2,8 +2,9 @@
   testsSummary: TestsSummaryView, 
   tests: Seq[TestView], 
   configuration: Configuration, 
-  testStatusOpt: Option[TestStatus], 
-  nameOpt: Option[String], 
+  testStatusOpt: Option[TestStatus],
+  ignoredOpt: Option[Boolean],
+  nameOpt: Option[String],
   groupOpt: Option[String],
   categoryOpt: Option[String],
   canRerun: Boolean, 
@@ -42,6 +43,7 @@
 }
 
 @testsLink(status: TestStatus) = {@routes.TestsController.tests(configuration = Some(configuration), status = Some(status), name = nameOpt, group = groupOpt, sort = sortOpt, category = categoryOpt, descending = descendingOpt)}
+@ignoredTestsLink = {@routes.TestsController.tests(configuration = Some(configuration), ignored = Some(true), name = nameOpt, group = groupOpt, sort = sortOpt, category = categoryOpt, descending = descendingOpt)}
 
 @sortLink(sort: Sort) = {
   @if(sortOpt.getOrElse(Sort.Group) == sort) {
@@ -89,9 +91,10 @@
         <tr>
           <td class="headings-table-column">Counts</td>
           <td>
-            @if(testsSummary.passCount > 0){<a href="@testsLink(TestStatus.Healthy)"><span class="badge badge-success">@testsSummary.passCount</span></a> Healthy }
-            @if(testsSummary.warnCount > 0){<a href="@testsLink(TestStatus.Warning)"><span class="badge badge-warning">@testsSummary.warnCount</span></a> Warning }
-            @if(testsSummary.failCount > 0){<a href="@testsLink(TestStatus.Broken)"><span class="badge badge-error">@testsSummary.failCount</span></a> Broken }
+            @if(testsSummary.passCount > 0){<a id="healthy-test-count" href="@testsLink(TestStatus.Healthy)"><span class="badge badge-success">@testsSummary.passCount</span></a> Healthy }
+            @if(testsSummary.warnCount > 0){<a id="warning-test-count" href="@testsLink(TestStatus.Warning)"><span class="badge badge-warning">@testsSummary.warnCount</span></a> Warning }
+            @if(testsSummary.failCount > 0){<a id="broken-test-count" href="@testsLink(TestStatus.Broken)"><span class="badge badge-error">@testsSummary.failCount</span></a> Broken }
+            @if(testsSummary.ignoredCount > 0){<a id="ignored-test-count" href="@ignoredTestsLink"><span class="badge badge-disabled">@testsSummary.ignoredCount</span></a> Ignored }
             <a id="total-test-count" href="@routes.TestsController.tests(configuration = Some(configuration), name = nameOpt, group = groupOpt, category = categoryOpt, sort = sortOpt, descending = descendingOpt)"><span class="badge badge-inverse">@testsSummary.totalCount</span></a> Total
           </td>
         </tr>
@@ -137,11 +140,13 @@
               pass: @testsSummary.passCount,
               warn: @testsSummary.warnCount,
               fail: @testsSummary.failCount,
+              ignored: @testsSummary.ignoredCount,
             },
             {
               pass: "@testsLink(TestStatus.Healthy)",
               warn: "@testsLink(TestStatus.Warning)",
               fail: "@testsLink(TestStatus.Broken)",
+              ignored: "@ignoredTestsLink",
             }
           );
         });
@@ -178,6 +183,11 @@
     @if(testsSummary.failCount > 0) {
       <li @if(testStatusOpt == Some(TestStatus.Broken)){ class="active" }>
         <a id="broken-tab-link" href="@testsLink(TestStatus.Broken)">Broken</a>
+      </li>
+    }
+    @if(testsSummary.ignoredCount > 0) {
+      <li @if(ignoredOpt == Some(true)){ class="active" }>
+        <a id="broken-tab-link" href="@ignoredTestsLink">Ignored</a>
       </li>
     }
   </ul>

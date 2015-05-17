@@ -461,5 +461,35 @@
       <column name="category" />
     </createIndex>
   </changeSet>
+ 
+  <changeSet author="matt" id="create-ignored_test_configurations">
+    <createTable tableName="ignored_test_configurations">
+      <column name="test_id" type="INT">
+        <constraints nullable="false" />
+      </column>
+      <column name="configuration" type="VARCHAR(10485760)">
+        <constraints nullable="false" />
+      </column>
+    </createTable>
+  </changeSet>
+
+  <changeSet author="matt" id="ignored_test_configurations-foreign-key">
+    <addForeignKeyConstraint baseColumnNames="test_id" baseTableName="ignored_test_configurations" 
+      constraintName="ignored_test_configurations_test_id_fk" deferrable="false" initiallyDeferred="false" 
+      onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="tests" />
+  </changeSet>
+  
+  <changeSet author="matt" id="ignored_test_configurations-indexes">
+    <createIndex indexName="idx-ignored_test_configurations-test_id" tableName="ignored_test_configurations">
+      <column name="test_id" />
+    </createIndex>
+    <createIndex indexName="idx-ignored_test_configurations-configuration" tableName="ignored_test_configurations">
+      <column name="configuration" />
+    </createIndex>
+    <createIndex indexName="idx-ignored_test_configurations-unique" tableName="ignored_test_configurations" unique="true">
+      <column name="test_id" />
+      <column name="configuration" />
+    </createIndex>
+  </changeSet>
   
 </databaseChangeLog>

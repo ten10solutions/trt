@@ -12,7 +12,10 @@ case class WeatherInfo(weather: Double) {
   def passRate: String = "Pass rate: " + (weather * 100).toInt + "%"
 }
 
-case class TestView(enrichedTest: EnrichedTest, categories: Seq[String] = Seq()) extends HasTestName {
+case class TestView(
+    enrichedTest: EnrichedTest,
+    categories: Seq[String] = Seq(),
+    isIgnoredInConfiguration: Boolean = false) extends HasTestName {
 
   private val test = enrichedTest.test
 
@@ -22,7 +25,11 @@ case class TestView(enrichedTest: EnrichedTest, categories: Seq[String] = Seq())
 
   def deleted = enrichedTest.test.deleted
 
-  def ballIconOpt: Option[String] = enrichedTest.analysisOpt.map(_.status).map(BallIcons.icon)
+  def ballIconOpt: Option[String] =
+    if (isIgnoredInConfiguration)
+      Some(BallIcons.GreyBall)
+    else
+      enrichedTest.analysisOpt.map(_.status).map(BallIcons.icon)
 
   def weatherInfoOpt: Option[WeatherInfo] = enrichedTest.analysisOpt.map(_.weather).map(WeatherInfo)
 

@@ -284,4 +284,13 @@ trait Mappings { self: SlickDao ⇒
 
   }
 
+  class IgnoredTestConfigurationMapping(tag: Tag) extends Table[IgnoredTestConfiguration](tag, "ignored_test_configurations") {
+
+    def testId = column[Id[Test]]("test_id", O.PrimaryKey, O.NotNull)
+    def configuration = column[Configuration]("configuration", O.NotNull)
+
+    def * = (testId, configuration) <> (IgnoredTestConfiguration.tupled, IgnoredTestConfiguration.unapply)
+
+  }
+  
 }

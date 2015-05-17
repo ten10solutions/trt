@@ -42,39 +42,58 @@ class ServiceImpl(
       val executions = dao.getEnrichedExecutionsForTest(id, Some(configuration), resultOpt)
       val otherConfigurations = dao.getConfigurations(id).filterNot(_ == configuration)
       val categories = dao.getCategories(Seq(id)).getOrElse(id, Seq()).map(_.category).sortBy(_.toLowerCase)
-      TestAndExecutions(test, executions, otherConfigurations, categories)
+      val isIgnoredInConfiguration = dao.isTestIgnoredInConfiguration(id, configuration)
+      TestAndExecutions(test, executions, otherConfigurations, categories, isIgnoredInConfiguration)
     }
   }
 
   def getTests(
     configuration: Configuration,
     testStatusOpt: Option[TestStatus] = None,
+    ignoredOpt: Option[Boolean] = None,
     nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     categoryOpt: Option[String] = None,
     startingFrom: Int,
     limit: Int,
-    sortBy: SortBy.Test = SortBy.Test.Group()): (TestCounts, Seq[EnrichedTest]) = transaction {
+    sortBy: SortBy.Test = SortBy.Test.Group()): TestsInfo = transaction {
 
+    val ignoredTests = dao.getIgnoredTests(configuration)
     val testCounts = dao.getTestCounts(
       configuration = configuration,
       nameOpt = nameOpt,
       groupOpt = groupOpt,
-      categoryOpt = categoryOpt)
+      categoryOpt = categoryOpt,
+      ignoredTests = ignoredTests)
+
+    val (blackListOpt, whiteListOpt) = ignoredOpt match {
+      case None        ⇒ (None, None)
+      case Some(true)  ⇒ (None, Some(ignoredTests))
+      case Some(false) ⇒ (Some(ignoredTests), None)
+    }
+
     val tests = dao.getAnalysedTests(
       configuration = configuration,
       testStatusOpt = testStatusOpt,
       nameOpt = nameOpt,
       groupOpt = groupOpt,
       categoryOpt = categoryOpt,
+      blackListOpt = blackListOpt,
+      whiteListOpt = whiteListOpt,
       startingFrom = startingFrom,
       limitOpt = Some(limit),
       sortBy = sortBy)
 
-    (testCounts, tests)
+    TestsInfo(tests, testCounts, ignoredTests)
   }
 
-  def getTestCountsByConfiguration(): Map[Configuration, TestCounts] = transaction { dao.getTestCountsByConfiguration() }
+  def getTestCountsByConfiguration(): Map[Configuration, TestCounts] = transaction {
+    val configAndCounts = for {
+      configuration ← dao.getConfigurations
+      ignoredTests = dao.getIgnoredTests(configuration)
+    } yield configuration -> dao.getTestCounts(configuration, ignoredTests = ignoredTests)
+    configAndCounts.toMap
+  }
 
   def getDeletedTests(): Seq[EnrichedTest] = transaction { dao.getDeletedTests().map(t ⇒ EnrichedTest(t)) }
 
@@ -258,6 +277,31 @@ class ServiceImpl(
   def removeCategory(testId: Id[Test], category: String) = transaction {
     dao.removeCategories(testId, Seq(category))
     logger.info(s"Removed category $category from test $testId")
+  }
+
+  def ignoreTestInConfiguration(testId: Id[Test], configuration: Configuration): Boolean = transaction {
+    if (dao.getTestsById(Seq(testId)).isEmpty)
+      false
+    else {
+      val currentlyIgnoredConfigs = dao.getIgnoredConfigurations(testId)
+      if (currentlyIgnoredConfigs.contains(configuration))
+        false
+      else {
+        dao.addIgnoredTestConfigurations(Seq(IgnoredTestConfiguration(testId, configuration)))
+        logger.info(s"Ignoring test $testId in configuration $configuration")
+        true
+      }
+    }
+  }
+
+  def unignoreTestInConfiguration(testId: Id[Test], configuration: Configuration): Boolean = transaction {
+    if (dao.getTestsById(Seq(testId)).isEmpty)
+      false
+    else {
+      dao.removeIgnoredTestConfiguration(IgnoredTestConfiguration(testId, configuration))
+      logger.info(s"Unignoring test $testId in configuration $configuration")
+      true
+    }
   }
 
 }

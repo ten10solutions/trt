@@ -104,6 +104,7 @@ trait SlickBatchDao extends BatchDao { this: SlickDao ⇒
     val testIdsToDelete = testsWithoutExecutionsQuery.run
     testCategories.filter(_.testId inSet testIdsToDelete).delete
     testComments.filter(_.testId inSet testIdsToDelete).delete
+    ignoredTestConfigurations.filter(_.testId inSet testIdsToDelete).delete
     tests.filter(_.id inSet testIdsToDelete).delete
     testIdsToDelete
   }

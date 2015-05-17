@@ -11,11 +11,14 @@ import com.thetestpeople.trt.analysis.ExecutionVolume
 import com.thetestpeople.trt.analysis.ExecutionTimeMAD
 import com.thetestpeople.trt.analysis.AllHistoricalTestCounts
 
+case class TestsInfo(tests: Seq[EnrichedTest], testCounts: TestCounts, ignoredTests: Seq[Id[Test]])
+
 case class TestAndExecutions(
   test: EnrichedTest,
   executions: Seq[EnrichedExecution],
   otherConfigurations: Seq[Configuration],
-  categories: Seq[String] = Seq())
+  categories: Seq[String] = Seq(),
+  isIgnoredInConfiguration: Boolean)
 
 case class ExecutionsAndTotalCount(executions: Seq[EnrichedExecution], total: Int)
 
@@ -53,12 +56,13 @@ trait Service extends CiService {
   def getTests(
     configuration: Configuration = Configuration.Default,
     testStatusOpt: Option[TestStatus] = None,
+    ignoredOpt: Option[Boolean] = None,
     nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     categoryOpt: Option[String] = None,
     startingFrom: Int = 0,
     limit: Int = Integer.MAX_VALUE,
-    sortBy: SortBy.Test = SortBy.Test.Group()): (TestCounts, Seq[EnrichedTest])
+    sortBy: SortBy.Test = SortBy.Test.Group()): TestsInfo
 
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts]
 
@@ -121,4 +125,7 @@ trait Service extends CiService {
 
   def removeCategory(testId: Id[Test], category: String)
 
+  def ignoreTestInConfiguration(testId: Id[Test], configuration: Configuration): Boolean
+
+  def unignoreTestInConfiguration(testId: Id[Test], configuration: Configuration): Boolean
 }

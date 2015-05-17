@@ -5,7 +5,8 @@
 * Fix bug with adding executions incrementally to a batch
 * Add ui.applicationName configuration property to allow customisation of the project name
 * Use JS router instead of hard-coded URLs in case it is deployed with a different application.context
-
+* Allow user to ignore a test in a configuration
+	
 0.8.0 (9/Nov/2014)
 
 * Revamped test history charts into stacked bar charts with a bar per day

@@ -15,6 +15,7 @@ object BallIcons {
   val PassBall = "balls/green.png"
   val WarnBall = "balls/yellow.png"
   val FailBall = "balls/red.png"
+  val GreyBall = "balls/grey.png"
 
 }
 

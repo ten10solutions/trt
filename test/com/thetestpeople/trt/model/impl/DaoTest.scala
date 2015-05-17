@@ -516,4 +516,24 @@ abstract class DaoTest extends FlatSpec with Matchers with ExecutionDaoTest with
     dao.getCategories(testId) should equal(Seq())
   }
 
+  "Ignoring tests in a configuration" should "work" in transaction { dao ⇒
+    val testId = dao.ensureTestIsRecorded(F.test())
+
+    dao.isTestIgnoredInConfiguration(testId, DummyData.Configuration1) should equal(false)
+    dao.getIgnoredConfigurations(testId) should equal(Seq())
+    dao.getIgnoredTests(DummyData.Configuration1) should equal(Seq())
+
+    dao.addIgnoredTestConfigurations(Seq(IgnoredTestConfiguration(testId, DummyData.Configuration1)))
+
+    dao.isTestIgnoredInConfiguration(testId, DummyData.Configuration1) should equal(true)
+    dao.getIgnoredConfigurations(testId) should equal(Seq(DummyData.Configuration1))
+    dao.getIgnoredTests(DummyData.Configuration1) should equal(Seq(testId))
+
+    dao.removeIgnoredTestConfiguration(IgnoredTestConfiguration(testId, DummyData.Configuration1))
+
+    dao.isTestIgnoredInConfiguration(testId, DummyData.Configuration1) should equal(false)
+    dao.getIgnoredConfigurations(testId) should equal(Seq())
+    dao.getIgnoredTests(DummyData.Configuration1) should equal(Seq())
+  }
+
 }

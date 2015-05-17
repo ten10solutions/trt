@@ -44,6 +44,8 @@ trait SlickTestDao extends TestDao { this: SlickDao ⇒
     nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     categoryOpt: Option[String] = None,
+    blackListOpt: Option[Seq[Id[Test]]] = None,
+    whiteListOpt: Option[Seq[Id[Test]]] = None,
     startingFrom: Int = 0,
     limitOpt: Option[Int] = None,
     sortBy: SortBy.Test = SortBy.Test.Group()): Seq[EnrichedTest] = {
@@ -63,6 +65,10 @@ trait SlickTestDao extends TestDao { this: SlickDao ⇒
       } yield (test, analysis)
     for (status ← testStatusOpt)
       query = query.filter(_._2.status === status)
+    for (whiteList ← whiteListOpt)
+      query = query.filter(_._1.id inSet whiteList)
+    for (blackList ← blackListOpt)
+      query = query.filterNot(_._1.id inSet blackList)
     query = sortQuery(query, sortBy)
     query = query.drop(startingFrom)
     for (limit ← limitOpt)
@@ -100,10 +106,12 @@ trait SlickTestDao extends TestDao { this: SlickDao ⇒
 
   def getDeletedTests(): Seq[Test] = tests.filter(_.deleted).sortBy(_.name).sortBy(_.group).run
 
-  def getTestCounts(configuration: Configuration, nameOpt: Option[String] = None, groupOpt: Option[String] = None, categoryOpt: Option[String] = None): TestCounts = {
+  def getTestCounts(configuration: Configuration, nameOpt: Option[String] = None, groupOpt: Option[String] = None,
+    categoryOpt: Option[String] = None, ignoredTests: Seq[Id[Test]] = Seq()): TestCounts = {
     var query = testsAndAnalyses
     query = query.filter(_._2.configuration === configuration)
     query = query.filterNot(_._1.deleted)
+    query = query.filterNot(_._1.id inSet ignoredTests)
     for (name ← nameOpt)
       query = query.filter(_._1.name.toLowerCase like globToSqlPattern(name))
     for (group ← groupOpt)
@@ -120,34 +128,11 @@ trait SlickTestDao extends TestDao { this: SlickDao ⇒
     val results: Map[TestStatus, Int] =
       query.groupBy(_._2.status).map { case (status, results) ⇒ status -> results.length }.run.toMap
     def count(status: TestStatus) = results.collect { case (`status`, count) ⇒ count }.headOption.getOrElse(0)
-    TestCounts(passed = count(TestStatus.Healthy), warning = count(TestStatus.Warning), failed = count(TestStatus.Broken))
-  }
-
-  def getTestCountsByConfiguration(): Map[Configuration, TestCounts] = {
-    val baseQuery =
-      for {
-        test ← tests
-        analysis ← analyses
-        if analysis.testId === test.id
-        if !test.deleted
-      } yield (test, analysis)
-    case class CountRecord(configuration: Configuration, status: TestStatus, count: Int)
-    val countRecords: Seq[CountRecord] =
-      baseQuery.groupBy {
-        case (test, analysis) ⇒ (analysis.configuration, analysis.status)
-      }.map {
-        case ((configuration, status), results) ⇒ (configuration, status, results.length)
-      }.run.map(CountRecord.tupled)
-    def testCounts(countRecords: Seq[CountRecord]): TestCounts = {
-      def count(status: TestStatus) = countRecords.find(_.status == status).map(_.count).getOrElse(0)
-      TestCounts(
-        passed = count(TestStatus.Healthy),
-        warning = count(TestStatus.Warning),
-        failed = count(TestStatus.Broken))
-    }
-    countRecords.groupBy(_.configuration).map {
-      case (configuration, countRecords) ⇒ configuration -> testCounts(countRecords)
-    }
+    TestCounts(
+      passed = count(TestStatus.Healthy),
+      warning = count(TestStatus.Warning),
+      failed = count(TestStatus.Broken),
+      ignored = ignoredTests.size)
   }
 
   private def getTestWithName(name: Column[String]) =
@@ -265,5 +250,33 @@ trait SlickTestDao extends TestDao { this: SlickDao ⇒
 
   def getConfigurations(testId: Id[Test]): Seq[Configuration] =
     executions.filter(_.testId === testId).groupBy(_.configuration).map(_._1).sorted.run
+
+  def getIgnoredConfigurations(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[Configuration]] =
+    ignoredTestConfigurations.filter(_.testId inSet testIds).run.groupBy(_.testId).map {
+      case (testId, ignoredConfigs) ⇒ testId -> ignoredConfigs.map(_.configuration)
+    }
+
+  def getIgnoredTests(configuration: Configuration): Seq[Id[Test]] = {
+    val query =
+      for {
+        ignoredConfig ← ignoredTestConfigurations
+        if ignoredConfig.configuration === configuration
+        test ← tests if test.id === ignoredConfig.testId if !test.deleted
+      } yield ignoredConfig.testId
+    query.run
+  }
+
+  def isTestIgnoredInConfiguration(testId: Id[Test], configuration: Configuration): Boolean =
+    ignoredTestConfigurations.filter(c ⇒ c.testId === testId && c.configuration === configuration).exists.run
+
+  def addIgnoredTestConfigurations(ignoredConfigs: Seq[IgnoredTestConfiguration]) {
+    ignoredTestConfigurations.insertAll(ignoredConfigs: _*)
+  }
+
+  def removeIgnoredTestConfiguration(ignoredConfig: IgnoredTestConfiguration) {
+    ignoredTestConfigurations
+      .filter(c ⇒ c.testId === ignoredConfig.testId && c.configuration === ignoredConfig.configuration)
+      .delete
+  }
 
 }

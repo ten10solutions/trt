@@ -19,6 +19,7 @@ class TestsController(service: Service) extends AbstractController(service) with
   def tests(
     configurationOpt: Option[Configuration],
     testStatusOpt: Option[TestStatus],
+    ignoredOpt: Option[Boolean],
     nameOpt: Option[String],
     groupOpt: Option[String],
     categoryOpt: Option[String],
@@ -34,13 +35,14 @@ class TestsController(service: Service) extends AbstractController(service) with
           case None ⇒
             Redirect(routes.Application.index())
           case Some(configuration) ⇒
-            Ok(handleTests(testStatusOpt, configuration, nameOpt, groupOpt, categoryOpt, pagination, sortOpt, descendingOpt))
+            Ok(handleTests(testStatusOpt, ignoredOpt, configuration, nameOpt, groupOpt, categoryOpt, pagination, sortOpt, descendingOpt))
         }
     }
   }
 
   private def handleTests(
     testStatusOpt: Option[TestStatus],
+    ignoredOpt: Option[Boolean],
     configuration: Configuration,
     nameOpt: Option[String],
     groupOpt: Option[String],
@@ -49,9 +51,10 @@ class TestsController(service: Service) extends AbstractController(service) with
     sortOpt: Option[Sort],
     descendingOpt: Option[Boolean])(implicit request: Request[_]) = {
     val sortBy = SortHelper.getTestSortBy(sortOpt, descendingOpt)
-    val (testCounts, tests) = service.getTests(
+    val TestsInfo(tests, testCounts, ignoredTests) = service.getTests(
       configuration = configuration,
       testStatusOpt = testStatusOpt,
+      ignoredOpt = ignoredOpt,
       nameOpt = nameOpt,
       groupOpt = groupOpt,
       categoryOpt = categoryOpt,
@@ -59,27 +62,28 @@ class TestsController(service: Service) extends AbstractController(service) with
       limit = pagination.pageSize,
       sortBy = sortBy)
 
-    val testViews = tests.map(TestView(_))
+    val testViews = tests.map(t ⇒ TestView(t, isIgnoredInConfiguration = ignoredTests contains t.id))
     val testsSummary = TestsSummaryView(configuration, testCounts)
     val paginationData = pagination.paginationData(testCounts.countFor(testStatusOpt))
-    views.html.tests(testsSummary, testViews, configuration, testStatusOpt, nameOpt, groupOpt, categoryOpt, service.canRerun, paginationData, sortOpt, descendingOpt)
+    views.html.tests(testsSummary, testViews, configuration, testStatusOpt, ignoredOpt, nameOpt, groupOpt, categoryOpt,
+      service.canRerun, paginationData, sortOpt, descendingOpt)
   }
 
+  private def getSelectedTestIds(implicit request: Request[AnyContent]): Seq[Id[Test]] =
+    getFormParameters("selectedTest").flatMap(Id.parse[Test])
+
   def deleteTests() = Action { implicit request ⇒
-    val selectedTestIds = getFormParameters("selectedTest").flatMap(Id.parse[Test])
-    service.markTestsAsDeleted(selectedTestIds)
+    service.markTestsAsDeleted(getSelectedTestIds)
     Redirect(previousUrlOrDefault).flashing("success" -> "Marked tests as deleted.")
   }
 
   def undeleteTests() = Action { implicit request ⇒
-    val selectedTestIds = getFormParameters("selectedTest").flatMap(Id.parse[Test])
-    service.markTestsAsDeleted(selectedTestIds, deleted = false)
+    service.markTestsAsDeleted(getSelectedTestIds, deleted = false)
     Redirect(previousUrlOrDefault).flashing("success" -> "Marked tests as no longer deleted.")
   }
 
   def rerunSelectedTests() = Action { implicit request ⇒
-    val selectedTestIds = getFormParameters("selectedTest").flatMap(Id.parse[Test])
-    rerunTests(selectedTestIds)
+    rerunTests(getSelectedTestIds)
   }
 
 }

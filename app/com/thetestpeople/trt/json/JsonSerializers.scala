@@ -75,7 +75,8 @@ object JsonSerializers {
   implicit val testCountsFormat: Format[TestCounts] = (
     (__ \ "healthy").format[Int] and
     (__ \ "warning").format[Int] and
-    (__ \ "broken").format[Int])(TestCounts, unlift(TestCounts.unapply))
+    (__ \ "broken").format[Int] and
+    (__ \ "ignored").format[Int])(TestCounts, unlift(TestCounts.unapply))
 
   implicit val historicalTestCountsFormat: Format[HistoricalTestCounts] = (
     (__ \ "when").format[DateTime] and

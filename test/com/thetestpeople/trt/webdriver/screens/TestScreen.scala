@@ -40,6 +40,18 @@ class TestScreen(implicit automationContext: AutomationContext) extends Abstract
     waitForSuccessMessage()
   }
 
+  def ignore() {
+    log("Click 'Ignore test'")
+    webDriver.waitForDisplayedAndEnabled(id("ignore-test")).click()
+    waitForSuccessMessage()
+  }
+
+  def unignore() {
+    log("Click 'Unignore test'")
+    webDriver.waitForDisplayedAndEnabled(id("unignore-test")).click()
+    waitForSuccessMessage()
+  }
+
   def categoryWidgets: Seq[CategoryWidget] = webDriver.findElements_(cssSelector(".category-widget")).map(CategoryWidget)
 
   def clickAddCategory(): AddCategoryDialog = {

@@ -11,7 +11,7 @@ GET     /assets/*file               controllers.Assets.at(path="/public", file)
 
 GET     /dashboard                  @controllers.Application.configurations()
 
-GET     /tests                      @controllers.TestsController.tests(configuration: Option[Configuration] ?= None, status: Option[TestStatus] ?= None, name: Option[String] ?= None, group: Option[String] ?= None, category: Option[String] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None, sort: Option[Sort] ?= None, descending: Option[Boolean] ?= None)
+GET     /tests                      @controllers.TestsController.tests(configuration: Option[Configuration] ?= None, status: Option[TestStatus] ?= None, ignored: Option[Boolean] ?= None, name: Option[String] ?= None, group: Option[String] ?= None, category: Option[String] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None, sort: Option[Sort] ?= None, descending: Option[Boolean] ?= None)
 POST    /tests/undelete             @controllers.TestsController.undeleteTests()
 POST    /tests/delete               @controllers.TestsController.deleteTests()
 POST    /tests/rerun                @controllers.TestsController.rerunSelectedTests()
@@ -26,6 +26,8 @@ POST    /test/:id/comment           @controllers.TestController.setTestComment(i
 POST    /test/:id/addCategory       @controllers.TestController.addCategory(id: Id[Test])
 POST    /test/:id/removeCategory    @controllers.TestController.removeCategory(id: Id[Test])
 POST    /test/:id/rerun             @controllers.TestController.rerunTest(id: Id[Test])
+POST    /test/:id/ignore            @controllers.TestController.ignoreTestInConfiguration(id: Id[Test], configuration: Configuration)
+POST    /test/:id/unignore          @controllers.TestController.unignoreTestInConfiguration(id: Id[Test], configuration: Configuration)
 
 GET     /execution/:id              @controllers.ExecutionController.execution(id: Id[Execution])
 POST    /execution/:id/comment      @controllers.ExecutionController.setExecutionComment(id: Id[Execution])
@@ -72,7 +74,6 @@ GET     /webApi/tests/groups          @controllers.WebApiController.groups(query
 GET     /webApi/categories            @controllers.WebApiController.categories(query: String)
 GET     /webApi/configuration/chart   @controllers.WebApiController.configurationChart(configuration: Configuration)
 GET     /javascriptRoutes             @controllers.WebApiController.javascriptRoutes
-
 
 # Routes for external JSON API:
 

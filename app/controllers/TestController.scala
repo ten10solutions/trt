@@ -34,9 +34,9 @@ class TestController(service: Service) extends AbstractController(service) with 
 
   private def handleTest(testId: Id[Test], configuration: Configuration, resultOpt: Option[Boolean], pagination: Pagination)(implicit request: Request[_]) =
     service.getTestAndExecutions(testId, configuration, resultOpt) map {
-      case TestAndExecutions(test, executions, otherConfigurations, categories) ⇒
+      case TestAndExecutions(test, executions, otherConfigurations, categories, isIgnoredInConfiguration) ⇒
         val executionViews = executions.map(e ⇒ ExecutionView(e))
-        val testView = new TestView(test, categories)
+        val testView = TestView(test, categories, isIgnoredInConfiguration)
         val paginationData = pagination.paginationData(executions.size)
         views.html.test(testView, executionViews, Some(configuration), resultOpt, otherConfigurations, service.canRerun, paginationData)
     }
@@ -93,6 +93,22 @@ class TestController(service: Service) extends AbstractController(service) with 
 
   def rerunTest(testId: Id[Test]) = Action { implicit request ⇒
     rerunTests(Seq(testId))
+  }
+
+  def ignoreTestInConfiguration(id: Id[Test], configuration: Configuration) = Action { implicit request ⇒
+    val success = service.ignoreTestInConfiguration(id, configuration)
+    if (success)
+      Redirect(previousUrlOrDefault).flashing("success" -> s"Ignored test in configuration $configuration.")
+    else
+      Redirect(previousUrlOrDefault).flashing("error" -> "Problem ignoring test.")
+  }
+
+  def unignoreTestInConfiguration(id: Id[Test], configuration: Configuration) = Action { implicit request ⇒
+    val success = service.unignoreTestInConfiguration(id, configuration)
+    if (success)
+      Redirect(previousUrlOrDefault).flashing("success" -> s"Stopped ignoring test in configuration $configuration.")
+    else
+      Redirect(previousUrlOrDefault).flashing("error" -> "Problem unignoring test.")
   }
 
 }

@@ -80,7 +80,7 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
     val Seq(testId) = service.getTestIdsInBatch(batchId)
     val Seq(executionId) = service.getExecutionIdsInBatch(batchId)
 
-    val Some(TestAndExecutions(testAndAnalysis, Seq(execution), configurations, _)) = service.getTestAndExecutions(testId)
+    val Some(TestAndExecutions(testAndAnalysis, Seq(execution), configurations, _, _)) = service.getTestAndExecutions(testId)
 
     val EnrichedTest(test, Some(analysis), _) = testAndAnalysis
     analysis.status should equal(TestStatus.Healthy)
@@ -88,15 +88,31 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
     executionId should equal(execution.id)
   }
 
-  it should "let you fetch a paged list of tests and total counts" in {
+  "getTests()" should "let you fetch a paged list of tests and total counts" in {
     val service = setup().service
     service.addBatch(F.batch(executions = Seq(F.execution(F.test("test1"), passed = true))))
     service.addBatch(F.batch(executions = Seq(F.execution(F.test("test2"), passed = false))))
     service.addBatch(F.batch(executions = Seq(F.execution(F.test("test3"), passed = false))))
     service.addBatch(F.batch(executions = Seq(F.execution(F.test("test4"), passed = true))))
-    val (counts, testsAndAnalysis) = service.getTests(startingFrom = 0, limit = 2)
+    val TestsInfo(tests, counts, _) = service.getTests(startingFrom = 0, limit = 2)
     counts.total should be(4)
-    testsAndAnalysis.size should be(2)
+    tests.size should be(2)
+  }
+
+  "it" should "let you select just ignored tests" in {
+    val service = setup().service
+    val batchId = service.addBatch(F.batch(
+      configurationOpt = Some(DummyData.Configuration1),
+      executions = Seq(
+        F.execution(F.test("test1")),
+        F.execution(F.test("test2")))))
+    val Seq(testId1, testId2) = service.getTestIdsInBatch(batchId)
+
+    service.ignoreTestInConfiguration(testId1, DummyData.Configuration1)
+
+    service.getTests(configuration = DummyData.Configuration1, ignoredOpt = None).tests.map(_.id) should contain theSameElementsAs Seq(testId1, testId2)
+    service.getTests(configuration = DummyData.Configuration1, ignoredOpt = Some(true)).tests.map(_.id) should equal(Seq(testId1))
+    service.getTests(configuration = DummyData.Configuration1, ignoredOpt = Some(false)).tests.map(_.id) should equal(Seq(testId2))
   }
 
   "Deleting batches" should "delete the data and trigger analysis" in {
@@ -134,6 +150,18 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
     service.deleteBatches(Seq(batchId2))
 
     service.searchLogs("foo")._2 should equal(1)
+  }
+
+  "Deleting batches" should "clean up ignore records" in {
+    val service = setup().service
+    val batchId = service.addBatch(F.batch(configurationOpt = Some(DummyData.Configuration1), executions = Seq(F.execution())))
+    val Seq(testId) = service.getTestIdsInBatch(batchId)
+    service.ignoreTestInConfiguration(testId, DummyData.Configuration1)
+    service.getTests(DummyData.Configuration1).ignoredTests should equal(Seq(testId))
+
+    service.deleteBatches(Seq(batchId))
+    
+    service.getTests(DummyData.Configuration1).ignoredTests should equal(Seq())
   }
 
   "Updating system configuration" should "update the status of tests" in {
@@ -212,6 +240,56 @@ class ServiceTest extends FlatSpec with ShouldMatchers {
     batch2.failCount should equal(1)
     batch2.totalCount should equal(2)
 
+  }
+
+  "getTests()" should "return ignored tests" in {
+    val service = setup().service
+    val batchId = service.addBatch(F.batch(
+      configurationOpt = Some(DummyData.Configuration1),
+      executions = Seq(F.execution(F.test(), passed = true))))
+    val Seq(testId) = service.getTestIdsInBatch(batchId)
+
+    val testsInfo1 = service.getTests(configuration = DummyData.Configuration1)
+    testsInfo1.ignoredTests should equal(Seq())
+    testsInfo1.testCounts.passed should equal(1)
+    testsInfo1.testCounts.ignored should equal(0)
+
+    service.ignoreTestInConfiguration(testId, DummyData.Configuration1)
+
+    val testsInfo2 = service.getTests(configuration = DummyData.Configuration1)
+    testsInfo2.ignoredTests should equal(Seq(testId))
+    testsInfo2.testCounts.passed should equal(0)
+    testsInfo2.testCounts.ignored should equal(1)
+
+    service.unignoreTestInConfiguration(testId, DummyData.Configuration1)
+
+    val testsInfo3 = service.getTests(configuration = DummyData.Configuration1)
+    testsInfo3.ignoredTests should equal(Seq())
+    testsInfo3.testCounts.passed should equal(1)
+    testsInfo3.testCounts.ignored should equal(0)
+  }
+
+  "getTestCounts()" should "return test counts" in {
+    val service = setup().service
+    def addTest(name: String, configuration: Configuration, passed: Boolean, ignored: Boolean): Id[Test] = {
+      val batchId = service.addBatch(F.batch(
+        configurationOpt = Some(configuration),
+        executions = Seq(F.execution(F.test(name), passed = passed))))
+      val Seq(testId) = service.getTestIdsInBatch(batchId)
+      if (ignored)
+        service.ignoreTestInConfiguration(testId, configuration)
+      testId
+    }
+
+    addTest("test1", DummyData.Configuration1, passed = true, ignored = false)
+    addTest("test2", DummyData.Configuration1, passed = true, ignored = false)
+    addTest("test3", DummyData.Configuration1, passed = false, ignored = false)
+    addTest("test4", DummyData.Configuration1, passed = true, ignored = true)
+    addTest("test5", DummyData.Configuration2, passed = true, ignored = false)
+
+    service.getTestCountsByConfiguration() should equal(Map(
+      DummyData.Configuration1 -> TestCounts(passed = 2, warning = 1, ignored = 1),
+      DummyData.Configuration2 -> TestCounts(passed = 1)))
   }
 
   private def setup() = TestServiceFactory.setup()

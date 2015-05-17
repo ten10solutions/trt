@@ -35,7 +35,7 @@ class BatchRecorderTest extends FlatSpec with Matchers {
     val batch = serviceBundle.batchRecorder.recordBatch(inBatch)
 
     val List(execution) = dao.getEnrichedExecutionsInBatch(batch.id)
-    val List(EnrichedTest(test, _, _)) = dao.getAnalysedTests()
+    val Seq(EnrichedTest(test, _, _)) = dao.getAnalysedTests(configuration = DummyData.Configuration1)
     val categories = dao.getCategories(test.id)
     checkBatchDataWasCaptured(batch, inBatch)
     checkExecutionDataWasCaptured(execution, inExecution)

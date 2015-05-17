@@ -41,6 +41,11 @@ window.createPieChart = (chartId, counts, urls, showLabels = true) ->
       data: counts.fail
       color: "#b94a48"
     }
+    {
+      label: "Ignored"
+      data: counts.ignored
+      color: "#909090"
+    }
   ]
   $.plot ("#" + chartId), slices, chartOptions(showLabels)
 

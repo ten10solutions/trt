@@ -12,6 +12,10 @@ class TestsScreen(implicit automationContext: AutomationContext) extends Abstrac
 
   def total: Int = webDriver.waitForDisplayedAndEnabled(id("total-test-count")).getText.toInt
 
+  def healthy: Int = webDriver.waitForDisplayedAndEnabled(id("healthy-test-count")).getText.toInt
+
+  def ignored: Int = webDriver.waitForDisplayedAndEnabled(id("ignored-test-count")).getText.toInt
+
   def expandFilterOptions: FilterTestsWidget = {
     log("Click the 'Filter Tests' bar to expand the filter options")
     webDriver.waitForDisplayedAndEnabled(id("filter-tests-header-bar")).click()

@@ -16,7 +16,8 @@ object TestDataFactory {
   def test(
     name: String = "test" + testNameCounter.getAndIncrement(),
     groupOpt: Option[String] = Some(DummyData.Group),
-    deleted: Boolean = false): Test =
+    deleted: Boolean = false,
+    ignored: Boolean = false): Test =
     Test(name = name, groupOpt = groupOpt, deleted = deleted)
 
   def batch(

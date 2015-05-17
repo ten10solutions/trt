@@ -49,6 +49,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None)
     val batchComments = TableQuery[BatchCommentMapping]
     val testComments = TableQuery[TestCommentMapping]
     val testCategories = TableQuery[TestCategoryMapping]
+    val ignoredTestConfigurations = TableQuery[IgnoredTestConfigurationMapping]
     val systemConfiguration = TableQuery[SystemConfigurationMapping]
 
     val ciJobs = TableQuery[CiJobMapping]
@@ -100,6 +101,7 @@ class SlickDao(jdbcUrl: String, dataSourceOpt: Option[DataSource] = None)
 
     transaction {
       batches.delete
+      ignoredTestConfigurations.delete
       tests.delete
       jenkinsConfiguration.delete
       teamCityConfiguration.delete

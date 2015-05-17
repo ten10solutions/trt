@@ -27,6 +27,7 @@ class MockDao extends Dao {
   private var tests: Seq[Test] = Seq()
   private var testComments: Seq[TestComment] = Seq()
   private var testCategories: Seq[TestCategory] = Seq()
+  private var ignoredTestConfigurations: Seq[IgnoredTestConfiguration] = Seq()
   private var batches: Seq[Batch] = Seq()
   private var analyses: Seq[Analysis] = Seq()
   private var executionLogs: Seq[ExecutionLogRow] = Seq()
@@ -74,6 +75,8 @@ class MockDao extends Dao {
     nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     categoryOpt: Option[String] = None,
+    blackListOpt: Option[Seq[Id[Test]]] = None,
+    whiteListOpt: Option[Seq[Id[Test]]] = None,
     startingFrom: Int = 0,
     limitOpt: Option[Int],
     sortBy: SortBy.Test = SortBy.Test.Group()): Seq[EnrichedTest] = {
@@ -82,10 +85,12 @@ class MockDao extends Dao {
         test ← tests
         if groupOpt.forall(pattern ⇒ test.groupOpt.exists(group ⇒ matchesPattern(pattern, group)))
         if nameOpt.forall(pattern ⇒ matchesPattern(pattern, test.name))
-        analysisOpt = analyses.find(a ⇒ a.testId == test.id && a.configuration == configuration)
-        if testStatusOpt.forall(status ⇒ analysisOpt.exists(_.status == status))
+        analysis ← analyses.find(a ⇒ a.testId == test.id && a.configuration == configuration)
+        if testStatusOpt.forall(status ⇒ analysis.status == status)
+        if blackListOpt.forall(blackList ⇒ !(blackList contains test.id))
+        if whiteListOpt.forall(blackList ⇒ blackList contains test.id)
         commentOpt = testComments.find(_.testId == test.id).map(_.text)
-      } yield EnrichedTest(test, analysisOpt, commentOpt)
+      } yield EnrichedTest(test, Some(analysis), commentOpt)
     def order(x: Seq[EnrichedTest], descending: Boolean) = if (descending) x.reverse else x
     val sortedResults = sortBy match {
       case SortBy.Test.Weather(descending) ⇒
@@ -113,15 +118,19 @@ class MockDao extends Dao {
 
   def getTestsById(testIds: Seq[Id[Test]]): Seq[Test] = tests.filter(test ⇒ testIds.contains(test.id))
 
-  def getTestCountsByConfiguration(): Map[Configuration, TestCounts] =
-    getConfigurations().map { c ⇒ c -> getTestCounts(c) }.toMap
-
-  def getTestCounts(configuration: Configuration, nameOpt: Option[String] = None, groupOpt: Option[String] = None, categoryOpt: Option[String] = None): TestCounts = {
-    val tests = getAnalysedTests(configuration, nameOpt = nameOpt, groupOpt = groupOpt, categoryOpt = categoryOpt)
+  def getTestCounts(
+    configuration: Configuration,
+    nameOpt: Option[String] = None,
+    groupOpt: Option[String] = None,
+    categoryOpt: Option[String] = None,
+    ignoredTests: Seq[Id[Test]] = Seq()): TestCounts = {
+    val tests =
+      getAnalysedTests(configuration, nameOpt = nameOpt, groupOpt = groupOpt, categoryOpt = categoryOpt)
+        .filterNot(ignoredTests contains _.id)
     val passed = tests.count(_.analysisOpt.exists(_.status == TestStatus.Healthy))
     val warning = tests.count(_.analysisOpt.exists(_.status == TestStatus.Warning))
     val failed = tests.count(_.analysisOpt.exists(_.status == TestStatus.Broken))
-    TestCounts(passed, warning, failed)
+    TestCounts(passed, warning, failed, ignoredTests.size)
   }
 
   def upsertAnalysis(analysis: Analysis) {
@@ -250,6 +259,7 @@ class MockDao extends Dao {
     tests = tests.filterNot(deleteTestIds contains _.id)
     testComments = testComments.filterNot(testIds contains _.testId)
     testCategories = testCategories.filterNot(testIds contains _.testId)
+    ignoredTestConfigurations = ignoredTestConfigurations.filterNot(testIds contains _.testId)
     DeleteBatchResult(affectedTestIds, executionIds)
   }
 
@@ -433,24 +443,45 @@ class MockDao extends Dao {
     testCategories = testCategories.filterNot(tc ⇒ tc.testId == testId && categories.contains(tc.category))
   }
 
-  def deleteAll() = {
-   executions = Seq()
-   tests = Seq()
-   testComments = Seq()
-   testCategories = Seq()
-   batches = Seq()
-   analyses = Seq()
-   executionLogs = Seq()
-   executionComments = Seq()
-   batchLogs = Seq()
-   batchComments = Seq()
-   ciJobs = Seq()
-   ciBuilds = Seq()
-   importSpecs = Seq()
-   systemConfiguration = SystemConfiguration()
-   jenkinsConfiguration = JenkinsConfiguration()
-   jenkinsConfigParams = Seq()
-   teamCityConfiguration = TeamCityConfiguration()
+  def addIgnoredTestConfigurations(ignoredConfigs: Seq[IgnoredTestConfiguration]) {
+    ignoredTestConfigurations ++:= ignoredConfigs
   }
-  
+
+  def removeIgnoredTestConfiguration(ignoredConfig: IgnoredTestConfiguration) {
+    ignoredTestConfigurations = ignoredTestConfigurations.filterNot(c ⇒
+      c.testId == ignoredConfig.testId && c.configuration == ignoredConfig.configuration)
+  }
+
+  def getIgnoredConfigurations(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[Configuration]] =
+    ignoredTestConfigurations.filter(t ⇒ testIds contains t.testId).groupBy(_.testId).map {
+      case (testId, ignoredConfigs) ⇒ testId -> ignoredConfigs.map(_.configuration)
+    }
+
+  def getIgnoredTests(configuration: Configuration): Seq[Id[Test]] =
+    ignoredTestConfigurations.filter(_.configuration == configuration).map(_.testId)
+
+  def isTestIgnoredInConfiguration(testId: Id[Test], configuration: Configuration): Boolean =
+    getIgnoredTests(configuration) contains testId
+
+  def deleteAll() = {
+    executions = Seq()
+    tests = Seq()
+    testComments = Seq()
+    testCategories = Seq()
+    batches = Seq()
+    analyses = Seq()
+    executionLogs = Seq()
+    executionComments = Seq()
+    batchLogs = Seq()
+    batchComments = Seq()
+    ciJobs = Seq()
+    ciBuilds = Seq()
+    importSpecs = Seq()
+    systemConfiguration = SystemConfiguration()
+    jenkinsConfiguration = JenkinsConfiguration()
+    jenkinsConfigParams = Seq()
+    teamCityConfiguration = TeamCityConfiguration()
+    ignoredTestConfigurations = Seq()
+  }
+
 }

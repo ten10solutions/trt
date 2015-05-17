@@ -25,7 +25,7 @@
 
 @main("Test", "Test", scripts = scripts, css = css) {
 
-  <h2>@for(ballIcon <- test.ballIconOpt){<img src="@routes.Assets.at("images/" + ballIcon)"/> }Test Case@if(test.deleted){ (deleted)}</h2>
+  <h2>@for(ballIcon <- test.ballIconOpt){<img src="@routes.Assets.at("images/" + ballIcon)"/> }Test Case@if(test.deleted){ (deleted)}@if(test.isIgnoredInConfiguration){ (ignored)}</h2>
 
   <div class="row">
   <div class="col-md-5">
@@ -133,6 +133,14 @@
   <form id="delete-test-form" action="@routes.TestController.deleteTest(test.id)" role="form" method="post">
     <input type="hidden" name="previousURL" value="@request.uri"/>
   </form>
+  @for(configuration <- configurationOpt) {
+    <form id="ignore-test-form" action="@routes.TestController.ignoreTestInConfiguration(test.id, configuration)" role="form" method="post">
+      <input type="hidden" name="previousURL" value="@request.uri"/>
+    </form>
+    <form id="unignore-test-form" action="@routes.TestController.unignoreTestInConfiguration(test.id, configuration)" role="form" method="post">
+      <input type="hidden" name="previousURL" value="@request.uri"/>
+    </form>
+  }
   @if(canRerun) {
     <button style="margin-bottom: 12px" id="rerun-test" type="button" onclick="$('#rerun-test-form').submit()" class="btn btn-default" title="Rerun test on Jenkins"><i class="glyphicon glyphicon-refresh"></i> Rerun test</button>
   }
@@ -140,6 +148,13 @@
     <button style="margin-bottom: 12px" id="undelete-test" type="button" onclick="$('#undelete-test-form').submit()" class="btn btn-default" title="Mark test as not deleted"><i class="fa fa-undo"></i> Undelete test</button>
   } else {
     <button style="margin-bottom: 12px" id="delete-test" type="button" onclick="$('#delete-test-form').submit()" class="btn btn-default" title="Mark test as deleted"><i class="glyphicon glyphicon-trash"></i> Mark test as deleted</button>
+  }
+  @for(configuration <- configurationOpt) {
+    @if(test.isIgnoredInConfiguration) {
+      <button style="margin-bottom: 12px" id="unignore-test" type="button" onclick="$('#unignore-test-form').submit()" class="btn btn-default" title="Stop ignoring results from this test in this configuration"><i class="fa fa-toggle-on"></i> Unignore test</button>
+    } else {
+      <button style="margin-bottom: 12px" id="ignore-test" type="button" onclick="$('#ignore-test-form').submit()" class="btn btn-default" title="Ignore results from this test in this configuration"><i class="fa fa-toggle-off"></i> Ignore test</button>
+    }
   }
   </div> <!-- col-md-5 -->
   <div class="col-md-7">

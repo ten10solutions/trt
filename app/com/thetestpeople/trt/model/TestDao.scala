@@ -40,6 +40,8 @@ trait TestDao {
    * @param nameOpt -- if Some(name), filter returned tests to those matching the given name (case insensitive, allows * wildcards)
    * @param groupOpt -- if Some(group), filter returned tests to those matching the given group (case insensitive, allows * wildcards)
    * @param testStatusOpt -- if Some(testStatus), filter returned tests to those matching the given status.
+   * @param blackListOpt -- if Some(blackList), exclude any tests in the list from the returned results.
+   * @param whiteListOpt -- if Some(whiteList), only include tests from the list in the returned results.
    */
   def getAnalysedTests(
     configuration: Configuration = Configuration.Default,
@@ -47,32 +49,27 @@ trait TestDao {
     nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
     categoryOpt: Option[String] = None,
+    blackListOpt: Option[Seq[Id[Test]]] = None,
+    whiteListOpt: Option[Seq[Id[Test]]] = None,
     startingFrom: Int = 0,
     limitOpt: Option[Int] = None,
     sortBy: SortBy.Test = SortBy.Test.Group()): Seq[EnrichedTest]
-
-  /**
-   * Gets test counts for all configurations.
-   *
-   * Excludes deleted tests
-   *
-   * @return a map of configuration to test counts for that configuration
-   */
-  def getTestCountsByConfiguration(): Map[Configuration, TestCounts]
 
   /**
    * Gets test counts for a given configuration (and filters).
    *
    * @param nameOpt -- if Some(name), filter returned tests to those matching the given name (case insensitive, allows * wildcards)
    * @param groupOpt -- if Some(group), filter returned tests to those matching the given group (case insensitive, allows * wildcards)
-   *
-   * Excludes deleted tests
+   * @param ignoredTests -- exclude tests from this set when counting
+   * 
+   * Excludes deleted tests.
    */
   def getTestCounts(
     configuration: Configuration = Configuration.Default,
     nameOpt: Option[String] = None,
     groupOpt: Option[String] = None,
-    categoryOpt: Option[String] = None): TestCounts
+    categoryOpt: Option[String] = None,
+    ignoredTests: Seq[Id[Test]] = Seq()): TestCounts
 
   def getTestsById(testIds: Seq[Id[Test]]): Seq[Test]
 
@@ -99,6 +96,19 @@ trait TestDao {
   def addCategories(categories: Seq[TestCategory])
 
   def removeCategories(testId: Id[Test], categories: Seq[String])
+
+  def addIgnoredTestConfigurations(ignoredConfigs: Seq[IgnoredTestConfiguration])
+
+  def removeIgnoredTestConfiguration(ignoredConfig: IgnoredTestConfiguration)
+
+  def getIgnoredTests(configuration: Configuration): Seq[Id[Test]]
+
+  def isTestIgnoredInConfiguration(testId: Id[Test], configuration: Configuration): Boolean
+
+  def getIgnoredConfigurations(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[Configuration]]
+
+  def getIgnoredConfigurations(testId: Id[Test]): Seq[Configuration] =
+    getIgnoredConfigurations(Seq(testId)).getOrElse(testId, Seq())
 
   /**
    * Return the configurations of executions that have been recorded for the given test.

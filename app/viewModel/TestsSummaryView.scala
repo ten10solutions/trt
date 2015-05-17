@@ -10,6 +10,8 @@ case class TestsSummaryView(configuration: Configuration, testCounts: TestCounts
 
   val warnCount = testCounts.warning
 
+  val ignoredCount = testCounts.ignored 
+  
   val totalCount = testCounts.total
 
   val overallStatus: TestStatus =
