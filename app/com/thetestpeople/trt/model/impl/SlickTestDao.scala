@@ -251,10 +251,26 @@ trait SlickTestDao extends TestDao { this: SlickDao ⇒
   def getConfigurations(testId: Id[Test]): Seq[Configuration] =
     executions.filter(_.testId === testId).groupBy(_.configuration).map(_._1).sorted.run
 
-  def getIgnoredConfigurations(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[Configuration]] =
-    ignoredTestConfigurations.filter(_.testId inSet testIds).run.groupBy(_.testId).map {
-      case (testId, ignoredConfigs) ⇒ testId -> ignoredConfigs.map(_.configuration)
+  def getIgnoredConfigurations(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[Configuration]] = {
+    val query =
+      for {
+        (test, ignoredConfig) ← tests leftJoin ignoredTestConfigurations on (_.id === _.testId)
+        if test.id inSet testIds
+      } yield (test.id, ignoredConfig.?)
+    val ignoredConfigs =
+      for {
+        (testId, ignoredConfigOpt) ← query.run
+        ignoredConfig ← ignoredConfigOpt
+      } yield ignoredConfig
+    //    ignoredConfigs.groupBy(_.testId).map {
+    //      case (testId, ignoredConfigs) ⇒ testId -> ignoredConfigs.map(_.configuration)
+    //    }
+    query.run.groupBy(_._1).map {
+      case (testId, ignoredConfigs) ⇒
+        testId -> ignoredConfigs.map(_._2).flatten.map(_.configuration)
     }
+
+  }
 
   def getIgnoredTests(configuration: Configuration): Seq[Id[Test]] = {
     val query =
@@ -273,10 +289,9 @@ trait SlickTestDao extends TestDao { this: SlickDao ⇒
     ignoredTestConfigurations.insertAll(ignoredConfigs: _*)
   }
 
-  def removeIgnoredTestConfiguration(ignoredConfig: IgnoredTestConfiguration) {
+  def removeIgnoredTestConfigurations(testIds: Seq[Id[Test]], configuration: Configuration) =
     ignoredTestConfigurations
-      .filter(c ⇒ c.testId === ignoredConfig.testId && c.configuration === ignoredConfig.configuration)
+      .filter(c ⇒ c.testId.inSet(testIds) && c.configuration === configuration)
       .delete
-  }
 
 }

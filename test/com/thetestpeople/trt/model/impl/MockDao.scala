@@ -447,15 +447,17 @@ class MockDao extends Dao {
     ignoredTestConfigurations ++:= ignoredConfigs
   }
 
-  def removeIgnoredTestConfiguration(ignoredConfig: IgnoredTestConfiguration) {
+  def removeIgnoredTestConfigurations(testIds: Seq[Id[Test]], configuration: Configuration) {
     ignoredTestConfigurations = ignoredTestConfigurations.filterNot(c ⇒
-      c.testId == ignoredConfig.testId && c.configuration == ignoredConfig.configuration)
+      testIds.contains(c.testId) && c.configuration == configuration)
   }
 
-  def getIgnoredConfigurations(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[Configuration]] =
-    ignoredTestConfigurations.filter(t ⇒ testIds contains t.testId).groupBy(_.testId).map {
-      case (testId, ignoredConfigs) ⇒ testId -> ignoredConfigs.map(_.configuration)
-    }
+  def getIgnoredConfigurations(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[Configuration]] = {
+    for {
+      test ← tests if testIds contains test.id
+      ignoredConfigs = ignoredTestConfigurations.filter(_.testId == test.id)
+    } yield test.id -> ignoredConfigs.map(_.configuration)
+  }.toMap
 
   def getIgnoredTests(configuration: Configuration): Seq[Id[Test]] =
     ignoredTestConfigurations.filter(_.configuration == configuration).map(_.testId)

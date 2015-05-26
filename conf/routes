@@ -15,6 +15,8 @@ GET     /tests                      @controllers.TestsController.tests(configura
 POST    /tests/undelete             @controllers.TestsController.undeleteTests()
 POST    /tests/delete               @controllers.TestsController.deleteTests()
 POST    /tests/rerun                @controllers.TestsController.rerunSelectedTests()
+POST    /tests/ignore               @controllers.TestsController.ignoreTests(configuration: Configuration)
+POST    /tests/unignore             @controllers.TestsController.unignoreTests(configuration: Configuration)
 
 GET     /tests/deleted              @controllers.Application.deletedTests(page: Option[Int] ?= None, pageSize: Option[Int] ?= None)
 GET     /tests/stale                @controllers.Application.staleTests(configuration: Option[Configuration] ?= None, page: Option[Int] ?= None, pageSize: Option[Int] ?= None)

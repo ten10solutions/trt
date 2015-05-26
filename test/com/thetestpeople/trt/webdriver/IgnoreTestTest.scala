@@ -32,4 +32,27 @@ class IgnoreTestTest extends AbstractBrowserTest {
     }
   }
 
+  "A user" should "be able to ignore and unignore multiple tests" in {
+    automate { site ⇒
+
+      val batch = F.batch(executions = Seq(
+        F.execution(F.test(name = "test1")),
+        F.execution(F.test(name = "test2")),
+        F.execution(F.test(name = "test3"))))
+      site.restApi.addBatch(batch)
+
+      var testsScreen = site.launch().mainMenu.tests()
+      testsScreen.testRows.take(2).foreach(_.selected = true)
+      testsScreen.clickIgnoreSelectedTests()
+
+      testsScreen.healthy should equal(1)
+      testsScreen.ignored should equal(2)
+
+      testsScreen.testRows.take(3).foreach(_.selected = true)
+      testsScreen.clickUnignoreSelectedTests()
+
+      testsScreen.healthy should equal(3)
+    }
+  }
+
 }

@@ -520,20 +520,24 @@ abstract class DaoTest extends FlatSpec with Matchers with ExecutionDaoTest with
     val testId = dao.ensureTestIsRecorded(F.test())
 
     dao.isTestIgnoredInConfiguration(testId, DummyData.Configuration1) should equal(false)
-    dao.getIgnoredConfigurations(testId) should equal(Seq())
+    dao.getIgnoredConfigurations(testId) should equal(Some(Seq()))
     dao.getIgnoredTests(DummyData.Configuration1) should equal(Seq())
 
     dao.addIgnoredTestConfigurations(Seq(IgnoredTestConfiguration(testId, DummyData.Configuration1)))
 
     dao.isTestIgnoredInConfiguration(testId, DummyData.Configuration1) should equal(true)
-    dao.getIgnoredConfigurations(testId) should equal(Seq(DummyData.Configuration1))
+    dao.getIgnoredConfigurations(testId) should equal(Some(Seq(DummyData.Configuration1)))
     dao.getIgnoredTests(DummyData.Configuration1) should equal(Seq(testId))
 
-    dao.removeIgnoredTestConfiguration(IgnoredTestConfiguration(testId, DummyData.Configuration1))
+    dao.removeIgnoredTestConfiguration(testId, DummyData.Configuration1)
 
     dao.isTestIgnoredInConfiguration(testId, DummyData.Configuration1) should equal(false)
-    dao.getIgnoredConfigurations(testId) should equal(Seq())
+    dao.getIgnoredConfigurations(testId) should equal(Some(Seq()))
     dao.getIgnoredTests(DummyData.Configuration1) should equal(Seq())
   }
 
+  "getIgnoredConfigurations" should "return None if test ID is unknown" in transaction { dao => 
+      dao.getIgnoredConfigurations(Id[Test](1)) should equal (None)
+  }
+  
 }

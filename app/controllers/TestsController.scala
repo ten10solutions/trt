@@ -69,21 +69,37 @@ class TestsController(service: Service) extends AbstractController(service) with
       service.canRerun, paginationData, sortOpt, descendingOpt)
   }
 
-  private def getSelectedTestIds(implicit request: Request[AnyContent]): Seq[Id[Test]] =
+  private def selectedTestIds(implicit request: Request[AnyContent]): Seq[Id[Test]] =
     getFormParameters("selectedTest").flatMap(Id.parse[Test])
 
   def deleteTests() = Action { implicit request ⇒
-    service.markTestsAsDeleted(getSelectedTestIds)
+    service.markTestsAsDeleted(selectedTestIds)
     Redirect(previousUrlOrDefault).flashing("success" -> "Marked tests as deleted.")
   }
 
   def undeleteTests() = Action { implicit request ⇒
-    service.markTestsAsDeleted(getSelectedTestIds, deleted = false)
+    service.markTestsAsDeleted(selectedTestIds, deleted = false)
     Redirect(previousUrlOrDefault).flashing("success" -> "Marked tests as no longer deleted.")
   }
 
   def rerunSelectedTests() = Action { implicit request ⇒
-    rerunTests(getSelectedTestIds)
+    rerunTests(selectedTestIds)
+  }
+
+  def ignoreTests(configuration: Configuration) = Action { implicit request ⇒
+    val success = service.ignoreTestsInConfiguration(selectedTestIds, configuration)
+    if (success)
+      Redirect(previousUrlOrDefault).flashing("success" -> s"Ignored tests in configuration $configuration.")
+    else
+      Redirect(previousUrlOrDefault).flashing("error" -> "Problem ignoring tests.")
+  }
+
+  def unignoreTests(configuration: Configuration) = Action { implicit request ⇒
+    val success = service.unignoreTestsInConfiguration(selectedTestIds, configuration)
+    if (success)
+      Redirect(previousUrlOrDefault).flashing("success" -> s"Stopped ignoring tests in configuration $configuration.")
+    else
+      Redirect(previousUrlOrDefault).flashing("error" -> "Problem ignoring tests.")
   }
 
 }

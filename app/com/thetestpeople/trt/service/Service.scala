@@ -125,7 +125,24 @@ trait Service extends CiService {
 
   def removeCategory(testId: Id[Test], category: String)
 
-  def ignoreTestInConfiguration(testId: Id[Test], configuration: Configuration): Boolean
+  /**
+   * Ignore all the given test IDs in the given configuration.
+   *
+   * @return true iff all the given test IDs are in the DB
+   */
+  def ignoreTestsInConfiguration(testIds: Seq[Id[Test]], configuration: Configuration): Boolean
 
-  def unignoreTestInConfiguration(testId: Id[Test], configuration: Configuration): Boolean
+  def ignoreTestInConfiguration(testId: Id[Test], configuration: Configuration): Boolean =
+    ignoreTestsInConfiguration(Seq(testId), configuration)
+
+  /**
+   * Stops ignoring the given test ID in the given configuration.
+   *
+   * @return true iff the given test ID is in the DB
+   */
+  def unignoreTestsInConfiguration(testIds: Seq[Id[Test]], configuration: Configuration): Boolean
+
+  def unignoreTestInConfiguration(testId: Id[Test], configuration: Configuration): Boolean =
+    unignoreTestsInConfiguration(Seq(testId), configuration)
+    
 }

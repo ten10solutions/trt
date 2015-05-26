@@ -61,7 +61,7 @@ trait TestDao {
    * @param nameOpt -- if Some(name), filter returned tests to those matching the given name (case insensitive, allows * wildcards)
    * @param groupOpt -- if Some(group), filter returned tests to those matching the given group (case insensitive, allows * wildcards)
    * @param ignoredTests -- exclude tests from this set when counting
-   * 
+   *
    * Excludes deleted tests.
    */
   def getTestCounts(
@@ -99,16 +99,27 @@ trait TestDao {
 
   def addIgnoredTestConfigurations(ignoredConfigs: Seq[IgnoredTestConfiguration])
 
-  def removeIgnoredTestConfiguration(ignoredConfig: IgnoredTestConfiguration)
+  def removeIgnoredTestConfigurations(testIds: Seq[Id[Test]], configuration: Configuration)
 
+  def removeIgnoredTestConfiguration(testId: Id[Test], configuration: Configuration) =
+    removeIgnoredTestConfigurations(Seq(testId), configuration)
+    
+  /**
+   * Get ignored tests in a configuration, excluding deleted tests.
+   */
   def getIgnoredTests(configuration: Configuration): Seq[Id[Test]]
 
   def isTestIgnoredInConfiguration(testId: Id[Test], configuration: Configuration): Boolean
 
+  /**
+   * For each given testId, if a test exists in the DB, the Map will contain an entry for that test indicating in which
+   * configurations it is ignored (this might be empty). If no test with that ID is present in the DB, then there will
+   * be no entry for that test in the returned Map.
+   */
   def getIgnoredConfigurations(testIds: Seq[Id[Test]]): Map[Id[Test], Seq[Configuration]]
 
-  def getIgnoredConfigurations(testId: Id[Test]): Seq[Configuration] =
-    getIgnoredConfigurations(Seq(testId)).getOrElse(testId, Seq())
+  def getIgnoredConfigurations(testId: Id[Test]): Option[Seq[Configuration]] =
+    getIgnoredConfigurations(Seq(testId)).get(testId)
 
   /**
    * Return the configurations of executions that have been recorded for the given test.

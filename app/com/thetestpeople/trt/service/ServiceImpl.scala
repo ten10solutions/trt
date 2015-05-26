@@ -88,10 +88,12 @@ class ServiceImpl(
   }
 
   def getTestCountsByConfiguration(): Map[Configuration, TestCounts] = transaction {
-    val configAndCounts = for {
-      configuration ← dao.getConfigurations
-      ignoredTests = dao.getIgnoredTests(configuration)
-    } yield configuration -> dao.getTestCounts(configuration, ignoredTests = ignoredTests)
+    val configAndCounts =
+      for {
+        configuration ← dao.getConfigurations
+        ignoredTests = dao.getIgnoredTests(configuration)
+        testCounts = dao.getTestCounts(configuration, ignoredTests = ignoredTests)
+      } yield configuration -> testCounts
     configAndCounts.toMap
   }
 
@@ -279,27 +281,28 @@ class ServiceImpl(
     logger.info(s"Removed category $category from test $testId")
   }
 
-  def ignoreTestInConfiguration(testId: Id[Test], configuration: Configuration): Boolean = transaction {
-    if (dao.getTestsById(Seq(testId)).isEmpty)
+  def ignoreTestsInConfiguration(testIds: Seq[Id[Test]], configuration: Configuration): Boolean = transaction {
+    val ignoredConfigurationsByTest = dao.getIgnoredConfigurations(testIds)
+    if (ignoredConfigurationsByTest.keySet == testIds.toSet) {
+      val newIgnoredRecords =
+        for {
+          (testId, currentlyIgnoredConfigs) ← ignoredConfigurationsByTest.toSeq
+          if !currentlyIgnoredConfigs.contains(configuration)
+        } yield IgnoredTestConfiguration(testId, configuration)
+      dao.addIgnoredTestConfigurations(newIgnoredRecords)
+      val idsString = newIgnoredRecords.map(_.testId).mkString(", ")
+      logger.info(s"Ignoring tests $idsString in configuration $configuration")
+      true
+    } else
       false
-    else {
-      val currentlyIgnoredConfigs = dao.getIgnoredConfigurations(testId)
-      if (currentlyIgnoredConfigs.contains(configuration))
-        false
-      else {
-        dao.addIgnoredTestConfigurations(Seq(IgnoredTestConfiguration(testId, configuration)))
-        logger.info(s"Ignoring test $testId in configuration $configuration")
-        true
-      }
-    }
   }
 
-  def unignoreTestInConfiguration(testId: Id[Test], configuration: Configuration): Boolean = transaction {
-    if (dao.getTestsById(Seq(testId)).isEmpty)
+  def unignoreTestsInConfiguration(testIds: Seq[Id[Test]], configuration: Configuration): Boolean = transaction {
+    if (dao.getTestsById(testIds).size != testIds.size)
       false
     else {
-      dao.removeIgnoredTestConfiguration(IgnoredTestConfiguration(testId, configuration))
-      logger.info(s"Unignoring test $testId in configuration $configuration")
+      dao.removeIgnoredTestConfigurations(testIds, configuration)
+      logger.info(s"Unignoring tests ${testIds.mkString(", ")} in configuration $configuration")
       true
     }
   }

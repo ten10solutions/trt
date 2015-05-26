@@ -84,8 +84,21 @@ class TestsScreen(implicit automationContext: AutomationContext) extends Abstrac
   }
 
   def clickRerunSelectedTests() {
-    log("Click 'Rerun Selected'")
+    log("Click 'Rerun selected'")
     webDriver.waitForDisplayedAndEnabled(id("rerunSelected")).click()
+    waitForSuccessMessage()
+  }
+
+  def clickIgnoreSelectedTests() {
+    log("Click 'Ignore selected'")
+    webDriver.waitForDisplayedAndEnabled(id("ignoreSelected")).click()
+    waitForSuccessMessage()
+  }
+
+  def clickUnignoreSelectedTests() {
+    log("Click 'Unignore selected'")
+    webDriver.waitForDisplayedAndEnabled(id("unignoreSelected")).click()
+    waitForSuccessMessage()
   }
 
   def warningTab(): TestsScreen = {

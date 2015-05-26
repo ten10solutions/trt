@@ -159,9 +159,11 @@
   @if(tests.nonEmpty) {
 
   @if(canRerun) {
-    <button style="margin-bottom: 12px" id="rerunSelected" type="button" class="btn btn-default" title="Rerun selected tests on Jenkins" onclick="performTestAction('@routes.TestsController.rerunSelectedTests()')"><i class="glyphicon glyphicon-refresh"></i> Rerun Selected</button>
+    <button style="margin-bottom: 12px" id="rerunSelected" type="button" class="btn btn-default" title="Rerun selected tests on Jenkins" onclick="performTestAction('@routes.TestsController.rerunSelectedTests()')"><i class="glyphicon glyphicon-refresh"></i> Rerun selected</button>
   }
   <button style="margin-bottom: 12px" id="deleteSelected" type="button" class="btn btn-default" title="Mark selected tests as deleted" onclick="performTestAction('@routes.TestsController.deleteTests()')"><i class="glyphicon glyphicon-trash"></i> Mark selected tests as deleted</button>
+  <button style="margin-bottom: 12px" id="ignoreSelected" type="button" class="btn btn-default" title="Ignore the selected tests in this configuration" onclick="performTestAction('@routes.TestsController.ignoreTests(configuration)')"><i class="fa fa-toggle-off"></i>  Ignore selected</button>
+  <button style="margin-bottom: 12px" id="unignoreSelected" type="button" class="btn btn-default" title="Stop ignoring the selected tests in this configuration" onclick="performTestAction('@routes.TestsController.unignoreTests(configuration)')"><i class="fa fa-toggle-on"></i>  Unignore selected</button>
   <div style="clear: both;"></div>
 
   @testsPaginationWidget
