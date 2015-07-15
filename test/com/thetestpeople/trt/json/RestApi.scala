@@ -15,6 +15,7 @@ import play.api.libs.ws.WSClient
 import play.api.libs.ws.ning.NingWSClient
 import play.api.libs.ws.ning.NingAsyncHttpClientConfigBuilder
 import play.api.libs.ws.DefaultWSClientConfig
+import com.thetestpeople.trt.utils.WsUtils
 
 object RestApi {
 
@@ -22,7 +23,7 @@ object RestApi {
 
 }
 
-case class RestApi(siteUrl: URI, client: WSClient = new NingWSClient(new NingAsyncHttpClientConfigBuilder(new DefaultWSClientConfig).build())) {
+case class RestApi(siteUrl: URI, client: WSClient = WsUtils.newWsClient) {
 
   import RestApi._
 
@@ -49,4 +50,13 @@ case class RestApi(siteUrl: URI, client: WSClient = new NingWSClient(new NingAsy
     Await.result(future, Timeout)
   }
 
+  def getTests(configurationOpt: Option[Configuration] = None, statusOpt: Option[TestStatus] = None): Seq[TestApiView] = {
+    val call: Call = controllers.routes.JsonController.getTests(configurationOpt, statusOpt)
+    val future = client.url((siteUrl / call.url).toString).get()
+    val response = Await.result(future, Timeout)
+    if (response.status == 200)
+      response.json.as[Seq[TestApiView]]
+    else
+      throw new RuntimeException(s"Problem getting tests: ${response.statusText}\n${response.body}")
+  }
 }

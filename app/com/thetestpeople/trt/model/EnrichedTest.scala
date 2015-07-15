@@ -9,4 +9,6 @@ case class EnrichedTest(
 
   def name = test.name
 
+  def groupOpt = test.groupOpt
+  
 }

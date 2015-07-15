@@ -10,6 +10,7 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import play.api.mvc._
 import com.thetestpeople.trt.utils.Utils
+import com.thetestpeople.trt.json.TestApiView
 
 object JsonController {
 
@@ -17,7 +18,7 @@ object JsonController {
 
 }
 
-class JsonController(service: Service, adminService: AdminService) extends Controller with HasLogger {
+class JsonController(service: Service, adminService: AdminService) extends AbstractController(service) with HasLogger {
 
   def addBatch = Action(parse.json(maxLength = JsonController.MaxBatchJsonSize)) { implicit request ⇒
     Utils.time("JsonController.addBatch()") {
@@ -55,6 +56,24 @@ class JsonController(service: Service, adminService: AdminService) extends Contr
     val batches = service.getBatches()
     Ok(Json.toJson(batches))
   }
+
+  def getTests(configurationOpt: Option[Configuration], testStatusOpt: Option[TestStatus]) = Action { implicit request ⇒
+    configurationOpt.orElse(getDefaultConfiguration) match {
+      case None ⇒
+        Ok(Json.toJson(Seq[String]()))
+      case Some(configuration) ⇒
+        val TestsInfo(tests, testCounts, ignoredTests) =
+          service.getTests(configuration = configuration, testStatusOpt = testStatusOpt)
+        Ok(Json.toJson(tests.map(makeView(ignoredTests.toSet))))
+    }
+  }
+
+  private def makeView(ignoredTests: Set[Id[Test]])(test: EnrichedTest): TestApiView =
+    TestApiView(id = test.id,
+      name = test.name,
+      groupOpt = test.groupOpt,
+      statusOpt = test.analysisOpt.map(_.status),
+      ignored = ignoredTests.contains(test.id))
 
   def deleteAll() = Action { implicit request ⇒
     adminService.deleteAll()

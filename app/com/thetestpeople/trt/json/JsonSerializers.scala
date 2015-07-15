@@ -30,6 +30,12 @@ object JsonSerializers {
     Format(reads, writes)
   }
 
+  implicit val statusFormat: Format[TestStatus] = {
+    val reads = Reads.StringReads.map(TestStatus.parse)
+    val writes = new Writes[TestStatus] { def writes(status: TestStatus) = JsString(status.toString) }
+    Format(reads, writes)
+  }
+
   implicit def idFormat[T <: EntityType]: Format[Id[T]] = {
     val reads = Reads.StringReads.map(unlift(Id.parse[T]))
     val writes = new Writes[Id[T]] { def writes(id: Id[T]) = JsString(id.asString) }
@@ -85,5 +91,12 @@ object JsonSerializers {
   implicit val batchCompleteMessageFormat: Format[Incoming.BatchCompleteMessage] = (
     (__ \ "id").format[Id[Batch]] and
     (__ \ "duration").formatNullable[Duration]).apply(Incoming.BatchCompleteMessage, unlift(Incoming.BatchCompleteMessage.unapply))
+
+  implicit val testViewFormat: Format[TestApiView] = (
+    (__ \ "testId").format[Id[Test]] and
+    (__ \ "name").format[String] and
+    (__ \ "groupOpt").formatNullable[String] and
+    (__ \ "status").formatNullable[TestStatus] and
+    (__ \ "ignored").format[Boolean])(TestApiView, unlift(TestApiView.unapply))
 
 }

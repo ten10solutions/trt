@@ -79,6 +79,7 @@ GET     /javascriptRoutes             @controllers.WebApiController.javascriptRo
 
 # Routes for external JSON API:
 
+GET     /api/tests                  @controllers.JsonController.getTests(configuration: Option[Configuration] ?= None, status: Option[TestStatus] ?= None)
 GET     /api/batches                @controllers.JsonController.getBatches()
 POST    /api/batches                @controllers.JsonController.addBatch()
 POST    /api/deleteAll              @controllers.JsonController.deleteAll()
