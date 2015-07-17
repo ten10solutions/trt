@@ -79,12 +79,12 @@ GET     /javascriptRoutes             @controllers.WebApiController.javascriptRo
 
 # Routes for external JSON API:
 
-GET     /api/tests                  @controllers.JsonController.getTests(configuration: Option[Configuration] ?= None, status: Option[TestStatus] ?= None)
-GET     /api/batches                @controllers.JsonController.getBatches()
-POST    /api/batches                @controllers.JsonController.addBatch()
-POST    /api/deleteAll              @controllers.JsonController.deleteAll()
-POST    /api/batch/:id/executions   @controllers.JsonController.addExecutions(id: Id[Batch])
-POST    /api/batch/:id/complete     @controllers.JsonController.completeBatch(id: Id[Batch])
+GET     /api/tests                  @controllers.ApiController.getTests(configuration: Option[Configuration] ?= None, status: Option[TestStatus] ?= None)
+GET     /api/batches                @controllers.ApiController.getBatches()
+POST    /api/batches                @controllers.ApiController.addBatch()
+POST    /api/deleteAll              @controllers.ApiController.deleteAll()
+POST    /api/batch/:id/executions   @controllers.ApiController.addExecutions(id: Id[Batch])
+POST    /api/batch/:id/complete     @controllers.ApiController.completeBatch(id: Id[Batch])
 
 # Routes for test-only API:
 

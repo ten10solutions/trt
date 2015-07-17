@@ -1,40 +1,15 @@
 package com.thetestpeople.trt.api
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers
-import com.thetestpeople.trt.FakeApplicationFactory
-import java.net.URI
+
 import org.junit.runner.RunWith
-import org.openqa.selenium.WebDriver
-import org.openqa.selenium.phantomjs.PhantomJSDriver
-import org.scalatest.FlatSpec
-import org.scalatest.Matchers
-import com.thetestpeople.trt.FakeApplicationFactory
-import com.thetestpeople.trt.model.impl.DummyData
 import com.thetestpeople.trt.tags.SlowTest
-import com.thetestpeople.trt.webdriver.screens.AutomationContext
-import com.thetestpeople.trt.webdriver.screens.Site
-import play.api.test.Helpers
-import play.api.test.TestServer
 import org.scalatest.junit.JUnitRunner
-import org.openqa.selenium.firefox.FirefoxDriver
-import play.api.libs.ws.WS
-import com.thetestpeople.trt.json.RestApi
 import com.thetestpeople.trt.mother.{ IncomingFactory ⇒ F }
+import com.thetestpeople.trt.model.impl.DummyData
 import com.thetestpeople.trt.model.TestStatus
 
-@RunWith(classOf[JUnitRunner])
 @SlowTest
-class GetTestsTest extends FlatSpec with Matchers {
-
-  private val port = 9001
-
-  private val siteUrl = new URI("http://localhost:" + port)
-
-  def withApi[T](p: RestApi ⇒ T): T = Helpers.running(TestServer(port, FakeApplicationFactory.fakeApplication)) {
-    val restApi = new RestApi(siteUrl)
-    restApi.deleteAll()
-    p(restApi)
-  }
+@RunWith(classOf[JUnitRunner])
+class GetTestsApiTest extends AbstractApiTest {
 
   "When there are no test results, getting tests" should "return an empty list" in {
     withApi { restApi ⇒

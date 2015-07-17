@@ -23,13 +23,16 @@ object RestApi {
 
 }
 
+/**
+ * Access to the API for tests
+ */
 case class RestApi(siteUrl: URI, client: WSClient = WsUtils.newWsClient) {
 
   import RestApi._
 
   def addBatch(batch: Incoming.Batch): Id[Batch] = {
     val batchJson = Json.toJson(batch)
-    val call: Call = controllers.routes.JsonController.addBatch()
+    val call: Call = controllers.routes.ApiController.addBatch()
     val future = client.url((siteUrl / call.url).toString).post(batchJson)
     val response = Await.result(future, Timeout)
     if (response.status == 200)
@@ -39,7 +42,7 @@ case class RestApi(siteUrl: URI, client: WSClient = WsUtils.newWsClient) {
   }
 
   def deleteAll() {
-    val call: Call = controllers.routes.JsonController.deleteAll()
+    val call: Call = controllers.routes.ApiController.deleteAll()
     val future = client.url((siteUrl / call.url).toString).post("")
     Await.result(future, Timeout)
   }
@@ -51,7 +54,7 @@ case class RestApi(siteUrl: URI, client: WSClient = WsUtils.newWsClient) {
   }
 
   def getTests(configurationOpt: Option[Configuration] = None, statusOpt: Option[TestStatus] = None): Seq[TestApiView] = {
-    val call: Call = controllers.routes.JsonController.getTests(configurationOpt, statusOpt)
+    val call: Call = controllers.routes.ApiController.getTests(configurationOpt, statusOpt)
     val future = client.url((siteUrl / call.url).toString).get()
     val response = Await.result(future, Timeout)
     if (response.status == 200)

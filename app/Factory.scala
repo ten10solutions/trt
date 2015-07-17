@@ -88,7 +88,7 @@ class Factory(configuration: Configuration) {
 
   lazy val webApiController = new WebApiController(service)
   lazy val ciController = new ImportSpecController(service)
-  lazy val jsonController = new JsonController(service, adminService)
+  lazy val jsonController = new ApiController(service, adminService)
   lazy val controller = new Application(service)
   lazy val adminController = new AdminController(service, adminService)
   lazy val testController = new TestController(service)
@@ -112,6 +112,6 @@ class Factory(configuration: Configuration) {
     classOf[Application] -> controller,
     classOf[AdminController] -> adminController,
     classOf[ImportSpecController] -> ciController,
-    classOf[JsonController] -> jsonController,
+    classOf[ApiController] -> jsonController,
     classOf[WebApiController] -> webApiController)
 }

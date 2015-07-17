@@ -12,16 +12,16 @@ import play.api.mvc._
 import com.thetestpeople.trt.utils.Utils
 import com.thetestpeople.trt.json.TestApiView
 
-object JsonController {
+object ApiController {
 
   val MaxBatchJsonSize = 1024 * 1024 * 200
 
 }
 
-class JsonController(service: Service, adminService: AdminService) extends AbstractController(service) with HasLogger {
+class ApiController(service: Service, adminService: AdminService) extends AbstractController(service) with HasLogger {
 
-  def addBatch = Action(parse.json(maxLength = JsonController.MaxBatchJsonSize)) { implicit request ⇒
-    Utils.time("JsonController.addBatch()") {
+  def addBatch = Action(parse.json(maxLength = ApiController.MaxBatchJsonSize)) { implicit request ⇒
+    Utils.time("ApiController.addBatch()") {
       request.body.validate[Incoming.Batch].map { batch ⇒
         val batchId = service.addBatch(batch)
         Ok(JsString(batchId.toString))
@@ -30,7 +30,7 @@ class JsonController(service: Service, adminService: AdminService) extends Abstr
     }
   }
 
-  def addExecutions(batchId: Id[Batch]) = Action(parse.json(maxLength = JsonController.MaxBatchJsonSize)) { implicit request ⇒
+  def addExecutions(batchId: Id[Batch]) = Action(parse.json(maxLength = ApiController.MaxBatchJsonSize)) { implicit request ⇒
     request.body.validate[Seq[Incoming.Execution]].map { executions ⇒
       val batchFound = service.addExecutionsToBatch(batchId, executions)
       if (batchFound)
