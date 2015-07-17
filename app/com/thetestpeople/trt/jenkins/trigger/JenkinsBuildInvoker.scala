@@ -10,7 +10,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.Json._
 import play.api.libs.ws.WS
 import play.api.libs.ws.WS._
-import play.api.libs.ws.Response
+import play.api.libs.ws.WSResponse
 
 /**
  * @param authenticationTokenOpt -- build token for the Jenkins job (if required)

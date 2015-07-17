@@ -17,6 +17,8 @@ import com.thetestpeople.trt.importer._
 import routes.ImportSpecController
 import views.html
 import com.thetestpeople.trt.utils.Utils
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 
 class ImportSpecController(service: Service) extends AbstractController(service) with HasLogger {
 

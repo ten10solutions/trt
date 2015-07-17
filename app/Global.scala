@@ -68,6 +68,6 @@ object Global extends WithFilters(LoggingFilter) with GlobalSettings with HasLog
     factory.ciImportWorker.stop()
   }
 
-  override def getControllerInstance[A](clazz: Class[A]): A = factory.getControllerInstance(clazz)
+  // override def getControllerInstance[A](clazz: Class[A]): A = factory.getControllerInstance(clazz)
 
 }

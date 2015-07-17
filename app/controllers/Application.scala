@@ -11,6 +11,8 @@ import viewModel._
 import java.net.URI
 import play.api.libs.json._
 import com.thetestpeople.trt.json.JsonSerializers._
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 
 /**
  * Controller for miscellaneous screens

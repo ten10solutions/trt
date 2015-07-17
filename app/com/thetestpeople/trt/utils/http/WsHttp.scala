@@ -6,7 +6,7 @@ import scala.concurrent.Future
 import scala.concurrent.duration.Duration
 import scala.concurrent.duration._
 import com.ning.http.client.Realm.AuthScheme
-import play.api.libs.ws.Response
+import play.api.libs.ws.WSResponse
 import play.api.libs.ws.WS._
 import play.api.libs.ws._
 import play.api.Play.current

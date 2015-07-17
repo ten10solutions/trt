@@ -1,4 +1,4 @@
-import com.typesafe.sbt.packager.Keys._
+// import com.typesafe.sbt.packager.Keys._
 
 import PlayKeys._
 
@@ -12,14 +12,14 @@ version := "0.8.1-SNAPSHOT"
 
 scalacOptions ++= List("-deprecation", "-feature")
 
-scalaVersion := "2.11.1"
+scalaVersion := "2.11.6"
 
 // == Dependencies ============================================================================
 
 libraryDependencies ++= List(
   ws,
   jdbc,
-  "com.google.guava" % "guava" % "16.0.1",
+  "com.google.guava" % "guava" % "18.0",
   "com.google.code.findbugs" % "jsr305" % "2.0.3", // Workaround for scalac/Guava clash, SI-7751 
   "com.typesafe.slick" %% "slick" % "2.1.0",
   "com.h2database" % "h2" % "1.3.166",

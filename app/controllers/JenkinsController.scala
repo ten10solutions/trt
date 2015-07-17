@@ -8,6 +8,8 @@ import play.api.mvc._
 import routes.ImportSpecController
 import viewModel._
 import views.html
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 
 /**
  * Controller for Jenkins config screen
