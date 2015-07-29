@@ -6,6 +6,8 @@ $(document).ready ->
     disabled = $("input:checkbox:checked").length is 0
     $("button#rerunSelected").prop "disabled", disabled
     $("button#deleteSelected").prop "disabled", disabled
+    $("button#ignoreSelected").prop "disabled", disabled
+    $("button#unignoreSelected").prop "disabled", disabled
 
   $("#selectAll").change ->
     c = @checked

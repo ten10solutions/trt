@@ -7,6 +7,7 @@ import org.openqa.selenium.WebElement
 import org.openqa.selenium.By
 import org.openqa.selenium.By._
 import com.thetestpeople.trt.utils.Utils
+import com.thetestpeople.trt.model.TestStatus
 
 class TestsScreen(implicit automationContext: AutomationContext) extends AbstractScreen with HasMainMenu {
 
@@ -65,6 +66,10 @@ class TestsScreen(implicit automationContext: AutomationContext) extends Abstrac
 
     def name: String = rowElement.findElement(cssSelector("a.test-link")).getAttribute("title")
 
+    def statusOpt: Option[TestStatus] = Option(rowElement.getAttribute("data-status")).map(TestStatus.parse)
+
+    def isIgnored: Boolean = rowElement.getAttribute("data-ignored").toBoolean
+    
     private def getCheckBox = rowElement.findElement(cssSelector(".testCheckbox"))
 
     def selected: Boolean = getCheckBox.isSelected
@@ -101,9 +106,24 @@ class TestsScreen(implicit automationContext: AutomationContext) extends Abstrac
     waitForSuccessMessage()
   }
 
-  def warningTab(): TestsScreen = {
+  def selectWarningTab(): TestsScreen = {
     log(s"Click the 'Warning' tab")
     webDriver.waitForDisplayedAndEnabled(id("warning-tab-link")).click()
+    webDriver.waitForDisplayedAndEnabled(cssSelector("#warning-tab.active"))
+    new TestsScreen
+  }
+  
+  def selectHealthyTab(): TestsScreen = {
+    log(s"Click the 'Healthy' tab")
+    webDriver.waitForDisplayedAndEnabled(id("healthy-tab-link")).click()
+    webDriver.waitForDisplayedAndEnabled(cssSelector("#healthy-tab.active"))
+    new TestsScreen
+  }
+
+  def selectIgnoredTab(): TestsScreen = {
+    log(s"Click the 'Ignored' tab")
+    webDriver.waitForDisplayedAndEnabled(id("ignored-tab-link")).click()
+    webDriver.waitForDisplayedAndEnabled(cssSelector("#ignored-tab.active"))
     new TestsScreen
   }
 

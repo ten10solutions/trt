@@ -25,3 +25,5 @@ test-dbs/
 phantomjsdriver.log
 webcache/
 luceneIndex/
+.cache-main
+.cache-tests

@@ -29,8 +29,10 @@ case class TestView(
     if (isIgnoredInConfiguration)
       Some(BallIcons.GreyBall)
     else
-      enrichedTest.analysisOpt.map(_.status).map(BallIcons.icon)
+      enrichedTest.statusOpt.map(BallIcons.icon)
 
+  def statusOpt = enrichedTest.statusOpt
+      
   def weatherInfoOpt: Option[WeatherInfo] = enrichedTest.analysisOpt.map(_.weather).map(WeatherInfo)
 
   def consecutiveFailuresOpt: Option[Int] =

@@ -37,13 +37,13 @@ object IncomingFactory {
       configurationOpt = configurationOpt)
 
   def batch(
+    executions: Seq[Incoming.Execution] = Seq(IncomingFactory.execution()),
     complete: Boolean = true,
     urlOpt: Option[URI] = Some(DummyData.BuildUrl),
     executionTimeOpt: Option[DateTime] = Some(DummyData.ExecutionTime),
     nameOpt: Option[String] = Some(DummyData.BatchName),
     logOpt: Option[String] = Some(DummyData.Log),
     durationOpt: Option[Duration] = Some(DummyData.Duration),
-    executions: Seq[Incoming.Execution] = Seq(IncomingFactory.execution()),
     configurationOpt: Option[Configuration] = None): Incoming.Batch =
     Incoming.Batch(
       complete = complete,

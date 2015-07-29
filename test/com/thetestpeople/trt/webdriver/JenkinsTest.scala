@@ -40,7 +40,7 @@ class JenkinsTest extends AbstractBrowserTest with HasLogger {
   }
 
   private def rerunFailingTest(site: Site) {
-    val testsScreen = site.launch().mainMenu.tests().warningTab()
+    val testsScreen = site.launch().mainMenu.tests().selectWarningTab()
     val Seq(testRow) = testsScreen.testRows
     testRow.name should equal("testMethod1")
     testRow.selected = true

@@ -53,6 +53,10 @@ trait Service extends CiService {
 
   def getTestAndExecutions(id: Id[Test], configuration: Configuration = Configuration.Default, resultOpt: Option[Boolean] = None): Option[TestAndExecutions]
 
+  /**
+   * @param ignoredOpt -- If Some(true), return only ignored tests. If Some(false), return only tests that 
+   * are not ignored. If None, return both ignored and not ignored tests.
+   */
   def getTests(
     configuration: Configuration = Configuration.Default,
     testStatusOpt: Option[TestStatus] = None,

@@ -55,4 +55,29 @@ class IgnoreTestTest extends AbstractBrowserTest {
     }
   }
 
+  "The tests screen" should "include ignored tests only in the correct tabs" in {
+    automate { site ⇒
+      val executions =
+        for (n ← 1 to 10)
+          yield F.execution(F.test(name = s"Healthy $n"), passed = true)
+      val batch = F.batch(executions)
+      site.restApi.addBatch(batch)
+      
+      var testsScreen = site.launch().mainMenu.tests()
+      testsScreen.testRows.take(6).foreach(_.selected = true)
+      testsScreen.clickIgnoreSelectedTests()
+
+      testsScreen.testRows.size should equal(10)
+      testsScreen.testRows.count(_.isIgnored) should equal(6)
+
+      testsScreen.selectHealthyTab()
+      testsScreen.testRows.size should equal(4)
+      testsScreen.testRows.count(_.isIgnored) should equal(0)
+
+      testsScreen.selectIgnoredTab()
+      testsScreen.testRows.size should equal(6)
+      testsScreen.testRows.count(_.isIgnored) should equal(6)
+    }
+  }
+
 }

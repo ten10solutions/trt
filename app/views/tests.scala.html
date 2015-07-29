@@ -28,7 +28,8 @@
   @paginationWidget(pagination)((page, pageSize) => 
     routes.TestsController.tests(
       configuration = Some(configuration), 
-      status = testStatusOpt, 
+      status = testStatusOpt,
+	  ignored = ignoredOpt,
       name = nameOpt,
       group = groupOpt,
       category = categoryOpt,
@@ -42,7 +43,7 @@
   @if(nameOpt.isEmpty && groupOpt.isEmpty && categoryOpt.isEmpty) { display: none; }
 }
 
-@testsLink(status: TestStatus) = {@routes.TestsController.tests(configuration = Some(configuration), status = Some(status), name = nameOpt, group = groupOpt, sort = sortOpt, category = categoryOpt, descending = descendingOpt)}
+@testsLink(status: TestStatus) = {@routes.TestsController.tests(configuration = Some(configuration), status = Some(status), ignored = Some(false), name = nameOpt, group = groupOpt, sort = sortOpt, category = categoryOpt, descending = descendingOpt)}
 @ignoredTestsLink = {@routes.TestsController.tests(configuration = Some(configuration), ignored = Some(true), name = nameOpt, group = groupOpt, sort = sortOpt, category = categoryOpt, descending = descendingOpt)}
 
 @sortLink(sort: Sort) = {
@@ -169,27 +170,27 @@
   @testsPaginationWidget
   
   <ul class="nav nav-tabs">
-    <li @if(testStatusOpt.isEmpty){ class="active" }>
+    <li id="all-tab" @if(testStatusOpt.isEmpty){ class="active" }>
       <a id="all-tab-link" href="@routes.TestsController.tests(configuration = Some(configuration), name = nameOpt, group = groupOpt, category = categoryOpt, sort = sortOpt, descending = descendingOpt)">All</a>
     </li>
     @if(testsSummary.passCount > 0) {
-      <li @if(testStatusOpt == Some(TestStatus.Healthy)){ class="active" }>
+      <li id="healthy-tab" @if(testStatusOpt == Some(TestStatus.Healthy)){ class="active" }>
         <a id="healthy-tab-link" href="@testsLink(TestStatus.Healthy)">Healthy<br/></a>
       </li>
     }
     @if(testsSummary.warnCount > 0) {
-      <li @if(testStatusOpt == Some(TestStatus.Warning)){ class="active" }>
+      <li id="warning-tab" @if(testStatusOpt == Some(TestStatus.Warning)){ class="active" }>
         <a id="warning-tab-link" href="@testsLink(TestStatus.Warning)">Warning<br/></a>
       </li>
     }
     @if(testsSummary.failCount > 0) {
-      <li @if(testStatusOpt == Some(TestStatus.Broken)){ class="active" }>
+      <li id="broken-tab" @if(testStatusOpt == Some(TestStatus.Broken)){ class="active" }>
         <a id="broken-tab-link" href="@testsLink(TestStatus.Broken)">Broken</a>
       </li>
     }
     @if(testsSummary.ignoredCount > 0) {
-      <li @if(ignoredOpt == Some(true)){ class="active" }>
-        <a id="broken-tab-link" href="@ignoredTestsLink">Ignored</a>
+      <li id="ignored-tab" @if(ignoredOpt == Some(true)){ class="active" }>
+        <a id="ignored-tab-link" href="@ignoredTestsLink">Ignored</a>
       </li>
     }
   </ul>
@@ -212,7 +213,7 @@
       </thead>
       <tbody>
         @for(test <- tests) {
-          <tr class="test-row">
+          <tr class="test-row" @for(status <- test.statusOpt){ data-status="@status" } data-ignored="@test.isIgnoredInConfiguration")>
             <td style="text-align: center; width: 50px"><input class="testCheckbox" type="checkbox" name="selectedTest" value="@test.id"/></td>
             <td class="pass-fail-cell">@for(icon <- test.ballIconOpt){<a href="@routes.TestController.test(test.id, configuration = Some(configuration))"><img src="@routes.Assets.at("images/" + icon)"/></a>}</td>
             <td class="pass-fail-cell">@for(weatherInfo <- test.weatherInfoOpt){<img title="@weatherInfo.passRate" src="@routes.Assets.at("images/" + weatherInfo.iconPath)"/>}</td>

@@ -16,6 +16,7 @@ import play.api.test.TestServer
 import org.scalatest.junit.JUnitRunner
 import org.openqa.selenium.firefox.FirefoxDriver
 import play.api.libs.ws.WS
+import org.openqa.selenium.chrome.ChromeDriver
 
 abstract class AbstractBrowserTest extends FlatSpec with Matchers {
 
@@ -39,10 +40,16 @@ abstract class AbstractBrowserTest extends FlatSpec with Matchers {
       }
     }
 
-  private def getWebDriver: WebDriver =
-    if ("firefox".equalsIgnoreCase(System.getenv("TRT_BROWSER")))
-      new FirefoxDriver
-    else
-      new PhantomJSDriver
+  private def getWebDriver: WebDriver = {
+    val requestedBrowserOpt = Option(System.getenv("TRT_BROWSER"))
+    Option(System.getenv("TRT_BROWSER")).map { requestedBrowser ⇒
+      requestedBrowser.toLowerCase match {
+        case "firefox"   ⇒ new FirefoxDriver
+        case "chrome"    ⇒ new ChromeDriver
+        case "phantomjs" ⇒ new PhantomJSDriver
+        case _           ⇒ throw new RuntimeException(s"Unknown browser type '$requestedBrowser'. Valid options are 'firefox', 'chrome' and 'phantomjs'")
+      }
+    }.getOrElse(new PhantomJSDriver)
+  }
 
 }
