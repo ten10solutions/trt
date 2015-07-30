@@ -509,7 +509,7 @@ abstract class DaoTest extends FlatSpec with Matchers with ExecutionDaoTest with
 
   "Removing categories" should "work" in transaction { dao ⇒
     val testId = dao.ensureTestIsRecorded(F.test())
-    dao.addCategories(Seq(F.testCategory(testId)))
+    dao.addCategories(Seq(F.testCategory(testId, category = DummyData.Category)))
 
     dao.removeCategories(testId, Seq(DummyData.Category))
 
@@ -536,8 +536,8 @@ abstract class DaoTest extends FlatSpec with Matchers with ExecutionDaoTest with
     dao.getIgnoredTests(DummyData.Configuration1) should equal(Seq())
   }
 
-  "getIgnoredConfigurations" should "return None if test ID is unknown" in transaction { dao => 
-      dao.getIgnoredConfigurations(Id[Test](1)) should equal (None)
+  "getIgnoredConfigurations" should "return None if test ID is unknown" in transaction { dao ⇒
+    dao.getIgnoredConfigurations(Id[Test](1)) should equal(None)
   }
-  
+
 }

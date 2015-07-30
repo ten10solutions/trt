@@ -228,6 +228,17 @@ trait GetTestsDaoTest { self: DaoTest ⇒
     dao.getAnalysedTests(whiteListOpt = Some(Seq(testId1))).map(_.id) shouldEqual (Seq(testId1))
   }
 
+  "Getting tests" should "filter by category" in transaction { dao ⇒
+    val testId1 = dao.ensureTestIsRecorded(F.test())
+    dao.upsertAnalysis(F.analysis(testId1))
+    dao.addCategories(Seq(F.testCategory(testId1, category = DummyData.Category)))
+
+    val testId2 = dao.ensureTestIsRecorded(F.test())
+    dao.upsertAnalysis(F.analysis(testId2))
+
+    dao.getAnalysedTests(categoryOpt = Some(DummyData.Category)).map(_.id) shouldEqual (Seq(testId1))
+  }
+
   "Getting tests by ID" should "work" in transaction { dao ⇒
     val dao = createDao
     val testId1 = dao.ensureTestIsRecorded(F.test())
@@ -320,6 +331,28 @@ trait GetTestsDaoTest { self: DaoTest ⇒
     val testId = dao.ensureTestIsRecorded(F.test())
 
     dao.getEnrichedTest(testId) should equal(None)
+  }
+
+  "getIgnoredTests()" should "exclude deleted tests" in transaction { dao ⇒
+    val testId = dao.ensureTestIsRecorded(F.test())
+    dao.addIgnoredTestConfigurations(Seq(IgnoredTestConfiguration(testId, DummyData.Configuration1)))
+    dao.markTestsAsDeleted(Seq(testId), deleted = true)
+
+    dao.getIgnoredTests(DummyData.Configuration1) should equal(Seq())
+  }
+
+  "getIgnoredTests()" should "let you filter by name, group and category" in transaction { dao ⇒
+    val testId1 = dao.ensureTestIsRecorded(F.test(name = "test1", groupOpt = Some("group")))
+    val testId2 = dao.ensureTestIsRecorded(F.test(name = "test2", groupOpt = Some("group2")))
+    val testId3 = dao.ensureTestIsRecorded(F.test(name = "test3", groupOpt = Some("group3")))
+    for (testId ← Seq(testId1, testId2, testId3))
+      dao.addIgnoredTestConfigurations(Seq(IgnoredTestConfiguration(testId, Configuration.Default)))
+    dao.addCategories(Seq(F.testCategory(testId3, category = DummyData.Category)))
+
+    dao.getIgnoredTests(Configuration.Default, nameOpt = Some("test1")) should equal(Seq(testId1))
+    dao.getIgnoredTests(Configuration.Default, groupOpt = Some("group2")) should equal(Seq(testId2))
+    dao.getIgnoredTests(Configuration.Default, categoryOpt = Some(DummyData.Category)) should equal(Seq(testId3))
+
   }
 
 }

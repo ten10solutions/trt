@@ -170,7 +170,7 @@
   @testsPaginationWidget
   
   <ul class="nav nav-tabs">
-    <li id="all-tab" @if(testStatusOpt.isEmpty && ignoredOpt.isEmpty ){ class="active" }>
+    <li id="all-tab" @if(testStatusOpt.isEmpty && ignoredOpt.isEmpty){ class="active" }>
       <a id="all-tab-link" href="@routes.TestsController.tests(configuration = Some(configuration), name = nameOpt, group = groupOpt, category = categoryOpt, sort = sortOpt, descending = descendingOpt)">All</a>
     </li>
     @if(testsSummary.passCount > 0) {

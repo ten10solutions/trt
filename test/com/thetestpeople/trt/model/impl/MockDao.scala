@@ -89,7 +89,7 @@ class MockDao extends Dao {
         if testStatusOpt.forall(status ⇒ analysis.status == status)
         if blackListOpt.forall(blackList ⇒ !(blackList contains test.id))
         if whiteListOpt.forall(blackList ⇒ blackList contains test.id)
-        // TODO: filter categoryOpt
+        if categoryOpt.forall(category ⇒ testCategories.exists(tc ⇒ tc.testId == test.id && tc.category == category))
         commentOpt = testComments.find(_.testId == test.id).map(_.text)
       } yield EnrichedTest(test, Some(analysis), commentOpt)
     def order(x: Seq[EnrichedTest], descending: Boolean) = if (descending) x.reverse else x
@@ -469,7 +469,7 @@ class MockDao extends Dao {
       if !test.deleted
       if groupOpt.forall(pattern ⇒ test.groupOpt.exists(group ⇒ matchesPattern(pattern, group)))
       if nameOpt.forall(pattern ⇒ matchesPattern(pattern, test.name))
-      // TODO: filter categoryOpt
+      if categoryOpt.forall(category ⇒ testCategories.exists(tc ⇒ tc.testId == test.id && tc.category == category))
     } yield test.id
 
   def isTestIgnoredInConfiguration(testId: Id[Test], configuration: Configuration): Boolean =
