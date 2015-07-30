@@ -103,11 +103,12 @@ trait TestDao {
 
   def removeIgnoredTestConfiguration(testId: Id[Test], configuration: Configuration) =
     removeIgnoredTestConfigurations(Seq(testId), configuration)
-    
+
   /**
    * Get ignored tests in a configuration, excluding deleted tests.
    */
-  def getIgnoredTests(configuration: Configuration): Seq[Id[Test]]
+  def getIgnoredTests(configuration: Configuration, nameOpt: Option[String] = None, groupOpt: Option[String] = None,
+                       categoryOpt: Option[String] = None): Seq[Id[Test]]
 
   def isTestIgnoredInConfiguration(testId: Id[Test], configuration: Configuration): Boolean
 

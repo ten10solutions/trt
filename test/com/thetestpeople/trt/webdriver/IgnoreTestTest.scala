@@ -5,6 +5,8 @@ import com.thetestpeople.trt.model.impl.DummyData
 import com.thetestpeople.trt.mother.{ IncomingFactory ⇒ F }
 import com.thetestpeople.trt.tags.SlowTest
 import org.scalatest.junit.JUnitRunner
+import com.thetestpeople.trt.webdriver.screens.TestsScreen
+import com.thetestpeople.trt.utils.StringUtils
 
 @SlowTest
 @RunWith(classOf[JUnitRunner])
@@ -57,12 +59,10 @@ class IgnoreTestTest extends AbstractBrowserTest {
 
   "The tests screen" should "include ignored tests only in the correct tabs" in {
     automate { site ⇒
-      val executions =
-        for (n ← 1 to 10)
-          yield F.execution(F.test(name = s"Healthy $n"), passed = true)
-      val batch = F.batch(executions)
+      def makeExecution(n: Int) = F.execution(F.test(name = s"Healthy $n"), passed = true)
+      val batch = F.batch(executions = (1 to 10).map(makeExecution))
       site.restApi.addBatch(batch)
-      
+
       var testsScreen = site.launch().mainMenu.tests()
       testsScreen.testRows.take(6).foreach(_.selected = true)
       testsScreen.clickIgnoreSelectedTests()
@@ -77,6 +77,49 @@ class IgnoreTestTest extends AbstractBrowserTest {
       testsScreen.selectIgnoredTab()
       testsScreen.testRows.size should equal(6)
       testsScreen.testRows.count(_.isIgnored) should equal(6)
+    }
+  }
+
+  "Paging through two pages of ignored tests" should "work correctly" in {
+    automate { site ⇒
+      val testNames = StringUtils.wordsN(3).take(2 * TestsScreen.DefaultPageSize)
+      val executions = testNames.map(name ⇒ F.execution(F.test(name = name)))
+      val batch = F.batch(executions)
+      site.restApi.addBatch(batch)
+
+      var testsScreen = site.launch().mainMenu.tests()
+      testsScreen.testRows.foreach(_.selected = true)
+      testsScreen.clickIgnoreSelectedTests()
+      testsScreen.clickNextPage()
+      testsScreen.testRows.foreach(_.selected = true)
+      testsScreen.clickIgnoreSelectedTests()
+
+      testsScreen.selectIgnoredTab()
+      val firstScreenNames = testsScreen.testRows.map(_.name)
+      testsScreen.clickNextPage()
+      val secondScreenNames = testsScreen.testRows.map(_.name)
+      firstScreenNames ++ secondScreenNames should equal(testNames)
+    }
+  }
+
+  "Ignored tests page count" should "be calculated correctly" in {
+    automate { site ⇒
+      def makeExecution(n: Int) = F.execution(F.test(name = s"Test $n"), passed = true)
+      val executions = (1 to 5 * TestsScreen.DefaultPageSize).map(makeExecution)
+      val batch = F.batch(executions = executions)
+      site.restApi.addBatch(batch)
+
+      var testsScreen = site.launch().mainMenu.tests()
+      testsScreen.lastPageNumberDisplayed should be(Some(5))
+
+      for (n ← 1 to 2) {
+        testsScreen.testRows.foreach(_.selected = true)
+        testsScreen.clickIgnoreSelectedTests()
+        testsScreen.clickNextPage()
+      }
+
+      testsScreen.selectIgnoredTab()
+      testsScreen.lastPageNumberDisplayed should be(Some(2))
     }
   }
 

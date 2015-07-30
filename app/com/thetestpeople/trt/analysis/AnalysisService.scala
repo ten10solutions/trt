@@ -77,7 +77,8 @@ class AnalysisService(dao: Dao, clock: Clock, async: Boolean = true) extends Has
       lastFailedExecutionIdOpt = analysis.lastFailedExecutionOpt.map(_.id),
       lastFailedTimeOpt = analysis.lastFailedExecutionOpt.map(_.executionTime),
       whenAnalysed = analysis.whenAnalysed,
-      medianDurationOpt = analysis.medianDurationOpt))
+      medianDurationOpt = analysis.medianDurationOpt,
+      lastSummaryOpt = analysis.lastSummaryOpt))
     logger.debug(s"Updated analysis for test $testId")
   }
 

@@ -12,4 +12,5 @@ case class TestAnalysis(
   lastPassedExecutionOpt: Option[Execution],
   lastFailedExecutionOpt: Option[Execution],
   whenAnalysed: DateTime,
-  medianDurationOpt: Option[Duration])
+  medianDurationOpt: Option[Duration],
+  lastSummaryOpt: Option[String])

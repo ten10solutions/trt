@@ -8,6 +8,13 @@ import org.openqa.selenium.By
 import org.openqa.selenium.By._
 import com.thetestpeople.trt.utils.Utils
 import com.thetestpeople.trt.model.TestStatus
+import com.thetestpeople.trt.utils.StringUtils
+
+object TestsScreen {
+
+  val DefaultPageSize = 12
+
+}
 
 class TestsScreen(implicit automationContext: AutomationContext) extends AbstractScreen with HasMainMenu {
 
@@ -62,14 +69,14 @@ class TestsScreen(implicit automationContext: AutomationContext) extends Abstrac
       new TestScreen
     }
 
-    private def ordinalName = Utils.ordinalName(index + 1)
+    private def ordinalName = StringUtils.ordinalName(index + 1)
 
     def name: String = rowElement.findElement(cssSelector("a.test-link")).getAttribute("title")
 
     def statusOpt: Option[TestStatus] = Option(rowElement.getAttribute("data-status")).map(TestStatus.parse)
 
     def isIgnored: Boolean = rowElement.getAttribute("data-ignored").toBoolean
-    
+
     private def getCheckBox = rowElement.findElement(cssSelector(".testCheckbox"))
 
     def selected: Boolean = getCheckBox.isSelected
@@ -86,6 +93,19 @@ class TestsScreen(implicit automationContext: AutomationContext) extends Abstrac
         checkBox.click()
     }
 
+  }
+
+  def lastPageNumberDisplayed: Option[Int] =
+    webDriver.findElements_(cssSelector("a.directPageLink")).map(_.getText.toInt).sorted.lastOption
+
+  def clickNextPage() {
+    log("Click 'Next »'")
+    webDriver.waitForDisplayedAndEnabled(cssSelector("a.nextPage")).click()
+  }
+
+  def clickPreviousPage() {
+    log("Click '« Previous'")
+    webDriver.waitForDisplayedAndEnabled(cssSelector("a.previous")).click()
   }
 
   def clickRerunSelectedTests() {
@@ -112,7 +132,7 @@ class TestsScreen(implicit automationContext: AutomationContext) extends Abstrac
     webDriver.waitForDisplayedAndEnabled(cssSelector("#warning-tab.active"))
     new TestsScreen
   }
-  
+
   def selectHealthyTab(): TestsScreen = {
     log(s"Click the 'Healthy' tab")
     webDriver.waitForDisplayedAndEnabled(id("healthy-tab-link")).click()

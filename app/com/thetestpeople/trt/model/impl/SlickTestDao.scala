@@ -106,8 +106,13 @@ trait SlickTestDao extends TestDao { this: SlickDao ⇒
 
   def getDeletedTests(): Seq[Test] = tests.filter(_.deleted).sortBy(_.name).sortBy(_.group).run
 
-  def getTestCounts(configuration: Configuration, nameOpt: Option[String] = None, groupOpt: Option[String] = None,
-    categoryOpt: Option[String] = None, ignoredTests: Seq[Id[Test]] = Seq()): TestCounts = {
+  def getTestCounts(
+    configuration: Configuration,
+    nameOpt: Option[String] = None,
+    groupOpt: Option[String] = None,
+    categoryOpt: Option[String] = None,
+    ignoredTests: Seq[Id[Test]] = Seq()): TestCounts = {
+
     var query = testsAndAnalyses
     query = query.filter(_._2.configuration === configuration)
     query = query.filterNot(_._1.deleted)
@@ -128,6 +133,7 @@ trait SlickTestDao extends TestDao { this: SlickDao ⇒
     val results: Map[TestStatus, Int] =
       query.groupBy(_._2.status).map { case (status, results) ⇒ status -> results.length }.run.toMap
     def count(status: TestStatus) = results.collect { case (`status`, count) ⇒ count }.headOption.getOrElse(0)
+
     TestCounts(
       passed = count(TestStatus.Healthy),
       warning = count(TestStatus.Warning),
@@ -272,14 +278,27 @@ trait SlickTestDao extends TestDao { this: SlickDao ⇒
 
   }
 
-  def getIgnoredTests(configuration: Configuration): Seq[Id[Test]] = {
-    val query =
+  def getIgnoredTests(configuration: Configuration, nameOpt: Option[String] = None, groupOpt: Option[String] = None,
+                      categoryOpt: Option[String] = None): Seq[Id[Test]] = {
+    var query =
       for {
         ignoredConfig ← ignoredTestConfigurations
+        test ← tests if test.id === ignoredConfig.testId
+        if !test.deleted
         if ignoredConfig.configuration === configuration
-        test ← tests if test.id === ignoredConfig.testId if !test.deleted
-      } yield ignoredConfig.testId
-    query.run
+      } yield test
+    for (name ← nameOpt)
+      query = query.filter(_.name.toLowerCase like globToSqlPattern(name))
+    for (group ← groupOpt)
+      query = query.filter(_.group.toLowerCase like globToSqlPattern(group))
+    for (category ← categoryOpt)
+      query = for {
+        test ← query
+        testCategory ← testCategories
+        if test.id === testCategory.testId
+        if testCategory.category === category
+      } yield test
+    query.map(_.id).run
   }
 
   def isTestIgnoredInConfiguration(testId: Id[Test], configuration: Configuration): Boolean =

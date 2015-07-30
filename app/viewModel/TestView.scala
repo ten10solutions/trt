@@ -33,6 +33,8 @@ case class TestView(
 
   def statusOpt = enrichedTest.statusOpt
       
+  def lastSummaryOpt: Option[AbbreviableText] = enrichedTest.analysisOpt.flatMap(_.lastSummaryOpt).map(AbbreviableText)
+  
   def weatherInfoOpt: Option[WeatherInfo] = enrichedTest.analysisOpt.map(_.weather).map(WeatherInfo)
 
   def consecutiveFailuresOpt: Option[Int] =

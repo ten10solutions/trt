@@ -58,13 +58,8 @@ class ServiceImpl(
     limit: Int,
     sortBy: SortBy.Test = SortBy.Test.Group()): TestsInfo = transaction {
 
-    val ignoredTests = dao.getIgnoredTests(configuration)
-    val testCounts = dao.getTestCounts(
-      configuration = configuration,
-      nameOpt = nameOpt,
-      groupOpt = groupOpt,
-      categoryOpt = categoryOpt,
-      ignoredTests = ignoredTests)
+    val ignoredTests = dao.getIgnoredTests(configuration, nameOpt, groupOpt, categoryOpt)
+    val testCounts = dao.getTestCounts(configuration, nameOpt, groupOpt = groupOpt, categoryOpt, ignoredTests)
 
     val (blackListOpt, whiteListOpt) = ignoredOpt match {
       case None        ⇒ (None, None)
@@ -93,7 +88,7 @@ class ServiceImpl(
         configuration ← dao.getConfigurations
         ignoredTests = dao.getIgnoredTests(configuration)
         testCounts = dao.getTestCounts(configuration, ignoredTests = ignoredTests)
-      } yield configuration -> testCounts
+      } yield configuration -> testCounts.copy(ignored = ignoredTests.size)
     configAndCounts.toMap
   }
 

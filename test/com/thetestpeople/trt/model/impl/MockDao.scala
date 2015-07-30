@@ -89,6 +89,7 @@ class MockDao extends Dao {
         if testStatusOpt.forall(status ⇒ analysis.status == status)
         if blackListOpt.forall(blackList ⇒ !(blackList contains test.id))
         if whiteListOpt.forall(blackList ⇒ blackList contains test.id)
+        // TODO: filter categoryOpt
         commentOpt = testComments.find(_.testId == test.id).map(_.text)
       } yield EnrichedTest(test, Some(analysis), commentOpt)
     def order(x: Seq[EnrichedTest], descending: Boolean) = if (descending) x.reverse else x
@@ -130,7 +131,7 @@ class MockDao extends Dao {
     val passed = tests.count(_.analysisOpt.exists(_.status == TestStatus.Healthy))
     val warning = tests.count(_.analysisOpt.exists(_.status == TestStatus.Warning))
     val failed = tests.count(_.analysisOpt.exists(_.status == TestStatus.Broken))
-    TestCounts(passed, warning, failed, ignoredTests.size)
+    TestCounts(passed, warning, failed, ignored = ignoredTests.size)
   }
 
   def upsertAnalysis(analysis: Analysis) {
@@ -459,8 +460,17 @@ class MockDao extends Dao {
     } yield test.id -> ignoredConfigs.map(_.configuration)
   }.toMap
 
-  def getIgnoredTests(configuration: Configuration): Seq[Id[Test]] =
-    ignoredTestConfigurations.filter(_.configuration == configuration).map(_.testId)
+  def getIgnoredTests(configuration: Configuration, nameOpt: Option[String] = None, groupOpt: Option[String] = None,
+                      categoryOpt: Option[String] = None): Seq[Id[Test]] =
+    for {
+      ignoredTestConfig ← ignoredTestConfigurations
+      if ignoredTestConfig.configuration == configuration
+      test ← tests if test.id == ignoredTestConfig.testId
+      if !test.deleted
+      if groupOpt.forall(pattern ⇒ test.groupOpt.exists(group ⇒ matchesPattern(pattern, group)))
+      if nameOpt.forall(pattern ⇒ matchesPattern(pattern, test.name))
+      // TODO: filter categoryOpt
+    } yield test.id
 
   def isTestIgnoredInConfiguration(testId: Id[Test], configuration: Configuration): Boolean =
     getIgnoredTests(configuration) contains testId

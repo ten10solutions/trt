@@ -492,4 +492,12 @@
     </createIndex>
   </changeSet>
   
+  <changeSet author="matt" id="add-analysis-last_summary">
+    <addColumn tableName="analysis">
+      <column name="last_summary" type="VARCHAR(10485760)" defaultValue="NULL">
+        <constraints nullable="true" />
+      </column>
+    </addColumn>
+  </changeSet>
+  
 </databaseChangeLog>

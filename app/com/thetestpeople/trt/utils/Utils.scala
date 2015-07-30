@@ -17,20 +17,8 @@ object Utils extends HasLogger {
     }
   }
 
-  def ordinalName(n: Int): String = {
-    val suffix =
-      n match {
-        case 11 | 12 | 13 ⇒ "th"
-        case _ ⇒ (n % 10) match {
-          case 1 ⇒ "st"
-          case 2 ⇒ "nd"
-          case 3 ⇒ "rd"
-          case _ ⇒ "th"
-        }
-      }
-    n + suffix
-  }
-
+  def ordinalName(n: Int) = StringUtils.ordinalName(n) // TODO: replace
+  
   def printStackTrace(t: Throwable): String = {
     val stringWriter = new StringWriter
     t.printStackTrace(new PrintWriter(stringWriter))

@@ -218,9 +218,18 @@ class TestAnalyserTest extends FlatSpec with Matchers {
     analysis.medianDurationOpt should be(Some(6.minutes: Duration))
   }
 
+  "Analysis" should "record the summary of the most recent execution of the test" in {
+    val analysis = getTestAnalyser().analyse(
+      execution(executionTime = 1.day.ago, summaryOpt = Some("Execution 1")),
+      execution(executionTime = 2.days.ago, summaryOpt = Some("Execution 2")),
+      execution(executionTime = 3.days.ago, summaryOpt = Some("Execution 3")))
+      
+    analysis.lastSummaryOpt should be(Some("Execution 1"))
+  }
+
   implicit class RichTestAnalyser(testAnalyser: TestAnalyser) {
 
-    def analyse(executions: Execution*): TestAnalysis = testAnalyser.analyse(executions.toList).get
+    def analyse(executions: Execution*): TestAnalysis = testAnalyser.analyse(executions).get
 
   }
 
@@ -248,14 +257,15 @@ class TestAnalyserTest extends FlatSpec with Matchers {
     executionTime: DateTime = new DateTime,
     durationOpt: Option[Duration] = None,
     configuration: Configuration = Configuration.Default,
-    testId: Id[Test] = Id[Test](0)): Execution =
+    testId: Id[Test] = Id[Test](0),
+    summaryOpt: Option[String] = None): Execution =
     Execution(
       id = Id[Execution](uniqueIdSource.getAndIncrement()),
       batchId = Id[Batch](0),
       testId = testId,
       executionTime = executionTime,
       durationOpt = durationOpt,
-      summaryOpt = None,
+      summaryOpt = summaryOpt,
       passed = passed,
       configuration = configuration)
 

@@ -70,7 +70,8 @@ object TestDataFactory {
     lastFailedExecutionIdOpt: Option[Id[Execution]] = None,
     lastFailedTimeOpt: Option[DateTime] = None,
     whenAnalysed: DateTime = DummyData.WhenAnalysed,
-    medianDurationOpt: Option[Duration] = Some(DummyData.Duration)): Analysis =
+    medianDurationOpt: Option[Duration] = Some(DummyData.Duration),
+    lastSummaryOpt: Option[String] = None): Analysis =
     Analysis(
       testId = testId,
       configuration = configuration,
@@ -83,7 +84,8 @@ object TestDataFactory {
       lastFailedExecutionIdOpt = lastFailedExecutionIdOpt,
       lastFailedTimeOpt = lastFailedTimeOpt,
       whenAnalysed = whenAnalysed,
-      medianDurationOpt = medianDurationOpt)
+      medianDurationOpt = medianDurationOpt,
+      lastSummaryOpt = lastSummaryOpt)
 
   def ciImportSpec(
     jobUrl: URI = DummyData.JobUrl,

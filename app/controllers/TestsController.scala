@@ -35,7 +35,8 @@ class TestsController(service: Service) extends AbstractController(service) with
           case None ⇒
             Redirect(routes.Application.index())
           case Some(configuration) ⇒
-            Ok(handleTests(testStatusOpt, ignoredOpt, configuration, nameOpt, groupOpt, categoryOpt, pagination, sortOpt, descendingOpt))
+            Ok(handleTests(testStatusOpt, ignoredOpt, configuration, nameOpt, groupOpt, categoryOpt, pagination,
+              sortOpt, descendingOpt))
         }
     }
   }
@@ -64,10 +65,21 @@ class TestsController(service: Service) extends AbstractController(service) with
 
     val testViews = tests.map(t ⇒ TestView(t, isIgnoredInConfiguration = ignoredTests contains t.id))
     val testsSummary = TestsSummaryView(configuration, testCounts)
-    val paginationData = pagination.paginationData(testCounts.countFor(testStatusOpt))
+
+    val paginationData = pagination.paginationData(itemCount(testCounts, testStatusOpt, ignoredOpt))
     views.html.tests(testsSummary, testViews, configuration, testStatusOpt, ignoredOpt, nameOpt, groupOpt, categoryOpt,
       service.canRerun, paginationData, sortOpt, descendingOpt)
   }
+
+  def itemCount(testCounts: TestCounts, testStatusOpt: Option[TestStatus], ignoredOpt: Option[Boolean]) =
+    if (ignoredOpt == Some(true))
+      testCounts.ignored
+    else testStatusOpt match {
+      case Some(TestStatus.Healthy) ⇒ testCounts.passed
+      case Some(TestStatus.Warning) ⇒ testCounts.warning
+      case Some(TestStatus.Broken)  ⇒ testCounts.failed
+      case None                     ⇒ testCounts.total
+    }
 
   private def selectedTestIds(implicit request: Request[AnyContent]): Seq[Id[Test]] =
     getFormParameters("selectedTest").flatMap(Id.parse[Test])

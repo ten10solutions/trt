@@ -170,7 +170,7 @@
   @testsPaginationWidget
   
   <ul class="nav nav-tabs">
-    <li id="all-tab" @if(testStatusOpt.isEmpty){ class="active" }>
+    <li id="all-tab" @if(testStatusOpt.isEmpty && ignoredOpt.isEmpty ){ class="active" }>
       <a id="all-tab-link" href="@routes.TestsController.tests(configuration = Some(configuration), name = nameOpt, group = groupOpt, category = categoryOpt, sort = sortOpt, descending = descendingOpt)">All</a>
     </li>
     @if(testsSummary.passCount > 0) {
@@ -205,6 +205,7 @@
           <th class="pass-fail-col" style="white-space: nowrap">Weather @sortLink(Sort.Weather)</th>
           <th class="group-col">Group @sortLink(Sort.Group)</th>
           <th class="name-col">Name @sortLink(Sort.Name)</th>
+		  <th class="last-summary-col">Last summary</th>
           <th class="duration-col">Average duration @sortLink(Sort.Duration)</th>
           <th class="consecutive-failures-col">Consecutive failures @sortLink(Sort.ConsecutiveFailures)</th>
           <th class="failing-since-col">Started failing @sortLink(Sort.StartedFailing)</th>
@@ -219,6 +220,7 @@
             <td class="pass-fail-cell">@for(weatherInfo <- test.weatherInfoOpt){<img title="@weatherInfo.passRate" src="@routes.Assets.at("images/" + weatherInfo.iconPath)"/>}</td>
             <td>@for(group <- test.groupOpt) {<a href="@routes.TestsController.tests(configuration = Some(configuration), status = testStatusOpt, name = nameOpt, group = Some(group.full), category = categoryOpt, sort = sortOpt, descending = descendingOpt)"><span title="@group.full">@group.abbreviate(maxLength = 35)</span></a>}</td>
             <td><a class="test-link" href="@routes.TestController.test(test.id, configuration = Some(configuration))" title="@test.name.full">@test.name.abbreviate(maxLength = 40)</a></td>
+            <td class="last-summary-cell">@for(lastSummary <- test.lastSummaryOpt){<a href="@routes.ExecutionController.execution(test.lastExecutionIdOpt.get)" title="@lastSummary.full">@lastSummary.abbreviated</a>}</td>			
             <td class="duration-cell">@for(duration <- test.medianDurationOpt){@duration}</td>
             <td class="consecutive-failures-cell">@for(consecutiveFailures <- test.consecutiveFailuresOpt){@consecutiveFailures}</td>            
             <td class="failing-since-cell">@for(failingSince <- test.failingSinceOpt){<span title="@failingSince.absolute">@failingSince.relative</span>}</td>

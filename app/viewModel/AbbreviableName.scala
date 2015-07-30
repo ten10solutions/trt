@@ -19,4 +19,5 @@ case class AbbreviableName(full: String) {
       }
     }
 
+  override def toString = abbreviated
 }

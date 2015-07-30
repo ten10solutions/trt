@@ -43,6 +43,7 @@ class TestAnalyser(clock: Clock, config: AnalysisConfiguration) {
       val status = calculateTestStatus(recentFailures, recentPasses)
       val weather = calculateWeather(sortedExecutions)
       val medianDurationOpt = medianDuration(sortedExecutions)
+      val lastSummaryOpt = sortedExecutions.headOption.flatMap(_.summaryOpt)
       TestAnalysis(
         status = status,
         weather = weather,
@@ -51,7 +52,8 @@ class TestAnalyser(clock: Clock, config: AnalysisConfiguration) {
         lastPassedExecutionOpt = lastPassedExecutionOpt,
         lastFailedExecutionOpt = lastFailedExecutionOpt,
         whenAnalysed = clock.now,
-        medianDurationOpt = medianDurationOpt)
+        medianDurationOpt = medianDurationOpt,
+        lastSummaryOpt = lastSummaryOpt)
     }
   }
 

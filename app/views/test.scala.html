@@ -75,6 +75,12 @@
         <td><span title="@failingSince.absolute">@failingSince.relative</span></td>
       </tr>
     }
+	@for(lastSummary <- test.lastSummaryOpt) {
+	  <tr>
+	    <td>Last summary</td>
+		<td><a href="@routes.ExecutionController.execution(test.lastExecutionIdOpt.get)" title="@lastSummary.full">@lastSummary.abbreviated</a>
+	  </tr>
+	}
     @for((executionId, time) <- test.lastExecutionOpt) {
       <tr>
         <td>Last executed</td>

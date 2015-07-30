@@ -44,4 +44,31 @@ object StringUtils {
       s
   }
 
+  private val Alphabet: Stream[String] = Stream("abcdefghijklmnopqrstuvwxyz".map(_.toString): _*)
+
+  def wordsN(len: Int): Stream[String] =
+    if (len <= 1)
+      Alphabet
+    else
+      Alphabet.flatMap(c ⇒ wordsN(len - 1).map(w ⇒ c + w))
+
+  /**
+   * Stream of words: "a", "b", ..., "z", "aa", "ab", ..., "zz", ..
+   */
+  def words: Stream[String] = Stream.from(1).flatMap(wordsN)
+
+  def ordinalName(n: Int): String = {
+    val suffix =
+      n match {
+        case 11 | 12 | 13 ⇒ "th"
+        case _ ⇒ (n % 10) match {
+          case 1 ⇒ "st"
+          case 2 ⇒ "nd"
+          case 3 ⇒ "rd"
+          case _ ⇒ "th"
+        }
+      }
+    n + suffix
+  }
+
 }
