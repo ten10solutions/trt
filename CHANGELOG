@@ -7,6 +7,7 @@
 * Use JS router instead of hard-coded URLs in case it is deployed with a different application.context
 * Allow user to ignore a test in a configuration
 * Add an /api/tests API method
+* Show last failed summary for each test
 	
 0.8.0 (9/Nov/2014)
 
